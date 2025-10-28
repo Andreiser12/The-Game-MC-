@@ -7,6 +7,7 @@ class Table
 {
 public:
 	Table(unsigned int nrPlayers, std::stack<Cards> deck);
+	bool isDeckEmpty() const;
 private:
 	unsigned int m_nrPlayers;
 	std::vector<Player> m_Players;

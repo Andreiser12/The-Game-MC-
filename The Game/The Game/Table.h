@@ -6,7 +6,7 @@
 class Table
 {
 public:
-
+	Table(unsigned int nrPlayers, std::stack<Cards> deck);
 private:
 	unsigned int m_nrPlayers;
 	std::vector<Player> m_Players;

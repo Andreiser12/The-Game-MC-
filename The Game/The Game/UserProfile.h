@@ -10,7 +10,7 @@ public:
 
 	double PerformanceScore() const;
 
-	const std::string GetUserName() const;
+	const std::string GetUsername() const;
 
 
 

@@ -5,13 +5,12 @@
 class Player
 {
 public:
-	Player(unsigned int finalCards=0, const std::unordered_set<Cards>& cards);
+	Player(const std::unordered_set<Cards>& cards);
 	~Player();
 	void PlaceCards();
-	void PrintCards() const;
+	void PrintCards();
 	void DrawCards();
 
-	unsigned int GetFinalCards() const;
 	const std::unordered_set<Cards> GetCards() const;
 
 private:

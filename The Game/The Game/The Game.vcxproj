@@ -76,12 +76,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>"C:\Users\razva\Downloads\SFML-3.0.2-windows-vc17-64-bit\SFML-3.0.2\include"</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>"C:\Users\andre\Desktop\The-Game-MC-\The Game\lib"</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>"C:\Users\razva\Downloads\SFML-3.0.2-windows-vc17-64-bit\SFML-3.0.2\lib"</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>"C:\Users\andre\Desktop\The-Game-MC-\The Game\lib"</AdditionalLibraryDirectories>
       <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-system-d.lib;sfml-graphics.lib;sfml-window.lib;sfml-system.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -93,12 +94,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>"C:\Users\razva\Downloads\SFML-3.0.2-windows-vc17-64-bit\SFML-3.0.2\include"</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>"C:\Users\andre\Desktop\The-Game-MC-\The Game\lib"</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>"C:\Users\razva\Downloads\SFML-3.0.2-windows-vc17-64-bit\SFML-3.0.2\lib"</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>"C:\Users\andre\Desktop\The-Game-MC-\The Game\lib"</AdditionalLibraryDirectories>
       <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-system-d.lib;sfml-graphics.lib;sfml-window.lib;sfml-system.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -108,12 +110,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>"C:\Users\razva\Downloads\SFML-3.0.2-windows-vc17-64-bit\SFML-3.0.2\include"</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>"C:\Users\andre\Desktop\The-Game-MC-\The Game\lib"</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>"C:\Users\razva\Downloads\SFML-3.0.2-windows-vc17-64-bit\SFML-3.0.2\lib"</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>"C:\Users\andre\Desktop\The-Game-MC-\The Game\lib"</AdditionalLibraryDirectories>
       <AdditionalDependencies>
       </AdditionalDependencies>
     </Link>
@@ -126,12 +129,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>"C:\Users\razva\Downloads\SFML-3.0.2-windows-vc17-64-bit\SFML-3.0.2\include"</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>"C:\Users\andre\Desktop\The-Game-MC-\The Game\lib"</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>"C:\Users\razva\Downloads\SFML-3.0.2-windows-vc17-64-bit\SFML-3.0.2\lib"</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>"C:\Users\andre\Desktop\The-Game-MC-\The Game\lib"</AdditionalLibraryDirectories>
       <AdditionalDependencies>
       </AdditionalDependencies>
     </Link>

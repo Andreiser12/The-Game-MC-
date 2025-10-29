@@ -1,20 +1,23 @@
 #pragma once
-#include <unordered_set>
+#include <iostream>
+#include <vector>
 #include "Cards.h"
+#include "UserProfile.h"
 
 class Player
 {
 public:
-	Player(const std::unordered_set<Cards>& cards);
+	Player(const std::vector<Cards>& cards,
+		const UserProfile& userprofile);
 	~Player();
 	void PlaceCards();
 	void PrintCards();
 	void DrawCards();
 
-	const std::unordered_set<Cards> GetCards() const;
+	const std::vector<Cards> GetCards() const;
 
 private:
-	//UserProfile m_userProfile;
-	std::unordered_set<Cards> m_cards;
+	UserProfile m_userprofile;
+	std::vector<Cards> m_cards;
 };
 

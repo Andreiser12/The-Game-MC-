@@ -15,7 +15,6 @@ public:
 	const std::unordered_set<Cards> GetCards() const;
 
 private:
-	unsigned int m_finalCards;
 	//UserProfile m_userProfile;
 	std::unordered_set<Cards> m_cards;
 };

@@ -16,3 +16,12 @@ const std::string UserProfile::GetUsername() const
 {
 	return m_username;
 }
+//0
+//mutat sfml in folder-ul de proiect si inclus folder-ul in fisierul .gitignore
+
+//1
+// link-are cu lib si cai absolute
+
+//2
+// link-are cu lib si cai relatie la folderul sfml 
+//ex: ../sfml etc...

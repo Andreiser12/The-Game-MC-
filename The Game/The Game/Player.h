@@ -14,7 +14,8 @@ public:
 	void PrintCards();
 	void DrawCards();
 
-	const std::vector<Cards> GetCards() const;
+	const std::vector<Cards>& GetCards() const;
+	size_t GetCardsCount() const;
 
 private:
 	UserProfile m_userprofile;

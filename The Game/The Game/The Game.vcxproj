@@ -76,13 +76,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\andre\Desktop\The-Game-MC-\The Game\include\SFML</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>"C:\Users\razva\Git-projects\The-Game-MC-\The Game\include\SFML"</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>"C:\Users\andre\Desktop\The-Game-MC-\The Game\lib"</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>"C:\Users\razva\Git-projects\The-Game-MC-\The Game\lib"</AdditionalLibraryDirectories>
       <AdditionalDependencies>sfml-graphics.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -94,13 +94,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\andre\Desktop\The-Game-MC-\The Game\include\SFML</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>"C:\Users\razva\Git-projects\The-Game-MC-\The Game\include\SFML"</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>"C:\Users\andre\Desktop\The-Game-MC-\The Game\lib"</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>"C:\Users\razva\Git-projects\The-Game-MC-\The Game\lib"</AdditionalLibraryDirectories>
       <AdditionalDependencies>sfml-graphics.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -110,13 +110,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\andre\Desktop\The-Game-MC-\The Game\include\SFML</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>"C:\Users\razva\Git-projects\The-Game-MC-\The Game\include\SFML"</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>"C:\Users\andre\Desktop\The-Game-MC-\The Game\lib"</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>"C:\Users\razva\Git-projects\The-Game-MC-\The Game\lib"</AdditionalLibraryDirectories>
       <AdditionalDependencies>sfml-graphics.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -128,13 +128,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\andre\Desktop\The-Game-MC-\The Game\include\SFML</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>"C:\Users\razva\Git-projects\The-Game-MC-\The Game\include\SFML"</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>"C:\Users\andre\Desktop\The-Game-MC-\The Game\lib"</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>"C:\Users\razva\Git-projects\The-Game-MC-\The Game\lib"</AdditionalLibraryDirectories>
       <AdditionalDependencies>sfml-graphics.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

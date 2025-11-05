@@ -13,6 +13,10 @@ public:
 	void PlaceCards();
 	void PrintCards();
 	void DrawCards();
+	bool FindCard(unsigned int id) const;
+	void RemoveCard(unsigned int id);
+
+	void SetCards(const std::vector<Cards>& cards);
 
 	const std::vector<Cards>& GetCards() const;
 	size_t GetCardsCount() const;

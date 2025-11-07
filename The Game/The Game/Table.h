@@ -12,7 +12,9 @@ private:
 	unsigned int m_nrPlayers;
 	std::vector<Player> m_Players;
 	std::stack<Cards> m_Deck;
-	std::stack<Cards> m_AscendingDeck;
-	std::stack<Cards> m_DescendingDeck;
+	std::stack<Cards> m_AscendingDeckFirst;
+	std::stack<Cards> m_AscendingDeckSecond;
+	std::stack<Cards> m_DescendingDeckFirst;
+	std::stack<Cards> m_DescendingDeckSecond;
 };
 

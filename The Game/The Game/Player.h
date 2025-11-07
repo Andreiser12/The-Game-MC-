@@ -11,7 +11,10 @@ public:
 	Player(const std::vector<Cards>& cards,
 		const UserProfile& userprofile);
 	~Player();
-	void PlaceCards();
+	void PlaceCards(std::stack<Cards>& m_AscendingDeckFirst,
+					std::stack<Cards>& m_AscendingDeckSecond,
+					std::stack<Cards>& m_DescendingDeckFirst,
+					std::stack<Cards>& m_DescendingDeckSecond);
 	void PrintCards() const;
 	void DrawCards(std::stack<Cards>& deck);
 	bool FindCard(unsigned int id) const;

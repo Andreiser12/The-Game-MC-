@@ -10,7 +10,10 @@ Player::~Player()
 {
 }
 
-void Player::PlaceCards()
+void Player::PlaceCards(std::stack<Cards>& m_AscendingDeckFirst,
+						std::stack<Cards>& m_AscendingDeckSecond,
+						std::stack<Cards>& m_DescendingDeckFirst,
+						std::stack<Cards>& m_DescendingDeckSecond)
 {
 	unsigned int cardsPlaced = 0;
 	while (GetCardsCount() && cardsPlaced < kMinimumCards)
@@ -27,6 +30,10 @@ void Player::PlaceCards()
 				std::endl << "Pleace choose an existing card: ";
 			std::cin >> cardToPlace;
 		}
+		std::cout << "In which stack would you like to place the card? (Ascending/Descending)"
+			<< std::endl;
+		std::string choice;
+		std::cin >> choice;
 		RemoveCard(cardToPlace);
 		++cardsPlaced;
 	}

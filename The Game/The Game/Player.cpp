@@ -1,5 +1,7 @@
 #include "Player.h"
 
+constexpr static unsigned int kMinimumCards = 2u;
+
 Player::Player(const std::vector<Cards>& cards,
 	const UserProfile& userprofile) :
 	m_cards(cards), m_userprofile(userprofile){}
@@ -11,7 +13,7 @@ Player::~Player()
 void Player::PlaceCards()
 {
 	unsigned int cardsPlaced = 0;
-	while (GetCardsCount() && cardsPlaced < 2u)
+	while (GetCardsCount() && cardsPlaced < kMinimumCards)
 	{
 		std::cout << "Which card would you like to place?"
 			<< std::endl;
@@ -28,9 +30,10 @@ void Player::PlaceCards()
 		RemoveCard(cardToPlace);
 		++cardsPlaced;
 	}
+	m_cardsPlacedRound = cardsPlaced;
 }
 
-void Player::PrintCards()
+void Player::PrintCards() const
 {
 	for (Cards card : m_cards)
 	{
@@ -39,8 +42,15 @@ void Player::PrintCards()
 	std::cout << std::endl;
 }
 
-void Player::DrawCards()
+void Player::DrawCards(std::stack<Cards>& deck)
 {
+	while (!deck.empty() && m_cardsPlacedRound)
+	{
+		Cards card = deck.top();
+		deck.pop();
+		m_cards.push_back(card);
+		--m_cardsPlacedRound;
+	}
 }
 
 bool Player::FindCard(unsigned int id) const

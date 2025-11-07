@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <vector>
+#include <stack>
 #include "Cards.h"
 #include "UserProfile.h"
 
@@ -11,8 +12,8 @@ public:
 		const UserProfile& userprofile);
 	~Player();
 	void PlaceCards();
-	void PrintCards();
-	void DrawCards();
+	void PrintCards() const;
+	void DrawCards(std::stack<Cards>& deck);
 	bool FindCard(unsigned int id) const;
 	void RemoveCard(unsigned int id);
 
@@ -24,5 +25,6 @@ public:
 private:
 	UserProfile m_userprofile;
 	std::vector<Cards> m_cards;
+	unsigned int m_cardsPlacedRound=0;
 };
 

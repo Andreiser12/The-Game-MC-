@@ -6,7 +6,7 @@
 class Table
 {
 public:
-	Table(unsigned int nrPlayers, std::stack<Cards> deck);
+	Table(unsigned int nrPlayers, const std::stack<Cards>&deck);
 	bool isDeckEmpty() const;
 private:
 	unsigned int m_nrPlayers;

@@ -1,7 +1,7 @@
 #pragma once
 #include <iostream>
 #include <stack>
-#include "Cards.h"
+#include "FundamentalCard.h"
 using std::uint8_t;
 
 class Deck
@@ -19,6 +19,16 @@ public:
 		First,
 		Second
 	};
+
+public:
+	Deck() = default;
+	Deck(DeckType deckType, DeckNumber deckNumber);
+
+	const std::stack<Cards>& GetDeck() const;
+	DeckType GetDeckType() const;
+	DeckNumber GetDeckNumber() const;
+	const Cards& GetTopCard() const;
+
 
 private:
 	std::stack<Cards> m_deck;

@@ -10,10 +10,7 @@ Player::~Player()
 {
 }
 
-void Player::PlaceCards(std::stack<Cards>& m_AscendingDeckFirst,
-						std::stack<Cards>& m_AscendingDeckSecond,
-						std::stack<Cards>& m_DescendingDeckFirst,
-						std::stack<Cards>& m_DescendingDeckSecond)
+void Player::PlaceCards(Deck& chosenDeck)
 {
 	unsigned int cardsPlaced = 0;
 	while (GetCardsCount() && cardsPlaced < kMinimumCards)
@@ -30,10 +27,12 @@ void Player::PlaceCards(std::stack<Cards>& m_AscendingDeckFirst,
 				std::endl << "Pleace choose an existing card: ";
 			std::cin >> cardToPlace;
 		}
-		std::cout << "In which stack would you like to place the card? (Ascending/Descending)"
-			<< std::endl;
-		std::string choice;
-		std::cin >> choice;
+		int Try = 0;
+		while (!IsCardValid(chosenDeck, cardToPlace) && Try!=3)
+		{
+			Try++;
+			std::cout << "You can't place this card on this deck!";
+		}
 		RemoveCard(cardToPlace);
 		++cardsPlaced;
 	}
@@ -80,6 +79,14 @@ void Player::RemoveCard(unsigned int id)
 		}
 	}
 	SetCards(updatedCards);
+}
+
+inline const bool Player::IsCardValid(const Deck& chosenDeck, unsigned int cardID)
+{
+	return (chosenDeck.GetDeckType() == Deck::DeckType::Ascending
+		&& cardID > chosenDeck.GetTopCard().getId())
+		|| (chosenDeck.GetDeckType() == Deck::DeckType::Descending
+			&& cardID < chosenDeck.GetTopCard().getId());
 }
 
 void Player::SetCards(const std::vector<Cards>& cards)

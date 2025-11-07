@@ -4,6 +4,7 @@
 #include <stack>
 #include "Cards.h"
 #include "UserProfile.h"
+#include "Deck.h"
 
 class Player
 {
@@ -11,14 +12,12 @@ public:
 	Player(const std::vector<Cards>& cards,
 		const UserProfile& userprofile);
 	~Player();
-	void PlaceCards(std::stack<Cards>& m_AscendingDeckFirst,
-					std::stack<Cards>& m_AscendingDeckSecond,
-					std::stack<Cards>& m_DescendingDeckFirst,
-					std::stack<Cards>& m_DescendingDeckSecond);
+	void PlaceCards(Deck& chosenDeck);
 	void PrintCards() const;
 	void DrawCards(std::stack<Cards>& deck);
 	bool FindCard(unsigned int id) const;
 	void RemoveCard(unsigned int id);
+	const static inline bool IsCardValid(const Deck& chosenDeck, unsigned int cardID);
 
 	void SetCards(const std::vector<Cards>& cards);
 

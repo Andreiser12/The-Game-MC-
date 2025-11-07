@@ -3,6 +3,8 @@
 #include <stack>
 #include "Player.h"
 #include "Cards.h"
+#include "Deck.h"
+
 class Table
 {
 public:
@@ -12,9 +14,9 @@ private:
 	unsigned int m_nrPlayers;
 	std::vector<Player> m_Players;
 	std::stack<Cards> m_Deck;
-	std::stack<Cards> m_AscendingDeckFirst;
-	std::stack<Cards> m_AscendingDeckSecond;
-	std::stack<Cards> m_DescendingDeckFirst;
-	std::stack<Cards> m_DescendingDeckSecond;
+	Deck m_AscendingDeckFirst;
+	Deck m_AscendingDeckSecond;
+	Deck m_DescendingDeckFirst;
+	Deck m_DescendingDeckSecond;
 };
 

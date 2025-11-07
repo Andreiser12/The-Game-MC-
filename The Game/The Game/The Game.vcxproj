@@ -152,6 +152,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Cards.cpp" />
+    <ClCompile Include="Deck.cpp" />
     <ClCompile Include="FundamentalCard.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />

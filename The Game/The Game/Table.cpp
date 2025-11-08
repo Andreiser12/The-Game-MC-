@@ -49,6 +49,22 @@ bool Table::BackwardsTrick(const Deck& deck, const Cards& card)
 	}
 }
 
+bool Table::CheckCard(const Deck& deck, const Cards& card)
+{
+	const unsigned int cardValue = card.getId();
+	const unsigned int topCardValue = deck.GetTopCard().getId();
+
+	switch (deck.GetDeckType())
+	{
+	case Deck::DeckType::Ascending:
+		return cardValue > topCardValue || BackwardsTrick(deck, card);
+	case Deck::DeckType::Descending:
+		return cardValue < topCardValue || BackwardsTrick(deck, card);
+	default:
+		return false;
+	}
+}
+
 Deck& Table::getDeck(const Deck::DeckType& type, const Deck::DeckNumber& number)
 {
 	if (type == Deck::DeckType::Ascending)

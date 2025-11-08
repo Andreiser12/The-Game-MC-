@@ -15,6 +15,7 @@ public:
 	bool isDeckEmpty() const;
 	void Shuffle();
 	bool BackwardsTrick(const Deck& deck, const Cards& card);
+	bool CheckCard(const Deck& deck, const Cards& card);
 	Deck& getDeck(const Deck::DeckType &type, const Deck::DeckNumber &number);
 private:
 	unsigned int m_nrPlayers;

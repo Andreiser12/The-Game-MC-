@@ -44,6 +44,20 @@ int main()
 	else
 		std::cout << "Card with ID 50 cannot be placed on the descending deck." << std::endl;
 	
+	Cards c1(10u);
+	Cards c2(5u);
+	Cards c3(110u);
+	Cards c4(50u);
+
+	std::cout << "CheckCard for Ascending with 10: "
+		<< (t.CheckCard(firstAscending, c1) ? "valid" : "invalid") << std::endl;
+	std::cout << "CheckCard for Ascending with 5: "
+		<< (t.CheckCard(firstAscending, c2) ? "valid" : "invalid") << std::endl;
+	std::cout << "CheckCard for Descending with 110: "
+		<< (t.CheckCard(firstDescending, c3) ? "valid" : "invalid") << std::endl;
+	std::cout << "CheckCard for Descending with 50: "
+		<< (t.CheckCard(firstDescending, c4) ? "valid" : "invalid") << std::endl;
+	
 	UserProfile up=UserProfile("abcd", 2, 1, 10, 3);
 	std::cout << up.PerformanceScore();
 

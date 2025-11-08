@@ -1,15 +1,20 @@
 #pragma once
 #include <vector>
 #include <stack>
+#include <algorithm>
+#include <random>
 #include "Player.h"
 #include "Cards.h"
 #include "Deck.h"
+
 
 class Table
 {
 public:
 	Table(unsigned int nrPlayers, const std::stack<Cards>&deck);
 	bool isDeckEmpty() const;
+	void Shuffle();
+	std::stack<Cards> getDeck() const;
 private:
 	unsigned int m_nrPlayers;
 	std::vector<Player> m_Players;

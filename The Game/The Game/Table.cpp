@@ -14,3 +14,26 @@ bool Table::isDeckEmpty() const
 {
 	return m_Deck.empty();
 }
+
+void Table::Shuffle()
+{
+	std::vector<Cards> copyCards;
+
+	while (!m_Deck.empty())
+	{
+		copyCards.push_back(std::move(m_Deck.top()));
+		m_Deck.pop();
+	}
+
+	std::random_device rd;
+	std::mt19937 generator(rd());
+	std::shuffle(copyCards.begin(), copyCards.end(), generator);
+	
+	for (Cards& card : copyCards)
+		m_Deck.push(std::move(card));
+}
+
+std::stack<Cards> Table::getDeck() const
+{
+	return m_Deck;
+}

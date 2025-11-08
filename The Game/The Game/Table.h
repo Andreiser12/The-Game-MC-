@@ -14,7 +14,8 @@ public:
 	Table(unsigned int nrPlayers, const std::stack<Cards>&deck);
 	bool isDeckEmpty() const;
 	void Shuffle();
-	std::stack<Cards> getDeck() const;
+	bool BackwardsTrick(const Deck& deck, const Cards& card);
+	Deck& getDeck(const Deck::DeckType &type, const Deck::DeckNumber &number);
 private:
 	unsigned int m_nrPlayers;
 	std::vector<Player> m_Players;

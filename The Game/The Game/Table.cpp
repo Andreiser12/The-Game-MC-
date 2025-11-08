@@ -33,7 +33,36 @@ void Table::Shuffle()
 		m_Deck.push(std::move(card));
 }
 
-std::stack<Cards> Table::getDeck() const
+bool Table::BackwardsTrick(const Deck& deck, const Cards& card)
 {
-	return m_Deck;
+	const unsigned int cardValue = card.getId();
+	const unsigned int topCardValue = deck.GetTopCard().getId();
+
+	switch (deck.GetDeckType())
+	{
+		case Deck::DeckType::Ascending:
+			return (topCardValue>=10u && topCardValue - 10u == cardValue);
+		case Deck::DeckType::Descending:
+			return (topCardValue + 10u == cardValue);
+		default:
+			return false;
+	}
+}
+
+Deck& Table::getDeck(const Deck::DeckType& type, const Deck::DeckNumber& number)
+{
+	if (type == Deck::DeckType::Ascending)
+	{
+		if (number == Deck::DeckNumber::First)
+			return m_AscendingDeckFirst;
+		else if (number == Deck::DeckNumber::Second)
+			return m_AscendingDeckSecond;
+	}
+	else if (type == Deck::DeckType::Descending)
+	{
+		if (number == Deck::DeckNumber::First)
+			return m_DescendingDeckFirst;
+		else if (number == Deck::DeckNumber::Second)
+			return m_DescendingDeckSecond;
+	}
 }

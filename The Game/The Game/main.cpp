@@ -3,6 +3,18 @@
 #include "Table.h"
 #include "UserProfile.h"
 
+void ShowMenu()
+{
+	std::cout << "\n=== Game Menu ===\n";
+	std::cout << "1. Show all cards in main deck\n";
+	std::cout << "2. Show top card from Ascending deck\n";
+	std::cout << "3. Show top card from Descending deck\n";
+	std::cout << "4. Shuffle table deck\n";
+	std::cout << "5. Place a card\n";
+	std::cout << "0. Exit\n";
+	std::cout << "\nChoose an option: ";
+}
+
 int main()
 {
 	std::stack<Cards> deck;
@@ -61,6 +73,83 @@ int main()
 	
 	UserProfile up=UserProfile("abcd", 2, 1, 10, 3);
 	std::cout << up.PerformanceScore();
+
+	int option;
+	do {
+		ShowMenu();
+		std::cin >> option;
+		std::cout << std::endl;
+
+		switch (option) {
+		case 1:
+		{
+			std::stack<Cards> temp = deck;
+			std::cout << "All cards in deck:\n";
+			while (!temp.empty())
+			{
+				std::cout << temp.top() << std::endl;
+				temp.pop();
+			}
+			break;
+		}
+
+		case 2:
+		{
+			try {
+				std::cout << "Top card from Ascending deck:" << firstAscending.GetTopCard() << "\n";
+			}
+			catch (...) {
+				std::cout << "Ascending deck is empty!\n";
+			}
+			break;
+		}
+
+		case 3:
+		{
+			try {
+				std::cout << "Top card from Descending deck:" << firstDescending.GetTopCard() << "\n";
+			}
+			catch (...) {
+				std::cout << "Descending deck is empty!\n";
+			}
+			break;
+		}
+		case 4:
+		{
+			t.Shuffle();
+			std::cout << "Deck shuffled succesfully!\n";
+		}
+
+		case 5:
+		{
+			unsigned int id;
+			int deckChoice;
+			std::cout << "Enter card ID: ";
+			std::cin >> id;
+			std::cout << "Choose deck (1 = Ascending, 2 = Descending): ";
+			std::cin >> deckChoice;
+
+			Cards newCard(id);
+			Deck& chosenDeck = (deckChoice == 1) ? firstAscending : firstDescending;
+
+			if (t.CheckCard(chosenDeck, newCard))
+				std::cout << "Card " << id << " can be placed!\n";
+			else
+				std::cout << "Card " << id << "cannot be placed!\n";
+			break;
+		}
+
+		case 0:
+		{
+			std::cout << "Exiting game...\n";
+			break;
+		}
+
+		default:
+			std::cout << "Invalid option!\n";
+			break;
+		}
+	}while (option != 0);
 
 	return 0;
 }

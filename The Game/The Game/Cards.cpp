@@ -1,6 +1,6 @@
 #include "Cards.h"
 
-Cards::Cards(unsigned int id) : m_id(id) {}
+Cards::Cards(unsigned int id, Color color) : m_id(id), m_color(color) {}
 
 unsigned int Cards::getId() const {
 	return m_id;
@@ -9,6 +9,11 @@ unsigned int Cards::getId() const {
 Cards::Color Cards::getColor() const
 {
 	return m_color;
+}
+
+bool Cards::operator==(const Cards& other) const
+{
+	return m_id == other.m_id && m_color == other.m_color;
 }
 
 std::ostream& operator<<(std::ostream& out, const Cards& card)

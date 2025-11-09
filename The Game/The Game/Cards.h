@@ -13,10 +13,21 @@ protected:
 	unsigned int m_id;
 	Color m_color;
 public:
-	Cards(unsigned int id);
+	Cards(unsigned int id, Color color = Color::Gray);
 	unsigned int getId() const;
 	Color getColor() const;
+	bool operator==(const Cards& other) const;
 
 	friend std::ostream& operator<<(std::ostream& out, const Cards& card);
+
+	struct Hash
+	{
+		std::size_t operator()(const Cards& card) const noexcept
+		{
+			std::size_t h1 = std::hash<unsigned int>()(card.m_id);
+			std::size_t h2 = std::hash<uint8_t>()(static_cast<uint8_t>(card.m_color));
+			return h1 ^ (h2 << 1);
+		}
+	};
 };
 

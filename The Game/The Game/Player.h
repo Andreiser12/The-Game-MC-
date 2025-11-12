@@ -2,6 +2,8 @@
 #include <iostream>
 #include <vector>
 #include <stack>
+#include <unordered_set>
+
 #include "Cards.h"
 #include "UserProfile.h"
 #include "Deck.h"
@@ -9,7 +11,8 @@
 class Player
 {
 public:
-	Player(const std::vector<Cards>& cards,
+	Player(const std::unordered_set<Cards, Cards::CardsSetHashFunction,
+		Cards::CardsEqual>& cards,
 		const UserProfile& userprofile);
 	~Player();
 	void PlaceCards(Deck& chosenDeck);
@@ -19,14 +22,16 @@ public:
 	void RemoveCard(unsigned int id);
 	const static inline bool IsCardValid(const Deck& chosenDeck, unsigned int cardID);
 
-	void SetCards(const std::vector<Cards>& cards);
+	void SetCards(const std::unordered_set<Cards, Cards::CardsSetHashFunction,
+		Cards::CardsEqual>& cards);
 
-	const std::vector<Cards>& GetCards() const;
+	const std::unordered_set<Cards, Cards::CardsSetHashFunction,
+		Cards::CardsEqual>& GetCards() const;
 	size_t GetCardsCount() const;
 
 private:
 	UserProfile m_userprofile;
-	std::vector<Cards> m_cards;
+	std::unordered_set<Cards, Cards::CardsSetHashFunction, Cards::CardsEqual> m_cards;
 	unsigned int m_cardsPlacedRound=0;
 };
 

@@ -2,13 +2,13 @@
 
 constexpr static unsigned int kMinimumCards = 2u;
 
-Player::Player(const std::vector<Cards>& cards,
+Player::Player(const std::unordered_set<Cards, Cards::CardsSetHashFunction,
+	Cards::CardsEqual>& cards,
 	const UserProfile& userprofile) :
-	m_cards(cards), m_userprofile(userprofile){}
-
-Player::~Player()
-{
+	m_cards{ cards }, m_userprofile{ userprofile } {
 }
+
+Player::~Player() {}
 
 void Player::PlaceCards(Deck& chosenDeck)
 {
@@ -27,10 +27,10 @@ void Player::PlaceCards(Deck& chosenDeck)
 				std::endl << "Pleace choose an existing card: ";
 			std::cin >> cardToPlace;
 		}
-		int Try = 0;
-		while (!IsCardValid(chosenDeck, cardToPlace) && Try!=3)
+		int tries = 0;
+		while (!IsCardValid(chosenDeck, cardToPlace) && tries!=3)
 		{
-			Try++;
+			tries++;
 			std::cout << "You can't place this card on this deck!";
 		}
 		RemoveCard(cardToPlace);
@@ -54,31 +54,21 @@ void Player::DrawCards(std::stack<Cards>& deck)
 	{
 		Cards card = deck.top();
 		deck.pop();
-		m_cards.push_back(card);
+		m_cards.emplace(card);
 		--m_cardsPlacedRound;
 	}
 }
 
 bool Player::FindCard(unsigned int id) const
 {
-	for (Cards card : m_cards)
-	{
-		if (id == card.getId()) return true;
-	}
-	return false;
+	Cards cardToFind = Cards(id);
+	return m_cards.find(cardToFind) != m_cards.end();
 }
 
 void Player::RemoveCard(unsigned int id)
 {
-	std::vector<Cards> updatedCards;
-	for (Cards card : m_cards)
-	{
-		if (id != card.getId())
-		{
-			updatedCards.push_back(card);
-		}
-	}
-	SetCards(updatedCards);
+	Cards cardToDelete(id);
+	m_cards.erase(cardToDelete);
 }
 
 inline const bool Player::IsCardValid(const Deck& chosenDeck, unsigned int cardID)
@@ -89,12 +79,14 @@ inline const bool Player::IsCardValid(const Deck& chosenDeck, unsigned int cardI
 			&& cardID < chosenDeck.GetTopCard().getId());
 }
 
-void Player::SetCards(const std::vector<Cards>& cards)
+void Player::SetCards(const std::unordered_set<Cards, Cards::CardsSetHashFunction,
+	Cards::CardsEqual>& cards)
 {
 	m_cards = cards;
 }
 
-const std::vector<Cards>& Player::GetCards() const
+const std::unordered_set<Cards, Cards::CardsSetHashFunction,
+	Cards::CardsEqual>& Player::GetCards() const
 {
 	return m_cards;
 }

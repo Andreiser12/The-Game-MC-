@@ -11,13 +11,13 @@ Cards::Color Cards::getColor() const
 	return m_color;
 }
 
-bool Cards::operator==(const Cards& other) const
-{
-	return m_id == other.m_id && m_color == other.m_color;
-}
-
 std::ostream& operator<<(std::ostream& out, const Cards& card)
 {
 	out << card.getId() << std::endl;
 	return out;
+}
+
+bool Cards::operator == (const Cards& other) const
+{
+	return m_id == other.getId() && m_color == other.getColor();
 }

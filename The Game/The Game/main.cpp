@@ -25,11 +25,6 @@ int main()
 	Table t(3, deck);
 	t.Shuffle();
 	
-	/*while (!deck.empty())
-	{
-		std::cout<<deck.top()<<std::endl;
-		deck.pop();
-	}*/
 	if (t.isDeckEmpty())
 		std::cout << "There aren't cards in table.\n" << std::endl;
 	else std::cout << "There are cards in table.\n" << std::endl;

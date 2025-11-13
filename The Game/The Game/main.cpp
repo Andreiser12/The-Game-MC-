@@ -3,6 +3,7 @@
 
 #include "Table.h"
 #include "UserProfile.h"
+#include "DatabaseManager.h"
 
 void ShowMenu()
 {
@@ -20,6 +21,8 @@ int main()
 {
 	Table t(3);
 	
+	DatabaseManager database{ "game.db" };
+
 	if (t.isDeckEmpty())
 		std::cout << "There aren't cards in table.\n" << std::endl;
 	else std::cout << "There are cards in table.\n" << std::endl;

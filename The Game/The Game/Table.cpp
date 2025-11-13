@@ -1,10 +1,15 @@
 #include "Table.h"
 
 constexpr static unsigned int HOURS_TO_SECONDS = 3600;
+
 constexpr static uint8_t  TWO_PLAYERS = 2;
+constexpr static uint8_t  CARDS_TWO_PLAYERS = 8;
+
 constexpr static uint8_t THREE_PLAYERS = 3;
-//constexpr static unsigned int FOUR_PLAYERS = 4;
-//constexpr static unsigned int FOUR_PLAYERS = 4;
+constexpr static uint8_t  CARDS_THREE_PLAYERS = 7;
+
+constexpr static uint8_t  CARDS_DEFAULT_PLAYERS = 6;
+
 
 
 Table::Table(uint8_t nrPlayers) :
@@ -16,6 +21,7 @@ Table::Table(uint8_t nrPlayers) :
 	m_DescendingDeckSecond = Deck(Deck::DeckType::Descending, Deck::DeckNumber::Second);
 	m_time = 0u;
 	Shuffle();
+	SetupPlayers();
 
 	std::sort(m_Players.begin(), m_Players.end());
 }
@@ -52,14 +58,24 @@ void Table::SetupPlayers()
 	switch (m_nrPlayers)
 	{
 	case TWO_PLAYERS:
-		/*for (auto& player : m_Players)
+		for (auto& player : m_Players)
 		{
-
-		}*/
+			player.SetupCards(m_Deck, CARDS_TWO_PLAYERS);
+		}
+		break;
 
 	case THREE_PLAYERS:
+		for (auto& player : m_Players)
+		{
+			player.SetupCards(m_Deck, CARDS_THREE_PLAYERS);
+		}
+		break;
 
 	default:
+		for (auto& player : m_Players)
+		{
+			player.SetupCards(m_Deck, CARDS_DEFAULT_PLAYERS);
+		}
 		break;
 
 	};

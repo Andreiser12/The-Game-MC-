@@ -20,7 +20,6 @@ public:
 	bool CheckCard(const Deck& deck, const Card& card);
 	void PlayGame();
 
-
 	Deck& GetDeck(const Deck::DeckType &type, const Deck::DeckNumber &number);
 	const std::stack<Card>& GetMainDeck() const;
 

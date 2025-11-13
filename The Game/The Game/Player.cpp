@@ -100,3 +100,12 @@ UserProfile& Player::GetUserProfile()
 {
 	return m_userprofile;
 }
+
+bool Player::operator<(Player& other) const
+{
+	if (m_userprofile.PerformanceScore() == other.GetUserProfile().PerformanceScore())
+	{
+		return m_userprofile.GetUsername() < other.GetUserProfile().GetUsername();
+	}
+	return m_userprofile.PerformanceScore() > other.GetUserProfile().PerformanceScore();
+}

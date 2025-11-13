@@ -13,8 +13,6 @@ public:
 
 	const std::string GetUsername() const;
 
-
-
 private:
 	std::string m_username;
 	unsigned int m_gamesPlayed;

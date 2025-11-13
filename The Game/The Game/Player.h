@@ -30,6 +30,8 @@ public:
 	size_t GetCardsCount() const;
 	UserProfile& GetUserProfile();
 
+	bool operator<(Player& other) const;
+
 private:
 	UserProfile m_userprofile;
 	std::unordered_set<Card, Card::CardsSetHashFunction, Card::CardsEqual> m_cards;

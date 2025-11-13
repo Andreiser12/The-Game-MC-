@@ -17,10 +17,11 @@ public:
 	void Shuffle();
 	bool BackwardsTrick(const Deck& deck, const Card& card);
 	bool CheckCard(const Deck& deck, const Card& card);
+	void PlayGame();
+
 
 	Deck& GetDeck(const Deck::DeckType &type, const Deck::DeckNumber &number);
-
-	void PlayGame();
+	const std::stack<Card>& GetMainDeck() const;
 
 private:
 	uint8_t m_nrPlayers;

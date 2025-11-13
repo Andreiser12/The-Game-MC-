@@ -86,6 +86,11 @@ Deck& Table::GetDeck(const Deck::DeckType& type, const Deck::DeckNumber& number)
 	}
 }
 
+const std::stack<Card>& Table::GetMainDeck() const
+{
+	return m_Deck;
+}
+
 void Table::PlayGame()
 {
 	bool gameRunning = true;

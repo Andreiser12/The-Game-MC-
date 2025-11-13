@@ -76,7 +76,7 @@ int main()
 		switch (option) {
 		case 1:
 		{
-			std::stack<Card> temp = deck;
+			std::stack<Card> temp = t.GetMainDeck();
 			std::cout << "All cards in deck:\n";
 			while (!temp.empty())
 			{

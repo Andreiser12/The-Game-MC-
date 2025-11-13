@@ -1,5 +1,6 @@
 #include <iostream>
 #include <unordered_set>
+
 #include "Table.h"
 #include "UserProfile.h"
 
@@ -17,10 +18,10 @@ void ShowMenu()
 
 int main()
 {
-	std::stack<Cards> deck;
+	std::stack<Card> deck;
 
 	for (unsigned int i = 2; i <= 99; i++)
-		deck.push(Cards(i));
+		deck.push(Card(i));
 
 	Table t(3, deck);
 	t.Shuffle();
@@ -31,31 +32,31 @@ int main()
 
 	Deck& firstAscending = t.getDeck(Deck::DeckType::Ascending, Deck::DeckNumber::First);
 	Deck& firstDescending = t.getDeck(Deck::DeckType::Descending, Deck::DeckNumber::First);
-	if (t.BackwardsTrick(firstAscending, Cards(5u)))
+	if (t.BackwardsTrick(firstAscending, Card(5u)))
 	{
 		std::cout << "Card with ID 5 can be placed on the ascending deck."<<std::endl;
 	}
 	else std::cout << "Card with ID 5 cannot be placed on the ascending deck."<<std::endl;
 	
-	if (t.BackwardsTrick(firstAscending, Cards(10u)))
+	if (t.BackwardsTrick(firstAscending, Card(10u)))
 		std::cout << "Card with ID 10 can be placed on the ascending deck." << std::endl;
 	else
 		std::cout << "Card with ID 10 cannot be placed on the ascending deck." << std::endl;
 
-	if (t.BackwardsTrick(firstDescending, Cards(110u)))
+	if (t.BackwardsTrick(firstDescending, Card(110u)))
 		std::cout << "Card with ID 110 can be placed on the descending deck." << std::endl;
 	else
 		std::cout << "Card with ID 110 cannot be placed on the descending deck." << std::endl;
 
-	if (t.BackwardsTrick(firstDescending, Cards(50u)))
+	if (t.BackwardsTrick(firstDescending, Card(50u)))
 		std::cout << "Card with ID 50 can be placed on the descending deck." << std::endl;
 	else
 		std::cout << "Card with ID 50 cannot be placed on the descending deck." << std::endl;
 	
-	Cards c1(10u);
-	Cards c2(5u);
-	Cards c3(110u);
-	Cards c4(50u);
+	Card c1(10u);
+	Card c2(5u);
+	Card c3(110u);
+	Card c4(50u);
 
 	std::cout << "CheckCard for Ascending with 10: "
 		<< (t.CheckCard(firstAscending, c1) ? "valid" : "invalid") << std::endl;
@@ -78,7 +79,7 @@ int main()
 		switch (option) {
 		case 1:
 		{
-			std::stack<Cards> temp = deck;
+			std::stack<Card> temp = deck;
 			std::cout << "All cards in deck:\n";
 			while (!temp.empty())
 			{
@@ -124,7 +125,7 @@ int main()
 			std::cout << "Choose deck (1 = Ascending, 2 = Descending): ";
 			std::cin >> deckChoice;
 
-			Cards newCard(id);
+			Card newCard(id);
 			Deck& chosenDeck = (deckChoice == 1) ? firstAscending : firstDescending;
 
 			if (t.CheckCard(chosenDeck, newCard))

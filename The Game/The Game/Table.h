@@ -3,24 +3,24 @@
 #include <stack>
 #include <algorithm>
 #include <random>
-#include "Player.h"
-#include "Cards.h"
-#include "Deck.h"
 
+#include "Player.h"
+#include "Card.h"
+#include "Deck.h"
 
 class Table
 {
 public:
-	Table(unsigned int nrPlayers, const std::stack<Cards>&deck);
+	Table(unsigned int nrPlayers, const std::stack<Card>&deck);
 	bool isDeckEmpty() const;
 	void Shuffle();
-	bool BackwardsTrick(const Deck& deck, const Cards& card);
-	bool CheckCard(const Deck& deck, const Cards& card);
+	bool BackwardsTrick(const Deck& deck, const Card& card);
+	bool CheckCard(const Deck& deck, const Card& card);
 	Deck& getDeck(const Deck::DeckType &type, const Deck::DeckNumber &number);
 private:
 	unsigned int m_nrPlayers;
 	std::vector<Player> m_Players;
-	std::stack<Cards> m_Deck;
+	std::stack<Card> m_Deck;
 	Deck m_AscendingDeckFirst;
 	Deck m_AscendingDeckSecond;
 	Deck m_DescendingDeckFirst;

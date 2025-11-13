@@ -2,8 +2,8 @@
 
 constexpr static unsigned int kMinimumCards = 2u;
 
-Player::Player(const std::unordered_set<Cards, Cards::CardsSetHashFunction,
-	Cards::CardsEqual>& cards,
+Player::Player(const std::unordered_set<Card, Card::CardsSetHashFunction,
+	Card::CardsEqual>& cards,
 	const UserProfile& userprofile) :
 	m_cards{ cards }, m_userprofile{ userprofile } {
 }
@@ -41,18 +41,18 @@ void Player::PlaceCards(Deck& chosenDeck)
 
 void Player::PrintCards() const
 {
-	for (Cards card : m_cards)
+	for (Card card : m_cards)
 	{
 		std::cout << card;
 	}
 	std::cout << std::endl;
 }
 
-void Player::DrawCards(std::stack<Cards>& deck)
+void Player::DrawCards(std::stack<Card>& deck)
 {
 	while (!deck.empty() && m_cardsPlacedRound)
 	{
-		Cards card = deck.top();
+		Card card = deck.top();
 		deck.pop();
 		m_cards.emplace(card);
 		--m_cardsPlacedRound;
@@ -61,13 +61,13 @@ void Player::DrawCards(std::stack<Cards>& deck)
 
 bool Player::FindCard(unsigned int id) const
 {
-	Cards cardToFind = Cards(id);
+	Card cardToFind = Card(id);
 	return m_cards.find(cardToFind) != m_cards.end();
 }
 
 void Player::RemoveCard(unsigned int id)
 {
-	Cards cardToDelete(id);
+	Card cardToDelete(id);
 	m_cards.erase(cardToDelete);
 }
 
@@ -79,14 +79,14 @@ inline const bool Player::IsCardValid(const Deck& chosenDeck, unsigned int cardI
 			&& cardID < chosenDeck.GetTopCard().getId());
 }
 
-void Player::SetCards(const std::unordered_set<Cards, Cards::CardsSetHashFunction,
-	Cards::CardsEqual>& cards)
+void Player::SetCards(const std::unordered_set<Card, Card::CardsSetHashFunction,
+	Card::CardsEqual>& cards)
 {
 	m_cards = cards;
 }
 
-const std::unordered_set<Cards, Cards::CardsSetHashFunction,
-	Cards::CardsEqual>& Player::GetCards() const
+const std::unordered_set<Card, Card::CardsSetHashFunction,
+	Card::CardsEqual>& Player::GetCards() const
 {
 	return m_cards;
 }

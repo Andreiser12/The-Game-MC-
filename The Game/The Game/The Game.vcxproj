@@ -151,7 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Cards.cpp" />
+    <ClCompile Include="Card.cpp" />
     <ClCompile Include="Deck.cpp" />
     <ClCompile Include="FundamentalCard.cpp" />
     <ClCompile Include="main.cpp" />
@@ -160,7 +160,7 @@
     <ClCompile Include="UserProfile.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Cards.h" />
+    <ClInclude Include="Card.h" />
     <ClInclude Include="Deck.h" />
     <ClInclude Include="FundamentalCard.h" />
     <ClInclude Include="Player.h" />

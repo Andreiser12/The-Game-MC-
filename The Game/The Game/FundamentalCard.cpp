@@ -1,3 +1,3 @@
 #include "FundamentalCard.h"
 
-FundamentalCard::FundamentalCard(unsigned int id) : Cards(id) {}
+FundamentalCard::FundamentalCard(unsigned int id) : Card{ id } {}

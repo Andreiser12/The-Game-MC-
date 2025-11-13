@@ -1,7 +1,7 @@
 #include "Table.h"
 
 
-Table::Table(unsigned int nrPlayers, const std::stack<Cards>& deck) :
+Table::Table(unsigned int nrPlayers, const std::stack<Card>& deck) :
 	m_nrPlayers{ nrPlayers }, m_Deck{ deck }
 {
 	m_AscendingDeckFirst = Deck(Deck::DeckType::Ascending, Deck::DeckNumber::First);
@@ -17,7 +17,7 @@ bool Table::isDeckEmpty() const
 
 void Table::Shuffle()
 {
-	std::vector<Cards> copyCards;
+	std::vector<Card> copyCards;
 
 	while (!m_Deck.empty())
 	{
@@ -29,11 +29,11 @@ void Table::Shuffle()
 	std::mt19937 generator(rd());
 	std::shuffle(copyCards.begin(), copyCards.end(), generator);
 	
-	for (Cards& card : copyCards)
+	for (Card& card : copyCards)
 		m_Deck.push(std::move(card));
 }
 
-bool Table::BackwardsTrick(const Deck& deck, const Cards& card)
+bool Table::BackwardsTrick(const Deck& deck, const Card& card)
 {
 	const unsigned int cardValue = card.getId();
 	const unsigned int topCardValue = deck.GetTopCard().getId();
@@ -49,7 +49,7 @@ bool Table::BackwardsTrick(const Deck& deck, const Cards& card)
 	}
 }
 
-bool Table::CheckCard(const Deck& deck, const Cards& card)
+bool Table::CheckCard(const Deck& deck, const Card& card)
 {
 	const unsigned int cardValue = card.getId();
 	const unsigned int topCardValue = deck.GetTopCard().getId();

@@ -1,7 +1,7 @@
 #pragma once
-#include "Cards.h"
+#include "Card.h"
 
-class FundamentalCard : public Cards
+class FundamentalCard : public Card
 {
 public:
 	FundamentalCard(unsigned int id);

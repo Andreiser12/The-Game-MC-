@@ -9,7 +9,15 @@ UserProfile::~UserProfile() {}
 
 double UserProfile::PerformanceScore() const
 {
-	return (double)(m_gamesPlayed + m_gamesWon)/ m_finalCards;
+	return static_cast<double>((m_gamesPlayed + m_gamesWon)/ m_finalCards);
+}
+
+void UserProfile::UpdateStats(double hours, bool win, unsigned int finalCards)
+{
+	m_hoursPlayed += hours;
+	++m_gamesPlayed;
+	if (win) ++m_gamesWon;
+	m_finalCards = finalCards;
 }
 
 const std::string UserProfile::GetUsername() const

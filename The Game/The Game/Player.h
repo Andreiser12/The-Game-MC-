@@ -28,6 +28,7 @@ public:
 	const std::unordered_set<Card, Card::CardsSetHashFunction,
 		Card::CardsEqual>& GetCards() const;
 	size_t GetCardsCount() const;
+	UserProfile& GetUserProfile();
 
 private:
 	UserProfile m_userprofile;

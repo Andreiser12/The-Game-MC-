@@ -30,8 +30,8 @@ int main()
 		std::cout << "There aren't cards in table.\n" << std::endl;
 	else std::cout << "There are cards in table.\n" << std::endl;
 
-	Deck& firstAscending = t.getDeck(Deck::DeckType::Ascending, Deck::DeckNumber::First);
-	Deck& firstDescending = t.getDeck(Deck::DeckType::Descending, Deck::DeckNumber::First);
+	Deck& firstAscending = t.GetDeck(Deck::DeckType::Ascending, Deck::DeckNumber::First);
+	Deck& firstDescending = t.GetDeck(Deck::DeckType::Descending, Deck::DeckNumber::First);
 	if (t.BackwardsTrick(firstAscending, Card(5u)))
 	{
 		std::cout << "Card with ID 5 can be placed on the ascending deck."<<std::endl;
@@ -66,9 +66,6 @@ int main()
 		<< (t.CheckCard(firstDescending, c3) ? "valid" : "invalid") << std::endl;
 	std::cout << "CheckCard for Descending with 50: "
 		<< (t.CheckCard(firstDescending, c4) ? "valid" : "invalid") << std::endl;
-	
-	UserProfile up=UserProfile("abcd", 2, 1, 10, 3);
-	std::cout << up.PerformanceScore();
 
 	int option;
 	do {

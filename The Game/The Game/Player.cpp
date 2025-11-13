@@ -1,6 +1,6 @@
 #include "Player.h"
 
-constexpr static unsigned int kMinimumCards = 2u;
+constexpr static uint8_t MINIMUM_CARDS = 2u;
 
 Player::Player(const std::unordered_set<Card, Card::CardsSetHashFunction,
 	Card::CardsEqual>& cards,
@@ -12,8 +12,8 @@ Player::~Player() {}
 
 void Player::PlaceCards(Deck& chosenDeck)
 {
-	unsigned int cardsPlaced = 0;
-	while (GetCardsCount() && cardsPlaced < kMinimumCards)
+	uint8_t cardsPlaced = 0;
+	while (GetCardsCount() && cardsPlaced < MINIMUM_CARDS)
 	{
 		std::cout << "Which card would you like to place?"
 			<< std::endl;
@@ -27,11 +27,11 @@ void Player::PlaceCards(Deck& chosenDeck)
 				std::endl << "Pleace choose an existing card: ";
 			std::cin >> cardToPlace;
 		}
-		int tries = 0;
-		while (!IsCardValid(chosenDeck, cardToPlace) && tries!=3)
+		if (!IsCardValid(chosenDeck, cardToPlace))
 		{
-			tries++;
-			std::cout << "You can't place this card on this deck!";
+			std::cout << "You can't place this card on this deck!"
+				<< std::endl;
+			continue;
 		}
 		RemoveCard(cardToPlace);
 		++cardsPlaced;
@@ -94,4 +94,9 @@ const std::unordered_set<Card, Card::CardsSetHashFunction,
 size_t Player::GetCardsCount() const
 {
 	return m_cards.size();
+}
+
+UserProfile& Player::GetUserProfile()
+{
+	return m_userprofile;
 }

@@ -9,6 +9,7 @@ public:
 	~UserProfile();
 
 	double PerformanceScore() const;
+	void UpdateStats(double hours, bool win, unsigned int finalCards);
 
 	const std::string GetUsername() const;
 

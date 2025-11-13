@@ -1,16 +1,23 @@
 #include "Table.h"
 
 constexpr static unsigned int HOURS_TO_SECONDS = 3600;
+constexpr static uint8_t  TWO_PLAYERS = 2;
+constexpr static uint8_t THREE_PLAYERS = 3;
+//constexpr static unsigned int FOUR_PLAYERS = 4;
+//constexpr static unsigned int FOUR_PLAYERS = 4;
 
 
-Table::Table(uint8_t nrPlayers, const std::stack<Card>& deck) :
-	m_nrPlayers{ nrPlayers }, m_Deck{ deck }
+Table::Table(uint8_t nrPlayers) :
+	m_nrPlayers{ nrPlayers }
 {
 	m_AscendingDeckFirst = Deck(Deck::DeckType::Ascending, Deck::DeckNumber::First);
 	m_AscendingDeckSecond = Deck(Deck::DeckType::Ascending, Deck::DeckNumber::Second);
 	m_DescendingDeckFirst = Deck(Deck::DeckType::Descending, Deck::DeckNumber::First);
 	m_DescendingDeckSecond = Deck(Deck::DeckType::Descending, Deck::DeckNumber::Second);
 	m_time = 0u;
+	Shuffle();
+
+	std::sort(m_Players.begin(), m_Players.end());
 }
 
 bool Table::isDeckEmpty() const
@@ -22,6 +29,9 @@ void Table::Shuffle()
 {
 	std::vector<Card> copyCards;
 
+	for (unsigned int i = 2; i <= 99; i++)
+		m_Deck.push(Card(i));
+
 	while (!m_Deck.empty())
 	{
 		copyCards.push_back(std::move(m_Deck.top()));
@@ -32,8 +42,27 @@ void Table::Shuffle()
 	std::mt19937 generator(rd());
 	std::shuffle(copyCards.begin(), copyCards.end(), generator);
 	
-	for (Card& card : copyCards)
+	for (const auto& card : copyCards)
 		m_Deck.push(std::move(card));
+}
+
+void Table::SetupPlayers()
+{
+	m_Players.reserve(m_nrPlayers);
+	switch (m_nrPlayers)
+	{
+	case TWO_PLAYERS:
+		/*for (auto& player : m_Players)
+		{
+
+		}*/
+
+	case THREE_PLAYERS:
+
+	default:
+		break;
+
+	};
 }
 
 bool Table::BackwardsTrick(const Deck& deck, const Card& card)

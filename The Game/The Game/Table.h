@@ -11,10 +11,11 @@
 class Table
 {
 public:
-	Table(uint8_t nrPlayers, const std::stack<Card>&deck);
+	Table(uint8_t nrPlayers);
 
 	bool isDeckEmpty() const;
 	void Shuffle();
+	void SetupPlayers();
 	bool BackwardsTrick(const Deck& deck, const Card& card);
 	bool CheckCard(const Deck& deck, const Card& card);
 	void PlayGame();

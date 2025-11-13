@@ -15,6 +15,7 @@ protected:
 	Color m_color;
 
 public:
+	Card() = default;
 	Card(unsigned int id, Color color = Color::Gray);
 
 	unsigned int getId() const;

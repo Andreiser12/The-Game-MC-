@@ -79,6 +79,17 @@ inline const bool Player::IsCardValid(const Deck& chosenDeck, unsigned int cardI
 			&& cardID < chosenDeck.GetTopCard().getId());
 }
 
+void Player::SetupCards(std::stack<Card>& deck, uint8_t cardsCount)
+{
+	Card cardToPlace;
+	for (uint8_t i = 0; i < cardsCount; i++)
+	{
+		cardToPlace = deck.top();
+		deck.pop();
+		m_cards.emplace(cardToPlace);
+	}
+}
+
 void Player::SetCards(const std::unordered_set<Card, Card::CardsSetHashFunction,
 	Card::CardsEqual>& cards)
 {

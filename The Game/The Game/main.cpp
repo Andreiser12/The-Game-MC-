@@ -18,13 +18,7 @@ void ShowMenu()
 
 int main()
 {
-	std::stack<Card> deck;
-
-	for (unsigned int i = 2; i <= 99; i++)
-		deck.push(Card(i));
-
-	Table t(3, deck);
-	t.Shuffle();
+	Table t(3);
 	
 	if (t.isDeckEmpty())
 		std::cout << "There aren't cards in table.\n" << std::endl;

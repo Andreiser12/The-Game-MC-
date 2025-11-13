@@ -3,7 +3,6 @@
 #include <vector>
 #include <stack>
 #include <unordered_set>
-
 #include "Card.h"
 #include "UserProfile.h"
 #include "Deck.h"
@@ -21,6 +20,7 @@ public:
 	bool FindCard(unsigned int id) const;
 	void RemoveCard(unsigned int id);
 	const static inline bool IsCardValid(const Deck& chosenDeck, unsigned int cardID);
+	void SetupCards(std::stack<Card>& deck, uint8_t cardsCount);
 
 	void SetCards(const std::unordered_set<Card, Card::CardsSetHashFunction,
 		Card::CardsEqual>& cards);

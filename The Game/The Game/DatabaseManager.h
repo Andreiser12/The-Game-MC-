@@ -1,6 +1,7 @@
 #pragma once
 #include "DatabaseStructures.h"
 #include <sqlite_orm/sqlite_orm.h>
+
 class DatabaseManager
 {
 public:

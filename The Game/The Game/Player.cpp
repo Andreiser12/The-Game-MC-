@@ -1,6 +1,6 @@
 #include "Player.h"
 
-constexpr static uint8_t MINIMUM_CARDS = 2u;
+constexpr static uint8_t MINIMUM_CARDS = 2;
 
 Player::Player(const std::unordered_set<Card, Card::CardsSetHashFunction,
 	Card::CardsEqual>& cards,

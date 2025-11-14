@@ -62,6 +62,7 @@ void Menu::Choices()
 		{
 			m_table.Shuffle();
 			std::cout << "Deck shuffled succesfully!\n";
+			break;
 		}
 
 		case 5:

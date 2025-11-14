@@ -157,6 +157,7 @@
     <ClCompile Include="Deck.cpp" />
     <ClCompile Include="FundamentalCard.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Table.cpp" />
     <ClCompile Include="UserProfile.cpp" />
@@ -167,6 +168,7 @@
     <ClInclude Include="DatabaseStructures.h" />
     <ClInclude Include="Deck.h" />
     <ClInclude Include="FundamentalCard.h" />
+    <ClInclude Include="Menu.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Table.h" />
     <ClInclude Include="UserProfile.h" />

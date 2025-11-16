@@ -10,7 +10,8 @@ constexpr static uint8_t  CARDS_THREE_PLAYERS = 7;
 
 constexpr static uint8_t  CARDS_DEFAULT_PLAYERS = 6;
 
-
+constexpr static uint8_t MIN_CARDS_NORMAL = 2;
+constexpr static uint8_t MIN_CARDS_EMPTY_DECK = 1;
 
 Table::Table(uint8_t nrPlayers) :
 	m_nrPlayers{ nrPlayers }
@@ -140,6 +141,10 @@ void Table::PlayGame()
 {
 	bool gameRunning = true;
 	bool gameWon = false;
+	uint8_t currentPlayerIndex = 0;
+	std::cout << "\nThe game started!\n";
+	std::cout << "Number of players: " << static_cast<int>(m_nrPlayers) << "\n";
+	std::cout << "Cards in  deck: " << m_Deck.size() << "\n";
 	while (gameRunning)
 	{
 
@@ -149,4 +154,33 @@ void Table::PlayGame()
 	{
 		player.GetUserProfile().UpdateStats(hours, gameWon, player.GetCardsCount());
 	}
+}
+
+void Table::DisplayTableState() const
+{
+	std::cout << "Deck state:\n";
+	std::cout << "Ascending first: " << m_AscendingDeckFirst.GetTopCard().getId() << "\n";
+	std::cout << "Ascending second: " << m_AscendingDeckSecond.GetTopCard().getId() << "\n";
+	std::cout << "Descending first: " << m_DescendingDeckFirst.GetTopCard().getId() << "\n";
+	std::cout << "Descending second: " << m_DescendingDeckSecond.GetTopCard().getId() << "\n";
+}
+
+bool Table::CanPlayerPlayMinCards(const Player& player, uint8_t minCards) 
+{
+	if (player.GetCardsCount() < minCards)
+		return false;
+	uint8_t validCardsCount = 0;
+	for (const Card& card : player.GetCards())
+	{
+		if (CheckCard(m_AscendingDeckFirst, card) ||
+			CheckCard(m_AscendingDeckSecond, card) ||
+			CheckCard(m_DescendingDeckFirst, card) ||
+			CheckCard(m_DescendingDeckSecond, card))
+		{
+			validCardsCount++;
+			if (validCardsCount >= minCards)
+				return true;
+		}
+	}
+	return false;
 }

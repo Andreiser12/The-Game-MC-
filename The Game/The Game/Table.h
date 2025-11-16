@@ -20,6 +20,9 @@ public:
 	bool CheckCard(const Deck& deck, const Card& card);
 	void PlayGame();
 
+	void DisplayTableState() const;
+	bool CanPlayerPlayMinCards(const Player& player, uint8_t minCards);
+
 	Deck& GetDeck(const Deck::DeckType &type, const Deck::DeckNumber &number);
 	const std::stack<Card>& GetMainDeck() const;
 

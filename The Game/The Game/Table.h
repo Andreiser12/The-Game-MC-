@@ -22,6 +22,9 @@ public:
 
 	void DisplayTableState() const;
 	bool CanPlayerPlayMinCards(const Player& player, uint8_t minCards);
+	void PlaceCardOnDeck(Deck& deck, const Card& card);
+	bool AllCardsPlaced() const;
+	bool PlayerTurn(Player& player, uint8_t minCards);
 
 	Deck& GetDeck(const Deck::DeckType &type, const Deck::DeckNumber &number);
 	const std::stack<Card>& GetMainDeck() const;

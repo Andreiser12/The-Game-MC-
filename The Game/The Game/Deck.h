@@ -30,6 +30,8 @@ public:
 	DeckNumber GetDeckNumber() const;
 	const Card& GetTopCard() const;
 
+	void PushCard(const Card& card);
+
 
 private:
 	std::stack<Card> m_deck;

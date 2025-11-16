@@ -147,7 +147,13 @@ void Table::PlayGame()
 	std::cout << "Cards in  deck: " << m_Deck.size() << "\n";
 	while (gameRunning)
 	{
-
+		if (AllCardsPlaced())
+		{
+			std::cout << "Congratulations! All 98 cards placed!\n";
+			gameWon = true;
+			gameRunning = false;
+			break;
+		}
 	}
 	double hours = static_cast<double>(m_time / HOURS_TO_SECONDS);
 	for (Player player : m_Players)
@@ -183,4 +189,101 @@ bool Table::CanPlayerPlayMinCards(const Player& player, uint8_t minCards)
 		}
 	}
 	return false;
+}
+
+void Table::PlaceCardOnDeck(Deck& deck, const Card& card)
+{
+	deck.PushCard(card);
+	std::cout << " [Card " << card.getId() << " placed on deck]\n";
+}
+
+bool Table::AllCardsPlaced() const
+{
+	if (!isDeckEmpty())
+		return false;
+
+	for (const Player& player : m_Players) {
+		if (player.GetCardsCount() > 0)
+			return false;
+	}
+	return true;
+}
+
+bool Table::PlayerTurn(Player& player, uint8_t minCards)
+{
+	uint8_t cardsPlaced = 0;
+	bool continueTurn = true;
+
+	while (continueTurn)
+	{
+		std::cout << "Your cards: ";
+		player.PrintCards();
+
+		if (cardsPlaced >= minCards)
+		{
+			std::cout << "You already placed " << static_cast<int>(cardsPlaced) << " cards.(minimum = " << static_cast<int>(minCards) << ")\n";
+			std::cout << "Would you like to place another card? (1=Yes, 0=No): ";
+
+			int choice;
+			std::cin >> choice;
+			if (choice == 0)
+			{
+				continueTurn = false;
+				break;
+			}
+		}
+		std::cout << "Choose card's ID you want to place: ";
+		unsigned int cardId;
+		std::cin >> cardId;
+
+		if (!player.FindCard(cardId))
+		{
+			std::cout << "Invalid card!\n";
+			continue;
+		}
+
+		std::cout << "Choose deck:\n";
+		DisplayTableState();
+		std::cout << "Choice: ";
+		int deckChoice;
+		std::cin >> deckChoice;
+
+		Deck* chosenDeck = nullptr;
+		switch (deckChoice)
+		{
+		case 1: chosenDeck = &m_AscendingDeckFirst; break;
+		case 2: chosenDeck = &m_AscendingDeckSecond; break;
+		case 3: chosenDeck = &m_DescendingDeckFirst; break;
+		case 4: chosenDeck = &m_DescendingDeckSecond; break;
+		default:
+			std::cout << "Invalid choice\n";
+			continue;
+		}
+
+		Card cardToPlace(cardId);
+		if (!CheckCard(*chosenDeck, cardToPlace)) {
+			std::cout << "The card can't be placed on this deck!\n";
+			continue;
+		}
+
+		PlaceCardOnDeck(*chosenDeck, cardToPlace);
+		player.RemoveCard(cardId);
+		cardsPlaced++;
+
+		std::cout << "Card " << cardId << " was placed succesfully!\n";
+
+		if (player.GetCardsCount() == 0)
+		{
+			std::cout << "You ran out of cards!\n";
+			continueTurn = false;
+			break;
+		}
+	}
+	if (!isDeckEmpty() && cardsPlaced > 0)
+	{
+		uint8_t cardsToDraw = std::min(static_cast<uint8_t>(cardsPlaced), static_cast<uint8_t>(m_Deck.size()));
+		std::cout << "You draw " << static_cast<int>(cardsToDraw) << " new cards.\n";
+		player.DrawCards(m_Deck);
+	}
+	return cardsPlaced >= minCards;
 }

@@ -32,3 +32,8 @@ const Card& Deck::GetTopCard() const
 {
     return m_deck.top();
 }
+
+void Deck::PushCard(const Card& card)
+{
+    m_deck.push(card);
+}

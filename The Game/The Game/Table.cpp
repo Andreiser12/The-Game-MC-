@@ -55,31 +55,32 @@ void Table::Shuffle()
 
 void Table::SetupPlayers()
 {
-	m_Players.reserve(m_nrPlayers);
+	for (uint8_t i = 0; i < m_nrPlayers; i++)
+	{
+		std::string username = "Player" + std::to_string(i + 1);
+		UserProfile profile(username);
+		std::unordered_set<Card, Card::CardsSetHashFunction, Card::CardsEqual> emptyCards;
+		m_Players.push_back(Player(emptyCards, profile));
+	}
+	uint8_t cardsPerPlayer;
 	switch (m_nrPlayers)
 	{
 	case TWO_PLAYERS:
-		for (auto& player : m_Players)
-		{
-			player.SetupCards(m_Deck, CARDS_TWO_PLAYERS);
-		}
+		cardsPerPlayer = CARDS_TWO_PLAYERS;
 		break;
 
 	case THREE_PLAYERS:
-		for (auto& player : m_Players)
-		{
-			player.SetupCards(m_Deck, CARDS_THREE_PLAYERS);
-		}
+		cardsPerPlayer = CARDS_THREE_PLAYERS;
 		break;
 
 	default:
-		for (auto& player : m_Players)
-		{
-			player.SetupCards(m_Deck, CARDS_DEFAULT_PLAYERS);
-		}
+		cardsPerPlayer = CARDS_DEFAULT_PLAYERS;
 		break;
-
-	};
+	}
+	for (auto& player : m_Players)
+	{
+		player.SetupCards(m_Deck, cardsPerPlayer);
+	}
 }
 
 bool Table::BackwardsTrick(const Deck& deck, const Card& card)
@@ -145,6 +146,8 @@ void Table::PlayGame()
 	std::cout << "\nThe game started!\n";
 	std::cout << "Number of players: " << static_cast<int>(m_nrPlayers) << "\n";
 	std::cout << "Cards in  deck: " << m_Deck.size() << "\n";
+	auto startTime = std::chrono::steady_clock::now();
+
 	while (gameRunning)
 	{
 		if (AllCardsPlaced())
@@ -154,11 +157,48 @@ void Table::PlayGame()
 			gameRunning = false;
 			break;
 		}
+		Player& currentPlayer = m_Players[currentPlayerIndex];
+
+		std::cout << "Player " << currentPlayer.GetUserProfile().GetUsername() << "'s turn.\n";
+		std::cout << "Cards: " << currentPlayer.GetCardsCount() << "\n";
+		std::cout << "Cards on deck: " << m_Deck.size() << "\n";
+
+		DisplayTableState();
+
+		uint8_t minCards = isDeckEmpty() ? MIN_CARDS_EMPTY_DECK : MIN_CARDS_NORMAL;
+
+		if (!CanPlayerPlayMinCards(currentPlayer, minCards))
+		{
+			std::cout << currentPlayer.GetUserProfile().GetUsername() << " can't place " << static_cast<int>(minCards) << " cards! Game Over!\n";
+			gameWon = false;
+			gameRunning = false;
+			break;
+		}
+		bool turnSucces = PlayerTurn(currentPlayer, minCards);
+
+		if (!turnSucces)
+		{
+			std::cout << "Error while placing cards! Game Over!\n";
+			gameWon = false;
+			gameRunning = false;
+			break;
+		}
+		currentPlayerIndex = (currentPlayerIndex + 1) % m_nrPlayers;
 	}
+
+	auto endTime = std::chrono::steady_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::seconds>(endTime - startTime);
+	m_time = duration.count();
+
 	double hours = static_cast<double>(m_time / HOURS_TO_SECONDS);
-	for (Player player : m_Players)
+	std::cout << "Final game stats:\n";
+	std::cout << "Result: " << (gameWon ? "Victory!" : "Defeat!") << "\n";
+	std::cout << "Time played: " << hours << " hours\n";
+	for (Player& player : m_Players)
 	{
-		player.GetUserProfile().UpdateStats(hours, gameWon, player.GetCardsCount());
+		unsigned int finalCards = player.GetCardsCount();
+		player.GetUserProfile().UpdateStats(hours, gameWon, finalCards);
+		std::cout << player.GetUserProfile().GetUsername() << " - Cards left: " << finalCards << "\n";
 	}
 }
 
@@ -243,6 +283,10 @@ bool Table::PlayerTurn(Player& player, uint8_t minCards)
 		}
 
 		std::cout << "Choose deck:\n";
+		std::cout << "1 - Ascending First\n";
+		std::cout << "2 - Ascending Second\n";
+		std::cout << "3 - Descending First\n";
+		std::cout << "4 - Descending Second\n";
 		DisplayTableState();
 		std::cout << "Choice: ";
 		int deckChoice;

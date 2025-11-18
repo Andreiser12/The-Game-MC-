@@ -10,7 +10,7 @@ int main()
 {
 	Table table(3);
 	Menu menu(table);
-	
+
 	DatabaseManager database{ "game.db" };
 
 	Deck& firstAscending = table.GetDeck(Deck::DeckType::Ascending, Deck::DeckNumber::First);

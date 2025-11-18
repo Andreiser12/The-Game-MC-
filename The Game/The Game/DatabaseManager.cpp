@@ -6,3 +6,8 @@ DatabaseManager::DatabaseManager(const std::string& databasePath)
     m_storage.sync_schema();
 }
 
+void DatabaseManager::AddPlayer(const DB::Player& player)
+{
+    m_storage.insert(player);
+}
+

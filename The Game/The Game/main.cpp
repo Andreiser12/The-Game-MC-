@@ -6,12 +6,22 @@
 #include "UserProfile.h"
 #include "DatabaseManager.h"
 
+void TestDB()
+{
+	DatabaseManager database{ "game.db" };
+
+	DB::Player p;
+	std::cout << "Read username for player: ";
+	std::cin >> p.username;
+	database.AddPlayer(p);
+	std::cout << "Added player."<<std::endl;
+}
 int main()
 {
 	Table table(3);
 	Menu menu(table);
 
-	DatabaseManager database{ "game.db" };
+	TestDB();
 
 	Deck& firstAscending = table.GetDeck(Deck::DeckType::Ascending, Deck::DeckNumber::First);
 	Deck& firstDescending = table.GetDeck(Deck::DeckType::Descending, Deck::DeckNumber::First);

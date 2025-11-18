@@ -1,5 +1,7 @@
 #pragma once
 #include "DatabaseStructures.h"
+#include <optional>
+#include <iostream>
 #include <sqlite_orm/sqlite_orm.h>
 
 inline auto CreateStorage(const std::string& filename)
@@ -7,7 +9,7 @@ inline auto CreateStorage(const std::string& filename)
     return sqlite_orm::make_storage(filename,
         sqlite_orm::make_table("Players",
             sqlite_orm::make_column("ID", &DB::Player::ID, sqlite_orm::primary_key().autoincrement()),
-            sqlite_orm::make_column("username", &DB::Player::username)),
+            sqlite_orm::make_column("username", &DB::Player::username, sqlite_orm::unique())),
         sqlite_orm::make_table("UserProfiles",
             sqlite_orm::make_column("ID", &DB::UserProfile::ID, sqlite_orm::primary_key().autoincrement()),
             sqlite_orm::make_column("player_ID", &DB::UserProfile::player_ID),
@@ -28,16 +30,16 @@ public:
 	DatabaseManager(const std::string& databasePath);
 
 	//Methods for User
-	void AddPlayer(const DB::Player& player);
-    DB::Player GetPlayer(unsigned int ID) const;
+	bool AddPlayer(const DB::Player& player);
+    std::optional<DB::Player> GetPlayer(unsigned int ID);
 
 	//Methods for UserProfileDB
 	void AddUserProfile(const DB::UserProfile& profile);
-    DB::UserProfile GetUserProfile(unsigned int userID) const;
+    std::optional<DB::UserProfile> GetUserProfile(unsigned int userID);
 
 	//Methods for PlayerHand
 	void SavePlayerHand(const DB::PlayerHand& hand);
-    DB::PlayerHand GetPlayerHand(unsigned int userID) const;
+    std::optional<DB::PlayerHand> GetPlayerHand(unsigned int userID);
 
 private:
     Storage m_storage;

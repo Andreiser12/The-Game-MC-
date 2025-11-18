@@ -1,6 +1,5 @@
 #include <iostream>
 #include <unordered_set>
-
 #include "Table.h"
 #include "Menu.h"
 #include "UserProfile.h"
@@ -14,7 +13,15 @@ void TestDB()
 	std::cout << "Read username for player: ";
 	std::cin >> p.username;
 	database.AddPlayer(p);
-	std::cout << "Added player."<<std::endl;
+
+	unsigned int ID;
+	std::cout << "Read ID for a person: ";
+	std::cin >> ID;
+
+	auto pTarget = database.GetPlayer(ID);
+	if (pTarget)
+		std::cout << "Found player with ID: " << pTarget->ID << " and name: " << pTarget->username << std::endl;
+	else std::cout << "This player with ID " << ID << " doesn't exist in Player table."<<std::endl;
 }
 int main()
 {

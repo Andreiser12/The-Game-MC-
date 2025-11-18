@@ -9,6 +9,8 @@ UserProfile::~UserProfile() {}
 
 double UserProfile::PerformanceScore() const
 {
+	if (m_finalCards == 0u)
+		return 0.0;
 	return static_cast<double>((m_gamesPlayed + m_gamesWon)/ m_finalCards);
 }
 

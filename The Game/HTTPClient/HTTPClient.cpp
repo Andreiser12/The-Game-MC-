@@ -1,6 +1,9 @@
 // HTTPClient.cpp : Defines the entry point for the application.
 //
 
+#include <iostream>
+#include <string>
+
 #include "framework.h"
 #include "HTTPClient.h"
 #include "SFML/Graphics.hpp"
@@ -40,6 +43,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     loginMode.size = { LOGIN_WIDTH, LOGIN_HEIGHT };
     sf::RenderWindow window(loginMode, "TheGame - Login");
     window.setFramerateLimit(60);
+    const sf::Font font;
+
+    sf::Text statusText(font, "none");
+    statusText.setCharacterSize(100);
+    statusText.setFillColor(sf::Color::Red);
+    statusText.setPosition({ 250.f, 250.f });
+
+    std::string lastKeyPressed = "None";
+    unsigned int count = 0;
 
     while (window.isOpen())
     {
@@ -50,6 +62,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 break;
 
             const sf::Event& event = eventOpt.value();
+
+            if (event.is<sf::Event::KeyPressed>())
+            {
+                ++count;
+                lastKeyPressed = "S-au apasat taste de " + std::to_string(count) + " ori";
+                statusText.setString(lastKeyPressed);
+            }
 
             if (event.is<sf::Event::Closed>()) {
                 window.close();
@@ -71,13 +90,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         float radiusXUsername = usernameRectangle.getSize().x / 2.f;
         float radiusYUsername = usernameRectangle.getSize().y / 2.f;
 
-
         usernameRectangle.setPosition({ (window.getSize().x / 2.f) - radiusXUsername,
             (window.getSize().y / 2.f) - radiusYUsername});
+        statusText.setString(lastKeyPressed);
   
         window.clear(sf::Color::White);
         window.draw(loginRectangle);
         window.draw(usernameRectangle);
+        window.draw(statusText);
         window.display();
     }
 }

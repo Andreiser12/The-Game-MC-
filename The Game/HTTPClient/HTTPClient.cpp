@@ -10,6 +10,13 @@
 constexpr static int LOGIN_HEIGHT{ 480 };
 constexpr static int LOGIN_WIDTH{ 640 };
 
+sf::RectangleShape createRectangle(const sf::Vector2f& size, float thickness)
+{
+    sf::RectangleShape rect(size);
+    rect.setOutlineThickness(thickness);
+    return rect;
+}
+
 // Global Variables:
 HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
@@ -48,15 +55,29 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 window.close();
             }
         }
-        sf::RectangleShape loginRectangle({ 325.f, 140.f });
+        sf::RectangleShape loginRectangle = createRectangle({ 350.f, 150.f }, 3.f);
         loginRectangle.setOutlineColor(sf::Color::Black);
         loginRectangle.setFillColor(sf::Color::Blue);
-        float radiusX = loginRectangle.getSize().x/2;
-        float radiusY = loginRectangle.getSize().y / 2;
-        loginRectangle.setPosition({ (window.getSize().x / 2.f) - radiusX, (window.getSize().y / 2.f) - radiusY });
+        float radiusXLogin = loginRectangle.getSize().x/2.f;
+        float radiusYLogin = loginRectangle.getSize().y/2.f;
+        loginRectangle.setPosition({ (window.getSize().x / 2.f) - radiusXLogin,
+            (window.getSize().y / 2.f) - radiusYLogin });
 
+
+        sf::RectangleShape usernameRectangle = createRectangle({ 200.f, 50.f }, 2.f);
+        usernameRectangle.setOutlineColor(sf::Color::Black);
+        usernameRectangle.setFillColor(sf::Color::White);
+
+        float radiusXUsername = usernameRectangle.getSize().x / 2.f;
+        float radiusYUsername = usernameRectangle.getSize().y / 2.f;
+
+
+        usernameRectangle.setPosition({ (window.getSize().x / 2.f) - radiusXUsername,
+            (window.getSize().y / 2.f) - radiusYUsername});
+  
         window.clear(sf::Color::White);
         window.draw(loginRectangle);
+        window.draw(usernameRectangle);
         window.display();
     }
 }

@@ -1,10 +1,8 @@
-// HTTPClient.cpp : Defines the entry point for the application.
-//
-
 #include <iostream>
 #include <string>
 
 #include "framework.h"
+#include "LoginWindow.h"
 #include "HTTPClient.h"
 #include "SFML/Graphics.hpp"
 
@@ -20,12 +18,10 @@ sf::RectangleShape createRectangle(const sf::Vector2f& size, float thickness)
     return rect;
 }
 
-// Global Variables:
-HINSTANCE hInst;                                // current instance
-WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
-WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
+HINSTANCE hInst;                             
+WCHAR szTitle[MAX_LOADSTRING];                
+WCHAR szWindowClass[MAX_LOADSTRING];            
 
-// Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
@@ -43,11 +39,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     loginMode.size = { LOGIN_WIDTH, LOGIN_HEIGHT };
     sf::RenderWindow window(loginMode, "TheGame - Login");
     window.setFramerateLimit(60);
-    const sf::Font font;
+    const sf::Font font("arial.ttf");
 
     sf::Text statusText(font, "none");
-    statusText.setCharacterSize(100);
-    statusText.setFillColor(sf::Color::Red);
+    statusText.setCharacterSize(24);
+    statusText.setFillColor(sf::Color::Black);
     statusText.setPosition({ 250.f, 250.f });
 
     std::string lastKeyPressed = "None";

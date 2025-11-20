@@ -35,19 +35,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
+    
+
     sf::VideoMode loginMode = sf::VideoMode::getDesktopMode();
     loginMode.size = { LOGIN_WIDTH, LOGIN_HEIGHT };
     sf::RenderWindow window(loginMode, "TheGame - Login");
     window.setFramerateLimit(60);
-    const sf::Font font("arial.ttf");
-
-    sf::Text statusText(font, "none");
-    statusText.setCharacterSize(24);
-    statusText.setFillColor(sf::Color::Black);
-    statusText.setPosition({ 250.f, 250.f });
-
-    std::string lastKeyPressed = "None";
-    unsigned int count = 0;
+    LoginWindow loginWindow(window);
 
     while (window.isOpen())
     {
@@ -59,41 +53,26 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
             const sf::Event& event = eventOpt.value();
 
-            if (event.is<sf::Event::KeyPressed>())
-            {
-                ++count;
-                lastKeyPressed = "S-au apasat taste de " + std::to_string(count) + " ori";
-                statusText.setString(lastKeyPressed);
-            }
 
             if (event.is<sf::Event::Closed>()) {
                 window.close();
             }
         }
-        sf::RectangleShape loginRectangle = createRectangle({ 350.f, 150.f }, 3.f);
-        loginRectangle.setOutlineColor(sf::Color::Black);
-        loginRectangle.setFillColor(sf::Color::Blue);
-        float radiusXLogin = loginRectangle.getSize().x/2.f;
-        float radiusYLogin = loginRectangle.getSize().y/2.f;
-        loginRectangle.setPosition({ (window.getSize().x / 2.f) - radiusXLogin,
-            (window.getSize().y / 2.f) - radiusYLogin });
 
-
-        sf::RectangleShape usernameRectangle = createRectangle({ 200.f, 50.f }, 2.f);
-        usernameRectangle.setOutlineColor(sf::Color::Black);
-        usernameRectangle.setFillColor(sf::Color::White);
-
-        float radiusXUsername = usernameRectangle.getSize().x / 2.f;
-        float radiusYUsername = usernameRectangle.getSize().y / 2.f;
-
-        usernameRectangle.setPosition({ (window.getSize().x / 2.f) - radiusXUsername,
-            (window.getSize().y / 2.f) - radiusYUsername});
-        statusText.setString(lastKeyPressed);
+        sf::RectangleShape usernameBox = loginWindow.getUser();
+        sf::RectangleShape loginButton = loginWindow.getLoginButton();
+        sf::RectangleShape registerButton = loginWindow.getRegisterButton();
+        sf::Text userText = loginWindow.getUserText();
+        sf::Text loginText = loginWindow.getLoginText();
+        sf::Text registerText = loginWindow.getRegisterText();
   
         window.clear(sf::Color::White);
-        window.draw(loginRectangle);
-        window.draw(usernameRectangle);
-        window.draw(statusText);
+        window.draw(usernameBox);
+        window.draw(userText);
+        window.draw(loginButton);
+        window.draw(loginText);
+        window.draw(registerButton);
+        window.draw(registerText);
         window.display();
     }
 }

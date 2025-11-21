@@ -6,17 +6,16 @@
 #include "HTTPClient.h"
 #include "SFML/Graphics.hpp"
 
+#include "TGUI/TGUI.hpp"
+#include "TGUI/Core.hpp"
+#include "TGUI/Widgets/Button.hpp"
+#include "TGUI/Backend/SFML-Graphics.hpp"
+
 #define MAX_LOADSTRING 100
 
 constexpr static int LOGIN_HEIGHT{ 480 };
 constexpr static int LOGIN_WIDTH{ 640 };
 
-sf::RectangleShape createRectangle(const sf::Vector2f& size, float thickness)
-{
-    sf::RectangleShape rect(size);
-    rect.setOutlineThickness(thickness);
-    return rect;
-}
 
 HINSTANCE hInst;                             
 WCHAR szTitle[MAX_LOADSTRING];                
@@ -35,14 +34,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
-    
-
     sf::VideoMode loginMode = sf::VideoMode::getDesktopMode();
     loginMode.size = { LOGIN_WIDTH, LOGIN_HEIGHT };
-    sf::RenderWindow window(loginMode, "TheGame - Login");
-    window.setFramerateLimit(60);
-    LoginWindow loginWindow(window);
 
+    sf::RenderWindow window{ loginMode, "TheGame - Login" };
+    LoginWindow loginWindow(window);
+    window.setFramerateLimit(60);
     while (window.isOpen())
     {
         while (true)
@@ -53,26 +50,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
             const sf::Event& event = eventOpt.value();
 
-
             if (event.is<sf::Event::Closed>()) {
                 window.close();
             }
         }
-
-        sf::RectangleShape usernameBox = loginWindow.getUser();
-        sf::RectangleShape loginButton = loginWindow.getLoginButton();
-        sf::RectangleShape registerButton = loginWindow.getRegisterButton();
-        sf::Text userText = loginWindow.getUserText();
-        sf::Text loginText = loginWindow.getLoginText();
-        sf::Text registerText = loginWindow.getRegisterText();
-  
         window.clear(sf::Color::White);
-        window.draw(usernameBox);
-        window.draw(userText);
-        window.draw(loginButton);
-        window.draw(loginText);
-        window.draw(registerButton);
-        window.draw(registerText);
+        loginWindow.Draw();
         window.display();
     }
 }

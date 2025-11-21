@@ -37,25 +37,25 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     sf::VideoMode loginMode = sf::VideoMode::getDesktopMode();
     loginMode.size = { LOGIN_WIDTH, LOGIN_HEIGHT };
 
-    sf::RenderWindow window{ loginMode, "TheGame - Login" };
+    sf::RenderWindow window{ loginMode, "TheGame - Login", sf::Style::Titlebar | sf::Style::Close };
     LoginWindow loginWindow(window);
     window.setFramerateLimit(60);
     while (window.isOpen())
     {
-        while (true)
+        std::optional<sf::Event> eventOpt;
+        while ((eventOpt = window.pollEvent()))
         {
-            auto eventOpt = window.pollEvent();
-            if (!eventOpt.has_value())
-                break;
+            sf::Event& event = *eventOpt; 
 
-            const sf::Event& event = eventOpt.value();
+            loginWindow.HandleEvent(event);
 
-            if (event.is<sf::Event::Closed>()) {
+            if (event.is<sf::Event::Closed>())
                 window.close();
-            }
         }
+
         window.clear(sf::Color::White);
         loginWindow.Draw();
         window.display();
     }
+
 }

@@ -6,6 +6,7 @@
 #include "TGUI/Backend/SFML-Graphics.hpp"
 
 #include <string>
+#include <vector>
 
 class LoginWindow
 {
@@ -15,6 +16,7 @@ public:
 	void Login(tgui::EditBox::Ptr username);
 	void UpdateTextSize();
 	void Draw();
+	void HandleEvent(sf::Event event);
 
 private:
 	void LoadWidgets();

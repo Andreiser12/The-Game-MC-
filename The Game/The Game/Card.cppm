@@ -1,7 +1,7 @@
-#pragma once
 #include <iostream>
+export module Card;
 
-class Card
+export class Card
 {
 public:
 	enum class Color : uint8_t

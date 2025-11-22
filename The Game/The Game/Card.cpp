@@ -1,4 +1,5 @@
-#include "Card.h"
+module Card;
+#include <iostream>
 
 Card::Card(unsigned int id, Color color) : m_id(id), m_color(color) {}
 

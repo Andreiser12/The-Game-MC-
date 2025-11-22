@@ -152,7 +152,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Card.cpp" />
+    <ClCompile Include="Card.cpp">
+      <FileType>CppCode</FileType>
+    </ClCompile>
     <ClCompile Include="DatabaseManager.cpp" />
     <ClCompile Include="Deck.cpp" />
     <ClCompile Include="FundamentalCard.cpp" />
@@ -163,11 +165,17 @@
     <ClCompile Include="UserProfile.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Card.h" />
+    <ClCompile Include="Card.cppm">
+      <FileType>Document</FileType>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCppModule</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCppModule</CompileAs>
+    </ClCompile>
     <ClInclude Include="DatabaseManager.h" />
     <ClInclude Include="DatabaseStructures.h" />
     <ClInclude Include="Deck.h" />
-    <ClInclude Include="FundamentalCard.h" />
+    <ClCompile Include="FundamentalCard.cppm">
+      <FileType>CppHeader</FileType>
+    </ClCompile>
     <ClInclude Include="Menu.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Table.h" />

@@ -1,11 +1,11 @@
-#pragma once
+export module Deck;
+import Card;
+import FundamentalCard;
 #include <iostream>
 #include <stack>
-
-#include "FundamentalCard.h"
 using std::uint8_t;
 
-class Deck
+export class Deck
 {
 public:
 

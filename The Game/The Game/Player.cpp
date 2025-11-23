@@ -1,4 +1,8 @@
-#include "Player.h"
+module Player;
+#include <iostream>
+#include <vector>
+#include <stack>
+#include <unordered_set>
 
 constexpr static uint8_t MINIMUM_CARDS = 2;
 

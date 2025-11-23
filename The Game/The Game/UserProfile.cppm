@@ -1,7 +1,7 @@
-#pragma once
+export module UserProfile;
 #include <string>
 
-class UserProfile
+export class UserProfile
 {
 public:
 	UserProfile(std::string username = "", unsigned int gamesPlayed = 0,

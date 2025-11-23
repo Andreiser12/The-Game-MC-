@@ -1,15 +1,18 @@
-#pragma once
+export module Table;
+
+
+#include<iostream>
 #include <vector>
 #include <stack>
 #include <algorithm>
 #include <random>
 #include <chrono>
 
-#include "Player.h"
-#include "Card.h"
-#include "Deck.h"
+import Card;
+import Player;
+import Deck;
 
-class Table
+export class Table
 {
 public:
 	Table(uint8_t nrPlayers);

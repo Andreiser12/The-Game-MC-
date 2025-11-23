@@ -48,20 +48,20 @@
     <ClCompile Include="FundamentalCard.cppm">
       <Filter>Header Files</Filter>
     </ClCompile>
+    <ClCompile Include="Deck.cppm">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cppm">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UserProfile.cppm">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Table.cppm">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Table.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Player.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UserProfile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Deck.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DatabaseStructures.h">
       <Filter>Header Files</Filter>
     </ClInclude>

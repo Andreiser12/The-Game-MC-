@@ -172,14 +172,24 @@
     </ClCompile>
     <ClInclude Include="DatabaseManager.h" />
     <ClInclude Include="DatabaseStructures.h" />
-    <ClInclude Include="Deck.h" />
+    <ClCompile Include="Deck.cppm">
+      <FileType>Document</FileType>
+    </ClCompile>
     <ClCompile Include="FundamentalCard.cppm">
-      <FileType>CppHeader</FileType>
+      <FileType>Document</FileType>
     </ClCompile>
     <ClInclude Include="Menu.h" />
-    <ClInclude Include="Player.h" />
-    <ClInclude Include="Table.h" />
-    <ClInclude Include="UserProfile.h" />
+    <ClCompile Include="Player.cppm">
+      <FileType>Document</FileType>
+    </ClCompile>
+    <ClCompile Include="Table.cppm">
+      <FileType>Document</FileType>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Default</CompileAs>
+    </ClCompile>
+    <ClCompile Include="UserProfile.cppm">
+      <FileType>Document</FileType>
+    </ClCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

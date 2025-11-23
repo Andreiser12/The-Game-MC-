@@ -1,13 +1,13 @@
-#pragma once
+export module Player;
 #include <iostream>
 #include <vector>
 #include <stack>
 #include <unordered_set>
-#include "Card.h"
-#include "UserProfile.h"
-#include "Deck.h"
+import Card;
+import UserProfile;
+import Deck;
 
-class Player
+export class Player
 {
 public:
 	Player(const std::unordered_set<Card, Card::CardsSetHashFunction,

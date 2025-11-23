@@ -1,4 +1,5 @@
-#include "UserProfile.h"
+module UserProfile;
+#include<iostream>
 
 UserProfile::UserProfile(std::string username, unsigned int gamesPlayed,
 	unsigned int gamesWon, double hoursPlayed,

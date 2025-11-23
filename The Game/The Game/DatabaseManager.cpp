@@ -1,4 +1,8 @@
-#include "DatabaseManager.h"
+module DatabaseManager;
+
+#include<iostream>
+#include <optional>
+#include <sqlite_orm/sqlite_orm.h>
 
 DatabaseManager::DatabaseManager(const std::string& databasePath)
     : m_storage{ CreateStorage(databasePath) }

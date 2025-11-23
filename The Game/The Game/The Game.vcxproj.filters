@@ -60,16 +60,14 @@
     <ClCompile Include="Table.cppm">
       <Filter>Header Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="DatabaseStructures.h">
+    <ClCompile Include="Menu.cppm">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DatabaseManager.h">
+    </ClCompile>
+    <ClCompile Include="DatabaseManager.cppm">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Menu.h">
+    </ClCompile>
+    <ClCompile Include="DatabaseStructures.cppm">
       <Filter>Header Files</Filter>
-    </ClInclude>
+    </ClCompile>
   </ItemGroup>
 </Project>

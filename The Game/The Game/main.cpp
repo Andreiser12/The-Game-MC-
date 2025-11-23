@@ -1,9 +1,10 @@
 #include <iostream>
 #include <unordered_set>
-#include "Table.h"
-#include "Menu.h"
-#include "UserProfile.h"
-#include "DatabaseManager.h"
+
+import Table;
+import Menu;
+import UserProfile;
+import DatabaseManager;
 
 void TestDB()
 {

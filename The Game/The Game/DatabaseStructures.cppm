@@ -1,7 +1,8 @@
-#pragma once
+export module DatabaseStructures;
+
 #include <string>
 
-namespace DB
+export namespace DB
 {
     struct Player
     {

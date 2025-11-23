@@ -1,8 +1,10 @@
-#pragma once
-#include "Table.h"
+export module Menu;
+
 #include <iostream>
 
-class Menu
+import Table;
+
+export class Menu
 {
 public:
 	Menu(const Table& table);

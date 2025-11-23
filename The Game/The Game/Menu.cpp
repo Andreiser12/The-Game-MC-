@@ -1,4 +1,6 @@
-#include "Menu.h"
+module Menu;
+
+#include<iostream>
 
 Menu::Menu(const Table& table) :
 	m_table{table} {}

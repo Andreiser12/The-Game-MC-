@@ -1,10 +1,11 @@
-#pragma once
-#include "DatabaseStructures.h"
+export module DatabaseManager;
+import DatabaseStructures;
+
 #include <optional>
 #include <iostream>
 #include <sqlite_orm/sqlite_orm.h>
 
-inline auto CreateStorage(const std::string& filename)
+export inline auto CreateStorage(const std::string& filename)
 {
     return sqlite_orm::make_storage(filename,
         sqlite_orm::make_table("Players",
@@ -22,9 +23,9 @@ inline auto CreateStorage(const std::string& filename)
             sqlite_orm::make_column("player_ID", &DB::PlayerHand::player_ID),
             sqlite_orm::make_column("cards", &DB::PlayerHand::cards)));
 }
-using Storage = decltype(CreateStorage(" "));
+export using Storage = decltype(CreateStorage(" "));
 
-class DatabaseManager
+export class DatabaseManager
 {
 public:
 	DatabaseManager(const std::string& databasePath);

@@ -1,9 +1,16 @@
-import <iostream>;
+#include <iostream>
+#include <filesystem>
+#include <thread>
+#include <memory>
+
+#include <crow.h>
+#include "asio/asio.hpp"
 
 import Table;
 import Menu;
 import UserProfile;
 import DatabaseManager;
+
 
 void TestDB()
 {
@@ -23,10 +30,15 @@ void TestDB()
 		std::cout << "Found player with ID: " << pTarget->ID << " and name: " << pTarget->username << std::endl;
 	else std::cout << "This player with ID " << ID << " doesn't exist in Player table."<<std::endl;
 }
+
+
+
 int main()
 {
 	Table table(3);
 	Menu menu(table);
+
+	crow::SimpleApp app;
 
 	TestDB();
 

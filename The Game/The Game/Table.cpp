@@ -295,10 +295,18 @@ bool Table::PlayerTurn(Player& player, uint8_t minCards)
 		Deck* chosenDeck = nullptr;
 		switch (deckChoice)
 		{
-		case 1: chosenDeck = &m_AscendingDeckFirst; break;
-		case 2: chosenDeck = &m_AscendingDeckSecond; break;
-		case 3: chosenDeck = &m_DescendingDeckFirst; break;
-		case 4: chosenDeck = &m_DescendingDeckSecond; break;
+		case 1:
+			chosenDeck = &m_AscendingDeckFirst;
+			break;
+		case 2:
+			chosenDeck = &m_AscendingDeckSecond;
+			break;
+		case 3:
+			chosenDeck = &m_DescendingDeckFirst;
+			break;
+		case 4:
+			chosenDeck = &m_DescendingDeckSecond;
+			break;
 		default:
 			std::cout << "Invalid choice\n";
 			continue;

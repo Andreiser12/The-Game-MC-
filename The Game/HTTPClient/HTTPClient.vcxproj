@@ -133,12 +133,14 @@
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="LoginWindow.h" />
+    <ClInclude Include="RegisterWindow.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HTTPClient.cpp" />
     <ClCompile Include="LoginWindow.cpp" />
+    <ClCompile Include="RegisterWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="HTTPClient.rc" />

@@ -21,9 +21,6 @@ void LoginWindow::Login(tgui::EditBox::Ptr username)
 			errorLabel->setTextSize(16);
 			return;
 		}
-		else
-		{
-		}
 }
 
 void LoginWindow::UpdateTextSize()

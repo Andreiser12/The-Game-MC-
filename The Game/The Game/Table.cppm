@@ -1,15 +1,16 @@
 export module Table;
 
-
-#include<iostream>
-#include <vector>
-#include <stack>
-#include <algorithm>
-#include <random>
-#include <chrono>
+import <iostream>;
+import <vector>;
+import <stack>;
+import <unordered_set>;
+import <algorithm>;
+import <random>;
+import <chrono>;
 
 import Card;
 import Player;
+import UserProfile;
 import Deck;
 
 export class Table

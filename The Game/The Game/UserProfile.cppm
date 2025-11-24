@@ -1,5 +1,6 @@
 export module UserProfile;
-#include <string>
+
+import <string>;
 
 export class UserProfile
 {

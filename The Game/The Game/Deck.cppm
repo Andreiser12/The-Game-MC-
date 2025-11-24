@@ -1,8 +1,10 @@
 export module Deck;
 import Card;
 import FundamentalCard;
-#include <iostream>
-#include <stack>
+
+import <iostream>;
+import <stack>;
+
 using std::uint8_t;
 
 export class Deck

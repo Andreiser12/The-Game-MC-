@@ -1,9 +1,10 @@
 export module DatabaseManager;
+
 import DatabaseStructures;
 
-#include <optional>
-#include <iostream>
-#include <sqlite_orm/sqlite_orm.h>
+import <optional>;
+import <iostream>;
+import <sqlite_orm/sqlite_orm.h>;
 
 export inline auto CreateStorage(const std::string& filename)
 {

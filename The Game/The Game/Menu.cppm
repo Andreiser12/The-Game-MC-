@@ -1,6 +1,6 @@
 export module Menu;
 
-#include <iostream>
+import <iostream>;
 
 import Table;
 

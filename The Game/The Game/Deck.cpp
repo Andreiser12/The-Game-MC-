@@ -1,6 +1,4 @@
 module Deck;
-#include<iostream>
-#include<stack>
 
 Deck::Deck(DeckType deckType, DeckNumber deckNumber) :
     m_deckType(deckType), m_deckNumber(deckNumber)

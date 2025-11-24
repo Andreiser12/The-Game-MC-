@@ -1,8 +1,10 @@
 export module Player;
-#include <iostream>
-#include <vector>
-#include <stack>
-#include <unordered_set>
+
+import <iostream>;
+import <vector>;
+import <stack>;
+import <unordered_set>;
+
 import Card;
 import UserProfile;
 import Deck;
@@ -14,11 +16,13 @@ public:
 		Card::CardsEqual>& cards,
 		const UserProfile& userprofile);
 	~Player();
+
 	void PlaceCards(Deck& chosenDeck);
 	void PrintCards() const;
 	void DrawCards(std::stack<Card>& deck);
 	bool FindCard(unsigned int id) const;
 	void RemoveCard(unsigned int id);
+
 	const static inline bool IsCardValid(const Deck& chosenDeck, unsigned int cardID);
 	void SetupCards(std::stack<Card>& deck, uint8_t cardsCount);
 

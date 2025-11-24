@@ -1,12 +1,5 @@
 module Table;
 
-#include<iostream>
-#include <vector>
-#include <stack>
-#include <algorithm>
-#include <random>
-#include <chrono>
-
 constexpr static unsigned int HOURS_TO_SECONDS = 3600;
 
 constexpr static uint8_t  TWO_PLAYERS = 2;

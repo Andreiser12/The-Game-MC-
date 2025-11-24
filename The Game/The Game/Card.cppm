@@ -1,5 +1,6 @@
-#include <iostream>
 export module Card;
+
+import <iostream>;
 
 export class Card
 {

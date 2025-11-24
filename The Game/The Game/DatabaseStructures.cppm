@@ -1,6 +1,6 @@
 export module DatabaseStructures;
 
-#include <string>
+import <string>;
 
 export namespace DB
 {

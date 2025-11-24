@@ -47,7 +47,19 @@ int main()
 	}
 
 	crow::SimpleApp app;
-
+	CROW_ROUTE(app, "/players")([&database]() {
+		std::vector<crow::json::wvalue> playersJson;
+		auto players = database.GetPlayers();
+		for (const auto& player : players)
+		{
+			playersJson.push_back(crow::json::wvalue{
+				{"id", player.GetId()},
+				{"username", player.GetUsername()}
+				});
+		}
+		return crow::json::wvalue{ playersJson };
+	});
+	app.port(18080).multithreaded().run();
 	//TestDB();
 	
 

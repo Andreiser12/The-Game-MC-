@@ -10,6 +10,16 @@ export namespace DB
         unsigned int ID;
         std::string username;
 
+        unsigned int GetId() const
+        {
+            return ID;
+        }
+
+        const std::string& GetUsername() const
+        {
+            return username;
+        }
+
         friend std::ostream& operator<<(std::ostream& out, const Player& other)
         {
             out << other.ID << " " << other.username;

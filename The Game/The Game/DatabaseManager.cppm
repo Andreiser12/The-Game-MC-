@@ -1,9 +1,11 @@
 export module DatabaseManager;
 
 import DatabaseStructures;
+import Player;
 
 import <optional>;
 import <iostream>;
+import <vector>;
 import <sqlite_orm/sqlite_orm.h>;
 
 export inline auto CreateStorage(const std::string& filename)
@@ -42,6 +44,10 @@ public:
 	//Methods for PlayerHand
 	void SavePlayerHand(const DB::PlayerHand& hand);
     std::optional<DB::PlayerHand> GetPlayerHand(unsigned int userID);
+
+    void PopulateDataBase();
+
+    std::vector<DB::Player> GetPlayers();
 
 private:
     Storage m_storage;

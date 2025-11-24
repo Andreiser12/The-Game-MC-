@@ -16,6 +16,7 @@ void TestDB()
 {
 	DatabaseManager database{ "game.db" };
 
+
 	DB::Player p;
 	std::cout << "Read username for player: ";
 	std::cin >> p.username;
@@ -38,9 +39,17 @@ int main()
 	Table table(3);
 	Menu menu(table);
 
+	DatabaseManager database{ "gameDB.db" };
+	auto players = database.GetPlayers();
+	for (const auto& player : players)
+	{
+		std::cout << player <<std::endl;
+	}
+
 	crow::SimpleApp app;
 
-	TestDB();
+	//TestDB();
+	
 
 	Deck& firstAscending = table.GetDeck(Deck::DeckType::Ascending, Deck::DeckNumber::First);
 	Deck& firstDescending = table.GetDeck(Deck::DeckType::Descending, Deck::DeckNumber::First);

@@ -1,6 +1,7 @@
 export module DatabaseStructures;
 
 import <string>;
+import <iostream>;
 
 export namespace DB
 {
@@ -8,6 +9,12 @@ export namespace DB
     {
         unsigned int ID;
         std::string username;
+
+        friend std::ostream& operator<<(std::ostream& out, const Player& other)
+        {
+            out << other.ID << " " << other.username;
+            return out;
+        }
     };
 
     struct UserProfile

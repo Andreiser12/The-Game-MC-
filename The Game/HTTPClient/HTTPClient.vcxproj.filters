@@ -24,9 +24,6 @@
     <ClInclude Include="Resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="HTTPClient.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="LoginWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>

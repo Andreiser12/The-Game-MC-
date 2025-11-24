@@ -13,10 +13,13 @@ class LoginWindow
 public:
 	LoginWindow(sf::RenderWindow& window);
 
-	void Login(tgui::EditBox::Ptr username);
+	void CheckLogin(tgui::EditBox::Ptr username);
 	void UpdateTextSize();
 	void Draw();
 	void HandleEvent(sf::Event event);
+
+	bool GetLoggedState() const;
+	bool GetRegisteredState() const;
 
 private:
 	void LoadWidgets();
@@ -24,5 +27,7 @@ private:
 private:
 
 	tgui::Gui m_login;
+	bool m_isLoggedIn = false;
+	bool m_isRegisteredPressed = false;
 };
 

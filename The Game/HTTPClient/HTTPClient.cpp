@@ -3,7 +3,6 @@
 
 #include "framework.h"
 #include "LoginWindow.h"
-#include "HTTPClient.h"
 #include "SFML/Graphics.hpp"
 
 #include "TGUI/TGUI.hpp"
@@ -15,7 +14,6 @@
 
 constexpr static int LOGIN_HEIGHT{ 480 };
 constexpr static int LOGIN_WIDTH{ 640 };
-
 
 HINSTANCE hInst;                             
 WCHAR szTitle[MAX_LOADSTRING];                
@@ -49,8 +47,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
             loginWindow.HandleEvent(event);
 
-            if (event.is<sf::Event::Closed>())
+            if (event.is<sf::Event::Closed>() || loginWindow.GetLoggedState())
+            {
                 window.close();
+            }    
         }
 
         window.clear(sf::Color::White);
@@ -58,4 +58,25 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         window.display();
     }
 
+    if (loginWindow.GetLoggedState())
+    {
+        sf::VideoMode menuMode = sf::VideoMode::getDesktopMode();
+        sf::RenderWindow menuWindow{ menuMode, "TheGame - 1.0.0", sf::State::Fullscreen};
+        while (menuWindow.isOpen())
+        {
+            std::optional<sf::Event> eventOpt;
+            while ((eventOpt = menuWindow.pollEvent()))
+            {
+                sf::Event& event = *eventOpt;
+
+                if (event.is<sf::Event::Closed>())
+                {
+                    menuWindow.close();
+                }
+            }
+            menuWindow.clear(sf::Color::White);
+            menuWindow.display();
+        }
+    }
+    return 0;
 }

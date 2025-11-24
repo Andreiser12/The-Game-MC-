@@ -5,11 +5,11 @@ LoginWindow::LoginWindow(sf::RenderWindow& window)
 	LoadWidgets(); 
 } 
 
-void LoginWindow::Login(tgui::EditBox::Ptr username)
+void LoginWindow::CheckLogin(tgui::EditBox::Ptr username)
 {
 		std::vector<std::string> usernames = { "user1", "name123", "guest" };
-		if (username->getText() == "" && username->getText() != "user1" && username->getText() != "name123" &&
-			username->getText() != "guest")
+		if (username->getText() == "" || (username->getText() != "user1" && username->getText() != "name123" &&
+			username->getText() != "guest"))
 		{
 			auto errorLabel = tgui::Label::create();
 			errorLabel->setText("No account with this username has been found!");
@@ -21,6 +21,7 @@ void LoginWindow::Login(tgui::EditBox::Ptr username)
 			errorLabel->setTextSize(16);
 			return;
 		}
+		m_isLoggedIn = true;
 }
 
 void LoginWindow::UpdateTextSize()
@@ -70,5 +71,15 @@ void LoginWindow::LoadWidgets()
 	m_login.add(registerButton); 
 	registerButton->setTextSize(24);
 
-	loginButton->onClick([this, editBoxUsername] { Login(editBoxUsername); });
+	loginButton->onClick([this, editBoxUsername] { CheckLogin(editBoxUsername); });
+}
+
+bool LoginWindow::GetLoggedState() const
+{
+	return m_isLoggedIn;
+}
+
+bool LoginWindow::GetRegisteredState() const
+{
+	return m_isRegisteredPressed;
 }

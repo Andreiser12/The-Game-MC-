@@ -11,7 +11,6 @@ import Menu;
 import UserProfile;
 import DatabaseManager;
 
-
 void TestDB()
 {
 	DatabaseManager database{ "game.db" };

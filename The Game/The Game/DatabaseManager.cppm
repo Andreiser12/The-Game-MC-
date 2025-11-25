@@ -11,20 +11,17 @@ import <sqlite_orm/sqlite_orm.h>;
 export inline auto CreateStorage(const std::string& filename)
 {
     return sqlite_orm::make_storage(filename,
-        sqlite_orm::make_table("Players",
-            sqlite_orm::make_column("ID", &DB::Player::ID, sqlite_orm::primary_key().autoincrement()),
-            sqlite_orm::make_column("username", &DB::Player::username, sqlite_orm::unique())),
-        sqlite_orm::make_table("UserProfiles",
-            sqlite_orm::make_column("ID", &DB::UserProfile::ID, sqlite_orm::primary_key().autoincrement()),
-            sqlite_orm::make_column("player_ID", &DB::UserProfile::player_ID),
-            sqlite_orm::make_column("gamesPlayed", &DB::UserProfile::gamesPlayed),
-            sqlite_orm::make_column("gamesWon", &DB::UserProfile::gamesWon),
-            sqlite_orm::make_column("hoursPlayed", &DB::UserProfile::hoursPlayed),
-            sqlite_orm::make_column("finalCards", &DB::UserProfile::finalCards)),
-        sqlite_orm::make_table("PlayerHands",
-            sqlite_orm::make_column("ID", &DB::PlayerHand::ID, sqlite_orm::primary_key().autoincrement()),
-            sqlite_orm::make_column("player_ID", &DB::PlayerHand::player_ID),
-            sqlite_orm::make_column("cards", &DB::PlayerHand::cards)));
+        sqlite_orm::make_table("User",
+            sqlite_orm::make_column("ID", &DB::User::GetID, &DB::User::SetID, sqlite_orm::primary_key().autoincrement()),
+            sqlite_orm::make_column("username", &DB::User::GetUsername, &DB::User::SetUsername),
+            sqlite_orm::make_column("gamesPlayed", &DB::User::GetGamesPlayed, &DB::User::SetGamesPlayed),
+            sqlite_orm::make_column("gamesWon", &DB::User::GetGamesWon, &DB::User::SetGamesWon),
+            sqlite_orm::make_column("hoursPlayed", &DB::User::GetHoursPlayed, &DB::User::SetHoursPlayed),
+            sqlite_orm::make_column("finalCards", &DB::User::GetFinalCards, &DB::User::SetFinalCards)),
+        sqlite_orm::make_table("PlayerHand",
+            sqlite_orm::make_column("ID", &DB::PlayerHand::GetID, &DB::PlayerHand::SetID, sqlite_orm::primary_key().autoincrement()),
+            sqlite_orm::make_column("user_ID", &DB::PlayerHand::GetUserID, &DB::PlayerHand::SetUserID),
+            sqlite_orm::make_column("cards", &DB::PlayerHand::GetCards, &DB::PlayerHand::SetCards)));
 }
 export using Storage = decltype(CreateStorage(" "));
 
@@ -34,12 +31,8 @@ public:
 	DatabaseManager(const std::string& databasePath);
 
 	//Methods for User
-	bool AddPlayer(const DB::Player& player);
-    std::optional<DB::Player> GetPlayer(unsigned int ID);
-
-	//Methods for UserProfileDB
-	void AddUserProfile(const DB::UserProfile& profile);
-    std::optional<DB::UserProfile> GetUserProfile(unsigned int userID);
+	bool AddUser(const DB::User& user);
+    std::optional<DB::User> GetUser(unsigned int userID);
 
 	//Methods for PlayerHand
 	void SavePlayerHand(const DB::PlayerHand& hand);
@@ -47,7 +40,7 @@ public:
 
     void PopulateDataBase();
 
-    std::vector<DB::Player> GetPlayers();
+    std::vector<DB::User> GetUsers();
 
 private:
     Storage m_storage;

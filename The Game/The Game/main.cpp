@@ -15,52 +15,68 @@ void TestDB()
 {
 	DatabaseManager database{ "game.db" };
 
-
-	DB::Player p;
-	std::cout << "Read username for player: ";
-	std::cin >> p.username;
-	database.AddPlayer(p);
+	DB::User user;
+	std::string username;
+	std::cout << "Read a name for user: ";
+	std::cin >> username;
+	user.SetUsername(username);
+	database.AddUser(user);
 
 	unsigned int ID;
 	std::cout << "Read ID for a person: ";
 	std::cin >> ID;
 
-	auto pTarget = database.GetPlayer(ID);
-	if (pTarget)
-		std::cout << "Found player with ID: " << pTarget->ID << " and name: " << pTarget->username << std::endl;
-	else std::cout << "This player with ID " << ID << " doesn't exist in Player table."<<std::endl;
+	auto uTarget = database.GetUser(ID);
+	if (uTarget)
+		std::cout << *uTarget;
+	else std::cout << "This user with ID " << ID << " doesn't exist in User table." << std::endl;
+
+	DB::PlayerHand hand;
+	std::cout << "Read a ID for a user: ";
+	std::cin >> ID;
+	hand.SetUserID(ID);
+	std::string handUser;
+	std::cout << "Read a hand for a user: ";
+	std::cin >> handUser;
+	hand.SetCards(handUser);
+	database.SavePlayerHand(hand);
+
+	std::cout << "Read ID for a user: ";
+	std::cin >> ID;
+
+	auto uHand = database.GetPlayerHand(ID);
+	if (uHand)
+		std::cout << *uHand;
+	else std::cout << "This hand with ID " << ID << " doesn't exist in PlayerHand table." << std::endl;
 }
-
-
-
 int main()
 {
+	//TestDB();
+	
 	Table table(3);
 	Menu menu(table);
 
 	DatabaseManager database{ "gameDB.db" };
-	auto players = database.GetPlayers();
-	for (const auto& player : players)
+	auto Users = database.GetUsers();
+	for (const auto& user : Users)
 	{
-		std::cout << player <<std::endl;
+		std::cout << user <<std::endl;
 	}
 
 	crow::SimpleApp app;
-	CROW_ROUTE(app, "/players")([&database]() {
-		std::vector<crow::json::wvalue> playersJson;
-		auto players = database.GetPlayers();
-		for (const auto& player : players)
+	CROW_ROUTE(app, "/users")([&database]() {
+		std::vector<crow::json::wvalue> usersJson;
+		auto users = database.GetUsers();
+		for (const auto& user : users)
 		{
-			playersJson.push_back(crow::json::wvalue{
-				{"id", player.GetId()},
-				{"username", player.GetUsername()}
+			usersJson.push_back(crow::json::wvalue{
+				{"id", user.GetID()},
+				{"username", user.GetUsername()}
 				});
 		}
-		return crow::json::wvalue{ playersJson };
+		return crow::json::wvalue{ usersJson };
 	});
 	app.port(18080).multithreaded().run();
-	//TestDB();
-	
 
 	Deck& firstAscending = table.GetDeck(Deck::DeckType::Ascending, Deck::DeckNumber::First);
 	Deck& firstDescending = table.GetDeck(Deck::DeckType::Descending, Deck::DeckNumber::First);

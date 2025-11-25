@@ -1,14 +1,10 @@
 #pragma once
-#include "SFML/Graphics.hpp"
-#include "TGUI/TGUI.hpp"
-#include "TGUI/Core.hpp"
-#include "TGUI/Widgets/Button.hpp"
-#include "TGUI/Backend/SFML-Graphics.hpp"
+#include "IWindow.h"
 
 #include <string>
 #include <vector>
 
-class LoginWindow
+class LoginWindow : IWindow
 {
 public:
 	LoginWindow(sf::RenderWindow& window);
@@ -16,15 +12,16 @@ public:
 	void CheckLogin(tgui::EditBox::Ptr username);
 	void CheckRegister();
 
-	void UpdateTextSize();
-	void Draw();
-	void HandleEvent(sf::Event event);
+	void UpdateTextSize() override;
+	void Draw() override;
+	void HandleEvent(sf::Event event) override;
 
 	bool GetLoggedState() const;
 	bool GetRegisteredState() const;
+	bool GetWindowState() const override;
 
 private:
-	void LoadWidgets();
+	void LoadWidgets() override;
 	
 private:
 

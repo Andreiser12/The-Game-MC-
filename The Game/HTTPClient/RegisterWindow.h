@@ -1,28 +1,25 @@
 #pragma once
-#include "SFML/Graphics.hpp"
-#include "TGUI/TGUI.hpp"
-#include "TGUI/Core.hpp"
-#include "TGUI/Widgets/Button.hpp"
-#include "TGUI/Backend/SFML-Graphics.hpp"
+#include "IWindow.h"
 
 #include <vector>
 #include <string>
 
-class RegisterWindow
+class RegisterWindow : IWindow
 {
 public:
 	RegisterWindow(sf::RenderWindow& window);
 
-	void HandleEvent(sf::Event event);
-	void Draw();
-	void UpdateTextSize();
+	void HandleEvent(sf::Event event) override;
+	void Draw() override;
+	void UpdateTextSize() override;
+	void GoToLogin();
 	
 	void CheckRegister(tgui::EditBox::Ptr username);
 
 	bool GetRegisteredState() const;
 
 private:
-	void LoadWidgets();
+	void LoadWidgets() override;
 
 private:
 	tgui::Gui m_register;

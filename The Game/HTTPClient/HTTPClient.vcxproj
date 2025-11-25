@@ -132,6 +132,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="IWindow.h" />
     <ClInclude Include="LoginWindow.h" />
     <ClInclude Include="RegisterWindow.h" />
     <ClInclude Include="Resource.h" />
@@ -139,6 +140,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HTTPClient.cpp" />
+    <ClCompile Include="IWindow.cpp" />
     <ClCompile Include="LoginWindow.cpp" />
     <ClCompile Include="RegisterWindow.cpp" />
   </ItemGroup>

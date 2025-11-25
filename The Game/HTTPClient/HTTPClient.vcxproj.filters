@@ -30,6 +30,9 @@
     <ClInclude Include="RegisterWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HTTPClient.cpp">
@@ -40,6 +43,9 @@
     </ClCompile>
     <ClCompile Include="RegisterWindow.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IWindow.cpp">
+      <Filter>Resource Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

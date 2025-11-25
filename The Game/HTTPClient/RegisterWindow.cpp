@@ -12,6 +12,11 @@ void RegisterWindow::UpdateTextSize()
 	m_register.setTextSize(static_cast<unsigned int>(0.07f * windowHeight));
 }
 
+void RegisterWindow::GoToLogin()
+{
+	m_onLoginWindow = true;
+}
+
 void RegisterWindow::Draw()
 {
 	m_register.draw();
@@ -62,15 +67,23 @@ void RegisterWindow::LoadWidgets()
 		editBoxUsername->setDefaultText("Username");
 		});
 
-	auto registerButton = tgui::Button::create("Register"); registerButton->setSize({ "20%", "16.67%" });
+	auto registerButton = tgui::Button::create("Register");
+	registerButton->setSize({ "20%", "16.67%" });
 	registerButton->setPosition({
 		"usernameBox.w / 2 - registerButton.w / 2 + 30",
 		"usernameBox.bottom + 75"
-	});
+		});
 	m_register.add(registerButton);
 	registerButton->setTextSize(24);
 
 	registerButton->onClick([this, editBoxUsername] {CheckRegister(editBoxUsername); });
+
+	auto backButton = tgui::Button::create("Back");
+	backButton->setSize({ "10%", "12.5%" });
+	backButton->setPosition({ "3.5%", "5%" });
+	m_register.add(backButton);
+	backButton->setTextSize(20);
+	backButton->onClick([this] { GoToLogin(); });
 }
 
 bool RegisterWindow::GetRegisteredState() const

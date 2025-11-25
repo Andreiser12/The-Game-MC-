@@ -1,5 +1,4 @@
 #include "LoginWindow.h"
-#include "RegisterWindow.h"
 
 LoginWindow::LoginWindow(sf::RenderWindow& window)
 	: m_login(window) { 
@@ -28,6 +27,7 @@ void LoginWindow::CheckLogin(tgui::EditBox::Ptr username)
 void LoginWindow::CheckRegister()
 {
 	m_isRegisteredPressed = true;
+	m_onLoginWindow = false;
 }
 
 void LoginWindow::UpdateTextSize()
@@ -89,4 +89,9 @@ bool LoginWindow::GetLoggedState() const
 bool LoginWindow::GetRegisteredState() const
 {
 	return m_isRegisteredPressed;
+}
+
+bool LoginWindow::GetWindowState() const
+{
+	return m_onLoginWindow;
 }

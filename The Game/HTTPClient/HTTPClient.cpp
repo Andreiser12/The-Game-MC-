@@ -5,6 +5,8 @@
 #include "LoginWindow.h"
 #include "RegisterWindow.h"
 #include "SFML/Graphics.hpp"
+#include <cpr/cpr.h>
+#include <crow.h>
 
 #include "TGUI/TGUI.hpp"
 #include "TGUI/Core.hpp"
@@ -33,96 +35,74 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
-    sf::VideoMode loginRegisterMode = sf::VideoMode::getDesktopMode();
-    loginRegisterMode.size = { LOGIN_WIDTH, LOGIN_HEIGHT };
-
-    sf::RenderWindow loginWindow{ loginRegisterMode, "TheGame - Login", sf::Style::Titlebar | sf::Style::Close };
-    LoginWindow _login(loginWindow);
-    RegisterWindow _register(loginWindow);
-    bool onLoginWindow = true;
-    loginWindow.setFramerateLimit(60);
-
-    while (loginWindow.isOpen())
+    cpr::Response response = cpr::Get(cpr::Url{ "http://localhost:18080/users" });
+    if (!response.error)
     {
-        std::optional<sf::Event> eventOpt;
-        while ((eventOpt = loginWindow.pollEvent()))
-        {
-            sf::Event& event = *eventOpt; 
+        sf::VideoMode loginRegisterMode = sf::VideoMode::getDesktopMode();
+        loginRegisterMode.size = { LOGIN_WIDTH, LOGIN_HEIGHT };
 
-            if (_login.GetWindowState())
-            {
-                _login.HandleEvent(event);
-            }
-            else
-            {
-                _register.HandleEvent(event);
-            }
+        sf::RenderWindow loginWindow{ loginRegisterMode, "TheGame - Login", sf::Style::Titlebar | sf::Style::Close };
+        LoginWindow _login(loginWindow);
+        RegisterWindow _register(loginWindow);
+        bool onLoginWindow = true;
+        loginWindow.setFramerateLimit(60);
 
-            if (event.is<sf::Event::Closed>() || _login.GetLoggedState())
-            {
-                loginWindow.close();
-            }
-        }
-
-        loginWindow.clear(tgui::Color::White);
-        if (_login.GetWindowState())
-        {
-            _login.Draw();
-        }
-        else
-        {
-            _register.Draw();
-        }
-        loginWindow.display();
-    }
-
-    //if (_login.GetRegisteredState())
-    //{
-    //   
-    //    sf::VideoMode registerMode = sf::VideoMode::getDesktopMode();
-    //    registerMode.size = { LOGIN_WIDTH, LOGIN_HEIGHT };
-    //    sf::RenderWindow registerWindow(registerMode, "TheGame - Register", sf::Style::Titlebar | sf::Style::Close);
-    //    RegisterWindow _register(registerWindow);
-
-    //    while (registerWindow.isOpen())
-    //    {
-    //        std::optional<sf::Event> eventOpt;
-    //        while ((eventOpt = registerWindow.pollEvent()))
-    //        {
-    //            sf::Event& event = *eventOpt;
-
-    //            _register.HandleEvent(event);
-
-    //            if (event.is<sf::Event::Closed>() || _register.GetRegisteredState())
-    //            {
-    //                registerWindow.close();
-    //            }
-    //        }
-    //        registerWindow.clear(tgui::Color::White);
-    //        _register.Draw();
-    //        registerWindow.display();
-    //    }
-    //}
-
-    if (_login.GetLoggedState())
-    {
-        sf::VideoMode menuMode = sf::VideoMode::getDesktopMode();
-        sf::RenderWindow menuWindow{ menuMode, "TheGame - 1.0.0", sf::State::Fullscreen};
-        while (menuWindow.isOpen())
+        while (loginWindow.isOpen())
         {
             std::optional<sf::Event> eventOpt;
-            while ((eventOpt = menuWindow.pollEvent()))
+            while ((eventOpt = loginWindow.pollEvent()))
             {
                 sf::Event& event = *eventOpt;
 
-                if (event.is<sf::Event::Closed>())
+                if (_login.GetWindowState())
                 {
-                    menuWindow.close();
+                    _login.HandleEvent(event);
+                }
+                else
+                {
+                    _register.HandleEvent(event);
+                }
+
+                if (event.is<sf::Event::Closed>() || _login.GetLoggedState())
+                {
+                    loginWindow.close();
                 }
             }
-            menuWindow.clear(sf::Color::White);
-            menuWindow.display();
+
+            loginWindow.clear(tgui::Color::White);
+            if (_login.GetWindowState())
+            {
+                _login.Draw();
+            }
+            else
+            {
+                _register.Draw();
+            }
+            loginWindow.display();
+        }
+
+        if (_login.GetLoggedState())
+        {
+            sf::VideoMode menuMode = sf::VideoMode::getDesktopMode();
+            sf::RenderWindow menuWindow{ menuMode, "TheGame - 1.0.0", sf::State::Windowed};
+            while (menuWindow.isOpen())
+            {
+                std::optional<sf::Event> eventOpt;
+                while ((eventOpt = menuWindow.pollEvent()))
+                {
+                    sf::Event& event = *eventOpt;
+
+                    if (event.is<sf::Event::Closed>())
+                    {
+                        menuWindow.close();
+                    }
+                }
+                menuWindow.clear(sf::Color::White);
+                menuWindow.display();
+            }
         }
     }
+
+    
     return 0;
 }

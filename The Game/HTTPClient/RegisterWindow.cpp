@@ -24,12 +24,14 @@ void RegisterWindow::Draw()
 
 void RegisterWindow::CheckRegister(tgui::EditBox::Ptr username)
 {
-	std::vector<std::string> dataBaseUsernames = { "user1", "name123", "guest" };
-	if (username->getText() == "") return;
-
-	if (username->getText() == "user1" ||
-		username->getText() == "guest" ||
-		username->getText() == "name123")
+	std::string usernameStr = username->getText().toStdString();
+	cpr::Response r = cpr::Post(
+		cpr::Url{ "http://localhost:18080/register" },
+		cpr::Body{ "{\"username\": \"" + usernameStr + "\"}" },
+		cpr::Header{ {"Content-Type", "application/json"} }
+	);
+	auto json = crow::json::load(r.text);
+	if (!json || json["status"].s() == "fail")
 	{
 		auto errorLabel = tgui::Label::create();
 		errorLabel->setText("An account with this username already exists!");
@@ -41,7 +43,10 @@ void RegisterWindow::CheckRegister(tgui::EditBox::Ptr username)
 		errorLabel->setTextSize(16);
 		return;
 	}
-	m_isRegistered = true;
+	else
+	{
+		m_isRegistered = true;
+	}
 }
 
 void RegisterWindow::HandleEvent(sf::Event event)

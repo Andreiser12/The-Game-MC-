@@ -32,8 +32,8 @@ public:
 
 	//Methods for User
 	bool AddUser(const DB::User& user);
-    std::optional<DB::User> GetUser(unsigned int userID);
-
+    std::optional<DB::User> GetUserByID(unsigned int userID);
+    std::optional<DB::User> GetUserByName(const std::string& username);
 	//Methods for PlayerHand
 	void SavePlayerHand(const DB::PlayerHand& hand);
     std::optional<DB::PlayerHand> GetPlayerHand(unsigned int userID);

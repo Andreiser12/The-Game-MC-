@@ -7,21 +7,28 @@ LoginWindow::LoginWindow(sf::RenderWindow& window)
 
 void LoginWindow::CheckLogin(tgui::EditBox::Ptr username)
 {
-		std::vector<std::string> usernames = { "user1", "name123", "guest" };
-		if (username->getText() == "" || (username->getText() != "user1" && username->getText() != "name123" &&
-			username->getText() != "guest"))
-		{
-			auto errorLabel = tgui::Label::create();
-			errorLabel->setText("No account with this username has been found!");
-			errorLabel->getRenderer()->setTextColor(tgui::Color::Red);
-			auto coordErrorX = username->getPosition().x + username->getSize().x / 10000.f;
-			auto coordErrorY = username->getPosition().y + username->getSize().y;
-			errorLabel->setPosition(coordErrorX, coordErrorY);
-			m_login.add(errorLabel);
-			errorLabel->setTextSize(16);
-			return;
-		}
-		m_isLoggedIn = true;
+	std::string usernameStr = username->getText().toStdString();
+	cpr::Response r = cpr::Post(
+		cpr::Url{ "http://localhost:18080/login" },
+		cpr::Body{ "{\"username\": \"" + usernameStr + "\"}" },
+		cpr::Header{ {"Content-Type", "application/json"} }
+	);
+
+	auto json = crow::json::load(r.text);
+
+	if (!json || json["status"].s() == "fail")
+	{
+		auto errorLabel = tgui::Label::create();
+		errorLabel->setText("No account with this username has been found!");
+		errorLabel->getRenderer()->setTextColor(tgui::Color::Red);
+		auto coordErrorX = username->getPosition().x + username->getSize().x / 10000.f;
+		auto coordErrorY = username->getPosition().y + username->getSize().y;
+		errorLabel->setPosition(coordErrorX, coordErrorY);
+		m_login.add(errorLabel);
+		errorLabel->setTextSize(16);
+		return;
+	}
+	m_isLoggedIn = true;
 }
 
 void LoginWindow::CheckRegister()

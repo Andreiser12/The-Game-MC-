@@ -1,6 +1,7 @@
 #pragma once
 #include "IWindow.h"
-
+#include <cpr/cpr.h>
+#include <crow.h>
 #include <string>
 #include <vector>
 

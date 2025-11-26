@@ -4,7 +4,8 @@ constexpr static unsigned int K_OFFSET_BUTTONS{ 100u };
 constexpr static unsigned int K_TEXT_SIZE{ 24u };
 
 MainMenuWindow::MainMenuWindow(sf::RenderWindow& window) :
-	m_mainMenu(window)
+	m_mainMenu(window),
+	m_exitLayout(window)
 {
 	LoadWidgets();
 }
@@ -47,15 +48,30 @@ void MainMenuWindow::LoadWidgets()
 	exitButton->setText("Exit");
 	m_mainMenu.add(exitButton);
 	exitButton->setTextSize(K_TEXT_SIZE);
+	exitButton->onClick([this] {ExitButtonPressed (); });
 }
 
 void MainMenuWindow::Draw()
 {
 	m_mainMenu.draw();
+	if (m_showExitMenu)
+	{
+		m_exitLayout.Draw();
+	}
+}
+
+void MainMenuWindow::ExitButtonPressed()
+{
+	m_showExitMenu = true;
 }
 
 void MainMenuWindow::HandleEvent(sf::Event event)
 {
 	m_mainMenu.handleEvent(event);
+
+	if (m_showExitMenu)
+	{
+		m_exitLayout.HandleEvent(event);
+	}
 }
 

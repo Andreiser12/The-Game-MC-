@@ -1,30 +1,20 @@
 #pragma once
-#include <SFML/Graphics.hpp>
-#include <TGUI/TGUI.hpp>
-#include <TGUI/Backend/SFML-Graphics.hpp>
+#include "IWindow.h"
 
-
-class ExitButton
+class ExitButton : IWindow
 {
-private:
-    sf::RenderWindow& window;
-    tgui::Gui& gui;
-    tgui::Button::Ptr exitButton;
-    tgui::ChildWindow::Ptr confirmDialog;
-    bool dialogVisible;
-
-private:
-    void SetupExitButton(float x, float y, float width, float height);
-    void CreateConfirmationDialog();
-
 public:
-    ExitButton(sf::RenderWindow& win, tgui::Gui& g);
+	ExitButton(sf::RenderWindow& window);
+	ExitButton() = default;
 
-    void Create(float x, float y, float width = 200, float height = 50);
-    void ShowConfirmDialog();
-    void HideConfirmDialog();
-    bool IsDialogVisible() const;
+	void Draw() override;
+	void HandleEvent(sf::Event event) override;
+	void UpdateTextSize() override;
 
+private:
+	void LoadWidgets() override;
 
+private:
+	tgui::Gui m_exitButton;
 };
 

@@ -5,6 +5,8 @@
 #include "TGUI/Widgets/Button.hpp"
 #include "TGUI/Backend/SFML-Graphics.hpp"
 
+#include "ExitButton.h"
+
 class MainMenuWindow
 {
 public:
@@ -12,10 +14,15 @@ public:
 	void HandleEvent(sf::Event event);
 	void Draw();
 
+	void ExitButtonPressed();
+
 private:
 	void LoadWidgets();
 
 private:
 	tgui::Gui m_mainMenu;
+	ExitButton m_exitLayout;
+
+	bool m_showExitMenu{ false };
 };
 

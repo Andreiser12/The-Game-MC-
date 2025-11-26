@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
-
 #include "framework.h"
+
 #include "LoginWindow.h"
 #include "RegisterWindow.h"
 #include "MainMenuWindow.h"
@@ -10,19 +10,10 @@
 #include <cpr/cpr.h>
 #include <crow.h>
 
-#include "TGUI/TGUI.hpp"
-#include "TGUI/Core.hpp"
-#include "TGUI/Widgets/Button.hpp"
-#include "TGUI/Backend/SFML-Graphics.hpp"
-
-#define MAX_LOADSTRING 100
-
 constexpr static int LOGIN_WIDTH{ 640 };
 constexpr static int LOGIN_HEIGHT{ 480 };
 
 HINSTANCE hInst;
-WCHAR szTitle[MAX_LOADSTRING];
-WCHAR szWindowClass[MAX_LOADSTRING];
 
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
@@ -90,7 +81,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				_register.HandleEvent(event);
 			}
 
-			if (event.is<sf::Event::Closed>() || _login.GetLoggedState())
+			if (event.is<sf::Event::Closed>() || _login.GetLoggedState() || _register.GetRegisteredState())
 			{
 				loginWindow.close();
 			}
@@ -108,7 +99,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		loginWindow.display();
 	}
 
-	if (_login.GetLoggedState())
+	if (_login.GetLoggedState() || _register.GetRegisteredState())
 	{
 		sf::VideoMode menuMode = sf::VideoMode::getDesktopMode();
 		sf::RenderWindow menuWindow{ menuMode, "TheGame - 1.0.0", sf::State::Fullscreen };
@@ -132,7 +123,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			menuWindow.display();
 		}
 	}
-
 
 	return 0;
 }

@@ -131,6 +131,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ConnectionFailedWindow.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="IWindow.h" />
     <ClInclude Include="LoginWindow.h" />
@@ -139,6 +140,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ConnectionFailedWindow.cpp" />
     <ClCompile Include="HTTPClient.cpp" />
     <ClCompile Include="IWindow.cpp" />
     <ClCompile Include="LoginWindow.cpp" />

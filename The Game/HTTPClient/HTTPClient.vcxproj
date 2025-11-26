@@ -135,6 +135,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="IWindow.h" />
     <ClInclude Include="LoginWindow.h" />
+    <ClInclude Include="MainMenuWindow.h" />
     <ClInclude Include="RegisterWindow.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
@@ -144,6 +145,7 @@
     <ClCompile Include="HTTPClient.cpp" />
     <ClCompile Include="IWindow.cpp" />
     <ClCompile Include="LoginWindow.cpp" />
+    <ClCompile Include="MainMenuWindow.cpp" />
     <ClCompile Include="RegisterWindow.cpp" />
   </ItemGroup>
   <ItemGroup>

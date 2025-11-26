@@ -4,6 +4,7 @@
 #include "framework.h"
 #include "LoginWindow.h"
 #include "RegisterWindow.h"
+#include "MainMenuWindow.h"
 #include "ConnectionFailedWindow.h"
 #include "SFML/Graphics.hpp"
 #include <cpr/cpr.h>
@@ -110,7 +111,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	if (_login.GetLoggedState())
 	{
 		sf::VideoMode menuMode = sf::VideoMode::getDesktopMode();
-		sf::RenderWindow menuWindow{ menuMode, "TheGame - 1.0.0", sf::State::Windowed };
+		sf::RenderWindow menuWindow{ menuMode, "TheGame - 1.0.0", sf::State::Fullscreen };
+		MainMenuWindow _menu(menuWindow);
 		while (menuWindow.isOpen())
 		{
 			std::optional<sf::Event> eventOpt;
@@ -118,12 +120,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			{
 				sf::Event& event = *eventOpt;
 
+				_menu.HandleEvent(event);
+
 				if (event.is<sf::Event::Closed>())
 				{
 					menuWindow.close();
 				}
 			}
 			menuWindow.clear(sf::Color::White);
+			_menu.Draw();
 			menuWindow.display();
 		}
 	}

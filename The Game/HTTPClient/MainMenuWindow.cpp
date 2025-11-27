@@ -44,12 +44,12 @@ void MainMenuWindow::LoadWidgets()
 		});
 	profileButton->setOrigin(0.5f, 0.5f);
 	profileButton->setText("Profile");
-	profileButton->getRenderer()->setBackgroundColor(tgui::Color::Yellow);
-	profileButton->getRenderer()->setBackgroundColorHover(tgui::Color::Yellow);
-	profileButton->getRenderer()->setBackgroundColorDown(tgui::Color::Yellow);
 	profileButton->getRenderer()->setOpacity(0.5);
+	profileButton->getRenderer()->setTexture("assets/images/ceva2.png");
+
 	m_mainMenu.add(profileButton);
 	profileButton->setTextSize(K_TEXT_SIZE);
+
 
 	settingsButton->setSize({ "16.67%", "5%" });
 	settingsButton->setPosition({ "50%",

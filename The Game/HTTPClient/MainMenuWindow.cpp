@@ -68,10 +68,9 @@ void MainMenuWindow::LoadWidgets()
 		settingsButton->getPosition().y + K_OFFSET_BUTTONS });
 	exitButton->setOrigin(0.5f, 0.5f);
 	exitButton->setText("Exit");
-	exitButton->getRenderer()->setBackgroundColor(tgui::Color::Red);
-	exitButton->getRenderer()->setBackgroundColorHover(tgui::Color::Red);
-	exitButton->getRenderer()->setBackgroundColorDown(tgui::Color::Red);
 	exitButton->getRenderer()->setOpacity(0.5);
+	exitButton->getRenderer()->setTexture("assets/images/ceva2.png");
+
 	m_mainMenu.add(exitButton);
 	exitButton->setTextSize(K_TEXT_SIZE);
 	exitButton->onClick([this] {ExitButtonPressed (); });

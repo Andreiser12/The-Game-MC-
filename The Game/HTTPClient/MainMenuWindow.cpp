@@ -15,20 +15,18 @@ MainMenuWindow::MainMenuWindow(sf::RenderWindow& window) :
 
 void MainMenuWindow::LoadWidgets()
 {
-	auto playButton = tgui::BitmapButton::create();
-	auto profileButton = tgui::BitmapButton::create();
-	auto settingsButton = tgui::BitmapButton::create();
-	auto exitButton = tgui::BitmapButton::create();
+	auto playButton = tgui::Button::create();
+	auto profileButton = tgui::Button::create();
+	auto settingsButton = tgui::Button::create();
+	auto exitButton = tgui::Button::create();
 
 	playButton->setSize({"16.67%", "5%"});
 	playButton->setPosition({ "50%", "42.5%" });
 	playButton->setOrigin(0.5f, 0.5f);
 	playButton->setText("Play");
-	playButton->getRenderer()->setBackgroundColor(tgui::Color::Yellow);
-	playButton->getRenderer()->setBackgroundColorHover(tgui::Color::Yellow);
-	playButton->getRenderer()->setBackgroundColorDown(tgui::Color::Yellow);
 	playButton->getRenderer()->setOpacity(0.5);
-	//playButton->getRenderer()->setTexture("ceva2.png");
+	playButton->getRenderer()->setTexture("assets/images/ceva2.png");
+
 	m_mainMenu.add(playButton);
 	playButton->setTextSize(K_TEXT_SIZE);
 	

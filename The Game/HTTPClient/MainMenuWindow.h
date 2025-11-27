@@ -20,6 +20,7 @@ private:
 	void LoadWidgets();
 
 private:
+	sf::RenderWindow& m_window;
 	tgui::Gui m_mainMenu;
 	ExitButton m_exitLayout;
 

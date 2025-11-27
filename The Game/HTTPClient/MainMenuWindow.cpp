@@ -6,6 +6,7 @@ constexpr static unsigned int K_OFFSET_BUTTONS{ 100u };
 constexpr static unsigned int K_TEXT_SIZE{ 24u };
 
 MainMenuWindow::MainMenuWindow(sf::RenderWindow& window) :
+	m_window(window),
 	m_mainMenu(window),
 	m_exitLayout(window)
 {
@@ -80,6 +81,18 @@ void MainMenuWindow::HandleEvent(sf::Event event)
 	if (m_showExitMenu)
 	{
 		m_exitLayout.HandleEvent(event);
+
+		if (m_exitLayout.GetNoState())
+		{
+			m_exitLayout.SetNoState();
+			m_showExitMenu = false;
+		}
+
+		if (m_exitLayout.GetYesState())
+		{
+			m_exitLayout.SetYesState();
+			m_window.close();
+		}
 	}
 }
 

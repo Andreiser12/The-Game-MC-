@@ -21,9 +21,8 @@ void LoginWindow::CheckLogin(tgui::EditBox::Ptr username)
 		auto errorLabel = tgui::Label::create();
 		errorLabel->setText("No account with this username has been found!");
 		errorLabel->getRenderer()->setTextColor(tgui::Color::Red);
-		auto coordErrorX = username->getPosition().x + username->getSize().x / 10000.f;
-		auto coordErrorY = username->getPosition().y + username->getSize().y;
-		errorLabel->setPosition(coordErrorX, coordErrorY);
+		errorLabel->setPosition({"50%", "62.5%"});
+		errorLabel->setOrigin(0.5f, 0.5f);
 		m_login.add(errorLabel);
 		errorLabel->setTextSize(16);
 		return;

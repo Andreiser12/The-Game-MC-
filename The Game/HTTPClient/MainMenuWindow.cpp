@@ -10,6 +10,13 @@ MainMenuWindow::MainMenuWindow(sf::RenderWindow& window) :
 	m_mainMenu(window),
 	m_exitLayout(window)
 {
+	m_mainMenu.setTarget(window);
+
+	// BACKGROUND
+	m_background = tgui::Picture::create("assets/images/MainMenuBackground.png");
+	m_background->setSize({ "100%", "100%" }); // fullscreen
+	m_mainMenu.add(m_background);
+
 	LoadWidgets();
 }
 
@@ -24,7 +31,7 @@ void MainMenuWindow::LoadWidgets()
 	playButton->setPosition({ "50%", "42.5%" });
 	playButton->setOrigin(0.5f, 0.5f);
 	playButton->setText("Play");
-	playButton->getRenderer()->setOpacity(0.5);
+	playButton->getRenderer()->setOpacity(0.7);
 	playButton->getRenderer()->setTexture("assets/images/ceva2.png");
 
 	m_mainMenu.add(playButton);

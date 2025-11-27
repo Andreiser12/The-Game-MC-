@@ -23,6 +23,7 @@ private:
 	sf::RenderWindow& m_window;
 	tgui::Gui m_mainMenu;
 	ExitButton m_exitLayout;
+	tgui::Picture::Ptr m_background;
 
 	bool m_showExitMenu{ false };
 };

@@ -60,9 +60,13 @@ void ExitButton::LoadWidgets()
     m_panel = tgui::Panel::create();
     auto panel = m_panel;
     panel->setSize({ "33.33%", "33.33%" });
-    panel->getRenderer()->setBackgroundColor(tgui::Color::Black);
     panel->setPosition({ "50%", "50%" });
     panel->setOrigin(0.5f, 0.5f);
+
+    auto panelBackground = tgui::Picture::create("assets/images/background.png");
+    panelBackground->setSize({ "100%", "100%" });
+    panelBackground->setPosition({ "0%", "0%" });
+    
 
     auto textLabel = tgui::Label::create();
     textLabel->setSize({ "60%", "12.5%" });
@@ -77,7 +81,7 @@ void ExitButton::LoadWidgets()
     auto noButton = tgui::Button::create();
     noButton->setSize({ "16.67%", "20%" });
     noButton->setPosition({ "10%", "70%" });
-    noButton->getRenderer()->setBackgroundColor(tgui::Color::Red);
+    noButton->getRenderer()->setTexture("assets/images/buttons.png");
     noButton->getRenderer()->setTextColor(tgui::Color::White);
     noButton->setText("No");
     noButton->setTextSize(20);
@@ -86,16 +90,17 @@ void ExitButton::LoadWidgets()
     auto yesButton = tgui::Button::create();
     yesButton->setSize({ "16.67%", "20%" });
     yesButton->setPosition({ "75%", "70%" });
-    yesButton->getRenderer()->setBackgroundColor(tgui::Color::Green);
+    yesButton->getRenderer()->setTexture("assets/images/buttons.png");
     yesButton->getRenderer()->setTextColor(tgui::Color::White);
     yesButton->setText("Yes");
     yesButton->setTextSize(20);
     yesButton->onClick([this] { YesPressed(); });
 
-
+    panel->add(panelBackground);
     panel->add(textLabel);
     panel->add(noButton);
     panel->add(yesButton);
+    
 
     m_exitButton.add(panel);
 

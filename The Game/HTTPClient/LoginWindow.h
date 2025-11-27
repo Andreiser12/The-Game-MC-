@@ -27,6 +27,7 @@ private:
 private:
 
 	tgui::Gui m_login;
+	tgui::Picture::Ptr m_background;
 	bool m_isLoggedIn = false;
 	bool m_isRegisteredPressed = false;
 };

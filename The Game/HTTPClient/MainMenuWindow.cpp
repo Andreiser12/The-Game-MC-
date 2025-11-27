@@ -12,9 +12,8 @@ MainMenuWindow::MainMenuWindow(sf::RenderWindow& window) :
 {
 	m_mainMenu.setTarget(window);
 
-	// BACKGROUND
-	m_background = tgui::Picture::create("assets/images/MainMenuBackground.png");
-	m_background->setSize({ "100%", "100%" }); // fullscreen
+	m_background = tgui::Picture::create("assets/images/background.png");
+	m_background->setSize({ "100%", "100%" });
 	m_mainMenu.add(m_background);
 
 	LoadWidgets();
@@ -32,7 +31,7 @@ void MainMenuWindow::LoadWidgets()
 	playButton->setOrigin(0.5f, 0.5f);
 	playButton->setText("Play");
 	playButton->getRenderer()->setOpacity(0.7);
-	playButton->getRenderer()->setTexture("assets/images/ceva2.png");
+	playButton->getRenderer()->setTexture("assets/images/buttons.png");
 
 	m_mainMenu.add(playButton);
 	playButton->setTextSize(K_TEXT_SIZE);
@@ -44,8 +43,8 @@ void MainMenuWindow::LoadWidgets()
 		});
 	profileButton->setOrigin(0.5f, 0.5f);
 	profileButton->setText("Profile");
-	profileButton->getRenderer()->setOpacity(0.5);
-	profileButton->getRenderer()->setTexture("assets/images/ceva2.png");
+	profileButton->getRenderer()->setOpacity(0.7);
+	profileButton->getRenderer()->setTexture("assets/images/buttons.png");
 
 	m_mainMenu.add(profileButton);
 	profileButton->setTextSize(K_TEXT_SIZE);
@@ -56,8 +55,8 @@ void MainMenuWindow::LoadWidgets()
 		profileButton->getPosition().y + K_OFFSET_BUTTONS });
 	settingsButton->setOrigin(0.5f, 0.5f);
 	settingsButton->setText("Settings");
-	settingsButton->getRenderer()->setOpacity(0.5);
-	settingsButton->getRenderer()->setTexture("assets/images/ceva2.png");
+	settingsButton->getRenderer()->setOpacity(0.7);
+	settingsButton->getRenderer()->setTexture("assets/images/buttons.png");
 
 	m_mainMenu.add(settingsButton);
 	settingsButton->setTextSize(K_TEXT_SIZE);
@@ -68,8 +67,8 @@ void MainMenuWindow::LoadWidgets()
 		settingsButton->getPosition().y + K_OFFSET_BUTTONS });
 	exitButton->setOrigin(0.5f, 0.5f);
 	exitButton->setText("Exit");
-	exitButton->getRenderer()->setOpacity(0.5);
-	exitButton->getRenderer()->setTexture("assets/images/ceva2.png");
+	exitButton->getRenderer()->setOpacity(0.7);
+	exitButton->getRenderer()->setTexture("assets/images/buttons.png");
 
 	m_mainMenu.add(exitButton);
 	exitButton->setTextSize(K_TEXT_SIZE);

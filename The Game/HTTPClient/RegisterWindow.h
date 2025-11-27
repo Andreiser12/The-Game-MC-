@@ -24,6 +24,7 @@ private:
 
 private:
 	tgui::Gui m_register;
+	tgui::Picture::Ptr m_background;
 	bool m_isRegistered = false;
 };
 

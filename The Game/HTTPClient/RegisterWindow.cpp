@@ -3,6 +3,10 @@
 RegisterWindow::RegisterWindow(sf::RenderWindow& window)
 	: m_register(window)
 {
+	m_background = tgui::Picture::create("assets/images/background.png");
+	m_background->setSize({ "100%", "100%" });
+	m_register.add(m_background);
+
 	LoadWidgets();
 }
 
@@ -65,6 +69,7 @@ void RegisterWindow::LoadWidgets()
 	editBoxUsername->setOrigin(0.5f, 0.5f);
 	editBoxUsername->setDefaultText("Username");
 	editBoxUsername->setWidgetName("usernameBox");
+	editBoxUsername->getRenderer()->setTexture("assets/images/textBoxbackground2.png");
 	m_register.add(editBoxUsername);
 	editBoxUsername->onFocus([this, editBoxUsername] {
 		editBoxUsername->setDefaultText("");
@@ -79,6 +84,7 @@ void RegisterWindow::LoadWidgets()
 		"usernameBox.w / 2 - registerButton.w / 2 + 30",
 		"usernameBox.bottom + 75"
 		});
+	registerButton->getRenderer()->setTexture("assets/images/buttons.png");
 	m_register.add(registerButton);
 	registerButton->setTextSize(24);
 
@@ -87,6 +93,7 @@ void RegisterWindow::LoadWidgets()
 	auto backButton = tgui::Button::create("Back");
 	backButton->setSize({ "10%", "12.5%" });
 	backButton->setPosition({ "3.5%", "5%" });
+	backButton->getRenderer()->setTexture("assets/images/buttons.png");
 	m_register.add(backButton);
 	backButton->setTextSize(20);
 	backButton->onClick([this] { GoToLogin(); });

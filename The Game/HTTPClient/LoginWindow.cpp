@@ -2,7 +2,12 @@
 
 LoginWindow::LoginWindow(sf::RenderWindow& window)
 	: m_login(window) { 
-	LoadWidgets(); 
+	 
+	m_background = tgui::Picture::create("assets/images/background.png");
+	m_background->setSize({ "100%", "100%" });
+	m_login.add(m_background);
+
+	LoadWidgets();
 } 
 
 void LoginWindow::CheckLogin(tgui::EditBox::Ptr username)
@@ -62,6 +67,7 @@ void LoginWindow::LoadWidgets()
 	auto editBoxUsername = tgui::EditBox::create();
 	editBoxUsername->setSize({ "66.67%", "12.5%" });
 	editBoxUsername->setPosition({ "50%", "50%" });
+	editBoxUsername->getRenderer()->setTexture("assets/images/textBoxbackground2.png");
 	editBoxUsername->setOrigin(0.5f, 0.5f);
 	editBoxUsername->setDefaultText("Username");
 	m_login.add(editBoxUsername);
@@ -77,12 +83,14 @@ void LoginWindow::LoadWidgets()
 	auto coordX = editBoxUsername->getSize().x - editBoxUsername->getPosition().x;
 	auto coordY = editBoxUsername->getSize().y*1.5f + editBoxUsername->getPosition().y;
 	loginButton->setPosition({ coordX, coordY }); m_login.add(loginButton); loginButton->setTextSize(24); 
+	loginButton->getRenderer()->setTexture("assets/images/buttons.png");
 	loginButton->onClick([this, editBoxUsername] { CheckLogin(editBoxUsername); });
 
 	auto registerButton = tgui::Button::create("Register"); registerButton->setSize({ "20%", "16.67%" });
 	coordX = editBoxUsername->getPosition().x + loginButton->getSize().x*0.7f;
 	coordY = editBoxUsername->getSize().y * 1.5f + editBoxUsername->getPosition().y;
 	registerButton->setPosition({ coordX, coordY });
+	registerButton->getRenderer()->setTexture("assets/images/buttons.png");
 	m_login.add(registerButton); 
 	registerButton->setTextSize(24);
 

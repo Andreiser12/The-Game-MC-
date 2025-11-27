@@ -38,6 +38,8 @@ void RegisterWindow::CheckRegister(tgui::EditBox::Ptr username)
 		errorLabel->getRenderer()->setTextColor(tgui::Color::Red);
 		errorLabel->setPosition({ "50%", "65%" });
 		errorLabel->setOrigin(0.5f, 0.5f);
+		errorLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+		errorLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
 		m_register.add(errorLabel);
 		errorLabel->setTextSize(16);
 		return;

@@ -23,6 +23,8 @@ void LoginWindow::CheckLogin(tgui::EditBox::Ptr username)
 		errorLabel->getRenderer()->setTextColor(tgui::Color::Red);
 		errorLabel->setPosition({"50%", "62.5%"});
 		errorLabel->setOrigin(0.5f, 0.5f);
+		errorLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+		errorLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
 		m_login.add(errorLabel);
 		errorLabel->setTextSize(16);
 		return;

@@ -68,6 +68,8 @@ void ExitButton::LoadWidgets()
     textLabel->setSize({ "60%", "12.5%" });
     textLabel->setPosition({ "50%", "40%" });
     textLabel->setOrigin(0.5f, 0.5f);
+    textLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+    textLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
     textLabel->getRenderer()->setTextColor(tgui::Color::White);
     textLabel->setText("Are you sure you want to exit?");
     textLabel->setTextSize(24);

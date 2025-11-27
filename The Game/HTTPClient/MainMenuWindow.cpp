@@ -1,4 +1,6 @@
-#include "MainMenuWindow.h"
+﻿#include "MainMenuWindow.h"
+#include <iostream>
+#include <fstream>
 
 constexpr static unsigned int K_OFFSET_BUTTONS{ 100u };
 constexpr static unsigned int K_TEXT_SIZE{ 24u };
@@ -12,7 +14,7 @@ MainMenuWindow::MainMenuWindow(sf::RenderWindow& window) :
 
 void MainMenuWindow::LoadWidgets()
 {
-	auto playButton = tgui::Button::create();
+	auto playButton = tgui::BitmapButton::create();
 	auto profileButton = tgui::Button::create();
 	auto settingsButton = tgui::Button::create();
 	auto exitButton = tgui::Button::create();
@@ -21,8 +23,14 @@ void MainMenuWindow::LoadWidgets()
 	playButton->setPosition({ "50%", "42.5%" });
 	playButton->setOrigin(0.5f, 0.5f);
 	playButton->setText("Play");
+	playButton->getRenderer()->setBackgroundColor(tgui::Color::Yellow);
+	playButton->getRenderer()->setBackgroundColorHover(tgui::Color::Yellow);
+	playButton->getRenderer()->setBackgroundColorDown(tgui::Color::Yellow);
+	playButton->getRenderer()->setOpacity(0.5);
+	//playButton->getRenderer()->setTexture("ceva2.png");
 	m_mainMenu.add(playButton);
 	playButton->setTextSize(K_TEXT_SIZE);
+	
 
 	profileButton->setSize({ "16.67%", "5%" });
 	profileButton->setPosition({ "50%",

@@ -154,6 +154,8 @@
     <ResourceCompile Include="HTTPClient.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\x64\Debug\assets\images\ceva2.png" />
+    <Image Include="..\x64\Debug\ceva.png" />
     <Image Include="HTTPClient.ico" />
     <Image Include="small.ico" />
   </ItemGroup>

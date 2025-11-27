@@ -118,7 +118,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 					menuWindow.close();
 				}
 			}
-			menuWindow.clear(sf::Color::White);
+			menuWindow.clear(tgui::Color(180, 125, 23));
 			_menu.Draw();
 			menuWindow.display();
 		}

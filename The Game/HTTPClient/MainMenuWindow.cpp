@@ -16,9 +16,9 @@ MainMenuWindow::MainMenuWindow(sf::RenderWindow& window) :
 void MainMenuWindow::LoadWidgets()
 {
 	auto playButton = tgui::BitmapButton::create();
-	auto profileButton = tgui::Button::create();
-	auto settingsButton = tgui::Button::create();
-	auto exitButton = tgui::Button::create();
+	auto profileButton = tgui::BitmapButton::create();
+	auto settingsButton = tgui::BitmapButton::create();
+	auto exitButton = tgui::BitmapButton::create();
 
 	playButton->setSize({"16.67%", "5%"});
 	playButton->setPosition({ "50%", "42.5%" });
@@ -39,6 +39,10 @@ void MainMenuWindow::LoadWidgets()
 		});
 	profileButton->setOrigin(0.5f, 0.5f);
 	profileButton->setText("Profile");
+	profileButton->getRenderer()->setBackgroundColor(tgui::Color::Yellow);
+	profileButton->getRenderer()->setBackgroundColorHover(tgui::Color::Yellow);
+	profileButton->getRenderer()->setBackgroundColorDown(tgui::Color::Yellow);
+	profileButton->getRenderer()->setOpacity(0.5);
 	m_mainMenu.add(profileButton);
 	profileButton->setTextSize(K_TEXT_SIZE);
 
@@ -47,6 +51,10 @@ void MainMenuWindow::LoadWidgets()
 		profileButton->getPosition().y + K_OFFSET_BUTTONS });
 	settingsButton->setOrigin(0.5f, 0.5f);
 	settingsButton->setText("Settings");
+	settingsButton->getRenderer()->setBackgroundColor(tgui::Color::Yellow);
+	settingsButton->getRenderer()->setBackgroundColorHover(tgui::Color::Yellow);
+	settingsButton->getRenderer()->setBackgroundColorDown(tgui::Color::Yellow);
+	settingsButton->getRenderer()->setOpacity(0.5);
 	m_mainMenu.add(settingsButton);
 	settingsButton->setTextSize(K_TEXT_SIZE);
 
@@ -55,6 +63,10 @@ void MainMenuWindow::LoadWidgets()
 		settingsButton->getPosition().y + K_OFFSET_BUTTONS });
 	exitButton->setOrigin(0.5f, 0.5f);
 	exitButton->setText("Exit");
+	exitButton->getRenderer()->setBackgroundColor(tgui::Color::Red);
+	exitButton->getRenderer()->setBackgroundColorHover(tgui::Color::Red);
+	exitButton->getRenderer()->setBackgroundColorDown(tgui::Color::Red);
+	exitButton->getRenderer()->setOpacity(0.5);
 	m_mainMenu.add(exitButton);
 	exitButton->setTextSize(K_TEXT_SIZE);
 	exitButton->onClick([this] {ExitButtonPressed (); });

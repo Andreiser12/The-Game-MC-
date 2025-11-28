@@ -146,7 +146,7 @@ void Table::PlayGame()
 	std::cout << "\nThe game started!\n";
 	std::cout << "Number of players: " << static_cast<int>(m_nrPlayers) << "\n";
 	std::cout << "Cards in  deck: " << m_Deck.size() << "\n";
-	auto startTime = std::chrono::steady_clock::now();
+	auto startTime = std::chrono::high_resolution_clock::now();
 
 	while (gameRunning)
 	{
@@ -186,9 +186,9 @@ void Table::PlayGame()
 		currentPlayerIndex = (currentPlayerIndex + 1) % m_nrPlayers;
 	}
 
-	auto endTime = std::chrono::steady_clock::now();
-	auto duration = std::chrono::duration_cast<std::chrono::seconds>(endTime - startTime);
-	m_time = duration.count();
+	auto endTime = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration(endTime - startTime);
+	m_time = static_cast<unsigned>(duration.count());
 
 	double hours = static_cast<double>(m_time / HOURS_TO_SECONDS);
 	std::cout << "Final game stats:\n";

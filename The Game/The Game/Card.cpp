@@ -2,7 +2,8 @@ module Card;
 
 Card::Card(unsigned int id, Color color) : m_id(id), m_color(color) {}
 
-unsigned int Card::getId() const {
+unsigned int Card::getId() const
+{
 	return m_id;
 }
 

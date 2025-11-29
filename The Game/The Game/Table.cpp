@@ -29,28 +29,23 @@ Table::Table(uint8_t nrPlayers) :
 
 bool Table::isDeckEmpty() const
 {
-	return m_Deck.empty();
+	return m_mainDeck.empty();
 }
 
 void Table::Shuffle()
 {
 	std::vector<Card> copyCards;
+	copyCards.reserve(98);
 
-	for (unsigned int i = 2; i <= 99; i++)
-		m_Deck.push(Card(i));
-
-	while (!m_Deck.empty())
-	{
-		copyCards.push_back(std::move(m_Deck.top()));
-		m_Deck.pop();
-	}
+	for (unsigned int i = 2u; i <= 99u; ++i)
+		copyCards.emplace_back(i);
 
 	std::random_device rd;
 	std::mt19937 generator(rd());
 	std::shuffle(copyCards.begin(), copyCards.end(), generator);
 	
-	for (const auto& card : copyCards)
-		m_Deck.push(std::move(card));
+	for (auto& card : copyCards)
+		m_mainDeck.push(std::move(card));
 }
 
 void Table::SetupPlayers()
@@ -79,11 +74,11 @@ void Table::SetupPlayers()
 	}
 	for (auto& player : m_Players)
 	{
-		player.SetupCards(m_Deck, cardsPerPlayer);
+		player.SetupCards(m_mainDeck, cardsPerPlayer);
 	}
 }
 
-bool Table::BackwardsTrick(const Deck& deck, const Card& card)
+bool Table::BackwardsTrick(const Deck& deck, const Card& card) const
 {
 	const unsigned int cardValue = card.getId();
 	const unsigned int topCardValue = deck.GetTopCard().getId();
@@ -99,7 +94,7 @@ bool Table::BackwardsTrick(const Deck& deck, const Card& card)
 	}
 }
 
-bool Table::CheckCard(const Deck& deck, const Card& card)
+bool Table::CheckCard(const Deck& deck, const Card& card) const
 {
 	const unsigned int cardValue = card.getId();
 	const unsigned int topCardValue = deck.GetTopCard().getId();
@@ -131,11 +126,12 @@ Deck& Table::GetDeck(const Deck::DeckType& type, const Deck::DeckNumber& number)
 		else if (number == Deck::DeckNumber::Second)
 			return m_DescendingDeckSecond;
 	}
+	throw std::out_of_range("Invalid deck type or number.");
 }
 
 const std::stack<Card>& Table::GetMainDeck() const
 {
-	return m_Deck;
+	return m_mainDeck;
 }
 
 void Table::PlayGame()
@@ -145,7 +141,7 @@ void Table::PlayGame()
 	uint8_t currentPlayerIndex = 0;
 	std::cout << "\nThe game started!\n";
 	std::cout << "Number of players: " << static_cast<int>(m_nrPlayers) << "\n";
-	std::cout << "Cards in  deck: " << m_Deck.size() << "\n";
+	std::cout << "Cards in  deck: " << m_mainDeck.size() << "\n";
 	auto startTime = std::chrono::high_resolution_clock::now();
 
 	while (gameRunning)
@@ -161,7 +157,7 @@ void Table::PlayGame()
 
 		std::cout << "Player " << currentPlayer.GetUserProfile().GetUsername() << "'s turn.\n";
 		std::cout << "Cards: " << currentPlayer.GetCardsCount() << "\n";
-		std::cout << "Cards on deck: " << m_Deck.size() << "\n";
+		std::cout << "Cards on deck: " << m_mainDeck.size() << "\n";
 
 		DisplayTableState();
 
@@ -333,9 +329,9 @@ bool Table::PlayerTurn(Player& player, uint8_t minCards)
 	}
 	if (!isDeckEmpty() && cardsPlaced > 0)
 	{
-		uint8_t cardsToDraw = std::min(static_cast<uint8_t>(cardsPlaced), static_cast<uint8_t>(m_Deck.size()));
+		uint8_t cardsToDraw = std::min(static_cast<uint8_t>(cardsPlaced), static_cast<uint8_t>(m_mainDeck.size()));
 		std::cout << "You draw " << static_cast<int>(cardsToDraw) << " new cards.\n";
-		player.DrawCards(m_Deck);
+		player.DrawCards(m_mainDeck);
 	}
 	return cardsPlaced >= minCards;
 }

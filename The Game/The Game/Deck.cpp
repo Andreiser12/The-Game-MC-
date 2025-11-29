@@ -5,11 +5,11 @@ Deck::Deck(DeckType deckType, DeckNumber deckNumber) :
 {
     if (m_deckType == DeckType::Ascending)
     {
-        m_deck.push(FundamentalCard(1));
+        m_deck.push(FundamentalCard(ASCENDING_START_CARD));
     }
     else
     {
-        m_deck.push(FundamentalCard(100));
+        m_deck.push(FundamentalCard(DESCENDING_START_CARD));
     }
 }
 

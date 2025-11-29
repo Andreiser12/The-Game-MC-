@@ -94,23 +94,6 @@ void TestDB()
 		std::cout << *uTarget;
 	else std::cout << "This user with ID " << ID << " doesn't exist in User table." << std::endl;
 
-	DB::PlayerHand hand;
-	std::cout << "Read a ID for a user: ";
-	std::cin >> ID;
-	hand.SetUserID(ID);
-	std::string handUser;
-	std::cout << "Read a hand for a user: ";
-	std::cin >> handUser;
-	hand.SetCards(handUser);
-	database.SavePlayerHand(hand);
-
-	std::cout << "Read ID for a user: ";
-	std::cin >> ID;
-
-	auto uHand = database.GetPlayerHand(ID);
-	if (uHand)
-		std::cout << *uHand;
-	else std::cout << "This hand with ID " << ID << " doesn't exist in PlayerHand table." << std::endl;
 }
 int main()
 {
@@ -126,8 +109,8 @@ int main()
 		std::cout << user <<std::endl;
 	}
 
-	crow::SimpleApp app;
-	TestConnection(app, database);
+	//crow::SimpleApp app;
+	//TestConnection(app, database);
 
 	Deck& firstAscending = table.GetDeck(Deck::DeckType::Ascending, Deck::DeckNumber::First);
 	Deck& firstDescending = table.GetDeck(Deck::DeckType::Descending, Deck::DeckNumber::First);

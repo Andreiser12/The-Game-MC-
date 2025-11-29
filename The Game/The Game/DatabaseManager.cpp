@@ -39,28 +39,6 @@ std::optional<DB::User> DatabaseManager::GetUserByName(const std::string& userna
         return result.front();
     return std::nullopt;
 }
-void DatabaseManager::SavePlayerHand(const DB::PlayerHand& hand)
-{
-    auto existingHand = m_storage.get_all<DB::PlayerHand>(
-        sqlite_orm::where(sqlite_orm::c(&DB::PlayerHand::GetUserID) == hand.GetUserID()));
-    if (!existingHand.empty())
-    {
-        m_storage.update(hand);
-        std::cout << "Updated hand for user."<<std::endl;
-        return;
-    }
-    m_storage.insert(hand);
-    std::cout << "Added hand for user." << std::endl;
-}
-
-std::optional<DB::PlayerHand> DatabaseManager::GetPlayerHand(unsigned int userID)
-{
-    auto existingHand = m_storage.get_all<DB::PlayerHand>(
-        sqlite_orm::where(sqlite_orm::c(&DB::PlayerHand::GetUserID) == userID));
-    if (!existingHand.empty())
-        return existingHand.front();
-    return std::nullopt;
-}
 
 void DatabaseManager::PopulateDataBase()
 {

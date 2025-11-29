@@ -17,26 +17,19 @@ export inline auto CreateStorage(const std::string& filename)
             sqlite_orm::make_column("gamesPlayed", &DB::User::GetGamesPlayed, &DB::User::SetGamesPlayed),
             sqlite_orm::make_column("gamesWon", &DB::User::GetGamesWon, &DB::User::SetGamesWon),
             sqlite_orm::make_column("hoursPlayed", &DB::User::GetHoursPlayed, &DB::User::SetHoursPlayed),
-            sqlite_orm::make_column("finalCards", &DB::User::GetFinalCards, &DB::User::SetFinalCards)),
-        sqlite_orm::make_table("PlayerHand",
-            sqlite_orm::make_column("ID", &DB::PlayerHand::GetID, &DB::PlayerHand::SetID, sqlite_orm::primary_key().autoincrement()),
-            sqlite_orm::make_column("user_ID", &DB::PlayerHand::GetUserID, &DB::PlayerHand::SetUserID),
-            sqlite_orm::make_column("cards", &DB::PlayerHand::GetCards, &DB::PlayerHand::SetCards)));
+            sqlite_orm::make_column("finalCards", &DB::User::GetFinalCards, &DB::User::SetFinalCards)));
 }
 export using Storage = decltype(CreateStorage(" "));
 
 export class DatabaseManager
 {
 public:
-	DatabaseManager(const std::string& databasePath);
+	explicit DatabaseManager(const std::string& databasePath);
 
 	//Methods for User
 	bool AddUser(const DB::User& user);
     std::optional<DB::User> GetUserByID(unsigned int userID);
     std::optional<DB::User> GetUserByName(const std::string& username);
-	//Methods for PlayerHand
-	void SavePlayerHand(const DB::PlayerHand& hand);
-    std::optional<DB::PlayerHand> GetPlayerHand(unsigned int userID);
 
     void PopulateDataBase();
 

@@ -22,7 +22,7 @@ void UserProfile::UpdateStats(double hours, bool win, unsigned int finalCards)
 	m_finalCards = finalCards;
 }
 
-const std::string UserProfile::GetUsername() const
+const std::string& UserProfile::GetUsername() const
 {
 	return m_username;
 }

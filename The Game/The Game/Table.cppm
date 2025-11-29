@@ -21,8 +21,8 @@ public:
 	bool isDeckEmpty() const;
 	void Shuffle();
 	void SetupPlayers();
-	bool BackwardsTrick(const Deck& deck, const Card& card);
-	bool CheckCard(const Deck& deck, const Card& card);
+	bool BackwardsTrick(const Deck& deck, const Card& card) const;
+	bool CheckCard(const Deck& deck, const Card& card) const;
 	void PlayGame();
 
 	void DisplayTableState() const;
@@ -37,7 +37,7 @@ public:
 private:
 	uint8_t m_nrPlayers;
 	std::vector<Player> m_Players;
-	std::stack<Card> m_Deck;
+	std::stack<Card> m_mainDeck;
 	Deck m_AscendingDeckFirst;
 	Deck m_AscendingDeckSecond;
 	Deck m_DescendingDeckFirst;

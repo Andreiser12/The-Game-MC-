@@ -34,7 +34,9 @@ public:
 
 	void PushCard(const Card& card);
 
-
+public:
+	constexpr static unsigned int ASCENDING_START_CARD = 1u;
+	constexpr static unsigned int DESCENDING_START_CARD = 100u;
 private:
 	std::stack<Card> m_deck;
 	DeckType m_deckType : 1;

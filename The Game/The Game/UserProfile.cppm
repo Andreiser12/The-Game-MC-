@@ -12,7 +12,7 @@ public:
 	double PerformanceScore() const;
 	void UpdateStats(double hours, bool win, unsigned int finalCards);
 
-	const std::string GetUsername() const;
+	const std::string& GetUsername() const;
 
 private:
 	std::string m_username;

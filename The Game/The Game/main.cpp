@@ -96,9 +96,7 @@ void TestDB()
 
 }
 int main()
-{
-	//TestDB();
-	
+{	
 	Table table(3);
 
 	DatabaseManager database{ "gameDB.db" };

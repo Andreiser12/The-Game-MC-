@@ -9,6 +9,7 @@ public:
 
 	void Draw() override;
 	void HandleEvent(sf::Event event) override;
+	void SetTarget(sf::RenderWindow& window);
 
 	void NoPressed();
 	void YesPressed();

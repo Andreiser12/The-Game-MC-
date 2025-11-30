@@ -16,6 +16,11 @@ void SettingsButton::HandleEvent(sf::Event event)
 	m_settingsButton.handleEvent(event);
 }
 
+void SettingsButton::SetTarget(sf::RenderWindow& window)
+{
+	m_settingsButton.setTarget(window);
+}
+
 void SettingsButton::CloseButtonPressed()
 {
 	m_closePressed = true;
@@ -26,9 +31,24 @@ bool SettingsButton::GetCloseState() const
 	return m_closePressed;
 }
 
+bool SettingsButton::GetApplyState() const
+{
+	return m_applyPressed;
+}
+
+const sf::Vector2u& SettingsButton::GetCurrentResolution() const
+{
+	return m_resolutions[m_resolutionIndex];
+}
+
 void SettingsButton::SetCloseState()
 {
 	m_closePressed = false;
+}
+
+void SettingsButton::SetApplyState()
+{
+	m_applyPressed = false;
 }
 
 void SettingsButton::LoadWidgets()
@@ -122,6 +142,10 @@ void SettingsButton::LoadWidgets()
 	applyButton->getRenderer()->setBorderColor(tgui::Color::Black);
 	applyButton->getRenderer()->setTextColor(tgui::Color::Black);
 	applyButton->getRenderer()->setRoundedBorderRadius(10);
+	applyButton->onClick([this]
+		{
+			m_applyPressed = true;
+		});
 
 	auto resolutionText = tgui::Label::create();
 	resolutionText->setSize({ "16%", "12.5%" });

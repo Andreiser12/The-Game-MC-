@@ -9,13 +9,16 @@ public:
 
 	void Draw() override;
 	void HandleEvent(sf::Event event) override;
+	void SetTarget(sf::RenderWindow& window);
 
 	void CloseButtonPressed();
 
 	bool GetCloseState() const;
 	bool GetApplyState() const;
+	const sf::Vector2u& GetCurrentResolution() const;
 
 	void SetCloseState();
+	void SetApplyState();
 
 private:
 	void LoadWidgets() override;

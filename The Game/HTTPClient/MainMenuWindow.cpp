@@ -140,5 +140,14 @@ void MainMenuWindow::HandleEvent(sf::Event event)
 			m_uiState = UiState::MainMenu;
 			m_settingsLayout.SetCloseState();
 		}
+		if (m_settingsLayout.GetApplyState())
+		{
+			auto newRes = m_settingsLayout.GetCurrentResolution();
+			m_window.create(sf::VideoMode(newRes), "The Game - 1.0.0", sf::State::Fullscreen);
+			m_mainMenu.setTarget(m_window);
+			m_exitLayout.SetTarget(m_window);
+			m_settingsLayout.SetTarget(m_window);
+			m_settingsLayout.SetApplyState();
+		}
 	}
 }

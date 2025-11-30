@@ -17,6 +17,11 @@ void ExitButton::HandleEvent(sf::Event event)
     m_exitButton.handleEvent(event);
 }
 
+void ExitButton::SetTarget(sf::RenderWindow& window)
+{
+    m_exitButton.setTarget(window);
+}
+
 
 void ExitButton::NoPressed()
 {

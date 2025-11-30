@@ -15,11 +15,6 @@ void ConnectionFailedWindow::Draw()
 	m_connectionFailed.draw();
 }
 
-void ConnectionFailedWindow::UpdateTextSize()
-{
-
-}
-
 void ConnectionFailedWindow::LoadWidgets()
 {
 	auto errorLabel = tgui::Label::create();
@@ -27,6 +22,8 @@ void ConnectionFailedWindow::LoadWidgets()
 	errorLabel->setPosition({"50%", "50%"});
 	errorLabel->setOrigin(0.5f, 0.5f);
 	errorLabel->setText("Couldn't connect to the server!");
+	errorLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+	errorLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
 	errorLabel->getRenderer()->setTextColor(tgui::Color::Red);
 	m_connectionFailed.add(errorLabel);
 	errorLabel->setTextSize(24);

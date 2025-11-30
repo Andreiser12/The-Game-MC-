@@ -10,7 +10,6 @@ class IWindow
 protected:
 	virtual void HandleEvent(sf::Event event) = 0;
 	virtual void Draw() = 0;
-	virtual void UpdateTextSize() = 0;
 	virtual void LoadWidgets() = 0;
 	virtual bool GetWindowState() const
 	{

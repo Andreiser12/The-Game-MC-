@@ -1,4 +1,5 @@
 #include "ExitButton.h"
+#include "SettingsButton.h"
 
 ExitButton::ExitButton(sf::RenderWindow& window) :
     m_exitButton(window)
@@ -16,9 +17,6 @@ void ExitButton::HandleEvent(sf::Event event)
     m_exitButton.handleEvent(event);
 }
 
-void ExitButton::UpdateTextSize()
-{
-}
 
 void ExitButton::NoPressed()
 {
@@ -33,11 +31,6 @@ void ExitButton::YesPressed()
 void ExitButton::SetNoState()
 {
     m_noPressed = false;
-}
-
-void ExitButton::SetYesState()
-{
-    m_yesPressed = false;
 }
 
 bool ExitButton::GetNoState() const
@@ -66,7 +59,6 @@ void ExitButton::LoadWidgets()
     auto panelBackground = tgui::Picture::create("assets/images/background.png");
     panelBackground->setSize({ "100%", "100%" });
     panelBackground->setPosition({ "0%", "0%" });
-    
 
     auto textLabel = tgui::Label::create();
     textLabel->setSize({ "60%", "12.5%" });
@@ -101,7 +93,6 @@ void ExitButton::LoadWidgets()
     panel->add(noButton);
     panel->add(yesButton);
     
-
     m_exitButton.add(panel);
 
 }

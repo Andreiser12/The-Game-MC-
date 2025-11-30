@@ -9,13 +9,11 @@ public:
 
 	void Draw() override;
 	void HandleEvent(sf::Event event) override;
-	void UpdateTextSize() override;
 
 	void NoPressed();
 	void YesPressed();
 
 	void SetNoState();
-	void SetYesState();
 
 	bool GetNoState() const;
 	bool GetYesState() const;

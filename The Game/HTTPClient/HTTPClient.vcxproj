@@ -133,13 +133,12 @@
   <ItemGroup>
     <ClInclude Include="ConnectionFailedWindow.h" />
     <ClInclude Include="ExitButton.h" />
-    <ClInclude Include="framework.h" />
     <ClInclude Include="IWindow.h" />
     <ClInclude Include="LoginWindow.h" />
     <ClInclude Include="MainMenuWindow.h" />
     <ClInclude Include="RegisterWindow.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="targetver.h" />
+    <ClInclude Include="SettingsButton.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ConnectionFailedWindow.cpp" />
@@ -149,6 +148,7 @@
     <ClCompile Include="LoginWindow.cpp" />
     <ClCompile Include="MainMenuWindow.cpp" />
     <ClCompile Include="RegisterWindow.cpp" />
+    <ClCompile Include="SettingsButton.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="HTTPClient.rc" />

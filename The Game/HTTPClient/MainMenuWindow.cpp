@@ -1,6 +1,4 @@
 ﻿#include "MainMenuWindow.h"
-#include <iostream>
-#include <fstream>
 
 constexpr static unsigned int K_OFFSET_BUTTONS{ 100u };
 constexpr static unsigned int K_TEXT_SIZE{ 24u };
@@ -8,10 +6,9 @@ constexpr static unsigned int K_TEXT_SIZE{ 24u };
 MainMenuWindow::MainMenuWindow(sf::RenderWindow& window) :
 	m_window(window),
 	m_mainMenu(window),
-	m_exitLayout(window)
+	m_exitLayout(window),
+	m_settingsLayout(window)
 {
-	m_mainMenu.setTarget(window);
-
 	m_background = tgui::Picture::create("assets/images/background.png");
 	m_background->setSize({ "100%", "100%" });
 	m_mainMenu.add(m_background);
@@ -26,7 +23,7 @@ void MainMenuWindow::LoadWidgets()
 	auto settingsButton = tgui::Button::create();
 	auto exitButton = tgui::Button::create();
 
-	playButton->setSize({"16.67%", "5%"});
+	playButton->setSize({ "16.67%", "5%" });
 	playButton->setPosition({ "50%", "42.5%" });
 	playButton->setOrigin(0.5f, 0.5f);
 	playButton->setText("Play");
@@ -35,7 +32,7 @@ void MainMenuWindow::LoadWidgets()
 
 	m_mainMenu.add(playButton);
 	playButton->setTextSize(K_TEXT_SIZE);
-	
+
 
 	profileButton->setSize({ "16.67%", "5%" });
 	profileButton->setPosition({ "50%",
@@ -60,7 +57,7 @@ void MainMenuWindow::LoadWidgets()
 
 	m_mainMenu.add(settingsButton);
 	settingsButton->setTextSize(K_TEXT_SIZE);
-
+	settingsButton->onClick([this] { SettingsButtonPressed(); });
 
 	exitButton->setSize({ "16.67%", "5%" });
 	exitButton->setPosition({ "50%",
@@ -68,46 +65,80 @@ void MainMenuWindow::LoadWidgets()
 	exitButton->setOrigin(0.5f, 0.5f);
 	exitButton->setText("Exit");
 	exitButton->getRenderer()->setOpacity(0.7);
+	exitButton->getRenderer()->setBackgroundColor(tgui::Color::Yellow);
 	exitButton->getRenderer()->setTexture("assets/images/buttons.png");
 
 	m_mainMenu.add(exitButton);
 	exitButton->setTextSize(K_TEXT_SIZE);
-	exitButton->onClick([this] {ExitButtonPressed (); });
+	exitButton->onClick([this] {ExitButtonPressed(); });
 }
 
 void MainMenuWindow::Draw()
 {
 	m_mainMenu.draw();
-	if (m_showExitMenu)
+
+	switch (m_uiState)
 	{
+	case UiState::ExitMenu:
 		m_exitLayout.Draw();
+		break;
+
+	case UiState::SettingsMenu:
+		m_settingsLayout.Draw();
+		break;
+
+	default:
+		break;
 	}
 }
 
 void MainMenuWindow::ExitButtonPressed()
 {
-	m_showExitMenu = true;
+	if (m_uiState == UiState::MainMenu)
+	{
+		m_uiState = UiState::ExitMenu;
+	}
+}
+
+void MainMenuWindow::SettingsButtonPressed()
+{
+	if (m_uiState == UiState::MainMenu)
+	{
+		m_uiState = UiState::SettingsMenu;
+	}
 }
 
 void MainMenuWindow::HandleEvent(sf::Event event)
 {
-	m_mainMenu.handleEvent(event);
+	if (m_uiState == UiState::MainMenu)
+	{
+		m_mainMenu.handleEvent(event);
+	}
 
-	if (m_showExitMenu)
+	if (m_uiState == UiState::ExitMenu)
 	{
 		m_exitLayout.HandleEvent(event);
 
 		if (m_exitLayout.GetNoState())
 		{
+			m_uiState = UiState::MainMenu;
 			m_exitLayout.SetNoState();
-			m_showExitMenu = false;
 		}
 
 		if (m_exitLayout.GetYesState())
 		{
-			m_exitLayout.SetYesState();
 			m_window.close();
 		}
 	}
-}
 
+	if (m_uiState == UiState::SettingsMenu)
+	{
+		m_settingsLayout.HandleEvent(event);
+
+		if (m_settingsLayout.GetCloseState())
+		{
+			m_uiState = UiState::MainMenu;
+			m_settingsLayout.SetCloseState();
+		}
+	}
+}

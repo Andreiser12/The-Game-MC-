@@ -13,7 +13,7 @@ Player::~Player() {}
 void Player::PlaceCards(Deck& chosenDeck)
 {
 	uint8_t cardsPlaced = 0;
-	while (GetCardsCount() && cardsPlaced < MINIMUM_CARDS)
+	while (GetCardsCount() || cardsPlaced < MINIMUM_CARDS)
 	{
 		std::cout << "Which card would you like to place?"
 			<< std::endl;

@@ -6,6 +6,14 @@
 #include "TGUI/Backend/SFML-Graphics.hpp"
 
 #include "ExitButton.h"
+#include "SettingsButton.h"
+
+enum class UiState
+{
+	MainMenu,
+	ExitMenu,
+	SettingsMenu
+};
 
 class MainMenuWindow
 {
@@ -15,16 +23,19 @@ public:
 	void Draw();
 
 	void ExitButtonPressed();
+	void SettingsButtonPressed();
 
 private:
 	void LoadWidgets();
 
 private:
 	sf::RenderWindow& m_window;
+	UiState m_uiState = UiState::MainMenu;
+
 	tgui::Gui m_mainMenu;
-	ExitButton m_exitLayout;
 	tgui::Picture::Ptr m_background;
 
-	bool m_showExitMenu{ false };
+	ExitButton m_exitLayout;
+	SettingsButton m_settingsLayout;
 };
 

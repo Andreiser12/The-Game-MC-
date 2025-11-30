@@ -82,7 +82,9 @@ void LoginWindow::LoadWidgets()
 	loginButton->setSize({ "20%", "16.67%" }); 
 	auto coordX = editBoxUsername->getSize().x - editBoxUsername->getPosition().x;
 	auto coordY = editBoxUsername->getSize().y*1.5f + editBoxUsername->getPosition().y;
-	loginButton->setPosition({ coordX, coordY }); m_login.add(loginButton); loginButton->setTextSize(24); 
+	loginButton->setPosition({ coordX, coordY });
+	m_login.add(loginButton);
+	loginButton->setTextSize(24); 
 	loginButton->getRenderer()->setTexture("assets/images/buttons.png");
 	loginButton->onClick([this, editBoxUsername] { CheckLogin(editBoxUsername); });
 

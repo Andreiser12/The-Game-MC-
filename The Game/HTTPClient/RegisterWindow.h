@@ -12,7 +12,7 @@ public:
 
 	void HandleEvent(sf::Event event) override;
 	void Draw() override;
-	void UpdateTextSize() override;
+	void UpdateTextSize();
 	void GoToLogin();
 	
 	void CheckRegister(tgui::EditBox::Ptr username);

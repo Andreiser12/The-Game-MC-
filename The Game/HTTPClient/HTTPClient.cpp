@@ -1,33 +1,19 @@
-#include <iostream>
-#include <string>
-#include "framework.h"
-
 #include "LoginWindow.h"
 #include "RegisterWindow.h"
 #include "MainMenuWindow.h"
 #include "ConnectionFailedWindow.h"
-#include "SFML/Graphics.hpp"
+
 #include <cpr/cpr.h>
 #include <crow.h>
 
 constexpr static int LOGIN_WIDTH{ 640 };
 constexpr static int LOGIN_HEIGHT{ 480 };
 
-HINSTANCE hInst;
-
-ATOM                MyRegisterClass(HINSTANCE hInstance);
-BOOL                InitInstance(HINSTANCE, int);
-LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
-INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
-
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR    lpCmdLine,
 	_In_ int       nCmdShow)
 {
-	UNREFERENCED_PARAMETER(hPrevInstance);
-	UNREFERENCED_PARAMETER(lpCmdLine);
-
 	cpr::Response response = cpr::Get(cpr::Url{ "http://localhost:18080/users" });
 	if ((int)response.status_code == 404 || response.primary_port!=18080)
 	{
@@ -62,8 +48,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	sf::RenderWindow loginWindow{ loginRegisterMode, "TheGame - Login", sf::Style::Titlebar | sf::Style::Close };
 	LoginWindow _login(loginWindow);
 	RegisterWindow _register(loginWindow);
-	bool onLoginWindow = true;
-	loginWindow.setFramerateLimit(60);
 
 	while (loginWindow.isOpen())
 	{
@@ -81,13 +65,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				_register.HandleEvent(event);
 			}
 
-			if (event.is<sf::Event::Closed>() || _login.GetLoggedState() || _register.GetRegisteredState())
+			if (event.is<sf::Event::Closed>() || _login.GetLoggedState()
+				|| _register.GetRegisteredState())
 			{
 				loginWindow.close();
 			}
 		}
 
-		loginWindow.clear(tgui::Color::White);
 		if (_login.GetWindowState())
 		{
 			_login.Draw();
@@ -118,11 +102,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 					menuWindow.close();
 				}
 			}
-			menuWindow.clear(tgui::Color(180, 125, 23));
 			_menu.Draw();
 			menuWindow.display();
 		}
 	}
-
 	return 0;
 }

@@ -33,10 +33,10 @@
     <ClInclude Include="MainMenuWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ExitButton.h">
+    <ClInclude Include="SettingsButton.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SettingsButton.h">
+    <ClInclude Include="ExitPanel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -59,10 +59,10 @@
     <ClCompile Include="IWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ExitButton.cpp">
+    <ClCompile Include="SettingsButton.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SettingsButton.cpp">
+    <ClCompile Include="ExitPanel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

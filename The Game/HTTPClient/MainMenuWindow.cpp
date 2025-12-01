@@ -1,12 +1,10 @@
 ﻿#include "MainMenuWindow.h"
 
-constexpr static unsigned int K_OFFSET_BUTTONS{ 100u };
 constexpr static unsigned int K_TEXT_SIZE{ 24u };
 
 MainMenuWindow::MainMenuWindow(sf::RenderWindow& window) :
 	m_window(window),
 	m_mainMenu(window),
-	m_exitLayout(window),
 	m_settingsLayout(window)
 	//m_bgSprite{}
 {
@@ -63,7 +61,7 @@ void MainMenuWindow::LoadWidgets()
 	playButton->setPosition({ "50%", "42.5%" });
 	playButton->setOrigin(0.5f, 0.5f);
 	playButton->setText("Play");
-	playButton->getRenderer()->setOpacity(0.7);
+	playButton->getRenderer()->setOpacity(0.7f);
 	playButton->getRenderer()->setTexture("assets/images/buttons.png");
 
 	m_mainMenu.add(playButton);
@@ -71,12 +69,10 @@ void MainMenuWindow::LoadWidgets()
 
 
 	profileButton->setSize({ "16.67%", "5%" });
-	profileButton->setPosition({ "50%",
-		playButton->getPosition().y + K_OFFSET_BUTTONS
-		});
+	profileButton->setPosition({ "50%", "52.5%" });
 	profileButton->setOrigin(0.5f, 0.5f);
 	profileButton->setText("Profile");
-	profileButton->getRenderer()->setOpacity(0.7);
+	profileButton->getRenderer()->setOpacity(0.7f);
 	profileButton->getRenderer()->setTexture("assets/images/buttons.png");
 
 	m_mainMenu.add(profileButton);
@@ -84,35 +80,31 @@ void MainMenuWindow::LoadWidgets()
 
 
 	settingsButton->setSize({ "16.67%", "5%" });
-	settingsButton->setPosition({ "50%",
-		profileButton->getPosition().y + K_OFFSET_BUTTONS });
+	settingsButton->setPosition({ "50%", "62.5%" });
 	settingsButton->setOrigin(0.5f, 0.5f);
 	settingsButton->setText("Settings");
-	settingsButton->getRenderer()->setOpacity(0.7);
+	settingsButton->getRenderer()->setOpacity(0.7f);
 	settingsButton->getRenderer()->setTexture("assets/images/buttons.png");
 
 	m_mainMenu.add(settingsButton);
 	settingsButton->setTextSize(K_TEXT_SIZE);
 	settingsButton->onClick([this] { SettingsButtonPressed(); });
 
+	exitButton->setTextSize(K_TEXT_SIZE);
 	exitButton->setSize({ "16.67%", "5%" });
-	exitButton->setPosition({ "50%",
-		settingsButton->getPosition().y + K_OFFSET_BUTTONS });
+	exitButton->setPosition({ "50%", "72.5%"});
 	exitButton->setOrigin(0.5f, 0.5f);
 	exitButton->setText("Exit");
-	exitButton->getRenderer()->setOpacity(0.7);
+	exitButton->getRenderer()->setOpacity(0.7f);
 	exitButton->getRenderer()->setBackgroundColor(tgui::Color::Yellow);
 	exitButton->getRenderer()->setTexture("assets/images/buttons.png");
 
 	m_mainMenu.add(exitButton);
-	exitButton->setTextSize(K_TEXT_SIZE);
 	exitButton->onClick([this] {ExitButtonPressed(); });
 }
 
 void MainMenuWindow::Draw()
 {
-
-
 	/*if (m_bgClock.getElapsedTime().asSeconds() >= m_bgFrameDuration)
 	{
 		m_bgClock.restart();
@@ -121,15 +113,10 @@ void MainMenuWindow::Draw()
 	}
 	m_window.draw(m_bgSprite);*/
 
-
 	m_mainMenu.draw();
 
 	switch (m_uiState)
 	{
-	case UiState::ExitMenu:
-		m_exitLayout.Draw();
-		break;
-
 	case UiState::SettingsMenu:
 		m_settingsLayout.Draw();
 		break;
@@ -141,10 +128,17 @@ void MainMenuWindow::Draw()
 
 void MainMenuWindow::ExitButtonPressed()
 {
-	if (m_uiState == UiState::MainMenu)
-	{
-		m_uiState = UiState::ExitMenu;
-	}
+	auto exitPanel = ExitPanel::Create(
+		m_mainMenu,
+		[this]() {
+			m_window.close();
+		},
+		[this]() {
+			auto panel = m_mainMenu.get<tgui::Panel>("ExitPanel");
+			if (panel) m_mainMenu.remove(panel);
+		}
+	);
+	m_mainMenu.add(exitPanel);
 }
 
 void MainMenuWindow::SettingsButtonPressed()
@@ -162,22 +156,6 @@ void MainMenuWindow::HandleEvent(sf::Event event)
 		m_mainMenu.handleEvent(event);
 	}
 
-	if (m_uiState == UiState::ExitMenu)
-	{
-		m_exitLayout.HandleEvent(event);
-
-		if (m_exitLayout.GetNoState())
-		{
-			m_uiState = UiState::MainMenu;
-			m_exitLayout.SetNoState();
-		}
-
-		if (m_exitLayout.GetYesState())
-		{
-			m_window.close();
-		}
-	}
-
 	if (m_uiState == UiState::SettingsMenu)
 	{
 		m_settingsLayout.HandleEvent(event);
@@ -192,7 +170,6 @@ void MainMenuWindow::HandleEvent(sf::Event event)
 			auto newRes = m_settingsLayout.GetCurrentResolution();
 			m_window.create(sf::VideoMode(newRes), "The Game - 1.0.0", sf::State::Fullscreen);
 			m_mainMenu.setTarget(m_window);
-			m_exitLayout.SetTarget(m_window);
 			m_settingsLayout.SetTarget(m_window);
 			m_settingsLayout.SetApplyState();
 		}

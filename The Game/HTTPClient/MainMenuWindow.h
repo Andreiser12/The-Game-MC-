@@ -5,7 +5,7 @@
 #include "TGUI/Widgets/Button.hpp"
 #include "TGUI/Backend/SFML-Graphics.hpp"
 
-#include "ExitButton.h"
+#include "ExitPanel.h"
 #include "SettingsButton.h"
 #include <vector>
 
@@ -36,7 +36,6 @@ private:
 	tgui::Gui m_mainMenu;
 	tgui::Picture::Ptr m_background;
 
-	ExitButton m_exitLayout;
 	SettingsButton m_settingsLayout;
 
 	/*std::vector<sf::Texture> m_bgFrames;

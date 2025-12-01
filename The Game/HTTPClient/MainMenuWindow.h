@@ -6,7 +6,8 @@
 #include "TGUI/Backend/SFML-Graphics.hpp"
 
 #include "ExitPanel.h"
-#include "SettingsButton.h"
+#include "SettingsPanel.h"
+
 #include <vector>
 
 enum class UiState
@@ -35,8 +36,6 @@ private:
 
 	tgui::Gui m_mainMenu;
 	tgui::Picture::Ptr m_background;
-
-	SettingsButton m_settingsLayout;
 
 	/*std::vector<sf::Texture> m_bgFrames;
 	sf::Sprite m_bgSprite;

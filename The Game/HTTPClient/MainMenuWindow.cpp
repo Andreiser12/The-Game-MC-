@@ -4,8 +4,7 @@ constexpr static unsigned int K_TEXT_SIZE{ 24u };
 
 MainMenuWindow::MainMenuWindow(sf::RenderWindow& window) :
 	m_window(window),
-	m_mainMenu(window),
-	m_settingsLayout(window)
+	m_mainMenu(window)
 	//m_bgSprite{}
 {
 	m_background = tgui::Picture::create("assets/images/background.png");
@@ -46,7 +45,6 @@ MainMenuWindow::MainMenuWindow(sf::RenderWindow& window) :
 		m_bgSprite.setScale(scale);
 	}*/
 
-
 	LoadWidgets();
 }
 
@@ -67,7 +65,6 @@ void MainMenuWindow::LoadWidgets()
 	m_mainMenu.add(playButton);
 	playButton->setTextSize(K_TEXT_SIZE);
 
-
 	profileButton->setSize({ "16.67%", "5%" });
 	profileButton->setPosition({ "50%", "52.5%" });
 	profileButton->setOrigin(0.5f, 0.5f);
@@ -77,7 +74,6 @@ void MainMenuWindow::LoadWidgets()
 
 	m_mainMenu.add(profileButton);
 	profileButton->setTextSize(K_TEXT_SIZE);
-
 
 	settingsButton->setSize({ "16.67%", "5%" });
 	settingsButton->setPosition({ "50%", "62.5%" });
@@ -92,7 +88,7 @@ void MainMenuWindow::LoadWidgets()
 
 	exitButton->setTextSize(K_TEXT_SIZE);
 	exitButton->setSize({ "16.67%", "5%" });
-	exitButton->setPosition({ "50%", "72.5%"});
+	exitButton->setPosition({ "50%", "72.5%" });
 	exitButton->setOrigin(0.5f, 0.5f);
 	exitButton->setText("Exit");
 	exitButton->getRenderer()->setOpacity(0.7f);
@@ -112,18 +108,7 @@ void MainMenuWindow::Draw()
 		m_bgSprite.setTexture(m_bgFrames[m_bgCurrentFrame]);
 	}
 	m_window.draw(m_bgSprite);*/
-
 	m_mainMenu.draw();
-
-	switch (m_uiState)
-	{
-	case UiState::SettingsMenu:
-		m_settingsLayout.Draw();
-		break;
-
-	default:
-		break;
-	}
 }
 
 void MainMenuWindow::ExitButtonPressed()
@@ -143,35 +128,20 @@ void MainMenuWindow::ExitButtonPressed()
 
 void MainMenuWindow::SettingsButtonPressed()
 {
-	if (m_uiState == UiState::MainMenu)
-	{
-		m_uiState = UiState::SettingsMenu;
-	}
+	auto settingsPanel = SettingsPanel::Create(
+		m_mainMenu,
+		[this]() {},
+		[this](sf::Vector2u newRes)
+		{
+			m_window.create(sf::VideoMode(newRes), "The Game 1.0.0",
+				sf::State::Fullscreen);
+			m_mainMenu.setTarget(m_window);
+		}
+	);
+	m_mainMenu.add(settingsPanel);
 }
 
 void MainMenuWindow::HandleEvent(sf::Event event)
 {
-	if (m_uiState == UiState::MainMenu)
-	{
-		m_mainMenu.handleEvent(event);
-	}
-
-	if (m_uiState == UiState::SettingsMenu)
-	{
-		m_settingsLayout.HandleEvent(event);
-
-		if (m_settingsLayout.GetCloseState())
-		{
-			m_uiState = UiState::MainMenu;
-			m_settingsLayout.SetCloseState();
-		}
-		if (m_settingsLayout.GetApplyState())
-		{
-			auto newRes = m_settingsLayout.GetCurrentResolution();
-			m_window.create(sf::VideoMode(newRes), "The Game - 1.0.0", sf::State::Fullscreen);
-			m_mainMenu.setTarget(m_window);
-			m_settingsLayout.SetTarget(m_window);
-			m_settingsLayout.SetApplyState();
-		}
-	}
+	m_mainMenu.handleEvent(event);
 }

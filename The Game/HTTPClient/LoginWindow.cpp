@@ -26,7 +26,7 @@ void LoginWindow::CheckLogin(tgui::EditBox::Ptr username)
 		auto errorLabel = tgui::Label::create();
 		errorLabel->setText("No account with this username has been found!");
 		errorLabel->getRenderer()->setTextColor(tgui::Color::Red);
-		errorLabel->setPosition({"50%", "62.5%"});
+		errorLabel->setPosition({ "50%", "62.5%" });
 		errorLabel->setOrigin(0.5f, 0.5f);
 		errorLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
 		errorLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
@@ -35,12 +35,6 @@ void LoginWindow::CheckLogin(tgui::EditBox::Ptr username)
 		return;
 	}
 	m_isLoggedIn = true;
-}
-
-void LoginWindow::CheckRegister()
-{
-	m_isRegisteredPressed = true;
-	m_onLoginWindow = false;
 }
 
 void LoginWindow::UpdateTextSize()
@@ -88,15 +82,18 @@ void LoginWindow::LoadWidgets()
 	loginButton->getRenderer()->setTexture("assets/images/buttons.png");
 	loginButton->onClick([this, editBoxUsername] { CheckLogin(editBoxUsername); });
 
-	auto registerButton = tgui::Button::create("Register"); registerButton->setSize({ "20%", "16.67%" });
+	auto registerButton = tgui::Button::create("Register");
+	registerButton->setSize({ "20%", "16.67%" });
 	coordX = editBoxUsername->getPosition().x + loginButton->getSize().x*0.7f;
 	coordY = editBoxUsername->getSize().y * 1.5f + editBoxUsername->getPosition().y;
 	registerButton->setPosition({ coordX, coordY });
 	registerButton->getRenderer()->setTexture("assets/images/buttons.png");
 	m_login.add(registerButton); 
 	registerButton->setTextSize(24);
-
-	registerButton->onClick([this] {CheckRegister(); });
+	registerButton->onClick([this] {
+		m_isRegisteredPressed = true;
+		m_onLoginWindow = false;
+		});
 }
 
 bool LoginWindow::GetLoggedState() const

@@ -11,7 +11,6 @@ public:
 	LoginWindow(sf::RenderWindow& window);
 
 	void CheckLogin(tgui::EditBox::Ptr username);
-	void CheckRegister();
 
 	void UpdateTextSize();
 	void Draw() override;

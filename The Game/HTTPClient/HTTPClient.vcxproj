@@ -138,7 +138,7 @@
     <ClInclude Include="MainMenuWindow.h" />
     <ClInclude Include="RegisterWindow.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="SettingsButton.h" />
+    <ClInclude Include="SettingsPanel.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ConnectionFailedWindow.cpp" />
@@ -148,7 +148,7 @@
     <ClCompile Include="LoginWindow.cpp" />
     <ClCompile Include="MainMenuWindow.cpp" />
     <ClCompile Include="RegisterWindow.cpp" />
-    <ClCompile Include="SettingsButton.cpp" />
+    <ClCompile Include="SettingsPanel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="HTTPClient.rc" />

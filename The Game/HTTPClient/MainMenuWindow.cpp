@@ -8,10 +8,46 @@ MainMenuWindow::MainMenuWindow(sf::RenderWindow& window) :
 	m_mainMenu(window),
 	m_exitLayout(window),
 	m_settingsLayout(window)
+	//m_bgSprite{}
 {
 	m_background = tgui::Picture::create("assets/images/background.png");
 	m_background->setSize({ "100%", "100%" });
 	m_mainMenu.add(m_background);
+	// Încarcă cadrele GIF
+
+	/*const int frameCount = 60;
+	m_bgFrames.reserve(frameCount);
+
+	for (int i = 0; i < frameCount; i++)
+	{
+		sf::Texture tempTex;
+
+		std::string filename = "assets/images/TheGameLevelSequence-ezgif.com-speed" + std::to_string(i) + ".png";
+
+		if (!tempTex.loadFromFile(filename))
+		{
+			std::cerr << "Eroare la incarcarea imaginii: " << filename << std::endl;
+			continue;
+		}
+		m_bgFrames.push_back(std::move(tempTex));
+	}
+
+	if (!m_bgFrames.empty())
+	{
+		m_bgSprite.setTexture(m_bgFrames[0]);
+		m_bgSprite.setPosition({ 0.f, 0.f });
+
+		auto texSize = m_bgFrames[0].getSize();
+		auto winSize = m_window.getSize();
+
+		sf::Vector2f scale{
+			static_cast<float>(winSize.x) / texSize.x,
+			static_cast<float>(winSize.y) / texSize.y
+		};
+
+		m_bgSprite.setScale(scale);
+	}*/
+
 
 	LoadWidgets();
 }
@@ -75,6 +111,17 @@ void MainMenuWindow::LoadWidgets()
 
 void MainMenuWindow::Draw()
 {
+
+
+	/*if (m_bgClock.getElapsedTime().asSeconds() >= m_bgFrameDuration)
+	{
+		m_bgClock.restart();
+		m_bgCurrentFrame = (m_bgCurrentFrame + 1) % m_bgFrames.size();
+		m_bgSprite.setTexture(m_bgFrames[m_bgCurrentFrame]);
+	}
+	m_window.draw(m_bgSprite);*/
+
+
 	m_mainMenu.draw();
 
 	switch (m_uiState)

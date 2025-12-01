@@ -13,11 +13,15 @@ tgui::Panel::Ptr SettingsPanel::Create(tgui::Gui& gui,
 	panel->getRenderer()->setRoundedBorderRadius(15);
 	panel->setOrigin(0.5f, 0.5f);
 
+	auto background = tgui::Picture::create("assets/images/background.png");
+	background->setSize({ "100%", "100%" });
+
 	auto sidebar = tgui::Panel::create({ "20%", "100%" });
 	sidebar->setPosition({ "0%", "0%" });
 	sidebar->getRenderer()->setBackgroundColor(tgui::Color(50, 50, 50, 180));
 	sidebar->getRenderer()->setBorders({ 1 });
 	sidebar->getRenderer()->setBorderColor(tgui::Color::White);
+	sidebar->add(background);
 	panel->add(sidebar);	
 
 	auto content = tgui::Panel::create({ "80%", "100%" });
@@ -37,12 +41,15 @@ tgui::Panel::Ptr SettingsPanel::Create(tgui::Gui& gui,
 
 	videoPanel->setPosition({ "0%", "0%" });
 	videoPanel->getRenderer()->setBackgroundColor(tgui::Color(128, 128, 128));
+	videoPanel->add(background);
 
 	audioPanel->setPosition({ "0%", "0%" });
 	audioPanel->getRenderer()->setBackgroundColor(tgui::Color(128, 128, 128));
+	audioPanel->add(background);
 
 	gameplayPanel->setPosition({ "0%", "0%" });
 	gameplayPanel->getRenderer()->setBackgroundColor(tgui::Color(128, 128, 128));
+	gameplayPanel->add(background);
 
 	auto videoButton = tgui::Button::create();
 	videoButton->setSize({ "90%", "10%" });
@@ -52,6 +59,7 @@ tgui::Panel::Ptr SettingsPanel::Create(tgui::Gui& gui,
 	videoButton->getRenderer()->setBorderColor(tgui::Color::White);
 	videoButton->getRenderer()->setBorders({ 1 });
 	videoButton->setTextSize(24);
+	videoButton->getRenderer()->setTexture("assets/images/buttons.png");
 	sidebar->add(videoButton);
 
 	auto audioButton = tgui::Button::create();
@@ -62,6 +70,7 @@ tgui::Panel::Ptr SettingsPanel::Create(tgui::Gui& gui,
 	audioButton->getRenderer()->setBorderColor(tgui::Color::White);
 	audioButton->getRenderer()->setBorders({ 1 });
 	audioButton->setTextSize(24);
+	audioButton->getRenderer()->setTexture("assets/images/buttons.png");
 	sidebar->add(audioButton);
 
 	auto gameplayButton = tgui::Button::create();
@@ -72,6 +81,7 @@ tgui::Panel::Ptr SettingsPanel::Create(tgui::Gui& gui,
 	gameplayButton->getRenderer()->setBorderColor(tgui::Color::White);
 	gameplayButton->getRenderer()->setBorders({ 1 });
 	gameplayButton->setTextSize(24);
+	gameplayButton->getRenderer()->setTexture("assets/images/buttons.png");
 	sidebar->add(gameplayButton);
 
 	videoButton->onClick([=] {
@@ -97,6 +107,7 @@ tgui::Panel::Ptr SettingsPanel::Create(tgui::Gui& gui,
 	resolutionContainer->setPosition({ "75%", "10%" });
 	resolutionContainer->setOrigin(0.5f, 0.f);
 	resolutionContainer->getRenderer()->setBackgroundColor(tgui::Color(0, 0, 0, 0));
+	resolutionContainer->add(background);
 
 	auto resolutionsIndexPtr = std::make_shared<unsigned>(resolutionIndex);
 	auto resolutions = std::make_shared<std::vector<sf::Vector2u>>
@@ -144,6 +155,7 @@ tgui::Panel::Ptr SettingsPanel::Create(tgui::Gui& gui,
 	leftArrow->setPosition({ "0%", "0%" });
 	leftArrow->getRenderer()->setBackgroundColor(tgui::Color(128, 128, 128));
 	leftArrow->getRenderer()->setTextColor(tgui::Color::Black);
+	leftArrow->getRenderer()->setTexture("assets/images/buttons.png");
 	leftArrow->setTextSize(24);
 
 	auto rightArrow = tgui::Button::create(">");
@@ -151,6 +163,7 @@ tgui::Panel::Ptr SettingsPanel::Create(tgui::Gui& gui,
 	rightArrow->setPosition({ "85%", "0%" });
 	rightArrow->getRenderer()->setBackgroundColor(tgui::Color(128, 128, 128));
 	rightArrow->getRenderer()->setTextColor(tgui::Color::Black);
+	rightArrow->getRenderer()->setTexture("assets/images/buttons.png");
 	rightArrow->setTextSize(24);
 
 	leftArrow->onClick([resolutions, resolutionsIndexPtr, resolutionValue]
@@ -182,6 +195,7 @@ tgui::Panel::Ptr SettingsPanel::Create(tgui::Gui& gui,
 	applyButton->getRenderer()->setBorderColor(tgui::Color::Black);
 	applyButton->getRenderer()->setTextColor(tgui::Color::Black);
 	applyButton->getRenderer()->setRoundedBorderRadius(10);
+	applyButton->getRenderer()->setTexture("assets/images/buttons.png");
 	applyButton->onClick([resolutionsIndexPtr, onApply]
 		{
 			if (onApply) onApply(*resolutionsIndexPtr);
@@ -198,6 +212,7 @@ tgui::Panel::Ptr SettingsPanel::Create(tgui::Gui& gui,
 	closeButton->getRenderer()->setBorderColor(tgui::Color::Black);
 	closeButton->getRenderer()->setTextColor(tgui::Color::Black);
 	closeButton->getRenderer()->setRoundedBorderRadius(10);
+	closeButton->getRenderer()->setTexture("assets/images/buttons.png");
 	closeButton->onClick([panel, onClose] {
 		panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(150));
 		if (onClose) onClose();

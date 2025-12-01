@@ -5,12 +5,10 @@ constexpr static unsigned int K_TEXT_SIZE{ 24u };
 MainMenuWindow::MainMenuWindow(sf::RenderWindow& window) :
 	m_window(window),
 	m_mainMenu(window)
-	//m_bgSprite{}
 {
 	m_background = tgui::Picture::create("assets/images/background.png");
 	m_background->setSize({ "100%", "100%" });
 	m_mainMenu.add(m_background);
-	// Încarcă cadrele GIF
 
 	/*const int frameCount = 60;
 	m_bgFrames.reserve(frameCount);
@@ -23,7 +21,7 @@ MainMenuWindow::MainMenuWindow(sf::RenderWindow& window) :
 
 		if (!tempTex.loadFromFile(filename))
 		{
-			std::cerr << "Eroare la incarcarea imaginii: " << filename << std::endl;
+			std::cerr << "Eroare la incarcarea imaginii: "  << filename << std::endl;
 			continue;
 		}
 		m_bgFrames.push_back(std::move(tempTex));
@@ -31,8 +29,9 @@ MainMenuWindow::MainMenuWindow(sf::RenderWindow& window) :
 
 	if (!m_bgFrames.empty())
 	{
-		m_bgSprite.setTexture(m_bgFrames[0]);
-		m_bgSprite.setPosition({ 0.f, 0.f });
+		m_bgSprite.emplace();
+		m_bgSprite->setTexture(m_bgFrames[0], true);
+		m_bgSprite->setPosition({ 0.f, 0.f });
 
 		auto texSize = m_bgFrames[0].getSize();
 		auto winSize = m_window.getSize();
@@ -42,7 +41,7 @@ MainMenuWindow::MainMenuWindow(sf::RenderWindow& window) :
 			static_cast<float>(winSize.y) / texSize.y
 		};
 
-		m_bgSprite.setScale(scale);
+		m_bgSprite->setScale(scale);
 	}*/
 
 	LoadWidgets();
@@ -101,13 +100,14 @@ void MainMenuWindow::LoadWidgets()
 
 void MainMenuWindow::Draw()
 {
-	/*if (m_bgClock.getElapsedTime().asSeconds() >= m_bgFrameDuration)
+	/*if (m_bgSprite && m_bgClock.getElapsedTime().asSeconds() >= m_bgFrameDuration)
 	{
 		m_bgClock.restart();
 		m_bgCurrentFrame = (m_bgCurrentFrame + 1) % m_bgFrames.size();
-		m_bgSprite.setTexture(m_bgFrames[m_bgCurrentFrame]);
+		m_bgSprite->setTexture(m_bgFrames[m_bgCurrentFrame]);
 	}
-	m_window.draw(m_bgSprite);*/
+	if (m_bgSprite)
+		m_window.draw(*m_bgSprite);*/
 	m_mainMenu.draw();
 }
 

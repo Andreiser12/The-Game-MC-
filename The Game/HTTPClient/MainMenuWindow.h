@@ -8,7 +8,10 @@
 #include "ExitPanel.h"
 #include "SettingsPanel.h"
 
+#include <iostream>
 #include <vector>
+#include <optional>
+
 
 enum class UiState
 {
@@ -52,7 +55,7 @@ private:
 	};
 
 	/*std::vector<sf::Texture> m_bgFrames;
-	sf::Sprite m_bgSprite;
+	std::optional<sf::Sprite> m_bgSprite;
 	std::size_t m_bgCurrentFrame = 0;
 	sf::Clock m_bgClock;
 	const float m_bgFrameDuration = 1.f / 24.f;*/

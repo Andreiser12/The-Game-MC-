@@ -161,6 +161,8 @@
     <ClCompile Include="DatabaseManager.cpp" />
     <ClCompile Include="Deck.cpp" />
     <ClCompile Include="FundamentalCard.cpp" />
+    <ClCompile Include="Lobby.cpp" />
+    <ClCompile Include="Lobby.cppm" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Player.cpp" />

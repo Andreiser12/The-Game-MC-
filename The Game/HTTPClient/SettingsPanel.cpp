@@ -2,9 +2,38 @@
 
 tgui::Panel::Ptr SettingsPanel::Create(tgui::Gui& gui,
 	unsigned resolutionIndex,
+	bool isFullscreen,
+	unsigned framerateIndex,
 	std::function<void()> onClose,
-	std::function<void(unsigned res)> onApply)
+	std::function<void(unsigned res, bool fullscreen, unsigned framerate)> onApply)
 {
+	auto resolutionsIndexPtr = std::make_shared<unsigned>(resolutionIndex);
+	auto resolutions = std::make_shared<std::vector<sf::Vector2u>>
+		(std::vector<sf::Vector2u>{
+			{640, 480},
+			{ 800, 600 },
+			{ 1024, 768 },
+			{ 1280, 720 },
+			{ 1280, 800 },
+			{ 1366, 768 },
+			{ 1440, 900 },
+			{ 1680, 1050 },
+			{ 1920, 1080 },
+			{ 1920, 1200 },
+			{ 2560, 1440 }
+	});
+	auto fullscreenPtr = std::make_shared<bool>(isFullscreen);
+	auto framerateIndexPtr = std::make_shared<unsigned>(framerateIndex);
+	auto framerates = std::make_shared<std::vector<unsigned>>(
+		std::vector<unsigned>
+	{
+		30u,
+			60u,
+			120u,
+			144u,
+			180u
+	});
+
 	auto panel = tgui::Panel::create({ "60%", "60%" });
 	panel->setPosition({ "50%", "50%" });
 	panel->getRenderer()->setBackgroundColor(tgui::Color(0, 0, 0, 180));
@@ -107,25 +136,8 @@ tgui::Panel::Ptr SettingsPanel::Create(tgui::Gui& gui,
 	resolutionContainer->setPosition({ "75%", "10%" });
 	resolutionContainer->setOrigin(0.5f, 0.f);
 	resolutionContainer->getRenderer()->setBackgroundColor(tgui::Color(0, 0, 0, 0));
-	resolutionContainer->add(background);
 
-	auto resolutionsIndexPtr = std::make_shared<unsigned>(resolutionIndex);
-	auto resolutions = std::make_shared<std::vector<sf::Vector2u>>
-		(std::vector<sf::Vector2u>{
-			{640, 480},
-			{ 800, 600 },
-			{ 1024, 768 },
-			{ 1280, 720 },
-			{ 1280, 800 },
-			{ 1366, 768 },
-			{ 1440, 900 },
-			{ 1680, 1050 },
-			{ 1920, 1080 },
-			{ 1920, 1200 },
-			{ 2560, 1440 }
-	});
-
-	auto resolutionText = tgui::Label::create();
+	auto resolutionText = tgui::Label::create("Resolution");
 	resolutionText->setSize({ "16%", "12.5%" });
 	resolutionText->setPosition({ "5%", "10%" });
 	resolutionText->getRenderer()->setTextColor(tgui::Color::Red);
@@ -133,7 +145,6 @@ tgui::Panel::Ptr SettingsPanel::Create(tgui::Gui& gui,
 	resolutionText->getRenderer()->setBorderColor(tgui::Color::Black);
 	resolutionText->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
 	resolutionText->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-	resolutionText->setText("Resolution");
 	resolutionText->setTextSize(24);
 	videoPanel->add(resolutionText);
 
@@ -150,30 +161,30 @@ tgui::Panel::Ptr SettingsPanel::Create(tgui::Gui& gui,
 	resolutionValue->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
 	resolutionValue->setTextSize(24);
 
-	auto leftArrow = tgui::Button::create("<");
-	leftArrow->setSize({ "15%", "100%" });
-	leftArrow->setPosition({ "0%", "0%" });
-	leftArrow->getRenderer()->setBackgroundColor(tgui::Color(128, 128, 128));
-	leftArrow->getRenderer()->setTextColor(tgui::Color::Black);
-	leftArrow->getRenderer()->setTexture("assets/images/buttons.png");
-	leftArrow->setTextSize(24);
+	auto leftResolutionArrow = tgui::Button::create("<");
+	leftResolutionArrow->setSize({ "15%", "100%" });
+	leftResolutionArrow->setPosition({ "0%", "0%" });
+	leftResolutionArrow->getRenderer()->setBackgroundColor(tgui::Color(128, 128, 128));
+	leftResolutionArrow->getRenderer()->setTextColor(tgui::Color::Black);
+	leftResolutionArrow->getRenderer()->setTexture("assets/images/buttons.png");
+	leftResolutionArrow->setTextSize(24);
 
-	auto rightArrow = tgui::Button::create(">");
-	rightArrow->setSize({ "15%", "100%" });
-	rightArrow->setPosition({ "85%", "0%" });
-	rightArrow->getRenderer()->setBackgroundColor(tgui::Color(128, 128, 128));
-	rightArrow->getRenderer()->setTextColor(tgui::Color::Black);
-	rightArrow->getRenderer()->setTexture("assets/images/buttons.png");
-	rightArrow->setTextSize(24);
+	auto rightResolutionArrow = tgui::Button::create(">");
+	rightResolutionArrow->setSize({ "15%", "100%" });
+	rightResolutionArrow->setPosition({ "85%", "0%" });
+	rightResolutionArrow->getRenderer()->setBackgroundColor(tgui::Color(128, 128, 128));
+	rightResolutionArrow->getRenderer()->setTextColor(tgui::Color::Black);
+	rightResolutionArrow->getRenderer()->setTexture("assets/images/buttons.png");
+	rightResolutionArrow->setTextSize(24);
 
-	leftArrow->onClick([resolutions, resolutionsIndexPtr, resolutionValue]
+	leftResolutionArrow->onClick([resolutions, resolutionsIndexPtr, resolutionValue]
 		{
 			if (*resolutionsIndexPtr == 0) *resolutionsIndexPtr = resolutions->size() - 1;
 			else --(*resolutionsIndexPtr);
 			resolutionValue->setText(std::to_string((*resolutions)[*resolutionsIndexPtr].x) + "x"
 				+ std::to_string((*resolutions)[*resolutionsIndexPtr].y));
 		});
-	rightArrow->onClick([resolutions, resolutionsIndexPtr, resolutionValue]
+	rightResolutionArrow->onClick([resolutions, resolutionsIndexPtr, resolutionValue]
 		{
 			if (*resolutionsIndexPtr == resolutions->size() - 1) *resolutionsIndexPtr = 0;
 			else ++(*resolutionsIndexPtr);
@@ -181,9 +192,37 @@ tgui::Panel::Ptr SettingsPanel::Create(tgui::Gui& gui,
 				+ std::to_string((*resolutions)[*resolutionsIndexPtr].y));
 		});
 
-	resolutionContainer->add(leftArrow);
+	resolutionContainer->add(leftResolutionArrow);
 	resolutionContainer->add(resolutionValue);
-	resolutionContainer->add(rightArrow);
+	resolutionContainer->add(rightResolutionArrow);
+
+	auto fullscreenText = tgui::Label::create("Fullscreen");
+	fullscreenText->setSize({ "16%", "12.5%" });
+	fullscreenText->setPosition({ "5%", "35%" });
+	fullscreenText->getRenderer()->setTextColor(tgui::Color::Red);
+	fullscreenText->getRenderer()->setBorders({ 2 });
+	fullscreenText->getRenderer()->setBorderColor(tgui::Color::Black);
+	fullscreenText->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+	fullscreenText->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+	fullscreenText->setTextSize(24);
+	videoPanel->add(fullscreenText);
+
+	auto fullscreenCheckbox = tgui::CheckBox::create();
+	fullscreenCheckbox->setSize({ "5%", "6%" });
+	fullscreenCheckbox->setPosition({ "73%", "37.5%" });
+	fullscreenCheckbox->setChecked(true);
+	fullscreenCheckbox->onCheck([fullscreenPtr] {
+		*fullscreenPtr = true;
+		});
+	fullscreenCheckbox->onUncheck([fullscreenPtr] {
+		*fullscreenPtr = false;
+		});
+
+	auto framerateContainer = tgui::Panel::create();
+	framerateContainer->setSize({ "40%", "12.5%" });
+	framerateContainer->setPosition({ "75%", "60%" });
+	framerateContainer->setOrigin(0.5f, 0.f);
+	framerateContainer->getRenderer()->setBackgroundColor(tgui::Color(0, 0, 0, 0));
 
 	auto applyButton = tgui::Button::create("Apply");
 	applyButton->setSize({ "15%", "10%" });
@@ -196,9 +235,10 @@ tgui::Panel::Ptr SettingsPanel::Create(tgui::Gui& gui,
 	applyButton->getRenderer()->setTextColor(tgui::Color::Black);
 	applyButton->getRenderer()->setRoundedBorderRadius(10);
 	applyButton->getRenderer()->setTexture("assets/images/buttons.png");
-	applyButton->onClick([resolutionsIndexPtr, onApply]
+	applyButton->onClick([resolutionsIndexPtr, fullscreenPtr, 
+		framerateIndexPtr, onApply]
 		{
-			if (onApply) onApply(*resolutionsIndexPtr);
+			if (onApply) onApply(*resolutionsIndexPtr, *fullscreenPtr, *framerateIndexPtr);
 		});
 	content->add(applyButton);
 
@@ -219,18 +259,7 @@ tgui::Panel::Ptr SettingsPanel::Create(tgui::Gui& gui,
 		});
 	content->add(closeButton);
 
-	auto fullscreenText = tgui::Label::create();
-	fullscreenText->setSize({ "16%", "12.5%" });
-	fullscreenText->setPosition({ "5%", "35%" });
-	fullscreenText->getRenderer()->setTextColor(tgui::Color::Red);
-	fullscreenText->getRenderer()->setBorders({ 2 });
-	fullscreenText->getRenderer()->setBorderColor(tgui::Color::Black);
-	fullscreenText->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
-	fullscreenText->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-	fullscreenText->setText("Fullscreen");
-	fullscreenText->setTextSize(24);
-
-	auto framerateText = tgui::Label::create();
+	auto framerateText = tgui::Label::create("Framerate");
 	framerateText->setSize({ "16%", "12.5%" });
 	framerateText->setPosition({ "5%", "60%" });
 	framerateText->getRenderer()->setTextColor(tgui::Color::Red);
@@ -238,12 +267,52 @@ tgui::Panel::Ptr SettingsPanel::Create(tgui::Gui& gui,
 	framerateText->getRenderer()->setBorderColor(tgui::Color::Black);
 	framerateText->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
 	framerateText->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-	framerateText->setText("Framerate");
 	framerateText->setTextSize(24);
+	videoPanel->add(framerateText);
+
+	auto framerateValue = tgui::Label::create(std::to_string((*framerates)[*framerateIndexPtr]));
+	framerateValue->setSize({ "70%", "100%" });
+	framerateValue->setPosition({"15%", "0%"});
+	framerateValue->getRenderer()->setTextColor(tgui::Color::Red);
+	framerateValue->getRenderer()->setBorders({ 2 });
+	framerateValue->getRenderer()->setBorderColor(tgui::Color::Black);
+	framerateValue->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+	framerateValue->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+	framerateValue->setTextSize(24);
+
+	auto leftFramerateArrow = tgui::Button::create("<");
+	leftFramerateArrow->setSize({ "15%", "100%" });
+	leftFramerateArrow->setPosition({ "0%", "0%" });
+	leftFramerateArrow->getRenderer()->setBackgroundColor(tgui::Color(128, 128, 128));
+	leftFramerateArrow->getRenderer()->setTextColor(tgui::Color::Black);
+	leftFramerateArrow->getRenderer()->setTexture("assets/images/buttons.png");
+	leftFramerateArrow->setTextSize(24);
+	leftFramerateArrow->onClick([framerateIndexPtr, framerates, framerateValue] {
+		if (*framerateIndexPtr == 0) *framerateIndexPtr = (*framerates).size() - 1;
+		else --(*framerateIndexPtr);
+		framerateValue->setText(std::to_string((*framerates)[*framerateIndexPtr]));
+		});
+
+	auto rightFramerateArrow = tgui::Button::create(">");
+	rightFramerateArrow->setSize({ "15%", "100%" });
+	rightFramerateArrow->setPosition({ "85%", "0%" });
+	rightFramerateArrow->getRenderer()->setBackgroundColor(tgui::Color(128, 128, 128));
+	rightFramerateArrow->getRenderer()->setTextColor(tgui::Color::Black);
+	rightFramerateArrow->getRenderer()->setTexture("assets/images/buttons.png");
+	rightFramerateArrow->setTextSize(24);
+	rightFramerateArrow->onClick([framerateIndexPtr, framerates, framerateValue] {
+		if (*framerateIndexPtr == (*framerates).size() - 1) *framerateIndexPtr = 0;
+		else ++(*framerateIndexPtr);
+		framerateValue->setText(std::to_string((*framerates)[*framerateIndexPtr]));
+		});
+
+	framerateContainer->add(framerateValue);
+	framerateContainer->add(leftFramerateArrow);
+	framerateContainer->add(rightFramerateArrow);
 
 	videoPanel->add(resolutionContainer);
-	videoPanel->add(fullscreenText);
-	videoPanel->add(framerateText);
+	videoPanel->add(fullscreenCheckbox);
+	videoPanel->add(framerateContainer);
 
 	return panel;
 }

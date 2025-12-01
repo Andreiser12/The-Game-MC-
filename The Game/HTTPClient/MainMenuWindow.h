@@ -53,6 +53,28 @@ private:
 			{ 1920, 1200 },
 			{ 2560, 1440 }
 	};
+	std::vector<unsigned> m_textSizes = {
+		8u,
+		10u,
+		12u,
+		14u,
+		18u,
+		16u,
+		20u,
+		22u,
+		24u,
+		24u,
+		24u
+	};
+	std::vector<unsigned> m_framerates = {
+		30u,
+		60u,
+		120u,
+		144u,
+		180u
+	};
+	unsigned m_framerateIndex{ 1u };
+	bool m_isFullscreen{ true };
 
 	/*std::vector<sf::Texture> m_bgFrames;
 	std::optional<sf::Sprite> m_bgSprite;

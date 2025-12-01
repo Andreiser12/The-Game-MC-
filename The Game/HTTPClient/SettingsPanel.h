@@ -12,8 +12,10 @@ class SettingsPanel
 public:
 	static tgui::Panel::Ptr Create(tgui::Gui& gui,
 		unsigned resolutionIndex,
+		bool isFullscreen,
+		unsigned framerateIndex,
 		std::function<void()> onClose,
-		std::function<void(unsigned res)> onApply);
+		std::function<void(unsigned res, bool fullscreen, unsigned framerate)> onApply);
 
 private:
 

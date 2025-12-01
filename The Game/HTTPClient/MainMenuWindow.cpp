@@ -131,13 +131,28 @@ void MainMenuWindow::SettingsButtonPressed()
 	auto settingsPanel = SettingsPanel::Create(
 		m_mainMenu,
 		m_resolutionIndex,
+		m_isFullscreen,
+		m_framerateIndex,
 		[this]() {},
-		[this](unsigned newIndex)
+		[this](unsigned newResolutionIndex, bool fullscreen, unsigned newFramerateIndex)
 		{
-			m_resolutionIndex = newIndex;
-			m_window.create(sf::VideoMode(m_resolutions[m_resolutionIndex]),
-				"The Game 1.0.0",
-				sf::State::Fullscreen);
+			m_resolutionIndex = newResolutionIndex;
+			m_isFullscreen = fullscreen;
+			m_framerateIndex = newFramerateIndex;
+			if (m_isFullscreen)
+			{
+				m_window.create(sf::VideoMode(m_resolutions[m_resolutionIndex]),
+					"The Game 1.0.0",
+					sf::State::Fullscreen);
+			}
+			else
+			{
+				m_window.create(sf::VideoMode(m_resolutions[m_resolutionIndex]),
+					"The Game 1.0.0",
+					sf::State::Windowed);
+			}
+			m_window.setFramerateLimit(m_framerates[m_framerateIndex]);
+			m_mainMenu.setTextSize(m_textSizes[newResolutionIndex]);
 			m_mainMenu.setTarget(m_window);
 		}
 	);

@@ -1,8 +1,9 @@
 #include "SettingsPanel.h"
 
 tgui::Panel::Ptr SettingsPanel::Create(tgui::Gui& gui,
+	unsigned resolutionIndex,
 	std::function<void()> onClose,
-	std::function<void(const sf::Vector2u& newResolution)> onApply)
+	std::function<void(unsigned res)> onApply)
 {
 	auto panel = tgui::Panel::create({ "60%", "60%" });
 	panel->setPosition({ "50%", "50%" });
@@ -97,6 +98,7 @@ tgui::Panel::Ptr SettingsPanel::Create(tgui::Gui& gui,
 	resolutionContainer->setOrigin(0.5f, 0.f);
 	resolutionContainer->getRenderer()->setBackgroundColor(tgui::Color(0, 0, 0, 0));
 
+	auto resolutionsIndexPtr = std::make_shared<unsigned>(resolutionIndex);
 	auto resolutions = std::make_shared<std::vector<sf::Vector2u>>
 		(std::vector<sf::Vector2u>{
 			{640, 480},
@@ -111,7 +113,6 @@ tgui::Panel::Ptr SettingsPanel::Create(tgui::Gui& gui,
 			{ 1920, 1200 },
 			{ 2560, 1440 }
 	});
-	auto resolutionIndex = std::make_shared<std::size_t>(8u);
 
 	auto resolutionText = tgui::Label::create();
 	resolutionText->setSize({ "16%", "12.5%" });
@@ -126,8 +127,8 @@ tgui::Panel::Ptr SettingsPanel::Create(tgui::Gui& gui,
 	videoPanel->add(resolutionText);
 
 	auto resolutionValue = tgui::Label::create(
-		std::to_string((*resolutions)[*resolutionIndex].x) + "x" +
-		std::to_string((*resolutions)[*resolutionIndex].y)
+		std::to_string((*resolutions)[*resolutionsIndexPtr].x) + "x" +
+		std::to_string((*resolutions)[*resolutionsIndexPtr].y)
 	);
 	resolutionValue->setSize({ "70%", "100%" });
 	resolutionValue->setPosition({ "15%", "0%" });
@@ -152,19 +153,19 @@ tgui::Panel::Ptr SettingsPanel::Create(tgui::Gui& gui,
 	rightArrow->getRenderer()->setTextColor(tgui::Color::Black);
 	rightArrow->setTextSize(24);
 
-	leftArrow->onClick([resolutions, resolutionIndex, resolutionValue]
+	leftArrow->onClick([resolutions, resolutionsIndexPtr, resolutionValue]
 		{
-			if (*resolutionIndex == 0) *resolutionIndex = resolutions->size() - 1;
-			else --(*resolutionIndex);
-			resolutionValue->setText(std::to_string((*resolutions)[*resolutionIndex].x) + "x"
-				+ std::to_string((*resolutions)[*resolutionIndex].y));
+			if (*resolutionsIndexPtr == 0) *resolutionsIndexPtr = resolutions->size() - 1;
+			else --(*resolutionsIndexPtr);
+			resolutionValue->setText(std::to_string((*resolutions)[*resolutionsIndexPtr].x) + "x"
+				+ std::to_string((*resolutions)[*resolutionsIndexPtr].y));
 		});
-	rightArrow->onClick([resolutions, resolutionIndex, resolutionValue]
+	rightArrow->onClick([resolutions, resolutionsIndexPtr, resolutionValue]
 		{
-			if (*resolutionIndex == resolutions->size() - 1) *resolutionIndex = 0;
-			else ++(*resolutionIndex);
-			resolutionValue->setText(std::to_string((*resolutions)[*resolutionIndex].x) + "x"
-				+ std::to_string((*resolutions)[*resolutionIndex].y));
+			if (*resolutionsIndexPtr == resolutions->size() - 1) *resolutionsIndexPtr = 0;
+			else ++(*resolutionsIndexPtr);
+			resolutionValue->setText(std::to_string((*resolutions)[*resolutionsIndexPtr].x) + "x"
+				+ std::to_string((*resolutions)[*resolutionsIndexPtr].y));
 		});
 
 	resolutionContainer->add(leftArrow);
@@ -181,9 +182,9 @@ tgui::Panel::Ptr SettingsPanel::Create(tgui::Gui& gui,
 	applyButton->getRenderer()->setBorderColor(tgui::Color::Black);
 	applyButton->getRenderer()->setTextColor(tgui::Color::Black);
 	applyButton->getRenderer()->setRoundedBorderRadius(10);
-	applyButton->onClick([resolutions, resolutionIndex, onApply]
+	applyButton->onClick([resolutionsIndexPtr, onApply]
 		{
-			if (onApply) onApply((*resolutions)[*resolutionIndex]);
+			if (onApply) onApply(*resolutionsIndexPtr);
 		});
 	content->add(applyButton);
 

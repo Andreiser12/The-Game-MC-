@@ -130,10 +130,13 @@ void MainMenuWindow::SettingsButtonPressed()
 {
 	auto settingsPanel = SettingsPanel::Create(
 		m_mainMenu,
+		m_resolutionIndex,
 		[this]() {},
-		[this](sf::Vector2u newRes)
+		[this](unsigned newIndex)
 		{
-			m_window.create(sf::VideoMode(newRes), "The Game 1.0.0",
+			m_resolutionIndex = newIndex;
+			m_window.create(sf::VideoMode(m_resolutions[m_resolutionIndex]),
+				"The Game 1.0.0",
 				sf::State::Fullscreen);
 			m_mainMenu.setTarget(m_window);
 		}

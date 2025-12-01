@@ -11,8 +11,9 @@ class SettingsPanel
 {
 public:
 	static tgui::Panel::Ptr Create(tgui::Gui& gui,
+		unsigned resolutionIndex,
 		std::function<void()> onClose,
-		std::function<void(const sf::Vector2u& newResolution)> onApply);
+		std::function<void(unsigned res)> onApply);
 
 private:
 

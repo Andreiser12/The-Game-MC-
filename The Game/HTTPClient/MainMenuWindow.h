@@ -1,5 +1,5 @@
 #pragma once
-#include <SFML/Graphics.hpp>
+#include "SFML/Graphics.hpp"
 #include "TGUI/TGUI.hpp"
 #include "TGUI/Core.hpp"
 #include "TGUI/Widgets/Button.hpp"
@@ -32,10 +32,24 @@ private:
 
 private:
 	sf::RenderWindow& m_window;
-	UiState m_uiState = UiState::MainMenu;
 
 	tgui::Gui m_mainMenu;
 	tgui::Picture::Ptr m_background;
+	unsigned m_resolutionIndex = 8u;
+
+	std::vector<sf::Vector2u> m_resolutions = {
+			{640, 480},
+			{ 800, 600 },
+			{ 1024, 768 },
+			{ 1280, 720 },
+			{ 1280, 800 },
+			{ 1366, 768 },
+			{ 1440, 900 },
+			{ 1680, 1050 },
+			{ 1920, 1080 },
+			{ 1920, 1200 },
+			{ 2560, 1440 }
+	};
 
 	/*std::vector<sf::Texture> m_bgFrames;
 	sf::Sprite m_bgSprite;

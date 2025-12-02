@@ -17,11 +17,11 @@ bool Lobby::AddPlayer(std::shared_ptr<Player> player)
 	return true;
 }
 
-bool Lobby::RemovePlayer(std::shared_ptr<Player> player)
+bool Lobby::RemovePlayer(unsigned playerId)
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
-	if (!player) return false;
-	auto iterator = std::find(m_players.begin(), m_players.end(), player);
+
+	auto iterator = std::find(m_players.begin(), m_players.end(), playerId);
 	if (iterator != m_players.end())
 	{
 		m_players.erase(iterator);

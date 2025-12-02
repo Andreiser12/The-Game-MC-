@@ -163,6 +163,7 @@
     <ClCompile Include="FundamentalCard.cpp" />
     <ClCompile Include="Lobby.cpp" />
     <ClCompile Include="Lobby.cppm" />
+    <ClCompile Include="LobbyManager.cpp" />
     <ClCompile Include="LobbyManager.cppm" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Menu.cpp" />

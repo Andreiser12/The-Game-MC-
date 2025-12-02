@@ -75,5 +75,8 @@
     <ClCompile Include="Lobby.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LobbyManager.cppm">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -15,7 +15,6 @@ public:
 
 	bool StartMatch(unsigned lobbyId);
 
-
 private:
 	std::string m_serverURL;
 	

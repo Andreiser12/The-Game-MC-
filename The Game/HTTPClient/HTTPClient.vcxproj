@@ -137,6 +137,7 @@
     <ClInclude Include="IWindow.h" />
     <ClInclude Include="LoginWindow.h" />
     <ClInclude Include="MainMenuWindow.h" />
+    <ClInclude Include="PlayPanel.h" />
     <ClInclude Include="RegisterWindow.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SettingsPanel.h" />
@@ -149,6 +150,7 @@
     <ClCompile Include="IWindow.cpp" />
     <ClCompile Include="LoginWindow.cpp" />
     <ClCompile Include="MainMenuWindow.cpp" />
+    <ClCompile Include="PlayPanel.cpp" />
     <ClCompile Include="RegisterWindow.cpp" />
     <ClCompile Include="SettingsPanel.cpp" />
   </ItemGroup>

@@ -16,7 +16,6 @@ std::optional<std::string> ApiClient::CreateLobby()
 			[](unsigned char c) { return std::isspace(c); })
 	);
 
-
 	if (lobbyCode.empty()) return std::nullopt;
 
 	return lobbyCode;
@@ -28,13 +27,11 @@ std::optional<std::string> ApiClient::JoinLobby(const std::string& lobbyCode)
 	cpr::Response response = cpr::Post(cpr::Url{ url }, 
 		cpr::Body{ "lobby_code=" + lobbyCode});
 
-
 	if (response.error || response.status_code != 200) return std::nullopt;
 
 	std::string lobbyId = response.text;
-
 	lobbyId.erase(
-		std::remove_if(lobbyCode.begin(), lobbyCode.end(),
+		std::remove_if(lobbyId.begin(), lobbyId.end(),
 			[](unsigned char c) { return std::isspace(c); })
 	);
 
@@ -56,7 +53,7 @@ bool ApiClient::LeaveLobby(const std::string& lobbyId, unsigned playerId)
 
 std::optional<std::string> ApiClient::GetLobbyState(const std::string& lobbyId)
 {
-	
+	return "";
 }
 
 bool ApiClient::StartMatch(unsigned lobbyId)

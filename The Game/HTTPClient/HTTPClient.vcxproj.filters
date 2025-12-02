@@ -42,6 +42,9 @@
     <ClInclude Include="ApiClient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PlayPanel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HTTPClient.cpp">
@@ -69,6 +72,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ApiClient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayPanel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

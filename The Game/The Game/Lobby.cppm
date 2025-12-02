@@ -2,6 +2,7 @@ export module Lobby;
 
 import <stdint.h>;
 import <vector>;
+import <unordered_map>;
 import <atomic>;
 import <mutex>;
 
@@ -16,13 +17,13 @@ public:
 	bool RemovePlayer(unsigned playerId);
 	bool IsFull() const;
 	bool HasGameStarted() const;
-	const std::vector<std::shared_ptr<Player>>& GetPlayers() const;
+	const std::unordered_map<unsigned, std::shared_ptr<Player>>& GetPlayers() const;
 
 private:
 	uint32_t m_lobbyID;
 	uint32_t m_minPlayersToStart;
 	uint32_t m_maxPlayers;
-	std::vector<std::shared_ptr<Player>> m_players;
+	std::unordered_map<unsigned, std::shared_ptr<Player>> m_players;
 	std::atomic<bool> m_gameStarted;
 	std::mutex m_mutex;
 };

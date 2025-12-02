@@ -62,6 +62,7 @@ void MainMenuWindow::LoadWidgets()
 	playButton->getRenderer()->setTexture("assets/images/buttons.png");
 
 	m_mainMenu.add(playButton);
+	playButton->onClick([this] {PlayPanelPressed(); });
 	playButton->setTextSize(K_TEXT_SIZE);
 
 	profileButton->setSize({ "16.67%", "5%" });
@@ -157,6 +158,16 @@ void MainMenuWindow::SettingsButtonPressed()
 		}
 	);
 	m_mainMenu.add(settingsPanel);
+}
+
+void MainMenuWindow::PlayPanelPressed()
+{
+	auto playPanel = PlayPanel::Create(
+		m_mainMenu,
+		[this]() {},
+		[this]() {}
+	);
+	m_mainMenu.add(playPanel);
 }
 
 void MainMenuWindow::HandleEvent(sf::Event event)

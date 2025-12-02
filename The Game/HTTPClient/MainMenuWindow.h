@@ -7,6 +7,7 @@
 
 #include "ExitPanel.h"
 #include "SettingsPanel.h"
+#include "PlayPanel.h"
 
 #include <iostream>
 #include <vector>
@@ -29,6 +30,7 @@ public:
 
 	void ExitButtonPressed();
 	void SettingsButtonPressed();
+	void PlayPanelPressed();
 
 private:
 	void LoadWidgets();

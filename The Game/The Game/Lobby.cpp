@@ -11,7 +11,7 @@ bool Lobby::AddPlayer(std::shared_ptr<Player> player)
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
 	if (!player || IsFull()) return false;
-	m_players.push_back(player);
+	//m_players.emplace(player);
 	if (m_players.size() >= m_minPlayersToStart)
 		m_gameStarted.store(true);
 	return true;
@@ -21,7 +21,7 @@ bool Lobby::RemovePlayer(unsigned playerId)
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	auto iterator = std::find(m_players.begin(), m_players.end(), playerId);
+	auto iterator = m_players.find(playerId);
 	if (iterator != m_players.end())
 	{
 		m_players.erase(iterator);
@@ -40,7 +40,7 @@ bool Lobby::HasGameStarted() const
 	return m_gameStarted.load();
 }
 
-const std::vector<std::shared_ptr<Player>>& Lobby::GetPlayers() const
+const std::unordered_map<unsigned, std::shared_ptr<Player>>& Lobby::GetPlayers() const
 {
 	return m_players;
 }

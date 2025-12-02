@@ -22,19 +22,41 @@ std::optional<std::string> ApiClient::CreateLobby()
 	return lobbyCode;
 }
 
-std::optional<std::string> ApiClient::JoinLobby(unsigned lobbyCode)
+std::optional<std::string> ApiClient::JoinLobby(const std::string& lobbyCode)
 {
-	return std::optional<std::string>();
+	const std::string url = m_serverURL + "/lobby/join/" + lobbyCode;
+	cpr::Response response = cpr::Post(cpr::Url{ url }, 
+		cpr::Body{ "lobby_code=" + lobbyCode});
+
+
+	if (response.error || response.status_code != 200) return std::nullopt;
+
+	std::string lobbyId = response.text;
+
+	lobbyId.erase(
+		std::remove_if(lobbyCode.begin(), lobbyCode.end(),
+			[](unsigned char c) { return std::isspace(c); })
+	);
+
+	if (lobbyId.empty()) return std::nullopt;
+
+	return lobbyId;
 }
 
-bool ApiClient::LeaveLobby(unsigned lobbyId)
+bool ApiClient::LeaveLobby(const std::string& lobbyId, unsigned playerId)
 {
-	return false;
+	const std::string url = m_serverURL + "/lobby/leave/" + lobbyId;
+	cpr::Response response = cpr::Post(cpr::Url{ url },
+		cpr::Payload{ {"playerId", std::to_string(playerId)} });
+
+	if (response.error || response.status_code != 200) return false;
+
+	return true;
 }
 
-std::optional<std::string> ApiClient::GetLobbyState(unsigned lobbyId)
+std::optional<std::string> ApiClient::GetLobbyState(const std::string& lobbyId)
 {
-	return std::optional<std::string>();
+	
 }
 
 bool ApiClient::StartMatch(unsigned lobbyId)

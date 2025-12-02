@@ -12,6 +12,7 @@ import Card;
 import Player;
 import UserProfile;
 import Deck;
+import DatabaseManager;
 
 export class Table
 {

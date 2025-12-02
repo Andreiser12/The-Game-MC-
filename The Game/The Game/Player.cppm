@@ -12,7 +12,7 @@ import Deck;
 export class Player
 {
 public:
-	Player(const std::unordered_set<Card, Card::CardsSetHashFunction,
+	Player(unsigned int playerID, const std::unordered_set<Card, Card::CardsSetHashFunction,
 		Card::CardsEqual>& cards,
 		const UserProfile& userprofile);
 	~Player();
@@ -29,6 +29,7 @@ public:
 	void SetCards(const std::unordered_set<Card, Card::CardsSetHashFunction,
 		Card::CardsEqual>& cards);
 
+	unsigned int GetPlayerID() const;
 	const std::unordered_set<Card, Card::CardsSetHashFunction,
 		Card::CardsEqual>& GetCards() const;
 	size_t GetCardsCount() const;
@@ -37,6 +38,7 @@ public:
 	bool operator<(Player& other) const;
 
 private:
+	unsigned int m_playerID;
 	UserProfile m_userprofile;
 	std::unordered_set<Card, Card::CardsSetHashFunction, Card::CardsEqual> m_cards;
 	unsigned int m_cardsPlacedRound=0;

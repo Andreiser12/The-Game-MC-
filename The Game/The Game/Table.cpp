@@ -50,12 +50,14 @@ void Table::Shuffle()
 
 void Table::SetupPlayers()
 {
-	for (uint8_t i = 0; i < m_nrPlayers; i++)
+	DatabaseManager database{ "gameDB.db" };
+	auto players = database.GetUsers();
+	for (uint8_t i = 0; i < m_nrPlayers && i<players.size(); i++)
 	{
-		std::string username = "Player" + std::to_string(i + 1);
-		UserProfile profile(username);
+		const auto& player = players[i];
+		UserProfile profile(player.GetUsername());
 		std::unordered_set<Card, Card::CardsSetHashFunction, Card::CardsEqual> emptyCards;
-		m_Players.push_back(Player(emptyCards, profile));
+		m_Players.push_back(Player(player.GetID(), emptyCards, profile));
 	}
 	uint8_t cardsPerPlayer;
 	switch (m_nrPlayers)

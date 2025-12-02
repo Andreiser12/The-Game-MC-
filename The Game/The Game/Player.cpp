@@ -2,10 +2,12 @@ module Player;
 
 constexpr static uint8_t MINIMUM_CARDS = 2;
 
-Player::Player(const std::unordered_set<Card, Card::CardsSetHashFunction,
+Player::Player(unsigned int playerID, const std::unordered_set<Card, Card::CardsSetHashFunction,
 	Card::CardsEqual>& cards,
 	const UserProfile& userprofile) :
-	m_cards{ cards }, m_userprofile{ userprofile } {
+	m_playerID{ playerID }, m_cards { cards }, m_userprofile{ userprofile } 
+{
+
 }
 
 Player::~Player() {}
@@ -94,6 +96,11 @@ void Player::SetCards(const std::unordered_set<Card, Card::CardsSetHashFunction,
 	Card::CardsEqual>& cards)
 {
 	m_cards = cards;
+}
+
+unsigned int Player::GetPlayerID() const
+{
+	return m_playerID;
 }
 
 const std::unordered_set<Card, Card::CardsSetHashFunction,

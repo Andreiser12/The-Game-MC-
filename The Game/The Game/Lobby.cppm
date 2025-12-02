@@ -14,7 +14,7 @@ public:
 	Lobby() = delete;
 	explicit Lobby(uint32_t lobbyID, uint32_t minPlayers, uint32_t maxPlayers);
 	bool AddPlayer(std::shared_ptr<Player> player);
-	bool RemovePlayer(unsigned playerId);
+	bool RemovePlayer(unsigned playerID);
 	bool IsFull() const;
 	bool HasGameStarted() const;
 	const std::unordered_map<unsigned, std::shared_ptr<Player>>& GetPlayers() const;

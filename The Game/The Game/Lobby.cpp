@@ -38,7 +38,7 @@ bool Lobby::RemovePlayer(unsigned playerID)
 
 bool Lobby::IsFull() const
 {
-	return m_players.size() >= m_maxPlayers;
+	return m_players.size() == m_maxPlayers;
 }
 
 bool Lobby::HasGameStarted() const

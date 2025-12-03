@@ -13,7 +13,7 @@ public:
 	bool LeaveLobby(const std::string& lobbyId, unsigned playerId);
 	std::optional<std::string> GetLobbyState(const std::string& lobbyId);
 
-	bool StartMatch(unsigned lobbyId);
+	bool StartMatch(const std::string& lobbyId, unsigned playerId);
 
 private:
 	std::string m_serverURL;

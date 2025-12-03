@@ -44,7 +44,7 @@ bool ApiClient::LeaveLobby(const std::string& lobbyId, unsigned playerId)
 {
 	const std::string url = m_serverURL + "/lobby/leave/" + lobbyId;
 	cpr::Response response = cpr::Post(cpr::Url{ url },
-		cpr::Payload{ {"playerId", std::to_string(playerId)} });
+		cpr::Payload{ {"player_id", std::to_string(playerId)} });
 
 	if (response.error || response.status_code != 200) return false;
 
@@ -53,10 +53,40 @@ bool ApiClient::LeaveLobby(const std::string& lobbyId, unsigned playerId)
 
 std::optional<std::string> ApiClient::GetLobbyState(const std::string& lobbyId)
 {
-	return "";
+	const std::string url = m_serverURL + "/lobby/state/" + lobbyId;
+	cpr::Response response = cpr::Post(cpr::Url{ url });
+
+	if (response.error || response.status_code != 200) return std::nullopt;
+
+	std::string lobbyState = response.text;
+	lobbyState.erase(
+		std::remove_if(lobbyState.begin(), lobbyState.end(),
+			[](unsigned char c) { return std::isspace(c); })
+	);
+
+	if (lobbyState.empty()) return std::nullopt;
+
+	return lobbyState;
 }
 
-bool ApiClient::StartMatch(unsigned lobbyId)
+bool ApiClient::StartMatch(const std::string& lobbyId, unsigned playerId)
 {
+	const std::string url = m_serverURL + "/lobby/start/" + lobbyId;
+
+	cpr::Response response = cpr::Post(cpr::Url{ url },
+		cpr::Payload{ {"player_id", std::to_string(playerId)} });
+
+	if (response.error || response.status_code != 200) return false;
+
+	std::string matchStart = response.text;
+	matchStart.erase(
+		std::remove_if(matchStart.begin(), matchStart.end(),
+			[](unsigned char c) { return std::isspace(c); })
+	);
+	matchStart.erase(
+		std::remove(matchStart.begin(), matchStart.end(),'\"'), matchStart.end());
+
+	if (matchStart == "STARTED") return true;
+
 	return false;
 }

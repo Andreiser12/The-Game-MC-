@@ -15,6 +15,16 @@ tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 	titleLabel->setTextSize(26);
 	panel->add(titleLabel);
 
+	auto joinButton = tgui::Button::create("Join Lobby");
+	joinButton->setTextSize(22);
+	joinButton->setSize({ "35%", "20%" });
+	joinButton->setPosition({ "15%","55%" });
+	joinButton->onPress([onJoin]() {
+		if (onJoin) onJoin();
+		});
+
+	panel->add(joinButton);
+
 	return panel;
 }
 

@@ -165,6 +165,7 @@ void MainMenuWindow::PlayPanelPressed()
 	auto playPanel = PlayPanel::Create(
 		m_mainMenu,
 		[this]() {},
+		[this]() {},
 		[this]() {}
 	);
 	m_mainMenu.add(playPanel);

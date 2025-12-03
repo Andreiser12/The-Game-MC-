@@ -135,6 +135,7 @@
     <ClInclude Include="ConnectionFailedWindow.h" />
     <ClInclude Include="ExitPanel.h" />
     <ClInclude Include="IWindow.h" />
+    <ClInclude Include="JoinPanel.h" />
     <ClInclude Include="LoginWindow.h" />
     <ClInclude Include="MainMenuWindow.h" />
     <ClInclude Include="PlayPanel.h" />
@@ -148,6 +149,7 @@
     <ClCompile Include="ExitPanel.cpp" />
     <ClCompile Include="HTTPClient.cpp" />
     <ClCompile Include="IWindow.cpp" />
+    <ClCompile Include="JoinPanel.cpp" />
     <ClCompile Include="LoginWindow.cpp" />
     <ClCompile Include="MainMenuWindow.cpp" />
     <ClCompile Include="PlayPanel.cpp" />

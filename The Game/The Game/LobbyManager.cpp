@@ -5,7 +5,8 @@ LobbyManager& LobbyManager::Instance()
 	static LobbyManager instance;
 	return instance;
 }
-std::shared_ptr<Lobby> LobbyManager::CreateLobby(uint32_t id, uint32_t minPlayers, uint32_t maxPlayers)
+std::shared_ptr<Lobby> LobbyManager::CreateLobby(const std::string& id,
+	uint32_t minPlayers, uint32_t maxPlayers)
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -17,7 +18,7 @@ std::shared_ptr<Lobby> LobbyManager::CreateLobby(uint32_t id, uint32_t minPlayer
 	return lobby;
 }
 
-std::shared_ptr<Lobby> LobbyManager::GetLobby(uint32_t id)
+std::shared_ptr<Lobby> LobbyManager::GetLobby(const std::string& id)
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -27,7 +28,7 @@ std::shared_ptr<Lobby> LobbyManager::GetLobby(uint32_t id)
 	return nullptr;
 }
 
-bool LobbyManager::RemoveLobby(uint32_t id)
+bool LobbyManager::RemoveLobby(const std::string& id)
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
 

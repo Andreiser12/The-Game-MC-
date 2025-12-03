@@ -10,23 +10,23 @@ void LobbyRoutes::Register(crow::SimpleApp& app)
 		return this->CreateLobby(request);
 		});
 
-	CROW_ROUTE(app, "/lobby/join/<uint>").methods("POST"_method)
-		([this](const crow::request& req, uint32_t lobbyId) {
+	CROW_ROUTE(app, "/lobby/join/<string>").methods("POST"_method)
+		([this](const crow::request& req, const std::string& lobbyId) {
 		return this->JoinLobby(req, lobbyId);
 		});
 
-	CROW_ROUTE(app, "/lobby/leave/<uint>").methods("POST"_method)
-		([this](const crow::request& req, uint32_t lobbyId) {
+	CROW_ROUTE(app, "/lobby/leave/<string>").methods("POST"_method)
+		([this](const crow::request& req, const std::string& lobbyId) {
 		return this->LeaveLobby(req, lobbyId);
 		});
 
-	CROW_ROUTE(app, "/lobby/state/<uint>").methods("POST"_method)
-		([this](uint32_t lobbyId) {
+	CROW_ROUTE(app, "/lobby/state/<string>").methods("POST"_method)
+		([this](const std::string& lobbyId) {
 		return this->GetLobbyState(lobbyId);
 		});
 
-	CROW_ROUTE(app, "/lobby/start/<uint>").methods("POST"_method)
-		([this](const crow::request& req, uint32_t lobbyId) {
+	CROW_ROUTE(app, "/lobby/start/<string>").methods("POST"_method)
+		([this](const crow::request& req, const std::string& lobbyId) {
 		return this->StartLobby(req, lobbyId);
 		});
 
@@ -37,7 +37,7 @@ crow::response LobbyRoutes::CreateLobby(const crow::request& request)
 	return crow::response();
 }
 
-crow::response LobbyRoutes::JoinLobby(const crow::request& request, uint32_t lobbyId)
+crow::response LobbyRoutes::JoinLobby(const crow::request& request, const std::string& lobbyId)
 {
 	auto lobby = m_manager.GetLobby(lobbyId);
 	if (!lobby)
@@ -50,7 +50,7 @@ crow::response LobbyRoutes::JoinLobby(const crow::request& request, uint32_t lob
 	return crow::response(data);
 }
 
-crow::response LobbyRoutes::LeaveLobby(const crow::request& request, uint32_t lobbyId)
+crow::response LobbyRoutes::LeaveLobby(const crow::request& request, const std::string& lobbyId)
 {
 	auto body = crow::json::load(request.body);
 	if (!body)
@@ -65,7 +65,7 @@ crow::response LobbyRoutes::LeaveLobby(const crow::request& request, uint32_t lo
 	return crow::response(200, "left");
 }
 
-crow::response LobbyRoutes::GetLobbyState(uint32_t lobbyId)
+crow::response LobbyRoutes::GetLobbyState(const std::string& lobbyId)
 {
 	auto lobby = m_manager.GetLobby(lobbyId);
 	if (!lobby)
@@ -82,7 +82,7 @@ crow::response LobbyRoutes::GetLobbyState(uint32_t lobbyId)
 	return crow::response(data);
 }
 
-crow::response LobbyRoutes::StartLobby(const crow::request& request, uint32_t lobbyId)
+crow::response LobbyRoutes::StartLobby(const crow::request& request, const std::string& lobbyId)
 {
 	auto body = crow::json::load(request.body);
 	if (!body)

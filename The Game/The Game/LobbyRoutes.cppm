@@ -19,10 +19,10 @@ public:
 
 private:
 	crow::response CreateLobby(const crow::request& request);
-	crow::response JoinLobby(const crow::request& request, uint32_t lobbyId);
-	crow::response LeaveLobby(const crow::request& request, uint32_t lobbyId);
-	crow::response GetLobbyState(uint32_t lobbyId);
-	crow::response StartLobby(const crow::request& request, uint32_t lobbyId);
+	crow::response JoinLobby(const crow::request& request, const std::string& lobbyId);
+	crow::response LeaveLobby(const crow::request& request, const std::string& lobbyId);
+	crow::response GetLobbyState(const std::string& lobbyId);
+	crow::response StartLobby(const crow::request& request, const std::string& lobbyId);
 
 private:
 	LobbyManager& m_manager;

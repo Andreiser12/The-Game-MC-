@@ -1,8 +1,8 @@
 module Card;
 
-Card::Card(unsigned int id, Color color) : m_id(id), m_color(color) {}
+Card::Card(uint16_t id, Color color) : m_id(id), m_color(color) {}
 
-unsigned int Card::getId() const
+uint16_t Card::getId() const
 {
 	return m_id;
 }

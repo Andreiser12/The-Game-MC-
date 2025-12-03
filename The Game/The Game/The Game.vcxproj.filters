@@ -81,5 +81,11 @@
     <ClCompile Include="LobbyManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LobbyRoutes.cppm">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LobbyRoutes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

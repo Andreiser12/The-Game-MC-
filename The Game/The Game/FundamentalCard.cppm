@@ -5,5 +5,5 @@ import Card;
 export class FundamentalCard : public Card
 {
 public:
-	FundamentalCard(unsigned int id);
+	FundamentalCard(uint16_t id);
 };

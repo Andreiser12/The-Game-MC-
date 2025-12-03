@@ -1,3 +1,3 @@
 module FundamentalCard;
 
-FundamentalCard::FundamentalCard(unsigned int id) : Card{ id } {}
+FundamentalCard::FundamentalCard(uint16_t id) : Card{ id } {}

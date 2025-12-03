@@ -1,9 +1,12 @@
 module UserProfile;
 
-UserProfile::UserProfile(std::string username, unsigned int gamesPlayed,
-	unsigned int gamesWon, double hoursPlayed,
-	unsigned int finalCards) : m_username{ username }, m_gamesPlayed{gamesPlayed},
-	m_gamesWon{ gamesWon }, m_hoursPlayed{ hoursPlayed }, m_finalCards{finalCards} {}
+UserProfile::UserProfile(std::string username, unsigned gamesPlayed,
+	unsigned gamesWon, double hoursPlayed, uint8_t finalCards) :
+	m_username{ username },
+	m_gamesPlayed{gamesPlayed},
+	m_gamesWon{ gamesWon },
+	m_hoursPlayed{ hoursPlayed },
+	m_finalCards{finalCards} {}
 
 UserProfile::~UserProfile() {}
 
@@ -14,7 +17,7 @@ double UserProfile::PerformanceScore() const
 	return static_cast<double>((m_gamesPlayed + m_gamesWon)/ m_finalCards);
 }
 
-void UserProfile::UpdateStats(double hours, bool win, unsigned int finalCards)
+void UserProfile::UpdateStats(double hours, bool win, uint8_t finalCards)
 {
 	m_hoursPlayed += hours;
 	++m_gamesPlayed;

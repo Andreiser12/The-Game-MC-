@@ -1,17 +1,17 @@
 module Table;
 
-constexpr static unsigned int HOURS_TO_SECONDS = 3600;
+constexpr static unsigned HOURS_TO_SECONDS{ 3600u };
 
-constexpr static uint8_t  TWO_PLAYERS = 2;
-constexpr static uint8_t  CARDS_TWO_PLAYERS = 8;
+constexpr static uint8_t  TWO_PLAYERS{ 2u };
+constexpr static uint8_t  CARDS_TWO_PLAYERS{ 8u };
 
-constexpr static uint8_t THREE_PLAYERS = 3;
-constexpr static uint8_t  CARDS_THREE_PLAYERS = 7;
+constexpr static uint8_t THREE_PLAYERS{ 3u };
+constexpr static uint8_t  CARDS_THREE_PLAYERS{ 7u };
 
-constexpr static uint8_t  CARDS_DEFAULT_PLAYERS = 6;
+constexpr static uint8_t  CARDS_DEFAULT_PLAYERS{ 6u };
 
-constexpr static uint8_t MIN_CARDS_NORMAL = 2;
-constexpr static uint8_t MIN_CARDS_EMPTY_DECK = 1;
+constexpr static uint8_t MIN_CARDS_NORMAL{ 2u };
+constexpr static uint8_t MIN_CARDS_EMPTY_DECK{ 1u };
 
 Table::Table(uint8_t nrPlayers) :
 	m_nrPlayers{ nrPlayers }
@@ -37,7 +37,7 @@ void Table::Shuffle()
 	std::vector<Card> copyCards;
 	copyCards.reserve(98);
 
-	for (unsigned int i = 2u; i <= 99u; ++i)
+	for (uint16_t i = 2u; i <= 99u; ++i)
 		copyCards.emplace_back(i);
 
 	std::random_device rd;
@@ -56,7 +56,7 @@ void Table::SetupPlayers()
 	{
 		const auto& player = players[i];
 		UserProfile profile(player.GetUsername());
-		std::unordered_set<Card, Card::CardsSetHashFunction, Card::CardsEqual> emptyCards;
+		std::unordered_set<Card, CardsSetHashFunction, CardsEqual> emptyCards;
 		m_Players.push_back(Player(player.GetID(), emptyCards, profile));
 	}
 	uint8_t cardsPerPlayer;
@@ -82,8 +82,8 @@ void Table::SetupPlayers()
 
 bool Table::BackwardsTrick(const Deck& deck, const Card& card) const
 {
-	const unsigned int cardValue = card.getId();
-	const unsigned int topCardValue = deck.GetTopCard().getId();
+	const unsigned cardValue = card.getId();
+	const unsigned topCardValue = deck.GetTopCard().getId();
 
 	switch (deck.GetDeckType())
 	{
@@ -98,8 +98,8 @@ bool Table::BackwardsTrick(const Deck& deck, const Card& card) const
 
 bool Table::CheckCard(const Deck& deck, const Card& card) const
 {
-	const unsigned int cardValue = card.getId();
-	const unsigned int topCardValue = deck.GetTopCard().getId();
+	const unsigned cardValue = card.getId();
+	const unsigned topCardValue = deck.GetTopCard().getId();
 
 	switch (deck.GetDeckType())
 	{
@@ -140,9 +140,9 @@ void Table::PlayGame()
 {
 	bool gameRunning = true;
 	bool gameWon = false;
-	uint8_t currentPlayerIndex = 0;
+	uint8_t currentPlayerIndex = 0u;
 	std::cout << "\nThe game started!\n";
-	std::cout << "Number of players: " << static_cast<int>(m_nrPlayers) << "\n";
+	std::cout << "Number of players: " << static_cast<uint8_t>(m_nrPlayers) << "\n";
 	std::cout << "Cards in  deck: " << m_mainDeck.size() << "\n";
 	auto startTime = std::chrono::high_resolution_clock::now();
 
@@ -167,7 +167,8 @@ void Table::PlayGame()
 
 		if (!CanPlayerPlayMinCards(currentPlayer, minCards))
 		{
-			std::cout << currentPlayer.GetUserProfile().GetUsername() << " can't place " << static_cast<int>(minCards) << " cards! Game Over!\n";
+			std::cout << currentPlayer.GetUserProfile().GetUsername() << " can't place " <<
+				static_cast<uint8_t>(minCards) << " cards! Game Over!\n";
 			gameWon = false;
 			gameRunning = false;
 			break;
@@ -194,7 +195,7 @@ void Table::PlayGame()
 	std::cout << "Time played: " << hours << " hours\n";
 	for (Player& player : m_Players)
 	{
-		unsigned int finalCards = player.GetCardsCount();
+		size_t finalCards = player.GetCardsCount();
 		player.GetUserProfile().UpdateStats(hours, gameWon, finalCards);
 		std::cout << player.GetUserProfile().GetUsername() << " - Cards left: " << finalCards << "\n";
 	}
@@ -249,7 +250,7 @@ bool Table::AllCardsPlaced() const
 
 bool Table::PlayerTurn(Player& player, uint8_t minCards)
 {
-	uint8_t cardsPlaced = 0;
+	uint8_t cardsPlaced = 0u;
 	bool continueTurn = true;
 
 	while (continueTurn)
@@ -262,16 +263,16 @@ bool Table::PlayerTurn(Player& player, uint8_t minCards)
 			std::cout << "You already placed " << static_cast<int>(cardsPlaced) << " cards.(minimum = " << static_cast<int>(minCards) << ")\n";
 			std::cout << "Would you like to place another card? (1=Yes, 0=No): ";
 
-			int choice;
+			unsigned choice;
 			std::cin >> choice;
-			if (choice == 0)
+			if (choice == 0u)
 			{
 				continueTurn = false;
 				break;
 			}
 		}
 		std::cout << "Choose card's ID you want to place: ";
-		unsigned int cardId;
+		uint16_t cardId;
 		std::cin >> cardId;
 
 		if (!player.FindCard(cardId))
@@ -287,22 +288,22 @@ bool Table::PlayerTurn(Player& player, uint8_t minCards)
 		std::cout << "4 - Descending Second\n";
 		DisplayTableState();
 		std::cout << "Choice: ";
-		int deckChoice;
+		unsigned deckChoice;
 		std::cin >> deckChoice;
 
 		Deck* chosenDeck = nullptr;
 		switch (deckChoice)
 		{
-		case 1:
+		case 1u:
 			chosenDeck = &m_AscendingDeckFirst;
 			break;
-		case 2:
+		case 2u:
 			chosenDeck = &m_AscendingDeckSecond;
 			break;
-		case 3:
+		case 3u:
 			chosenDeck = &m_DescendingDeckFirst;
 			break;
-		case 4:
+		case 4u:
 			chosenDeck = &m_DescendingDeckSecond;
 			break;
 		default:
@@ -332,7 +333,7 @@ bool Table::PlayerTurn(Player& player, uint8_t minCards)
 	if (!isDeckEmpty() && cardsPlaced > 0)
 	{
 		uint8_t cardsToDraw = std::min(static_cast<uint8_t>(cardsPlaced), static_cast<uint8_t>(m_mainDeck.size()));
-		std::cout << "You draw " << static_cast<int>(cardsToDraw) << " new cards.\n";
+		std::cout << "You draw " << static_cast<uint8_t>(cardsToDraw) << " new cards.\n";
 		player.DrawCards(m_mainDeck);
 	}
 	return cardsPlaced >= minCards;

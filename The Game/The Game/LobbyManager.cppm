@@ -7,7 +7,6 @@ import <unordered_map>;
 
 export class LobbyManager
 {
-
 public:
 	static LobbyManager& Instance();
 	std::shared_ptr<Lobby> CreateLobby(uint32_t id, uint32_t minPlayers, uint32_t maxPlayers);

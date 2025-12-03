@@ -165,6 +165,8 @@
     <ClCompile Include="Lobby.cppm" />
     <ClCompile Include="LobbyManager.cpp" />
     <ClCompile Include="LobbyManager.cppm" />
+    <ClCompile Include="LobbyRoutes.cpp" />
+    <ClCompile Include="LobbyRoutes.cppm" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Player.cpp" />

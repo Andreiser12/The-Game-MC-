@@ -23,7 +23,16 @@ tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 		if (onJoin) onJoin();
 		});
 
+	auto hostButton = tgui::Button::create("Host Lobby");
+	hostButton->setTextSize(22);
+	hostButton->setSize({ "35%", "20%" });
+	hostButton->setPosition({ "50%", "55%" });
+	hostButton->onPress([onHost]() {
+		if (onHost) onHost();
+		});
+
 	panel->add(joinButton);
+	panel->add(hostButton);
 
 	return panel;
 }

@@ -26,9 +26,8 @@ export class DatabaseManager
 public:
 	explicit DatabaseManager(const std::string& databasePath);
 
-	//Methods for User
 	bool AddUser(const DB::User& user);
-    std::optional<DB::User> GetUserByID(unsigned int userID);
+    std::optional<DB::User> GetUserByID(unsigned userID);
     std::optional<DB::User> GetUserByName(const std::string& username);
 
     void PopulateDataBase();

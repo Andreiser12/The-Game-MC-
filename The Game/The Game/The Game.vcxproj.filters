@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\Lobby">
+      <UniqueIdentifier>{8002eb56-7bd3-42dc-9305-3c68a166ba02}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -72,20 +75,26 @@
     <ClCompile Include="Lobby.cppm">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="Lobby.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="LobbyManager.cppm">
       <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LobbyManager.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LobbyRoutes.cppm">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="LobbyRoutes.cpp">
+    <ClCompile Include="PlayerFactory.cppm">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerFactory.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Lobby.cpp">
+      <Filter>Source Files\Lobby</Filter>
+    </ClCompile>
+    <ClCompile Include="LobbyManager.cpp">
+      <Filter>Source Files\Lobby</Filter>
+    </ClCompile>
+    <ClCompile Include="LobbyRoutes.cpp">
+      <Filter>Source Files\Lobby</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

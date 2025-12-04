@@ -6,7 +6,6 @@ module;
 
 export module LobbyRoutes;
 
-//import <crow.h>;
 import LobbyManager;
 import Lobby;
 
@@ -19,10 +18,10 @@ public:
 
 private:
 	crow::response CreateLobby(const crow::request& request);
-	crow::response JoinLobby(const crow::request& request, const std::string& lobbyId);
-	crow::response LeaveLobby(const crow::request& request, const std::string& lobbyId);
+	crow::response JoinLobby(const crow::request& request);
+	crow::response LeaveLobby(const crow::request& request);
 	crow::response GetLobbyState(const std::string& lobbyId);
-	crow::response StartLobby(const crow::request& request, const std::string& lobbyId);
+	crow::response StartLobby(const crow::request& request);
 
 private:
 	LobbyManager& m_manager;

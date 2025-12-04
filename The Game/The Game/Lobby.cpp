@@ -4,7 +4,7 @@ Lobby::Lobby(const std::string& lobbyID, uint32_t minPlayers, uint32_t maxPlayer
 		m_lobbyID(lobbyID), m_minPlayersToStart(minPlayers), 
 		m_maxPlayers(maxPlayers), m_gameStarted(false) {}
 
-bool Lobby::AddPlayer(std::shared_ptr<Player> player)
+bool Lobby::AddPlayer(unsigned playerId, std::shared_ptr<Player> player)
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
 	if (IsFull()) return false;

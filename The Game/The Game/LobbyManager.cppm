@@ -1,6 +1,7 @@
 export module LobbyManager;
 
 import Lobby;
+import PlayerFactory;
 import <iostream>;
 import <mutex>;
 import <unordered_map>;
@@ -15,10 +16,6 @@ public:
 	bool RemoveLobby(const std::string& id);
 
 private:
-	std::unordered_map<std::string, std::shared_ptr<Lobby>> m_lobbies;
-	std::mutex m_mutex;
-
-private:
 	LobbyManager() = default;
 	~LobbyManager() = default;
 
@@ -27,5 +24,9 @@ private:
 
 	LobbyManager(LobbyManager&&) = delete;
 	LobbyManager& operator=(LobbyManager&&) = delete;
+
+private:
+	std::unordered_map<std::string, std::shared_ptr<Lobby>> m_lobbies;
+	std::mutex m_mutex;
 
 };

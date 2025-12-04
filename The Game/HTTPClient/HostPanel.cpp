@@ -47,13 +47,10 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 
 	});
 
-	auto playerList = tgui::ListBox::create();
-
 	panel->add(background);
 	panel->add(leaveButton);
 	panel->add(startButton);
 	panel->add(lobbyIdLabel);
-	//panel->add(playerList);
 
 	return panel;
 }

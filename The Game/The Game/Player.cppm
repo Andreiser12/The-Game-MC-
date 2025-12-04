@@ -14,6 +14,7 @@ import Deck;
 export class Player
 {
 public:
+	Player(unsigned playerID, const std::string& name);
 	Player(unsigned playerID, const std::unordered_set<Card, CardsSetHashFunction,
 		CardsEqual>& cards,
 		const UserProfile& userprofile);
@@ -40,6 +41,7 @@ public:
 
 private:
 	unsigned m_playerID;
+	std::string m_name;
 	UserProfile m_userprofile;
 	std::unordered_set<Card, CardsSetHashFunction, CardsEqual> m_cards;
 	uint8_t m_cardsPlacedRound=0;

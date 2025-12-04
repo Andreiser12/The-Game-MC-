@@ -53,8 +53,14 @@ tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 	hostButton->setSize({ "35%", "20%" });
 	hostButton->getRenderer()->setTexture("assets/images/buttons.png");
 	hostButton->setPosition({ "60%", "70%" });
-	hostButton->onPress([onHost]() {
+	hostButton->onPress([&gui, panel, onHost]() {
+		panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(120));
+		auto hostPanel = HostPanel::Create(gui,
+			[](){},
+			[](){}
+			);
 		if (onHost) onHost();
+		gui.add(hostPanel);
 		});
 
 	auto closeButton = tgui::Button::create("X");

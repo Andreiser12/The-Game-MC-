@@ -48,6 +48,9 @@
     <ClInclude Include="JoinPanel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="HostPanel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HTTPClient.cpp">
@@ -81,6 +84,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="JoinPanel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HostPanel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

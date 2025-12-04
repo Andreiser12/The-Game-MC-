@@ -6,6 +6,7 @@
 #include "TGUI/Backend/SFML-Graphics.hpp"
 
 #include "JoinPanel.h"
+#include "HostPanel.h"
 
 class PlayPanel
 {

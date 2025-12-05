@@ -7,15 +7,17 @@
 
 #include "JoinPanel.h"
 #include "HostPanel.h"
+#include "ApiClient.h"
 
 class PlayPanel
-{
+{	
 public:
 	static tgui::Panel::Ptr Create(tgui::Gui& gui,
+		ApiClient& apiClient,
 		const std::string& username,
 		std::function<void()> onClose,
 		std::function<void()> onJoin,
-		std::function<void()> onHost);
+		std::function<std::string(ApiClient&, const std::string&)> onHost);
 
 private:
 

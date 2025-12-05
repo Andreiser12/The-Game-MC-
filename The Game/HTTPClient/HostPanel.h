@@ -10,6 +10,7 @@ class HostPanel
 public:
 	static tgui::Panel::Ptr Create(tgui::Gui& gui,
 		const std::string& username,
+		const std::string& lobbyId,
 		std::function<void()> onLeave,
 		std::function<void()> onStart);
 

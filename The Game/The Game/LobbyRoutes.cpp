@@ -38,17 +38,20 @@ crow::response LobbyRoutes::CreateLobby(const crow::request& request)
 	auto body = crow::json::load(request.body);
 	if (!body) return crow::response(400, "Invalid JSON");
 
-	const std::string username = body["username"].s();
 	std::string lobbyId;
-	const char charset[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ01234556789";
+	const std::string charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ01234556789";
 	for (int i = 0; i < 6; i++)
 	{
-		lobbyId += charset[rand() % sizeof(charset) - 1];
+		lobbyId += charset[rand() % (charset.size() - 1)];
 	}
 	auto lobby = m_manager.CreateLobby(lobbyId);
 	if (!lobby) return crow::response(500, "Failed to create lobby!");
 
-	return crow::response(200, "Created lobby!");
+	crow::json::wvalue data;
+	data["lobbyId"] = lobbyId;
+	data["status"] = "Lobby created successfully!";
+
+	return crow::response(200, data);
 }
 
 crow::response LobbyRoutes::JoinLobby(const crow::request& request)
@@ -89,11 +92,13 @@ crow::response LobbyRoutes::LeaveLobby(const crow::request& request)
 
 	auto lobby = m_manager.GetLobby(lobbyId);
 	if (!lobby) return crow::response(404, "Lobby not found");
-	if (lobby->RemovePlayer(playerId) == RemoveResult::NotFound)
+
+	auto result = lobby->RemovePlayer(playerId);
+	if (result == RemoveResult::NotFound)
 	{
 		return crow::response(404, "Player not found");
 	}
-	if (lobby->RemovePlayer(playerId) == RemoveResult::HostRemoved)
+	if (result == RemoveResult::HostRemoved)
 	{
 		m_manager.RemoveLobby(lobbyId);
 

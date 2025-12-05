@@ -2,6 +2,7 @@
 
 tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	const std::string& username,
+	const std::string& lobbyId,
 	std::function<void()> onLeave,
 	std::function<void()> onStart)
 {
@@ -15,7 +16,7 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	panel->getRenderer()->setBorderColor(tgui::Color::Black);
 	panel->getRenderer()->setRoundedBorderRadius(15);
 
-	auto lobbyIdLabel = tgui::Label::create("Lobby ID:");
+	auto lobbyIdLabel = tgui::Label::create("Lobby ID: " + lobbyId);
 	lobbyIdLabel->setSize({ "25%", "8%" });
 	lobbyIdLabel->setPosition({"65%", "7.5%"});
 	lobbyIdLabel->getRenderer()->setBorders({ 1 });

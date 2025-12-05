@@ -9,6 +9,8 @@ import Table;
 import Menu;
 import UserProfile;
 import DatabaseManager;
+import LobbyRoutes;
+import LobbyManager;
 
 void TestConnection(crow::SimpleApp& app, DatabaseManager &database)
 {
@@ -74,27 +76,7 @@ void TestConnection(crow::SimpleApp& app, DatabaseManager &database)
 		});
 	app.port(18080).multithreaded().run();
 }
-void TestDB()
-{
-	DatabaseManager database{ "game.db" };
 
-	DB::User user;
-	std::string username;
-	std::cout << "Read a name for user: ";
-	std::cin >> username;
-	user.SetUsername(username);
-	database.AddUser(user);
-
-	unsigned int ID;
-	std::cout << "Read ID for a person: ";
-	std::cin >> ID;
-
-	auto uTarget = database.GetUserByID(ID);
-	if (uTarget)
-		std::cout << *uTarget;
-	else std::cout << "This user with ID " << ID << " doesn't exist in User table." << std::endl;
-
-}
 int main()
 {	
 	Table table(3);
@@ -102,6 +84,8 @@ int main()
 	DatabaseManager database{ "gameDB.db" };
 
 	crow::SimpleApp app;
+	LobbyRoutes lobbyRoutes(LobbyManager::Instance(), database);
+	lobbyRoutes.Register(app);
 	TestConnection(app, database);
 
 	return 0;

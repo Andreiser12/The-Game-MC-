@@ -15,14 +15,11 @@ std::optional<std::string> ApiClient::CreateLobby(const std::string& username)
 
 	if (response.error || response.status_code != 200) return std::nullopt;
 
-	std::string text = response.text;
+	auto json = crow::json::load(response.text);
+	if (!json) return std::nullopt;
 
-	text.erase(std::remove_if(text.begin(), text.end(), ::isspace), text.end());
+	const std::string lobbyId = json["lobbyId"].s();
 
-	auto pos = text.find(';');
-	if (pos == std::string::npos) return std::nullopt;
-	
-	std::string lobbyId = text.substr(0, pos);
 	return lobbyId;
 }
 
@@ -42,18 +39,9 @@ std::optional<unsigned> ApiClient::JoinLobby(const std::string& lobbyId,
 
 	if (response.error || response.status_code != 200) return std::nullopt;
 
-	std::string text = response.text;
-	text.erase(std::remove_if(text.begin(), text.end(), ::isspace), text.end());
-
-	auto pos = text.find(';');
-	if (pos == std::string::npos) return std::nullopt;
-
-	std::string status = text.substr(0, pos);
-	std::string rest = text.substr(pos + 1);
-	if (status != "OK") return std::nullopt;
-
-	unsigned playerId = std::stoi(rest);
-	return playerId;
+	auto json = crow::json::load(response.text);
+	if (!json || json["status"].s() != "OK") return std::nullopt;
+	return json["playerId"].i();
 }
 
 bool ApiClient::LeaveLobby(const std::string& lobbyId, unsigned playerId)
@@ -89,12 +77,10 @@ std::optional<std::string> ApiClient::GetLobbyState(const std::string& lobbyId)
 
 	if (response.error || response.status_code != 200) return std::nullopt;
 
-	std::string state = response.text;
-	state.erase(std::remove_if(state.begin(), state.end(), ::isspace), state.end());
+	auto json = crow::json::load(response.text);
+	if (!json) return std::nullopt;
 
-	if (state.empty()) return std::nullopt;
-
-	return state;
+	return json["status"].s();
 }
 
 bool ApiClient::StartMatch(const std::string& lobbyId, unsigned playerId)

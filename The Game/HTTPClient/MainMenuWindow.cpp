@@ -164,10 +164,16 @@ void MainMenuWindow::PlayPanelPressed()
 {
 	auto playPanel = PlayPanel::Create(
 		m_mainMenu,
+		m_apiClient,
 		m_username,
 		[this]() {},
 		[this]() {},
-		[this]() {}
+		[this](ApiClient& api, const std::string& user) 
+		{
+			auto lobbyId = api.CreateLobby(user);
+			if (!lobbyId) return "ERROR";
+			return "OK";
+		}
 	);
 	m_mainMenu.add(playPanel);
 }

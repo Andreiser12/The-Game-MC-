@@ -9,6 +9,7 @@
 #include "SettingsPanel.h"
 #include "PlayPanel.h"
 #include "IWindow.h"
+#include "ApiClient.h"
 
 #include <iostream>
 #include <vector>
@@ -69,6 +70,8 @@ private:
 	};
 	unsigned m_framerateIndex{ 1u };
 	bool m_isFullscreen{ true };
+	ApiClient m_apiClient{"http://localhost:18080"};
+
 
 	/*std::vector<sf::Texture> m_bgFrames;
 	std::optional<sf::Sprite> m_bgSprite;

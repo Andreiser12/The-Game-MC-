@@ -1,4 +1,5 @@
 #pragma once
+#include "crow.h"
 #include <cpr/cpr.h>
 #include <string>
 #include <memory>
@@ -15,6 +16,9 @@ public:
 	std::optional<std::string> GetLobbyState(const std::string& lobbyId);
 
 	bool StartMatch(const std::string& lobbyId, unsigned playerId);
+
+private:
+	ApiClient() = delete;
 
 private:
 	std::string m_serverURL;

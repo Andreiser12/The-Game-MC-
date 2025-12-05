@@ -17,5 +17,6 @@ protected:
 	}
 
 protected:
+	static std::string m_username;
 	static bool m_onLoginWindow;
 };

@@ -4,6 +4,7 @@ import DatabaseStructures;
 import Player;
 
 import <optional>;
+import <string>;
 import <iostream>;
 import <vector>;
 import <sqlite_orm/sqlite_orm.h>;
@@ -35,6 +36,6 @@ public:
     std::vector<DB::User> GetUsers();
 
 private:
-    Storage m_storage;
+    decltype(CreateStorage("")) m_storage;
 };
 

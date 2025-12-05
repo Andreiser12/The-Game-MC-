@@ -8,23 +8,34 @@ import <mutex>;
 
 import Player;
 
+export enum class RemoveResult
+{
+	NotFound,
+	Removed,
+	HostRemoved
+};
+
 export class Lobby
 {
 public:
 	Lobby() = delete;
-	explicit Lobby(const std::string& lobbyID, uint32_t minPlayers, uint32_t maxPlayers);
+	explicit Lobby(const std::string& lobbyID);
 	bool AddPlayer(unsigned playerID, std::shared_ptr<Player> player);
-	bool RemovePlayer(unsigned playerID);
+	RemoveResult RemovePlayer(unsigned playerId);
 	bool IsFull() const;
 	bool HasGameStarted() const;
 	const std::unordered_map<unsigned, std::shared_ptr<Player>>& GetPlayers() const;
+	bool IsPlayerHost(unsigned playerId) const;
+
+public:
+	static constexpr uint8_t K_MIN_PLAYERS{ 2u };
+	static constexpr uint8_t K_MAX_PLAYERS{ 5u };
 
 private:
 	std::string m_lobbyID;
-	uint32_t m_minPlayersToStart;
-	uint32_t m_maxPlayers;
-	std::unordered_map<unsigned, std::shared_ptr<Player>> m_players;
-	std::atomic<bool> m_gameStarted;
-	std::mutex m_mutex;
 	unsigned m_hostId;
+
+	std::unordered_map<unsigned, std::shared_ptr<Player>> m_players;
+	std::atomic<bool> m_gameStarted = false;
+	std::mutex m_mutex;
 };

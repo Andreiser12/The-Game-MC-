@@ -1,6 +1,6 @@
 module Player;
 
-constexpr static uint8_t MINIMUM_CARDS{ 2 };
+constexpr static uint8_t MINIMUM_CARDS{ 2u };
 
 Player::Player(unsigned playerID, const std::string& name) :
 	m_playerID{playerID}, m_name{name} {}

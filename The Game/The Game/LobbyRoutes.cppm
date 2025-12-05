@@ -8,21 +8,23 @@ export module LobbyRoutes;
 
 import LobbyManager;
 import Lobby;
+import DatabaseManager;
+import DatabaseStructures;
 
 export class LobbyRoutes
 {
 public:
-	LobbyRoutes(LobbyManager& manager);
+	LobbyRoutes(LobbyManager& manager, DatabaseManager& db);
 	void Register(crow::SimpleApp& app);
-
 
 private:
 	crow::response CreateLobby(const crow::request& request);
 	crow::response JoinLobby(const crow::request& request);
 	crow::response LeaveLobby(const crow::request& request);
 	crow::response GetLobbyState(const std::string& lobbyId);
-	crow::response StartLobby(const crow::request& request);
+	crow::response StartMatch(const crow::request& request);
 
 private:
 	LobbyManager& m_manager;
+	DatabaseManager& m_db;
 };

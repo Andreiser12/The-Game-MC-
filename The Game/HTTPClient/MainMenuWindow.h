@@ -8,40 +8,32 @@
 #include "ExitPanel.h"
 #include "SettingsPanel.h"
 #include "PlayPanel.h"
+#include "IWindow.h"
 
 #include <iostream>
 #include <vector>
 #include <optional>
 
-
-enum class UiState
-{
-	MainMenu,
-	ExitMenu,
-	SettingsMenu
-};
-
-class MainMenuWindow
+class MainMenuWindow : IWindow
 {
 public:
 	MainMenuWindow(sf::RenderWindow& window);
-	void HandleEvent(sf::Event event);
-	void Draw();
+	void HandleEvent(sf::Event event) override;
+	void Draw() override;
 
 	void ExitButtonPressed();
 	void SettingsButtonPressed();
 	void PlayPanelPressed();
 
 private:
-	void LoadWidgets();
+	void LoadWidgets() override;
 
 private:
 	sf::RenderWindow& m_window;
-
 	tgui::Gui m_mainMenu;
 	tgui::Picture::Ptr m_background;
-	unsigned m_resolutionIndex = 8u;
 
+	unsigned m_resolutionIndex{ 8u };
 	std::vector<sf::Vector2u> m_resolutions = {
 			{640, 480},
 			{ 800, 600 },

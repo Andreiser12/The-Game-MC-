@@ -48,10 +48,8 @@ void RegisterWindow::CheckRegister(tgui::EditBox::Ptr username)
 		errorLabel->setTextSize(16);
 		return;
 	}
-	else
-	{
-		m_isRegistered = true;
-	}
+	m_username = usernameStr;
+	m_isRegistered = true;
 }
 
 void RegisterWindow::HandleEvent(sf::Event event)

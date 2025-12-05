@@ -1,41 +1,51 @@
 module Lobby;
 
-Lobby::Lobby(const std::string& lobbyID, uint32_t minPlayers, uint32_t maxPlayers) :
-		m_lobbyID(lobbyID), m_minPlayersToStart(minPlayers), 
-		m_maxPlayers(maxPlayers), m_gameStarted(false) {}
+Lobby::Lobby(const std::string& lobbyID) : m_lobbyID(lobbyID) {}
 
 bool Lobby::AddPlayer(unsigned playerId, std::shared_ptr<Player> player)
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
 	if (IsFull()) return false;
 
-	unsigned playerID = player->GetPlayerID();
-	if (m_players.find(playerID) != m_players.end())
+	if (m_players.find(playerId) != m_players.end())
 		return false;
 
-	m_players[playerID] = player;
+	m_players[playerId] = player;
 
-	if (m_players.size() >= m_minPlayersToStart)
+	if (m_players.size() == 1) m_hostId = playerId;
+
+
+	if (m_players.size() >= K_MIN_PLAYERS)
 		m_gameStarted.store(true);
 	return true;
 }
 
-bool Lobby::RemovePlayer(unsigned playerID)
+RemoveResult Lobby::RemovePlayer(unsigned playerId)
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	auto iterator = m_players.find(playerID);
-	if (iterator != m_players.end())
+	auto it = m_players.find(playerId);
+	if (it == m_players.end()) return RemoveResult::NotFound;
+
+	bool isHost = (m_hostId == playerId);
+
+	m_players.erase(it);
+
+	if (isHost) 
 	{
-		m_players.erase(iterator);
-		return true;
+		m_hostId = 0;
+		return RemoveResult::HostRemoved;
 	}
-	return false;
+	if (m_players.size() < K_MIN_PLAYERS)
+	{
+		m_gameStarted.store(false);
+	}
+	return RemoveResult::Removed;
 }
 
 bool Lobby::IsFull() const
 {
-	return m_players.size() == m_maxPlayers;
+	return m_players.size() == K_MAX_PLAYERS;
 }
 
 bool Lobby::HasGameStarted() const
@@ -46,5 +56,10 @@ bool Lobby::HasGameStarted() const
 const std::unordered_map<unsigned, std::shared_ptr<Player>>& Lobby::GetPlayers() const
 {
 	return m_players;
+}
+
+bool Lobby::IsPlayerHost(unsigned playerId) const
+{
+	return m_hostId == playerId;
 }
 

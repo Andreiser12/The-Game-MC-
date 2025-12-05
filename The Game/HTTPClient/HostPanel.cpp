@@ -1,6 +1,7 @@
 #include "HostPanel.h"
 
 tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
+	const std::string& username,
 	std::function<void()> onLeave,
 	std::function<void()> onStart)
 {
@@ -22,6 +23,15 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	lobbyIdLabel->getRenderer()->setBackgroundColor(tgui::Color(128, 128, 128));
 	lobbyIdLabel->getRenderer()->setOpacity(0.7f);
 	lobbyIdLabel->setTextSize(24);
+
+	auto usernameLabel = tgui::Label::create(username);
+	usernameLabel->setSize({ "25%", "8%" });
+	usernameLabel->setPosition({ "25%", "7.5%" });
+	usernameLabel->getRenderer()->setBorders({ 1 });
+	usernameLabel->getRenderer()->setBorderColor(tgui::Color::Black);
+	usernameLabel->getRenderer()->setBackgroundColor(tgui::Color(128, 128, 128));
+	usernameLabel->getRenderer()->setOpacity(0.7f);
+	usernameLabel->setTextSize(24);
 	
 	auto leaveButton = tgui::Button::create("Leave Lobby");
 	leaveButton->setSize({ "22.5%", "12.5%" });
@@ -51,6 +61,7 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	panel->add(leaveButton);
 	panel->add(startButton);
 	panel->add(lobbyIdLabel);
+	panel->add(usernameLabel);
 
 	return panel;
 }

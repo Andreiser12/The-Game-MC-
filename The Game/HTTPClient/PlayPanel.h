@@ -12,6 +12,7 @@ class PlayPanel
 {
 public:
 	static tgui::Panel::Ptr Create(tgui::Gui& gui,
+		const std::string& username,
 		std::function<void()> onClose,
 		std::function<void()> onJoin,
 		std::function<void()> onHost);

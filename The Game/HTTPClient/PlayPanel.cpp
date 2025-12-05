@@ -1,6 +1,7 @@
 #include "PlayPanel.h"
 
 tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
+	const std::string& username,
 	std::function<void()> onClose,
 	std::function<void()> onJoin,
 	std::function<void()> onHost)
@@ -53,9 +54,10 @@ tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 	hostButton->setSize({ "35%", "20%" });
 	hostButton->getRenderer()->setTexture("assets/images/buttons.png");
 	hostButton->setPosition({ "60%", "70%" });
-	hostButton->onPress([&gui, panel, onHost]() {
+	hostButton->onPress([&gui, panel, username, onHost]() {
 		panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(120));
 		auto hostPanel = HostPanel::Create(gui,
+			username,
 			[](){},
 			[](){}
 			);

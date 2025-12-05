@@ -34,6 +34,7 @@ void LoginWindow::CheckLogin(tgui::EditBox::Ptr username)
 		errorLabel->setTextSize(16);
 		return;
 	}
+	m_username = usernameStr;
 	m_isLoggedIn = true;
 }
 

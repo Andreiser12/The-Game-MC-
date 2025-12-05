@@ -170,8 +170,6 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Player.cpp" />
-    <ClCompile Include="PlayerFactory.cpp" />
-    <ClCompile Include="PlayerFactory.cppm" />
     <ClCompile Include="Table.cpp" />
     <ClCompile Include="UserProfile.cpp" />
   </ItemGroup>

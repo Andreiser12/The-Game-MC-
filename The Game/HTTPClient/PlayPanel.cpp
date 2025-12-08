@@ -56,16 +56,18 @@ tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 	hostButton->getRenderer()->setTexture("assets/images/buttons.png");
 	hostButton->setPosition({ "60%", "70%" });
 	hostButton->onPress([&gui, panel, &apiClient, username, onHost]() {
-		std::string lobbyId = "";
-		if (onHost) lobbyId = onHost(apiClient, username);
-		panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(120));
-		auto hostPanel = HostPanel::Create(gui,
-			username,
-			lobbyId,
-			[](){},
-			[](){}
+		if (onHost)
+		{
+			std::string lobbyId = onHost(apiClient, username);
+			panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(120));
+			auto hostPanel = HostPanel::Create(gui,
+				username,
+				lobbyId,
+				[]() {},
+				[]() {}
 			);
-		gui.add(hostPanel);
+			gui.add(hostPanel);
+		}
 		});
 
 	auto closeButton = tgui::Button::create("X");

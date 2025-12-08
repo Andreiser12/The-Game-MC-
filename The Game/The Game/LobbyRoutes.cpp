@@ -1,6 +1,23 @@
 import LobbyRoutes;
 #include "crow.h"
 
+constexpr static uint8_t K_LOBBY_ID_LENGTH{ 6u };
+
+inline static std::string GenerateLobbyId()
+{
+	static std::random_device rd;
+	static std::mt19937 gen(rd());
+	static std::uniform_int_distribution<> dist(0, 35);
+	const std::string charset{ "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" };
+	std::string lobbyId;
+	lobbyId.reserve(K_LOBBY_ID_LENGTH);
+	for (uint8_t i = 0u; i < K_LOBBY_ID_LENGTH; i++)
+	{
+		lobbyId += charset[dist(gen)];
+	}
+	return lobbyId;
+}
+
 LobbyRoutes::LobbyRoutes(LobbyManager& manager, DatabaseManager& db)
 	: m_manager{manager},
 	m_db{db} {}
@@ -38,12 +55,7 @@ crow::response LobbyRoutes::CreateLobby(const crow::request& request)
 	auto body = crow::json::load(request.body);
 	if (!body) return crow::response(400, "Invalid JSON");
 
-	std::string lobbyId;
-	const std::string charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ01234556789";
-	for (int i = 0; i < 6; i++)
-	{
-		lobbyId += charset[rand() % (charset.size() - 1)];
-	}
+	std::string lobbyId = GenerateLobbyId();
 	auto lobby = m_manager.CreateLobby(lobbyId);
 	if (!lobby) return crow::response(500, "Failed to create lobby!");
 

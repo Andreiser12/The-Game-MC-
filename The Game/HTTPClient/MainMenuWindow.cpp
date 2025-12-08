@@ -171,8 +171,8 @@ void MainMenuWindow::PlayPanelPressed()
 		[this](ApiClient& api, const std::string& user) 
 		{
 			auto lobbyId = api.CreateLobby(user);
-			if (!lobbyId) return "ERROR";
-			return "OK";
+			if (!lobbyId) return std::string{ "ERROR" };
+			return lobbyId.value();
 		}
 	);
 	m_mainMenu.add(playPanel);

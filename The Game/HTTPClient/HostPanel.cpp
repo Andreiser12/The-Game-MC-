@@ -17,13 +17,13 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	panel->getRenderer()->setRoundedBorderRadius(15);
 
 	auto lobbyIdLabel = tgui::Label::create("Lobby ID: " + lobbyId);
-	lobbyIdLabel->setSize({ "25%", "8%" });
-	lobbyIdLabel->setPosition({"65%", "7.5%"});
+	lobbyIdLabel->setSize({ "30%", "10%" });
+	lobbyIdLabel->setPosition({"62.5%", "7.5%"});
 	lobbyIdLabel->getRenderer()->setBorders({ 1 });
 	lobbyIdLabel->getRenderer()->setBorderColor(tgui::Color::Black);
 	lobbyIdLabel->getRenderer()->setBackgroundColor(tgui::Color(128, 128, 128));
 	lobbyIdLabel->getRenderer()->setOpacity(0.7f);
-	lobbyIdLabel->setTextSize(24);
+	lobbyIdLabel->setTextSize(22);
 
 	auto usernameLabel = tgui::Label::create(username);
 	usernameLabel->setSize({ "25%", "8%" });

@@ -1,7 +1,8 @@
 #include "LoginWindow.h"
 
-LoginWindow::LoginWindow(sf::RenderWindow& window)
-	: m_login(window) { 
+LoginWindow::LoginWindow(sf::RenderWindow& window, ApiClient& api)
+	: m_login{window}, m_apiClient{api}
+{ 
 	 
 	m_background = tgui::Picture::create("assets/images/background.png");
 	m_background->setSize({ "100%", "100%" });
@@ -12,10 +13,10 @@ LoginWindow::LoginWindow(sf::RenderWindow& window)
 
 void LoginWindow::CheckLogin(tgui::EditBox::Ptr username)
 {
-	std::string usernameStr = username->getText().toStdString();
+	std::string usernameEntered = username->getText().toStdString();
 	cpr::Response r = cpr::Post(
 		cpr::Url{ "http://localhost:18080/login" },
-		cpr::Body{ "{\"username\": \"" + usernameStr + "\"}" },
+		cpr::Body{ "{\"username\": \"" + usernameEntered + "\"}" },
 		cpr::Header{ {"Content-Type", "application/json"} }
 	);
 
@@ -34,7 +35,7 @@ void LoginWindow::CheckLogin(tgui::EditBox::Ptr username)
 		errorLabel->setTextSize(16);
 		return;
 	}
-	m_username = usernameStr;
+	m_apiClient.SetUsername(usernameEntered);
 	m_isLoggedIn = true;
 }
 

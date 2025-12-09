@@ -1,5 +1,7 @@
 #pragma once
 #include "IWindow.h"
+#include "ApiClient.h"
+
 #include <cpr/cpr.h>
 #include <crow.h>
 #include <vector>
@@ -8,7 +10,7 @@
 class RegisterWindow : IWindow
 {
 public:
-	RegisterWindow(sf::RenderWindow& window);
+	RegisterWindow(sf::RenderWindow& window, ApiClient& api);
 
 	void HandleEvent(sf::Event event) override;
 	void Draw() override;
@@ -26,5 +28,6 @@ private:
 	tgui::Gui m_register;
 	tgui::Picture::Ptr m_background;
 	bool m_isRegistered = false;
+	ApiClient& m_apiClient;
 };
 

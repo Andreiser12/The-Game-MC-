@@ -18,7 +18,7 @@
 class MainMenuWindow : IWindow
 {
 public:
-	MainMenuWindow(sf::RenderWindow& window);
+	MainMenuWindow(sf::RenderWindow& window, ApiClient& api);
 	void HandleEvent(sf::Event event) override;
 	void Draw() override;
 
@@ -70,8 +70,7 @@ private:
 	};
 	unsigned m_framerateIndex{ 1u };
 	bool m_isFullscreen{ true };
-	ApiClient m_apiClient{"http://localhost:18080"};
-
+	ApiClient& m_apiClient;
 
 	/*std::vector<sf::Texture> m_bgFrames;
 	std::optional<sf::Sprite> m_bgSprite;

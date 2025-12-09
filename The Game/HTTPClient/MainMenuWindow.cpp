@@ -2,9 +2,10 @@
 
 constexpr static unsigned int K_TEXT_SIZE{ 24u };
 
-MainMenuWindow::MainMenuWindow(sf::RenderWindow& window) :
-	m_window(window),
-	m_mainMenu(window)
+MainMenuWindow::MainMenuWindow(sf::RenderWindow& window, ApiClient& api) :
+	m_window{ window },
+	m_mainMenu{ window },
+	m_apiClient{api}
 {
 	m_background = tgui::Picture::create("assets/images/background.png");
 	m_background->setSize({ "100%", "100%" });
@@ -165,7 +166,6 @@ void MainMenuWindow::PlayPanelPressed()
 	auto playPanel = PlayPanel::Create(
 		m_mainMenu,
 		m_apiClient,
-		m_username,
 		[this]() {},
 		[this]() {},
 		[this](ApiClient& api, const std::string& user) 

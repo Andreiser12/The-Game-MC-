@@ -1,9 +1,10 @@
 #include "HostPanel.h"
 
 tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
+	ApiClient& apiClient,
 	const std::string& username,
 	const std::string& lobbyId,
-	std::function<void()> onLeave,
+	std::function<bool(ApiClient&)> onLeave,
 	std::function<void()> onStart)
 {
 	auto background = tgui::Picture::create("assets/images/background.png");
@@ -39,12 +40,14 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	leaveButton->setPosition({ "27.5%", "80%" });
 	leaveButton->getRenderer()->setTexture("assets/images/buttons.png");
 	leaveButton->setTextSize(18);
-	leaveButton->onPress([panel, onLeave]()
+	leaveButton->onPress([panel, &apiClient, onLeave]()
 		{
-			panel->setVisible(false);
 			if (onLeave)
 			{
-				onLeave();
+				if (onLeave(apiClient))
+				{
+					panel->setVisible(false);
+				}
 			}
 		});
 

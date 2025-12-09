@@ -1,7 +1,7 @@
 #include "RegisterWindow.h"
 
-RegisterWindow::RegisterWindow(sf::RenderWindow& window)
-	: m_register(window)
+RegisterWindow::RegisterWindow(sf::RenderWindow& window, ApiClient& api)
+	: m_register{window}, m_apiClient{api}
 {
 	m_background = tgui::Picture::create("assets/images/background.png");
 	m_background->setSize({ "100%", "100%" });
@@ -28,10 +28,10 @@ void RegisterWindow::Draw()
 
 void RegisterWindow::CheckRegister(tgui::EditBox::Ptr username)
 {
-	std::string usernameStr = username->getText().toStdString();
+	std::string usernameEntered = username->getText().toStdString();
 	cpr::Response r = cpr::Post(
 		cpr::Url{ "http://localhost:18080/register" },
-		cpr::Body{ "{\"username\": \"" + usernameStr + "\"}" },
+		cpr::Body{ "{\"username\": \"" + usernameEntered + "\"}" },
 		cpr::Header{ {"Content-Type", "application/json"} }
 	);
 	auto json = crow::json::load(r.text);
@@ -48,7 +48,7 @@ void RegisterWindow::CheckRegister(tgui::EditBox::Ptr username)
 		errorLabel->setTextSize(16);
 		return;
 	}
-	m_username = usernameStr;
+	m_apiClient.SetUsername(usernameEntered);
 	m_isRegistered = true;
 }
 

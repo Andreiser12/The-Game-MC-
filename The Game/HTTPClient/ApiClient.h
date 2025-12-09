@@ -17,11 +17,17 @@ public:
 
 	bool StartMatch(const std::string& lobbyId, unsigned playerId);
 
+	void SetUsername(const std::string& username);
+	void SetPlayerId(unsigned playerId);
+
+	const std::string& GetUsername() const;
+
 private:
 	ApiClient() = delete;
 
 private:
 	std::string m_serverURL;
-	
+	std::string m_username;
+	std::optional<unsigned> m_playerId;
 };
 

@@ -2,6 +2,7 @@
 #include "RegisterWindow.h"
 #include "MainMenuWindow.h"
 #include "ConnectionFailedWindow.h"
+#include "ApiClient.h"
 
 #include <cpr/cpr.h>
 #include <crow.h>
@@ -14,6 +15,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_ LPWSTR    lpCmdLine,
 	_In_ int       nCmdShow)
 {
+	ApiClient api{ "http://localhost:18080" };
 	cpr::Response response = cpr::Get(cpr::Url{ "http://localhost:18080/users" });
 	if ((int)response.status_code == 404 || response.primary_port!=18080)
 	{
@@ -46,8 +48,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	loginRegisterMode.size = { LOGIN_WIDTH, LOGIN_HEIGHT };
 
 	sf::RenderWindow loginWindow{ loginRegisterMode, "TheGame - Login", sf::Style::Titlebar | sf::Style::Close };
-	LoginWindow _login(loginWindow);
-	RegisterWindow _register(loginWindow);
+	LoginWindow _login(loginWindow, api);
+	RegisterWindow _register(loginWindow, api);
 
 	while (loginWindow.isOpen())
 	{
@@ -87,7 +89,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	{
 		sf::VideoMode menuMode = sf::VideoMode::getDesktopMode();
 		sf::RenderWindow menuWindow{ menuMode, "TheGame - 1.0.0", sf::State::Fullscreen };
-		MainMenuWindow _menu(menuWindow);
+		MainMenuWindow _menu(menuWindow, api);
 		while (menuWindow.isOpen())
 		{
 			std::optional<sf::Event> eventOpt;

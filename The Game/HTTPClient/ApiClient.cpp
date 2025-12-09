@@ -102,7 +102,20 @@ bool ApiClient::StartMatch(const std::string& lobbyId, unsigned playerId)
 	matchStart.erase(
 		std::remove_if(matchStart.begin(), matchStart.end(), ::isspace), matchStart.end());
 
-	if (matchStart == "STARTED") return true;
+	return matchStart == "STARTED";
+}
 
-	return false;
+void ApiClient::SetUsername(const std::string& username)
+{
+	m_username = username;
+}
+
+void ApiClient::SetPlayerId(unsigned playerId)
+{
+	m_playerId.value() = playerId;
+}
+
+const std::string& ApiClient::GetUsername() const
+{
+	return m_username;
 }

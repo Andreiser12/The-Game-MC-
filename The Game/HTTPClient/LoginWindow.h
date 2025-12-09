@@ -1,5 +1,7 @@
 #pragma once
 #include "IWindow.h"
+#include "ApiClient.h"
+
 #include <cpr/cpr.h>
 #include <crow.h>
 #include <string>
@@ -8,7 +10,7 @@
 class LoginWindow : IWindow
 {
 public:
-	LoginWindow(sf::RenderWindow& window);
+	LoginWindow(sf::RenderWindow& window, ApiClient& api);
 
 	void CheckLogin(tgui::EditBox::Ptr username);
 
@@ -29,5 +31,6 @@ private:
 	tgui::Picture::Ptr m_background;
 	bool m_isLoggedIn = false;
 	bool m_isRegisteredPressed = false;
+	ApiClient& m_apiClient;
 };
 

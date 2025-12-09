@@ -2,7 +2,6 @@
 
 tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 	ApiClient& apiClient,
-	const std::string& username,
 	std::function<void()> onClose,
 	std::function<void()> onJoin,
 	std::function<std::string(ApiClient&, const std::string&)> onHost)
@@ -55,15 +54,16 @@ tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 	hostButton->setSize({ "35%", "20%" });
 	hostButton->getRenderer()->setTexture("assets/images/buttons.png");
 	hostButton->setPosition({ "60%", "70%" });
-	hostButton->onPress([&gui, panel, &apiClient, username, onHost]() {
+	hostButton->onPress([&gui, panel, &apiClient, onHost]() {
 		if (onHost)
 		{
-			std::string lobbyId = onHost(apiClient, username);
+			std::string lobbyId = onHost(apiClient, apiClient.GetUsername());
 			panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(120));
 			auto hostPanel = HostPanel::Create(gui,
-				username,
+				apiClient,
+				apiClient.GetUsername(),
 				lobbyId,
-				[]() {},
+				[](ApiClient& api) { return true; },
 				[]() {}
 			);
 			gui.add(hostPanel);

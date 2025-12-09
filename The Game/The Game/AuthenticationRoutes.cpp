@@ -13,6 +13,22 @@ void AuthenticationRoutes::Register(crow::SimpleApp& app)
 		});
 }
 
+void AuthenticationRoutes::Login(crow::SimpleApp& app)
+{
+	CROW_ROUTE(app, "/login").methods(crow::HTTPMethod::Post)(
+		[this](const crow::request& req)
+		{
+			return this->HandleLogin(req);
+		});
+}
+
+void AuthenticationRoutes::Users(crow::SimpleApp& app)
+{
+	CROW_ROUTE(app, "/users")([this]() {
+		return this->HandleUsers();
+	});
+}
+
 crow::response AuthenticationRoutes::HandleRegister(const crow::request& req)
 {
 	auto body = crow::json::load(req.body);
@@ -35,4 +51,42 @@ crow::response AuthenticationRoutes::HandleRegister(const crow::request& req)
 	res["id"] = insertedUser->GetID();
 	res["username"] = insertedUser->GetUsername();
 	return crow::response{ res };
+}
+
+crow::response AuthenticationRoutes::HandleLogin(const crow::request& req)
+{
+	auto body = crow::json::load(req.body);
+	if (!body)
+		return crow::response(400, "Invalid JSON");
+	std::string username = body["username"].s();
+
+	auto user = m_database.GetUserByName(username);
+	if (user) {
+		crow::json::wvalue res;
+		res["status"] = "ok";
+		res["id"] = user->GetID();
+		res["username"] = user->GetUsername();
+		return crow::response{ res };
+	}
+	else
+	{
+		crow::json::wvalue res;
+		res["status"] = "fail";
+		res["message"] = "User not found";
+		return crow::response{ res };
+	}
+}
+
+crow::response AuthenticationRoutes::HandleUsers()
+{
+	std::vector<crow::json::wvalue> usersJson;
+	auto users = m_database.GetUsers();
+	for (const auto& user : users)
+	{
+		usersJson.push_back(crow::json::wvalue{
+			{"id", user.GetID()},
+			{"username", user.GetUsername()}
+			});
+	}
+	return crow::json::wvalue{ usersJson };
 }

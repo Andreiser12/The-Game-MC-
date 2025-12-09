@@ -155,6 +155,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AuthenticationRoutes.cpp" />
+    <ClCompile Include="AuthenticationRoutes.cppm" />
     <ClCompile Include="Card.cpp">
       <FileType>CppCode</FileType>
     </ClCompile>

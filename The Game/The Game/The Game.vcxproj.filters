@@ -90,5 +90,11 @@
     <ClCompile Include="LobbyRoutes.cpp">
       <Filter>Source Files\Lobby</Filter>
     </ClCompile>
+    <ClCompile Include="AuthenticationRoutes.cppm">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AuthenticationRoutes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

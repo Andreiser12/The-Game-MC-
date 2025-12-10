@@ -3,7 +3,7 @@
 tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 	ApiClient& apiClient,
 	std::function<void()> onBack,
-	std::function<void(ApiClient&, std::string)> onJoinLobby)
+	std::function<bool(ApiClient&, std::string)> onJoinLobby)
 {
 	auto background = tgui::Picture::create("assets/images/background.png");
 	background->setSize({ "100%", "100%" });
@@ -34,11 +34,14 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 	joinLobbyButton->setPosition({"60%", "70%"});
 	joinLobbyButton->getRenderer()->setTexture("assets/images/buttons.png");
 	joinLobbyButton->setTextSize(22);
-	joinLobbyButton->onPress([onJoinLobby, &apiClient, lobbyEditBox]()
+	joinLobbyButton->onPress([&gui, onJoinLobby, &apiClient, lobbyEditBox, panel]()
 		{
 			if (onJoinLobby)
 			{
-				onJoinLobby(apiClient, lobbyEditBox->getText().toStdString());
+				if (onJoinLobby(apiClient, lobbyEditBox->getText().toStdString()))
+				{
+					panel->setVisible(false);
+				}
 			}
 		});
 

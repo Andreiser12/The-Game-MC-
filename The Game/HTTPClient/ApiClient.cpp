@@ -114,6 +114,11 @@ void ApiClient::SetPlayerId(unsigned playerId)
 	m_playerId = playerId;
 }
 
+void ApiClient::SetLobbyId(const std::string& lobbyId)
+{
+	m_lobbyId = lobbyId;
+}
+
 const std::string& ApiClient::GetUsername() const
 {
 	return m_username;
@@ -122,4 +127,27 @@ const std::string& ApiClient::GetUsername() const
 unsigned ApiClient::GetPlayerId() const
 {
 	return m_playerId;
+}
+
+const std::string& ApiClient::GetLobbyId() const
+{
+	return m_lobbyId;
+}
+
+std::vector<std::string> ApiClient::GetLobbyPlayers(const std::string& lobbyId) const
+{
+	auto url = m_serverURL + "/lobby/" + lobbyId + "/players";
+	cpr::Response response = cpr::Get(cpr::Url{ url });
+	std::vector<std::string> players;
+
+	if (response.status_code != 200) return players;
+
+	auto json = crow::json::load(response.text);
+	if (!json) return players;
+
+	for (auto& p : json["players"])
+	{
+		players.push_back(p.s());
+	}
+	return players;
 }

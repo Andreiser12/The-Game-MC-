@@ -136,6 +136,7 @@
   <ItemGroup>
     <ClInclude Include="ApiClient.h" />
     <ClInclude Include="ConnectionFailedWindow.h" />
+    <ClInclude Include="ErrorPopupPanel.h" />
     <ClInclude Include="ExitPanel.h" />
     <ClInclude Include="HostPanel.h" />
     <ClInclude Include="IWindow.h" />
@@ -150,6 +151,7 @@
   <ItemGroup>
     <ClCompile Include="ApiClient.cpp" />
     <ClCompile Include="ConnectionFailedWindow.cpp" />
+    <ClCompile Include="ErrorPopupPanel.cpp" />
     <ClCompile Include="ExitPanel.cpp" />
     <ClCompile Include="HostPanel.cpp" />
     <ClCompile Include="HTTPClient.cpp" />

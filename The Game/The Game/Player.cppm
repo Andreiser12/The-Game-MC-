@@ -32,6 +32,7 @@ public:
 	void SetCards(const std::unordered_set<Card, CardsSetHashFunction, CardsEqual>& cards);
 
 	unsigned GetPlayerID() const;
+	const std::string& GetUsername() const;
 	const std::unordered_set<Card, CardsSetHashFunction,
 		CardsEqual>& GetCards() const;
 	size_t GetCardsCount() const;
@@ -41,7 +42,7 @@ public:
 
 private:
 	unsigned m_playerID;
-	std::string m_name;
+	std::string m_username;
 	UserProfile m_userprofile;
 	std::unordered_set<Card, CardsSetHashFunction, CardsEqual> m_cards;
 	uint8_t m_cardsPlacedRound=0;

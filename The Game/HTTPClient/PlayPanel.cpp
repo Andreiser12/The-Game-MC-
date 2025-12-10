@@ -36,9 +36,23 @@ tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 			[panel]() {
 				panel->setVisible(true);
 			},
-			[](ApiClient& api, std::string lobbyIdEntered)
+			[&gui, &apiClient, panel](ApiClient& api, std::string lobbyIdEntered)
 			{
-				api.JoinLobby(lobbyIdEntered, api.GetUsername());
+				if (api.JoinLobby(lobbyIdEntered, api.GetUsername()))
+				{
+					panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(150));
+					std::string lobbyId = api.GetLobbyId();
+					auto host = HostPanel::Create(
+						gui,
+						apiClient,
+						lobbyId,
+						[lobbyId](ApiClient& api) { return api.LeaveLobby(lobbyId, api.GetPlayerId()); },
+						[](){}
+					);
+					gui.add(host);
+					return true;
+				}
+				return false;
 			}
 			);
 		gui.add(joinPanel);
@@ -54,6 +68,7 @@ tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 		if (onHost)
 		{
 			std::string lobbyId = onHost(apiClient, apiClient.GetUsername());
+			apiClient.SetLobbyId(lobbyId);
 			panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(120));
 			auto hostPanel = HostPanel::Create(gui,
 				apiClient,

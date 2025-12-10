@@ -3,6 +3,7 @@
 #include <cpr/cpr.h>
 #include <string>
 #include <memory>
+#include <vector>
 #include <optional>
 
 class ApiClient
@@ -19,9 +20,12 @@ public:
 
 	void SetUsername(const std::string& username);
 	void SetPlayerId(unsigned playerId);
+	void SetLobbyId(const std::string& lobbyId);
 
 	const std::string& GetUsername() const;
 	unsigned GetPlayerId() const;
+	const std::string& GetLobbyId() const;
+	std::vector<std::string> GetLobbyPlayers(const std::string& lobbyId) const;
 
 private:
 	ApiClient() = delete;
@@ -29,6 +33,7 @@ private:
 private:
 	std::string m_serverURL;
 	std::string m_username;
+	std::string m_lobbyId;
 	unsigned m_playerId;
 };
 

@@ -6,6 +6,7 @@
 #include "TGUI/Backend/SFML-Graphics.hpp"
 
 #include "ApiClient.h"
+#include "HostPanel.h"
 
 class JoinPanel
 {
@@ -13,7 +14,7 @@ public:
 	static tgui::Panel::Ptr Create(tgui::Gui& gui,
 		ApiClient& apiClient,
 		std::function<void()> onBack,
-		std::function<void(ApiClient&, std::string)> onJoinLobby);
+		std::function<bool(ApiClient&, std::string)> onJoinLobby);
 
 private:
 

@@ -25,6 +25,16 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	lobbyIdLabel->getRenderer()->setOpacity(0.7f);
 	lobbyIdLabel->setTextSize(22);
 
+	auto playersList = apiClient.GetLobbyPlayers(lobbyId);
+	auto playersListBox = tgui::ListBox::create();
+	playersListBox->setSize({ "20%", "30%"});
+	playersListBox->setPosition({ "0%", "5%" });
+	playersListBox->getRenderer()->setBackgroundColor(tgui::Color(128, 128, 128));
+	for (const auto& username : playersList)
+	{
+		playersListBox->addItem(username);
+	}
+
 	auto usernameLabel = tgui::Label::create(apiClient.GetUsername());
 	usernameLabel->setSize({ "25%", "8%" });
 	usernameLabel->setPosition({ "25%", "7.5%" });
@@ -60,11 +70,12 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 
 	});
 
-	panel->add(background);
 	panel->add(leaveButton);
 	panel->add(startButton);
 	panel->add(lobbyIdLabel);
-	panel->add(usernameLabel);
+	panel->add(playersListBox);
+	panel->add(background);
+	background->moveToBack();
 
 	return panel;
 }

@@ -48,6 +48,12 @@ void LobbyRoutes::Register(crow::SimpleApp& app)
 		([this](const crow::request& req) {
 		return this->StartMatch(req);
 		});
+
+	CROW_ROUTE(app, "/lobby/<string>/players").methods("GET"_method)
+		([&](const std::string& lobbyId)
+			{
+			return this->FetchLobbyPlayers(lobbyId);
+			});
 }
 
 crow::response LobbyRoutes::CreateLobby(const crow::request& request)
@@ -189,6 +195,24 @@ crow::response LobbyRoutes::StartMatch(const crow::request& request)
 	
 	data["status"] = "GAME_STARTED";
 	data["message"] = "Game has started.";
+
+	return crow::response(200, data);
+}
+
+crow::response LobbyRoutes::FetchLobbyPlayers(const std::string& lobbyId)
+{
+	auto lobby = m_manager.GetLobby(lobbyId);
+	if (!lobby) return crow::response(404, "Lobby not found");
+
+	crow::json::wvalue data;
+	crow::json::wvalue::list playersList;
+
+	const auto& players = lobby->GetPlayers();
+	for (const auto& [playerId, player] : players)
+	{
+		playersList.push_back(player->GetUsername());
+	}
+	data["players"] = std::move(playersList);
 
 	return crow::response(200, data);
 }

@@ -28,21 +28,17 @@ tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 	joinButton->getRenderer()->setTexture("assets/images/buttons.png");
 	joinButton->setSize({ "35%", "20%" });
 	joinButton->setPosition({ "5%","70%" });
-	joinButton->onPress([&gui, onJoin, panel]() {
+	joinButton->onPress([&gui, onJoin, &apiClient, panel]() {
 		panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(150));
 		auto joinPanel = JoinPanel::Create(
 			gui,
-			[&]() {
+			apiClient,
+			[panel]() {
 				panel->setVisible(true);
 			},
-			[&]()
+			[](ApiClient& api, std::string lobbyIdEntered)
 			{
-				/*
-				* Preia lobbyId-ul introdus de player si creeaza ruta catre LobbyManager
-				* Verificare Id este activ sau nu
-				* Afisare popup in caz de eroare
-				* Introdu user-ul in lobby in daca se poate
-				*/
+				api.JoinLobby(lobbyIdEntered, api.GetUsername());
 			}
 			);
 		gui.add(joinPanel);

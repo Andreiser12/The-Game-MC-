@@ -20,7 +20,7 @@ export class Lobby
 public:
 	Lobby() = delete;
 	explicit Lobby(const std::string& lobbyId, unsigned hostId, const std::string& username);
-	bool AddPlayer(unsigned playerID, std::shared_ptr<Player> player);
+	bool AddPlayer(unsigned playerId, const std::string& playerUsername);
 	RemoveResult RemovePlayer(unsigned playerId);
 	bool IsFull() const;
 	bool HasGameStarted() const;

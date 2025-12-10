@@ -24,7 +24,7 @@ std::optional<std::string> ApiClient::CreateLobby(const std::string& username)
 	return lobbyId;
 }
 
-std::optional<unsigned> ApiClient::JoinLobby(const std::string& lobbyId,
+bool ApiClient::JoinLobby(const std::string& lobbyId,
 	const std::string& username)
 {
 	const std::string url = m_serverURL + "/lobby/join";
@@ -38,11 +38,11 @@ std::optional<unsigned> ApiClient::JoinLobby(const std::string& lobbyId,
 		cpr::Body{ jsonBody },
 		cpr::Header{ {"Content-Type", "application/json"} });
 
-	if (response.error || response.status_code != 200) return std::nullopt;
+	if (response.error || response.status_code != 200) return false;
 
 	auto json = crow::json::load(response.text);
-	if (!json || json["status"].s() != "OK") return std::nullopt;
-	return json["playerId"].i();
+	if (!json || json["status"].s() != "OK") return false;
+	return true;
 }
 
 bool ApiClient::LeaveLobby(const std::string& lobbyId, unsigned playerId)

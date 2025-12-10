@@ -81,9 +81,7 @@ crow::response LobbyRoutes::JoinLobby(const crow::request& request)
 	auto lobby = m_manager.GetLobby(lobbyId);	
 	if (!lobby) return crow::response(404, "Lobby not found");
 
-	auto playerPtr = std::make_shared<Player>(playerId, username);
-
-	if (!lobby->AddPlayer(playerId, playerPtr)) return crow::response
+	if (!lobby->AddPlayer(playerId, username)) return crow::response
 	(409, "Lobby full or player already exists");
 
 	crow::json::wvalue data;

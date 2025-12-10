@@ -8,7 +8,7 @@ Lobby::Lobby(const std::string& lobbyId, unsigned hostId, const std::string& use
 	m_players.emplace(hostId, hostPlayer);
 }
 
-bool Lobby::AddPlayer(unsigned playerId, std::shared_ptr<Player> player)
+bool Lobby::AddPlayer(unsigned playerId, const std::string& playerUsername)
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
 	if (IsFull()) return false;
@@ -16,6 +16,7 @@ bool Lobby::AddPlayer(unsigned playerId, std::shared_ptr<Player> player)
 	if (m_players.find(playerId) != m_players.end())
 		return false;
 
+	auto player = std::make_shared<Player>(playerId, playerUsername);
 	m_players[playerId] = player;
 
 	if (m_players.size() == 1) m_hostId = playerId;

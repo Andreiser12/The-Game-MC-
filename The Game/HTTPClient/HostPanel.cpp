@@ -2,7 +2,6 @@
 
 tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	ApiClient& apiClient,
-	const std::string& username,
 	const std::string& lobbyId,
 	std::function<bool(ApiClient&)> onLeave,
 	std::function<void()> onStart)
@@ -26,7 +25,7 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	lobbyIdLabel->getRenderer()->setOpacity(0.7f);
 	lobbyIdLabel->setTextSize(22);
 
-	auto usernameLabel = tgui::Label::create(username);
+	auto usernameLabel = tgui::Label::create(apiClient.GetUsername());
 	usernameLabel->setSize({ "25%", "8%" });
 	usernameLabel->setPosition({ "25%", "7.5%" });
 	usernameLabel->getRenderer()->setBorders({ 1 });

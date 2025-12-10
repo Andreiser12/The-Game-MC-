@@ -19,7 +19,7 @@ export class Lobby
 {
 public:
 	Lobby() = delete;
-	explicit Lobby(const std::string& lobbyID);
+	explicit Lobby(const std::string& lobbyId, unsigned hostId, const std::string& username);
 	bool AddPlayer(unsigned playerID, std::shared_ptr<Player> player);
 	RemoveResult RemovePlayer(unsigned playerId);
 	bool IsFull() const;
@@ -32,8 +32,8 @@ public:
 	static constexpr uint8_t K_MAX_PLAYERS{ 5u };
 
 private:
-	std::string m_lobbyID;
-	unsigned m_hostId;
+	std::string m_lobbyId;
+	unsigned m_hostId;	
 
 	std::unordered_map<unsigned, std::shared_ptr<Player>> m_players;
 	std::atomic<bool> m_gameStarted = false;

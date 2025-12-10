@@ -5,7 +5,8 @@ ApiClient::ApiClient(const std::string& serverURL) : m_serverURL{serverURL} {}
 std::optional<std::string> ApiClient::CreateLobby(const std::string& username)
 {
 	const std::string url = m_serverURL + "/lobby/create";
-	std::string jsonBody = "{\"username\":\"" + username + "\"}";
+	std::string jsonBody = "{\"username\":\"" + username +
+		"\",\"playerId\":\"" + std::to_string(m_playerId) + "\"}";
 
 	cpr::Response response = cpr::Post(
 		cpr::Url{url},
@@ -60,12 +61,10 @@ bool ApiClient::LeaveLobby(const std::string& lobbyId, unsigned playerId)
 	if (response.error || response.status_code != 200) return false;
 
 	std::string text = response.text;
+	auto json = crow::json::load(response.text);
+	if (!json) return false;
 
-	text.erase(std::remove_if(text.begin(), text.end(), ::isspace), text.end());
-
-	if (text == "OK" || text == "DELETED") return true;
-
-	return false;
+	return json["status"].s() == "LOBBY_DELETED" || json["status"].s() == "PLAYER_LEFT";
 }
 
 std::optional<std::string> ApiClient::GetLobbyState(const std::string& lobbyId)
@@ -112,10 +111,15 @@ void ApiClient::SetUsername(const std::string& username)
 
 void ApiClient::SetPlayerId(unsigned playerId)
 {
-	m_playerId.value() = playerId;
+	m_playerId = playerId;
 }
 
 const std::string& ApiClient::GetUsername() const
 {
 	return m_username;
+}
+
+unsigned ApiClient::GetPlayerId() const
+{
+	return m_playerId;
 }

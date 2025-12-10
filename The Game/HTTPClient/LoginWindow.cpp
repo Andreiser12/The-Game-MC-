@@ -36,6 +36,7 @@ void LoginWindow::CheckLogin(tgui::EditBox::Ptr username)
 		return;
 	}
 	m_apiClient.SetUsername(usernameEntered);
+	m_apiClient.SetPlayerId(json["id"].i());
 	m_isLoggedIn = true;
 }
 

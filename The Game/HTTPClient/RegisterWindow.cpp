@@ -13,7 +13,7 @@ RegisterWindow::RegisterWindow(sf::RenderWindow& window, ApiClient& api)
 void RegisterWindow::UpdateTextSize()
 {
 	const float windowHeight = m_register.getView().getRect().height;
-	m_register.setTextSize(static_cast<unsigned int>(0.07f * windowHeight));
+	m_register.setTextSize(static_cast<unsigned>(0.07f * windowHeight));
 }
 
 void RegisterWindow::GoToLogin()
@@ -49,6 +49,7 @@ void RegisterWindow::CheckRegister(tgui::EditBox::Ptr username)
 		return;
 	}
 	m_apiClient.SetUsername(usernameEntered);
+	m_apiClient.SetPlayerId(json["id"].i());
 	m_isRegistered = true;
 }
 

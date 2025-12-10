@@ -61,9 +61,8 @@ tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 			panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(120));
 			auto hostPanel = HostPanel::Create(gui,
 				apiClient,
-				apiClient.GetUsername(),
 				lobbyId,
-				[](ApiClient& api) { return true; },
+				[lobbyId](ApiClient& api) { return api.LeaveLobby(lobbyId, api.GetPlayerId()); },
 				[]() {}
 			);
 			gui.add(hostPanel);

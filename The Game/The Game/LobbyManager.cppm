@@ -9,7 +9,8 @@ export class LobbyManager
 {
 public:
 	static LobbyManager& Instance();
-	std::shared_ptr<Lobby> CreateLobby(const std::string& lobbyId);
+	std::shared_ptr<Lobby> CreateLobby(const std::string& lobbyId, unsigned hostId,
+		const std::string& hostUsername);
 	std::shared_ptr<Lobby> GetLobby(const std::string& id);
 	bool RemoveLobby(const std::string& id);
 

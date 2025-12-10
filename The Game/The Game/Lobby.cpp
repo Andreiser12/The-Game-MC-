@@ -1,6 +1,12 @@
 module Lobby;
 
-Lobby::Lobby(const std::string& lobbyID) : m_lobbyID(lobbyID) {}
+Lobby::Lobby(const std::string& lobbyId, unsigned hostId, const std::string& username) : 
+	m_lobbyId{lobbyId},
+	m_hostId{hostId}
+{
+	auto hostPlayer = std::make_shared<Player>(hostId, username);
+	m_players.emplace(hostId, hostPlayer);
+}
 
 bool Lobby::AddPlayer(unsigned playerId, std::shared_ptr<Player> player)
 {
@@ -33,7 +39,7 @@ RemoveResult Lobby::RemovePlayer(unsigned playerId)
 
 	if (isHost) 
 	{
-		m_hostId = 0;
+		m_hostId = 0u;
 		return RemoveResult::HostRemoved;
 	}
 	if (m_players.size() < K_MIN_PLAYERS)

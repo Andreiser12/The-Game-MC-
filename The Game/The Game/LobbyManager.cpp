@@ -5,14 +5,15 @@ LobbyManager& LobbyManager::Instance()
 	static LobbyManager instance;
 	return instance;
 }
-std::shared_ptr<Lobby> LobbyManager::CreateLobby(const std::string& lobbyId)
+std::shared_ptr<Lobby> LobbyManager::CreateLobby(const std::string& lobbyId, unsigned hostId,
+	const std::string& hostUsername)
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	if (m_lobbies.contains(lobbyId))
 		return nullptr;
 
-	auto lobby = std::make_shared<Lobby>(lobbyId);
+	auto lobby = std::make_shared<Lobby>(lobbyId, hostId, hostUsername);
 	m_lobbies[lobbyId] = lobby;
 	return lobby;
 }

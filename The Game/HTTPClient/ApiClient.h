@@ -21,6 +21,7 @@ public:
 	void SetPlayerId(unsigned playerId);
 
 	const std::string& GetUsername() const;
+	unsigned GetPlayerId() const;
 
 private:
 	ApiClient() = delete;
@@ -28,6 +29,6 @@ private:
 private:
 	std::string m_serverURL;
 	std::string m_username;
-	std::optional<unsigned> m_playerId;
+	unsigned m_playerId;
 };
 

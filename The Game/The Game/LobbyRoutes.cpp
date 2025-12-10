@@ -52,11 +52,11 @@ void LobbyRoutes::Register(crow::SimpleApp& app)
 
 crow::response LobbyRoutes::CreateLobby(const crow::request& request)
 {
-	auto body = crow::json::load(request.body);
-	if (!body) return crow::response(400, "Invalid JSON");
+	auto json = crow::json::load(request.body);
+	if (!json) return crow::response(400, "Invalid JSON");
 
-	std::string lobbyId = GenerateLobbyId();
-	auto lobby = m_manager.CreateLobby(lobbyId);
+	const std::string lobbyId = GenerateLobbyId();
+	auto lobby = m_manager.CreateLobby(lobbyId, json["playerId"].i(), json["username"].s());
 	if (!lobby) return crow::response(500, "Failed to create lobby!");
 
 	crow::json::wvalue data;
@@ -113,7 +113,6 @@ crow::response LobbyRoutes::LeaveLobby(const crow::request& request)
 	if (result == RemoveResult::HostRemoved)
 	{
 		m_manager.RemoveLobby(lobbyId);
-
 		crow::json::wvalue data;
 		data["status"] = "LOBBY_DELETED";
 		data["message"] = "Host left. Lobby closed.";

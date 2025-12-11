@@ -6,6 +6,7 @@ import <iostream>;
 import <stack>;
 
 using std::uint8_t;
+export using DeckStack = std::stack<Card<uint16_t>>;
 
 export class Deck
 {
@@ -27,7 +28,7 @@ public:
 	Deck() = default;
 	Deck(DeckType deckType, DeckNumber deckNumber);
 
-	const std::stack<Card<uint16_t>>& GetDeck() const;
+	const DeckStack& GetDeck() const;
 	DeckType GetDeckType() const;
 	DeckNumber GetDeckNumber() const;
 	const Card<uint16_t>& GetTopCard() const;
@@ -38,7 +39,7 @@ public:
 	constexpr static unsigned int ASCENDING_START_CARD = 1u;
 	constexpr static unsigned int DESCENDING_START_CARD = 100u;
 private:
-	std::stack<Card<uint16_t>> m_deck;
+	DeckStack m_deck;
 	DeckType m_deckType : 1;
 	DeckNumber m_deckNumber : 1;
 };

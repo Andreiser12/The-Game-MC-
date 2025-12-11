@@ -1,10 +1,7 @@
 module Card;
 
-
-
 template<std::integral Integer>
 Card<Integer>::Card(Integer id) : m_id{ id } {}
-
 
 template<std::integral Integer>
 Integer Card<Integer>::getId() const

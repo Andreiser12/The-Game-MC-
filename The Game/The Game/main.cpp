@@ -6,7 +6,6 @@
 #include <crow.h>
 
 import Table;
-import Menu;
 import UserProfile;
 import DatabaseManager;
 import LobbyRoutes;

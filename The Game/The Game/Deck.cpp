@@ -13,7 +13,7 @@ Deck::Deck(DeckType deckType, DeckNumber deckNumber) :
     }
 }
 
-const std::stack<Card<uint16_t>>& Deck::GetDeck() const
+const DeckStack& Deck::GetDeck() const
 {
     return m_deck;
 }

@@ -33,12 +33,12 @@ public:
 	bool PlayerTurn(Player& player, uint8_t minCards);
 
 	Deck& GetDeck(const Deck::DeckType &type, const Deck::DeckNumber &number);
-	const std::stack<Card<uint16_t>>& GetMainDeck() const;
+	const DeckStack& GetMainDeck() const;
 
 private:
 	uint8_t m_nrPlayers;
 	std::vector<Player> m_Players;
-	std::stack<Card<uint16_t>> m_mainDeck;
+	DeckStack m_mainDeck;
 	Deck m_AscendingDeckFirst;
 	Deck m_AscendingDeckSecond;
 	Deck m_DescendingDeckFirst;

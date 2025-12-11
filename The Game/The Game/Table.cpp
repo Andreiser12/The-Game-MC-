@@ -56,7 +56,7 @@ void Table::SetupPlayers()
 	{
 		const auto& player = players[i];
 		UserProfile profile(player.GetUsername());
-		std::unordered_set<Card<uint16_t>, CardsSetHashFunction<uint16_t>, CardsEqual<uint16_t>> emptyCards;
+		PlayerHand emptyCards;
 		m_Players.push_back(Player(player.GetID(), emptyCards, profile));
 	}
 	uint8_t cardsPerPlayer;
@@ -131,7 +131,7 @@ Deck& Table::GetDeck(const Deck::DeckType& type, const Deck::DeckNumber& number)
 	throw std::out_of_range("Invalid deck type or number.");
 }
 
-const std::stack<Card<uint16_t>>& Table::GetMainDeck() const
+const DeckStack& Table::GetMainDeck() const
 {
 	return m_mainDeck;
 }

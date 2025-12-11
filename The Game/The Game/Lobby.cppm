@@ -5,6 +5,7 @@ import <vector>;
 import <unordered_map>;
 import <atomic>;
 import <mutex>;
+import <chrono>;
 
 import Player;
 
@@ -31,10 +32,15 @@ public:
 	void AddChatMessage(const std::string& username, const std::string& message);
 
 	RemoveResult RemovePlayer(unsigned playerId);
+	void UpdatePlayerPing(unsigned playerId);
+	std::vector<unsigned> GetInactivePlayers(std::chrono::seconds timeout);
+
 	bool IsFull() const;
 	bool HasGameStarted() const;
 	const std::unordered_map<unsigned, std::shared_ptr<Player>>& GetPlayers() const;
 	bool IsPlayerHost(unsigned playerId) const;
+	unsigned GetHostId() const;
+
 	const std::vector<ChatMessage>& GetChatMessages() const;
 
 public:
@@ -46,6 +52,8 @@ private:
 	unsigned m_hostId;	
 
 	std::unordered_map<unsigned, std::shared_ptr<Player>> m_players;
+	std::unordered_map<unsigned, std::chrono::steady_clock::time_point> m_lastPingPlayer;
+
 	std::vector<ChatMessage> m_chatMessages;
 	unsigned m_lastMessageId{ 0 };
 	std::atomic<bool> m_gameStarted{ false };

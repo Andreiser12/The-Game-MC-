@@ -63,6 +63,11 @@ void LobbyRoutes::Register(crow::SimpleApp& app)
 		([this](const crow::request& req, const std::string& lobbyId) {
 		return this->GetNewMessages(req, lobbyId);
 		});
+	
+	CROW_ROUTE(app, "/lobby/ping").methods("POST"_method)
+		([this](const crow::request& req) {
+		return this->PlayerPing(req);
+			});
 }
 
 crow::response LobbyRoutes::CreateLobby(const crow::request& request)
@@ -144,6 +149,8 @@ crow::response LobbyRoutes::GetLobbyState(const std::string& lobbyId)
 	if (!lobby) return crow::response(404, "Lobby not found");
 
 	crow::json::wvalue data;
+
+	data["hostId"] = lobby->GetHostId();
 
 	if (lobby->GetPlayers().size() < Lobby::K_MIN_PLAYERS)
 	{
@@ -271,4 +278,22 @@ crow::response LobbyRoutes::GetNewMessages(const crow::request& request, const s
 	data["messages"] = std::move(messageList);
 
 	return crow::response(200, data);
+}
+
+crow::response LobbyRoutes::PlayerPing(const crow::request& request)
+{
+	auto body = crow::json::load(request.body);
+	if (!body) return crow::response(400, "Invalid JSON");
+
+	const std::string lobbyId = body["lobbyId"].s();
+	const unsigned playerId = body["playerId"].i();
+
+	auto lobby = m_manager.GetLobby(lobbyId);
+	if (!lobby) return crow::response(404, "Lobby not found");
+
+	lobby->UpdatePlayerPing(playerId);
+
+	crow::json::wvalue data;
+	data["status"] = "OK";
+	return crow::response(data);
 }

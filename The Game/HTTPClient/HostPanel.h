@@ -16,7 +16,19 @@ public:
 		std::function<bool(ApiClient&)> onLeave,
 		std::function<void()> onStart);
 
+	static void RefreshPlayersList();
+	static void UpdateStartButton();
+	static void StopUpdateThread();
+	static tgui::ListBox::Ptr GetPlayersListBox() { return playersListBox; }
 private:
+	static tgui::ListBox::Ptr playersListBox;
+	static tgui::Button::Ptr startButton;
+	static std::atomic<bool> s_running;
+	static std::thread s_updateThread;
+	static std::vector<std::string> s_playersBuffer;
+	static std::mutex s_playersMutex;
+	static int s_hostId;
+	static int s_playerId;
 
 };
 

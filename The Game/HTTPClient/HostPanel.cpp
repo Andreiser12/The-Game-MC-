@@ -1,5 +1,14 @@
 #include "HostPanel.h"
 
+tgui::ListBox::Ptr HostPanel::playersListBox = nullptr;
+tgui::Button::Ptr HostPanel::startButton = nullptr;
+std::atomic<bool> HostPanel::s_running{ false };
+std::thread HostPanel::s_updateThread;
+std::vector<std::string> HostPanel::s_playersBuffer;
+std::mutex HostPanel::s_playersMutex;
+int HostPanel::s_hostId = -1;
+int HostPanel::s_playerId = -1;
+
 tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	ApiClient& apiClient,
 	const std::string& lobbyId,
@@ -26,13 +35,20 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	lobbyIdLabel->setTextSize(22);
 
 	auto playersList = apiClient.GetLobbyPlayers(lobbyId);
-	auto playersListBox = tgui::ListBox::create();
+	playersListBox = tgui::ListBox::create();
 	playersListBox->setSize({ "20%", "30%"});
 	playersListBox->setPosition({ "0%", "5%" });
 	playersListBox->getRenderer()->setBackgroundColor(tgui::Color(128, 128, 128));
 	for (const auto& username : playersList)
 	{
 		playersListBox->addItem(username);
+	}
+
+	auto lobbyState = apiClient.GetLobbyState(lobbyId);
+	if (lobbyState)
+	{
+		s_hostId = lobbyState->m_hostId;
+		s_playerId = apiClient.GetPlayerId();
 	}
 
 	auto usernameLabel = tgui::Label::create(apiClient.GetUsername());
@@ -44,6 +60,21 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	usernameLabel->getRenderer()->setOpacity(0.7f);
 	usernameLabel->setTextSize(24);
 	
+	apiClient.StartPingThread(lobbyId, apiClient.GetPlayerId());
+
+	s_running.store(true);
+	s_updateThread = std::thread([&apiClient, lobbyId]() {
+		while (s_running.load())
+		{
+			auto newPlayers = apiClient.GetLobbyPlayers(lobbyId);
+			{
+				std::lock_guard<std::mutex> lock(s_playersMutex);
+				s_playersBuffer = newPlayers;
+			}
+			std::this_thread::sleep_for(std::chrono::seconds(5));
+		}
+		});
+
 	auto leaveButton = tgui::Button::create("Leave Lobby");
 	leaveButton->setSize({ "22.5%", "12.5%" });
 	leaveButton->setPosition({ "27.5%", "80%" });
@@ -51,6 +82,11 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	leaveButton->setTextSize(18);
 	leaveButton->onPress([panel, &apiClient, onLeave]()
 		{
+			apiClient.StopPingThread();
+			StopUpdateThread();
+			playersListBox = nullptr;
+			startButton = nullptr;
+			s_playersBuffer.clear();
 			if (onLeave)
 			{
 				if (onLeave(apiClient))
@@ -60,14 +96,22 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 			}
 		});
 
-	auto startButton = tgui::Button::create("Start Match");
-	startButton->setSize({ "22.5%", "12.5%" });
-	startButton->setPosition({"65%", "80%"});
-	startButton->getRenderer()->setTexture("assets/images/buttons.png");
-	startButton->setTextSize(18);
-	startButton->onPress([]()
-	{
+	auto startButtonLocal = tgui::Button::create("Start Match");
+	startButtonLocal->setSize({ "22.5%", "12.5%" });
+	startButtonLocal->setPosition({"65%", "80%"});
+	startButtonLocal->getRenderer()->setTexture("assets/images/buttons.png");
+	startButtonLocal->setTextSize(18);
+	
+	startButton = startButtonLocal;
 
+	bool isHost = (s_playerId == s_hostId && s_playerId != -1 && s_hostId != -1);
+	bool enoughPlayers = (playersListBox->getItemCount() >= 2);
+	startButton->setVisible(isHost);
+	startButton->setEnabled(isHost && enoughPlayers);
+
+	startButton->onPress([onStart]()
+	{
+			if (onStart) onStart();
 	});
 
 	panel->add(leaveButton);
@@ -78,4 +122,39 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	background->moveToBack();
 
 	return panel;
+}
+
+void HostPanel::RefreshPlayersList()
+{
+	std::vector<std::string> playersCopy;
+	{
+		std::lock_guard<std::mutex> lock(s_playersMutex);
+		playersCopy = s_playersBuffer;
+	}
+
+	if (playersListBox)
+	{
+		playersListBox->removeAllItems();
+		for (const auto& name : playersCopy)
+			playersListBox->addItem(name);
+	}
+}
+
+void HostPanel::UpdateStartButton()
+{
+	if (!startButton || !playersListBox)
+		return;
+
+	bool isHost = (s_playerId == s_hostId);
+	bool enoughPlayers = (playersListBox->getItemCount() >= 2);
+
+	startButton->setVisible(isHost);
+	startButton->setEnabled(isHost && enoughPlayers);
+}
+
+void HostPanel::StopUpdateThread()
+{
+	s_running.store(false);
+	if (s_updateThread.joinable())
+		s_updateThread.join();
 }

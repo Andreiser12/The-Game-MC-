@@ -16,7 +16,10 @@ public:
 		std::function<void()> onBack,
 		std::function<bool(ApiClient&, std::string)> onJoinLobby);
 
+	static void StopUpdateThread();
+
 private:
+	static std::atomic<bool> s_running;
 
 };
 

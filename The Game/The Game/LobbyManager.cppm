@@ -13,6 +13,7 @@ public:
 		const std::string& hostUsername);
 	std::shared_ptr<Lobby> GetLobby(const std::string& id);
 	bool RemoveLobby(const std::string& id);
+	void CleanupInactivePlayers();
 
 private:
 	LobbyManager() = default;

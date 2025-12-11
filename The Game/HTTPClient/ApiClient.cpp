@@ -41,8 +41,18 @@ bool ApiClient::JoinLobby(const std::string& lobbyId,
 	if (response.error || response.status_code != 200) return false;
 
 	auto json = crow::json::load(response.text);
-	if (!json || json["status"].s() != "OK") return false;
-	return true;
+	if (!json) return false;
+
+	if (json.has("lobbyId"))
+		m_lobbyId = json["lobbyId"].s();
+
+	if (json.has("playerId"))
+		m_playerId = json["playerId"].i();
+
+	if (json.has("status") && json["status"].s() == "OK")
+		return true;
+
+	return false;
 }
 
 bool ApiClient::LeaveLobby(const std::string& lobbyId, unsigned playerId)
@@ -64,10 +74,16 @@ bool ApiClient::LeaveLobby(const std::string& lobbyId, unsigned playerId)
 	auto json = crow::json::load(response.text);
 	if (!json) return false;
 
-	return json["status"].s() == "LOBBY_DELETED" || json["status"].s() == "PLAYER_LEFT";
+	bool success = json["status"].s() == "LOBBY_DELETED" || json["status"].s() == "PLAYER_LEFT";
+	if (success)
+	{
+		m_playerId = 0u;
+		m_lobbyId.clear();
+	}
+	return success;
 }
 
-std::optional<std::string> ApiClient::GetLobbyState(const std::string& lobbyId)
+std::optional<LobbyState> ApiClient::GetLobbyState(const std::string& lobbyId)
 {
 	const std::string url = m_serverURL + "/lobby/info/" + lobbyId;
 	cpr::Response response = cpr::Get
@@ -79,7 +95,12 @@ std::optional<std::string> ApiClient::GetLobbyState(const std::string& lobbyId)
 	auto json = crow::json::load(response.text);
 	if (!json) return std::nullopt;
 
-	return json["status"].s();
+	LobbyState state;
+	state.m_status = json["status"].s();
+	state.m_message = json["message"].s();
+	state.m_hostId = json["hostId"].i();
+
+	return state;
 }
 
 bool ApiClient::StartMatch(const std::string& lobbyId, unsigned playerId)
@@ -151,33 +172,76 @@ std::optional<std::vector<ChatMessage>> ApiClient::GetNewMessages(unsigned after
 	return result;
 }
 
+bool ApiClient::SendPing(const std::string& lobbyId, unsigned playerId)
+{
+	const std::string url = m_serverURL + "/lobby/ping";
+	std::string jsonBody = "{\"lobbyId\":\"" + lobbyId + "\",\"playerId\":" + std::to_string(playerId) + "}";
+
+	cpr::Response response = cpr::Post(
+		cpr::Url{ url },
+		cpr::Body{ jsonBody },
+		cpr::Header{ {"Content-Type", "application/json"} }
+	);
+
+	if (response.error || response.status_code != 200)
+		return false;
+
+	auto json = crow::json::load(response.text);
+	if (!json) return false;
+
+	return json["status"].s() == "OK";
+}
+
+void ApiClient::StartPingThread(const std::string& lobbyId, unsigned playerId)
+{
+	m_pingRunning.store(true);
+	m_pingThread = std::thread([this, lobbyId, playerId]() {
+		while (m_pingRunning.load()) {
+			std::this_thread::sleep_for(std::chrono::seconds(5));
+			SendPing(lobbyId, playerId);
+		}
+		});
+	m_pingThread.detach();
+}
+
+void ApiClient::StopPingThread()
+{
+	m_pingRunning.store(false);
+}
+
 void ApiClient::SetUsername(const std::string& username)
 {
+	std::lock_guard<std::mutex> lock(m_mutex);
 	m_username = username;
 }
 
 void ApiClient::SetPlayerId(unsigned playerId)
 {
+	std::lock_guard<std::mutex> lock(m_mutex);
 	m_playerId = playerId;
 }
 
 void ApiClient::SetLobbyId(const std::string& lobbyId)
 {
+	std::lock_guard<std::mutex> lock(m_mutex);
 	m_lobbyId = lobbyId;
 }
 
 const std::string& ApiClient::GetUsername() const
 {
+	std::lock_guard<std::mutex> lock(m_mutex);
 	return m_username;
 }
 
 unsigned ApiClient::GetPlayerId() const
 {
+	std::lock_guard<std::mutex> lock(m_mutex);
 	return m_playerId;
 }
 
 const std::string& ApiClient::GetLobbyId() const
 {
+	std::lock_guard<std::mutex> lock(m_mutex);
 	return m_lobbyId;
 }
 

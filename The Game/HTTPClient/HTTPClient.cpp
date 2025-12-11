@@ -104,6 +104,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 					menuWindow.close();
 				}
 			}
+
+			if (HostPanel::GetPlayersListBox())
+			{
+				HostPanel::RefreshPlayersList();
+				HostPanel::UpdateStartButton();
+			}
+
 			_menu.Draw();
 			menuWindow.display();
 		}

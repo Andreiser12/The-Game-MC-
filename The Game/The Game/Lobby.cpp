@@ -18,6 +18,7 @@ bool Lobby::AddPlayer(unsigned playerId, const std::string& playerUsername)
 
 	auto player = std::make_shared<Player>(playerId, playerUsername);
 	m_players[playerId] = player;
+	m_lastPingPlayer[playerId] = std::chrono::steady_clock::now();
 
 	if (m_players.size() == 1) m_hostId = playerId;
 
@@ -43,6 +44,7 @@ RemoveResult Lobby::RemovePlayer(unsigned playerId)
 	bool isHost = (m_hostId == playerId);
 
 	m_players.erase(it);
+	m_lastPingPlayer.erase(playerId);
 
 	if (isHost) 
 	{
@@ -54,6 +56,30 @@ RemoveResult Lobby::RemovePlayer(unsigned playerId)
 		m_gameStarted.store(false);
 	}
 	return RemoveResult::Removed;
+}
+
+void Lobby::UpdatePlayerPing(unsigned playerId)
+{
+	std::lock_guard<std::mutex> lock(m_mutex);
+	auto iterator = m_lastPingPlayer.find(playerId);
+	if (iterator != m_lastPingPlayer.end())
+	{
+		iterator->second = std::chrono::steady_clock::now();
+	}
+}
+
+std::vector<unsigned> Lobby::GetInactivePlayers(std::chrono::seconds timeout)
+{
+	std::vector<unsigned> inactive;
+	auto now = std::chrono::steady_clock::now();
+
+	std::lock_guard<std::mutex> lock(m_mutex);
+	for (auto& [playerId, lastPing] : m_lastPingPlayer)
+	{
+		if (now - lastPing > timeout)
+			inactive.push_back(playerId);
+	}
+	return inactive;
 }
 
 bool Lobby::IsFull() const
@@ -74,6 +100,11 @@ const std::unordered_map<unsigned, std::shared_ptr<Player>>& Lobby::GetPlayers()
 bool Lobby::IsPlayerHost(unsigned playerId) const
 {
 	return m_hostId == playerId;
+}
+
+unsigned Lobby::GetHostId() const
+{
+	return m_hostId;
 }
 
 const std::vector<ChatMessage>& Lobby::GetChatMessages() const

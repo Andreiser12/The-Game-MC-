@@ -1,5 +1,7 @@
 #include "JoinPanel.h"
 
+std::atomic<bool> JoinPanel::s_running{ false };
+
 tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 	ApiClient& apiClient,
 	std::function<void()> onBack,
@@ -36,13 +38,18 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 	joinLobbyButton->setTextSize(22);
 	joinLobbyButton->onPress([&gui, onJoinLobby, &apiClient, lobbyEditBox, panel]()
 		{
+			std::string lobbyId = lobbyEditBox->getText().toStdString();
 			if (onJoinLobby)
 			{
-				if (onJoinLobby(apiClient, lobbyEditBox->getText().toStdString()))
+				if (onJoinLobby(apiClient, lobbyId))
 				{
 					panel->setVisible(false);
+					apiClient.StartPingThread(lobbyId, apiClient.GetPlayerId());
+
+					s_running.store(true);
 				}
 			}
+
 		});
 
 	auto backButton = tgui::Button::create("Back");
@@ -50,8 +57,9 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 	backButton->setPosition({ "10%", "70%" });
 	backButton->getRenderer()->setTexture("assets/images/buttons.png");
 	backButton->setTextSize(22);
-	backButton->onPress([panel, onBack]()
+	backButton->onPress([&apiClient, panel, onBack]()
 		{
+			apiClient.StopPingThread();
 			panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(150));
 			if (onBack)
 			{
@@ -65,4 +73,8 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 	panel->add(joinLobbyButton);
 
 	return panel;
+}
+void JoinPanel::StopUpdateThread()
+{
+	s_running.store(false);
 }

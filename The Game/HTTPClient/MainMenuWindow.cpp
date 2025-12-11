@@ -50,6 +50,7 @@ MainMenuWindow::MainMenuWindow(sf::RenderWindow& window, ApiClient& api) :
 
 void MainMenuWindow::LoadWidgets()
 {
+
 	auto playButton = tgui::Button::create();
 	auto profileButton = tgui::Button::create();
 	auto settingsButton = tgui::Button::create();
@@ -98,6 +99,9 @@ void MainMenuWindow::LoadWidgets()
 
 	m_mainMenu.add(exitButton);
 	exitButton->onClick([this] {ExitButtonPressed(); });
+
+	//auto gamePanel = GamePanel::Create(m_mainMenu, m_apiClient);
+	//m_mainMenu.add(gamePanel);
 }
 
 void MainMenuWindow::Draw()

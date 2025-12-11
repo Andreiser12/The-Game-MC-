@@ -10,6 +10,7 @@
 #include "PlayPanel.h"
 #include "IWindow.h"
 #include "ApiClient.h"
+#include "GamePanel.h"
 
 #include <iostream>
 #include <vector>

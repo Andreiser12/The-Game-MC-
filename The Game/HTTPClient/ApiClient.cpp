@@ -85,7 +85,7 @@ std::optional<std::string> ApiClient::GetLobbyState(const std::string& lobbyId)
 bool ApiClient::StartMatch(const std::string& lobbyId, unsigned playerId)
 {
 	const std::string url = m_serverURL + "/lobby/start";
-	std::string jsonBody =
+	const std::string jsonBody =
 		"{\"lobbyId\":\"" + lobbyId +
 		"\",\"playerId\":" + std::to_string(playerId) +
 		"}";
@@ -102,6 +102,53 @@ bool ApiClient::StartMatch(const std::string& lobbyId, unsigned playerId)
 		std::remove_if(matchStart.begin(), matchStart.end(), ::isspace), matchStart.end());
 
 	return matchStart == "STARTED";
+}
+
+bool ApiClient::SendChatMessage(const std::string& message)
+{
+	const std::string url = m_serverURL + "/lobby/chat/send";
+	const std::string jsonBody =
+		"{"
+		"\"lobbyId\": \"" + m_lobbyId + "\","
+		"\"username\": \"" + m_username + "\","
+		"\"playerId\": " + std::to_string(m_playerId) + ","
+		"\"message\": \"" + message + "\""
+		"}";
+
+	cpr::Response response = cpr::Post(
+		cpr::Url{ url },
+		cpr::Body{ jsonBody },
+		cpr::Header{ {"Content-Type", "application/json"} });
+
+	if (response.error || response.status_code != 200) return false;
+
+	return true;
+}
+
+std::optional<std::vector<ChatMessage>> ApiClient::GetNewMessages(unsigned afterId)
+{
+	const std::string url = m_serverURL + "/lobby/" + m_lobbyId
+		+ "/chat/messages?after=" + std::to_string(afterId);
+	cpr::Response response = cpr::Get(
+		cpr::Url{ url },
+		cpr::Header{ {"Content-Type", "application/json"} }
+	);
+
+	if (response.error || response.status_code != 200) return std::nullopt;
+
+	auto json = crow::json::load(response.text);
+	if (!json) return std::nullopt;
+
+	std::vector<ChatMessage> result;
+	auto messagesJson = json["messages"];
+	for (const auto& messageJson : messagesJson)
+	{
+		result.emplace_back(
+			messageJson["id"].i(),
+			messageJson["username"].s(),
+			messageJson["message"].s());
+	}
+	return result;
 }
 
 void ApiClient::SetUsername(const std::string& username)

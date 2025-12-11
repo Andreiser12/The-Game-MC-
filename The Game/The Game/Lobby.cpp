@@ -27,6 +27,12 @@ bool Lobby::AddPlayer(unsigned playerId, const std::string& playerUsername)
 	return true;
 }
 
+void Lobby::AddChatMessage(const std::string& username, const std::string& message)
+{
+	std::lock_guard<std::mutex> lock(m_mutex);
+	m_chatMessages.push_back({ ++m_lastMessageId, username, message });
+}
+
 RemoveResult Lobby::RemovePlayer(unsigned playerId)
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
@@ -68,5 +74,10 @@ const std::unordered_map<unsigned, std::shared_ptr<Player>>& Lobby::GetPlayers()
 bool Lobby::IsPlayerHost(unsigned playerId) const
 {
 	return m_hostId == playerId;
+}
+
+const std::vector<ChatMessage>& Lobby::GetChatMessages() const
+{
+	return m_chatMessages;
 }
 

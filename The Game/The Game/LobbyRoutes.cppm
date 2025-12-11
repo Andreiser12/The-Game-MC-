@@ -24,6 +24,8 @@ private:
 	crow::response GetLobbyState(const std::string& lobbyId);
 	crow::response StartMatch(const crow::request& request);
 	crow::response FetchLobbyPlayers(const std::string& lobbyId);
+	crow::response SendChatMessage(const crow::request& request);
+	crow::response GetNewMessages(const crow::request& request, const std::string& lobbyId);
 
 private:
 	LobbyManager& m_manager;

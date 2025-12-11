@@ -6,6 +6,16 @@
 #include <vector>
 #include <optional>
 
+struct ChatMessage
+{
+	unsigned id;
+	std::string username;
+	std::string message;
+
+	ChatMessage(unsigned i, std::string u, std::string m) : 
+		id(i), username(std::move(u)), message(std::move(m)) {}
+};
+
 class ApiClient
 {
 public:
@@ -17,6 +27,8 @@ public:
 	std::optional<std::string> GetLobbyState(const std::string& lobbyId);
 
 	bool StartMatch(const std::string& lobbyId, unsigned playerId);
+	bool SendChatMessage(const std::string& message);
+	std::optional<std::vector<ChatMessage>> GetNewMessages(unsigned afterId);
 
 	void SetUsername(const std::string& username);
 	void SetPlayerId(unsigned playerId);
@@ -26,6 +38,7 @@ public:
 	unsigned GetPlayerId() const;
 	const std::string& GetLobbyId() const;
 	std::vector<std::string> GetLobbyPlayers(const std::string& lobbyId) const;
+
 
 private:
 	ApiClient() = delete;

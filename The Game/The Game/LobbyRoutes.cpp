@@ -50,10 +50,19 @@ void LobbyRoutes::Register(crow::SimpleApp& app)
 		});
 
 	CROW_ROUTE(app, "/lobby/<string>/players").methods("GET"_method)
-		([&](const std::string& lobbyId)
-			{
+		([&](const std::string& lobbyId) {
 			return this->FetchLobbyPlayers(lobbyId);
-			});
+		});
+	
+	CROW_ROUTE(app, "/lobby/chat/send").methods("POST"_method)
+		([this](const crow::request& req) {
+			return this->SendChatMessage(req);
+		});
+
+	CROW_ROUTE(app, "/lobby/<string>/chat/messages").methods("GET"_method)
+		([this](const crow::request& req, const std::string& lobbyId) {
+		return this->GetNewMessages(req, lobbyId);
+		});
 }
 
 crow::response LobbyRoutes::CreateLobby(const crow::request& request)
@@ -213,6 +222,53 @@ crow::response LobbyRoutes::FetchLobbyPlayers(const std::string& lobbyId)
 		playersList.push_back(player->GetUsername());
 	}
 	data["players"] = std::move(playersList);
+
+	return crow::response(200, data);
+}
+crow::response LobbyRoutes::SendChatMessage(const crow::request& req)
+{
+	auto json = crow::json::load(req.body);
+	if (!json) return crow::response(400, "Invalid JSON");
+
+	const std::string lobbyId = json["lobbyId"].s();
+	const std::string username = json["username"].s();
+	const unsigned playerId = json["playerId"].i();
+	const std::string message = json["message"].s();
+
+	auto lobby = m_manager.GetLobby(lobbyId);
+	if (!lobby) return crow::response(404, "Lobby not found");
+
+	lobby->AddChatMessage(username, message);
+	
+	crow::json::wvalue data;
+	data["status"] = "OK";
+	return crow::response(200, data);
+}
+
+crow::response LobbyRoutes::GetNewMessages(const crow::request& request, const std::string& lobbyId)
+{
+	auto afterString = request.url_params.get("after");
+	unsigned afterId = 0;
+	if (afterString) afterId = std::stoul(afterString);
+	
+	auto lobby = m_manager.GetLobby(lobbyId);
+	if (!lobby) return crow::response(404, "Lobby not found");
+
+	crow::json::wvalue data;
+	crow::json::wvalue::list messageList;
+	const auto& messages = lobby->GetChatMessages();
+	for (const auto& chatMessage : messages)
+	{
+		if (chatMessage.id > afterId)
+		{
+			crow::json::wvalue messageJson;
+			messageJson["id"] = chatMessage.id;
+			messageJson["username"] = chatMessage.username;
+			messageJson["message"] = chatMessage.message;
+			messageList.push_back(messageJson);
+		}
+	}
+	data["messages"] = std::move(messageList);
 
 	return crow::response(200, data);
 }

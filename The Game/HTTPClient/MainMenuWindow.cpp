@@ -100,8 +100,8 @@ void MainMenuWindow::LoadWidgets()
 	m_mainMenu.add(exitButton);
 	exitButton->onClick([this] {ExitButtonPressed(); });
 
-	//auto gamePanel = GamePanel::Create(m_mainMenu, m_apiClient);
-	//m_mainMenu.add(gamePanel);
+	auto gamePanel = GamePanel::Create(m_mainMenu, m_apiClient);
+	m_mainMenu.add(gamePanel);
 }
 
 void MainMenuWindow::Draw()

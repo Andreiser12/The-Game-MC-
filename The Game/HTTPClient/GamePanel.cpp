@@ -1,5 +1,12 @@
 ﻿#include "GamePanel.h"
 
+GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api) :
+    m_apiClient{api}
+{
+    auto gamePanel = Create(gui, api);
+    gui.add(gamePanel);
+}
+
 tgui::Group::Ptr GamePanel::Create(tgui::Gui& gui, ApiClient& apiClient)
 {
     auto group = tgui::Group::create({ "100%", "100%" });
@@ -59,13 +66,17 @@ tgui::Group::Ptr GamePanel::Create(tgui::Gui& gui, ApiClient& apiClient)
         {
             chatEditBox->setDefaultText("Message...");
         });
-    chatEditBox->onReturnKeyPress([chatEditBox, gameChat]()
+    chatEditBox->onReturnKeyPress([chatEditBox, gameChat, &apiClient]()
         {
             const std::string messageSent = chatEditBox->getText().toStdString();
             if (messageSent.size())
             {
-                gameChat->addLine(messageSent);
-                chatEditBox->setText("");
+                if (apiClient.SendChatMessage(messageSent))
+                {
+
+                    //gameChat->addLine(messageSent);
+                    chatEditBox->setText("");
+                }
             }
         });
     chatGroup->add(chatEditBox);
@@ -74,12 +85,12 @@ tgui::Group::Ptr GamePanel::Create(tgui::Gui& gui, ApiClient& apiClient)
     sendButton->setSize({ "5%", "5%" });
     sendButton->setPosition({"22.5%", "25%"});
     sendButton->setTextSize(25);
-    sendButton->onPress([chatEditBox, gameChat]()
+    sendButton->onPress([chatEditBox, gameChat, &apiClient]()
         {
             const std::string messageSent = chatEditBox->getText().toStdString();
-            if (messageSent.size())
+            if (apiClient.SendChatMessage(messageSent))
             {
-                gameChat->addLine(messageSent);
+                //gameChat->addLine(messageSent);
                 chatEditBox->setText("");
             }
         });
@@ -105,4 +116,14 @@ tgui::Group::Ptr GamePanel::Create(tgui::Gui& gui, ApiClient& apiClient)
     gamePanel->add(toggleChatButton);
 
     return group;
+}
+
+
+
+void GamePanel::Update()
+{
+    /*if (m_chatClock.getElapsedTime().asMilliseconds() > 200)
+    {
+        auto newMessages = 
+    }*/
 }

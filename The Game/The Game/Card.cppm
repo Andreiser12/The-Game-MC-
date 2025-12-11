@@ -1,46 +1,46 @@
 export module Card;
 
 import <iostream>;
+import <concepts>;
+import <cstdint>;
+import <functional>; 
 
-export class Card
+export template<std::integral Integer>
+class Card
 {
-public:
-	enum class Color : uint8_t
-	{
-		Gray,
-		Blue
-	};
-
-protected:
-	uint16_t m_id;
-	Color m_color;
-
 public:
 	Card() = default;
-	Card(uint16_t id, Color color = Color::Gray);
+	Card(Integer id);
 
-	uint16_t getId() const;
-	Color getColor() const;
+	Integer getId() const;
 
-	bool operator == (const Card& other) const;
-	friend std::ostream& operator<<(std::ostream& out, const Card& card);
+	bool operator == (const Card<Integer>& other) const;
+
+	template<std::integral I>
+	friend std::ostream& operator<<(std::ostream& out, const Card<I>& card);
+
+protected:
+	Integer m_id{};
+
 };
 
-export struct CardsSetHashFunction
+export template<std::integral Integer>
+struct CardsSetHashFunction
 {
-	std::size_t operator()(const Card& card) const noexcept
+	std::size_t operator()(const Card<Integer>& card) const noexcept
 	{
-		std::size_t h1 = std::hash<uint16_t>()(card.getId());
-		std::size_t h2 = std::hash<uint8_t>()(static_cast<uint8_t>(card.getColor()));
-		return h1 ^ (h2 << 1);
+		std::size_t hash = std::hash<Integer>()(card.getId());
+		return hash;
 	}
 };
 
-export struct CardsEqual
+
+export template<std::integral Integer>
+struct CardsEqual
 {
-	bool operator()(const Card& c1, const Card& c2) const
+	bool operator()(const Card<Integer>& c1, const Card<Integer>& c2) const
 	{
-		return c1.getId() == c2.getId() && c1.getColor() == c2.getColor();
+		return c1.getId() == c2.getId();
 	}
 };
 

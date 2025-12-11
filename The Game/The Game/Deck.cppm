@@ -27,18 +27,18 @@ public:
 	Deck() = default;
 	Deck(DeckType deckType, DeckNumber deckNumber);
 
-	const std::stack<Card>& GetDeck() const;
+	const std::stack<Card<uint16_t>>& GetDeck() const;
 	DeckType GetDeckType() const;
 	DeckNumber GetDeckNumber() const;
-	const Card& GetTopCard() const;
+	const Card<uint16_t>& GetTopCard() const;
 
-	void PushCard(const Card& card);
+	void PushCard(const Card<uint16_t>& card);
 
 public:
 	constexpr static unsigned int ASCENDING_START_CARD = 1u;
 	constexpr static unsigned int DESCENDING_START_CARD = 100u;
 private:
-	std::stack<Card> m_deck;
+	std::stack<Card<uint16_t>> m_deck;
 	DeckType m_deckType : 1;
 	DeckNumber m_deckNumber : 1;
 };

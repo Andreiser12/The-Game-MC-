@@ -34,7 +34,7 @@ bool Table::isDeckEmpty() const
 
 void Table::Shuffle()
 {
-	std::vector<Card> copyCards;
+	std::vector<Card<uint16_t>> copyCards;
 	copyCards.reserve(98);
 
 	for (uint16_t i = 2u; i <= 99u; ++i)
@@ -56,7 +56,7 @@ void Table::SetupPlayers()
 	{
 		const auto& player = players[i];
 		UserProfile profile(player.GetUsername());
-		std::unordered_set<Card, CardsSetHashFunction, CardsEqual> emptyCards;
+		std::unordered_set<Card<uint16_t>, CardsSetHashFunction<uint16_t>, CardsEqual<uint16_t>> emptyCards;
 		m_Players.push_back(Player(player.GetID(), emptyCards, profile));
 	}
 	uint8_t cardsPerPlayer;
@@ -80,7 +80,7 @@ void Table::SetupPlayers()
 	}
 }
 
-bool Table::BackwardsTrick(const Deck& deck, const Card& card) const
+bool Table::BackwardsTrick(const Deck& deck, const Card<uint16_t>& card) const
 {
 	const unsigned cardValue = card.getId();
 	const unsigned topCardValue = deck.GetTopCard().getId();
@@ -96,7 +96,7 @@ bool Table::BackwardsTrick(const Deck& deck, const Card& card) const
 	}
 }
 
-bool Table::CheckCard(const Deck& deck, const Card& card) const
+bool Table::CheckCard(const Deck& deck, const Card<uint16_t>& card) const
 {
 	const unsigned cardValue = card.getId();
 	const unsigned topCardValue = deck.GetTopCard().getId();
@@ -131,7 +131,7 @@ Deck& Table::GetDeck(const Deck::DeckType& type, const Deck::DeckNumber& number)
 	throw std::out_of_range("Invalid deck type or number.");
 }
 
-const std::stack<Card>& Table::GetMainDeck() const
+const std::stack<Card<uint16_t>>& Table::GetMainDeck() const
 {
 	return m_mainDeck;
 }
@@ -215,7 +215,7 @@ bool Table::CanPlayerPlayMinCards(const Player& player, uint8_t minCards)
 	if (player.GetCardsCount() < minCards)
 		return false;
 	uint8_t validCardsCount = 0;
-	for (const Card& card : player.GetCards())
+	for (const Card<uint16_t>& card : player.GetCards())
 	{
 		if (CheckCard(m_AscendingDeckFirst, card) ||
 			CheckCard(m_AscendingDeckSecond, card) ||
@@ -230,7 +230,7 @@ bool Table::CanPlayerPlayMinCards(const Player& player, uint8_t minCards)
 	return false;
 }
 
-void Table::PlaceCardOnDeck(Deck& deck, const Card& card)
+void Table::PlaceCardOnDeck(Deck& deck, const Card<uint16_t>& card)
 {
 	deck.PushCard(card);
 	std::cout << " [Card " << card.getId() << " placed on deck]\n";

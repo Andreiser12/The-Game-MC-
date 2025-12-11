@@ -13,7 +13,7 @@ Deck::Deck(DeckType deckType, DeckNumber deckNumber) :
     }
 }
 
-const std::stack<Card>& Deck::GetDeck() const
+const std::stack<Card<uint16_t>>& Deck::GetDeck() const
 {
     return m_deck;
 }
@@ -28,12 +28,12 @@ Deck::DeckNumber Deck::GetDeckNumber() const
     return m_deckNumber;
 }
 
-const Card& Deck::GetTopCard() const
+const Card<uint16_t>& Deck::GetTopCard() const
 {
     return m_deck.top();
 }
 
-void Deck::PushCard(const Card& card)
+void Deck::PushCard(const Card<uint16_t>& card)
 {
     m_deck.push(card);
 }

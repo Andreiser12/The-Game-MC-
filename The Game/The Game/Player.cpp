@@ -5,8 +5,8 @@ constexpr static uint8_t MINIMUM_CARDS{ 2u };
 Player::Player(unsigned playerID, const std::string& name) :
 	m_playerID{playerID}, m_username{name} {}
 
-Player::Player(unsigned playerID, const std::unordered_set<Card, CardsSetHashFunction,
-	CardsEqual>& cards, const UserProfile& userprofile) :
+Player::Player(unsigned playerID, const std::unordered_set<Card<uint16_t>, CardsSetHashFunction<uint16_t>,
+	CardsEqual<uint16_t>>& cards, const UserProfile& userprofile) :
 	m_playerID{ playerID }, m_cards { cards }, m_userprofile{ userprofile }  {}
 
 Player::~Player() {}
@@ -42,18 +42,18 @@ void Player::PlaceCards(Deck& chosenDeck)
 
 void Player::PrintCards() const
 {
-	for (const Card& card : m_cards)
+	for (const Card<uint16_t>& card : m_cards)
 	{
 		std::cout << card;
 	}
 	std::cout << std::endl;
 }
 
-void Player::DrawCards(std::stack<Card>& deck)
+void Player::DrawCards(std::stack<Card<uint16_t>>& deck)
 {
 	while (!deck.empty() && m_cardsPlacedRound)
 	{
-		Card card = deck.top();
+		Card<uint16_t> card = deck.top();
 		deck.pop();
 		m_cards.emplace(card);
 		--m_cardsPlacedRound;
@@ -62,13 +62,13 @@ void Player::DrawCards(std::stack<Card>& deck)
 
 bool Player::FindCard(uint16_t cardId) const
 {
-	Card cardToFind = Card(cardId);
+	Card<uint16_t> cardToFind = Card(cardId);
 	return m_cards.find(cardToFind) != m_cards.end();
 }
 
 void Player::RemoveCard(uint16_t cardId)
 {
-	Card cardToDelete(cardId);
+	Card<uint16_t> cardToDelete(cardId);
 	m_cards.erase(cardToDelete);
 }
 
@@ -80,9 +80,9 @@ inline const bool Player::IsCardValid(const Deck& chosenDeck, uint16_t cardID)
 			&& cardID < chosenDeck.GetTopCard().getId());
 }
 
-void Player::SetupCards(std::stack<Card>& deck, uint8_t cardsCount)
+void Player::SetupCards(std::stack<Card<uint16_t>>& deck, uint8_t cardsCount)
 {
-	Card cardToPlace;
+	Card<uint16_t> cardToPlace;
 	for (uint8_t i = 0; i < cardsCount; i++)
 	{
 		cardToPlace = deck.top();
@@ -91,8 +91,8 @@ void Player::SetupCards(std::stack<Card>& deck, uint8_t cardsCount)
 	}
 }
 
-void Player::SetCards(const std::unordered_set<Card, CardsSetHashFunction,
-	CardsEqual>& cards)
+void Player::SetCards(const std::unordered_set<Card<uint16_t>, CardsSetHashFunction<uint16_t>,
+	CardsEqual<uint16_t>>& cards)
 {
 	m_cards = cards;
 }
@@ -107,8 +107,8 @@ const std::string& Player::GetUsername() const
 	return m_username;
 }
 
-const std::unordered_set<Card, CardsSetHashFunction,
-	CardsEqual>& Player::GetCards() const
+const std::unordered_set<Card<uint16_t>, CardsSetHashFunction<uint16_t>,
+	CardsEqual<uint16_t>>& Player::GetCards() const
 {
 	return m_cards;
 }

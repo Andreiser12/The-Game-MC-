@@ -1,24 +1,30 @@
 module Card;
 
-Card::Card(uint16_t id, Color color) : m_id(id), m_color(color) {}
 
-uint16_t Card::getId() const
+
+template<std::integral Integer>
+Card<Integer>::Card(Integer id) : m_id{ id } {}
+
+
+template<std::integral Integer>
+Integer Card<Integer>::getId() const
 {
 	return m_id;
 }
 
-Card::Color Card::getColor() const
-{
-	return m_color;
-}
-
-std::ostream& operator<<(std::ostream& out, const Card& card)
+template <std::integral I>
+std::ostream& operator<<(std::ostream& out, const Card<I>& card)
 {
 	out << card.getId() << std::endl;
 	return out;
 }
 
-bool Card::operator == (const Card& other) const
+template<std::integral Integer>
+bool Card<Integer>::operator == (const Card<Integer>& other) const
 {
-	return m_id == other.getId() && m_color == other.getColor();
+	return m_id == other.getId();
 }
+
+template class Card<std::uint16_t>;
+template std::ostream& operator<<(std::ostream&, const Card<std::uint16_t>&);
+template bool Card<std::uint16_t>::operator==(const Card<std::uint16_t>&) const;

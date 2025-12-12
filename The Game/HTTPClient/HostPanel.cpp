@@ -1,5 +1,6 @@
 #include "HostPanel.h"
 
+static constexpr uint8_t kMinPlayers{ 2u };
 tgui::ListBox::Ptr HostPanel::playersListBox = nullptr;
 tgui::Button::Ptr HostPanel::startButton = nullptr;
 std::atomic<bool> HostPanel::s_running{ false };
@@ -105,7 +106,7 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	startButton = startButtonLocal;
 
 	bool isHost = (s_playerId == s_hostId && s_playerId != -1 && s_hostId != -1);
-	bool enoughPlayers = (playersListBox->getItemCount() >= 2);
+	bool enoughPlayers = (playersListBox->getItemCount() >= kMinPlayers);
 	startButton->setVisible(isHost);
 	startButton->setEnabled(isHost && enoughPlayers);
 
@@ -149,7 +150,7 @@ void HostPanel::UpdateStartButton()
 		return;
 
 	bool isHost = (s_playerId == s_hostId);
-	bool enoughPlayers = (playersListBox->getItemCount() >= 2u);
+	bool enoughPlayers = (playersListBox->getItemCount() >= kMinPlayers);
 
 	startButton->setVisible(isHost);
 	startButton->setEnabled(isHost && enoughPlayers);

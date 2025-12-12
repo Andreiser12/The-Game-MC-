@@ -7,8 +7,8 @@
 #include <cpr/cpr.h>
 #include <crow.h>
 
-constexpr static int LOGIN_WIDTH{ 640 };
-constexpr static int LOGIN_HEIGHT{ 480 };
+constexpr static unsigned LOGIN_WIDTH{ 640u };
+constexpr static unsigned LOGIN_HEIGHT{ 480u };
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,

@@ -28,7 +28,29 @@ bool Lobby::AddPlayer(unsigned playerId, const std::string& playerUsername)
 void Lobby::AddChatMessage(const std::string& username, const std::string& message)
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
-	m_chatMessages.push_back({ ++m_lastMessageId, username, message });
+	m_chatBuffer.push_back({
+		++m_lastMessageId,
+		username,
+		message
+		});
+
+	if (m_chatBuffer.size() > kMaxChatMessages)
+	{
+		m_chatBuffer.pop_front();
+	}
+}
+
+std::optional<std::vector<ChatMessage>> Lobby::GetMessagesAfter(unsigned afterId) const
+{
+	std::lock_guard<std::mutex> lock(m_mutex);
+	std::vector<ChatMessage> out;
+	out.reserve(kMaxChatMessages);
+	for (const auto& message : m_chatBuffer)
+	{
+		if (message.id > afterId) out.push_back(message);
+	}
+	if (out.empty()) return std::nullopt;
+	return std::make_optional(out);
 }
 
 RemoveResult Lobby::RemovePlayer(unsigned playerId)
@@ -48,7 +70,7 @@ RemoveResult Lobby::RemovePlayer(unsigned playerId)
 		m_hostId = 0u;
 		return RemoveResult::HostRemoved;
 	}
-	if (m_players.size() < K_MIN_PLAYERS)
+	if (m_players.size() < kMinPlayers)
 	{
 		m_gameStarted.store(false);
 	}
@@ -81,7 +103,7 @@ std::vector<unsigned> Lobby::GetInactivePlayers(std::chrono::seconds timeout)
 
 bool Lobby::IsFull() const
 {
-	return m_players.size() == K_MAX_PLAYERS;
+	return m_players.size() == kMaxPlayers;
 }
 
 bool Lobby::StartGame(unsigned playerId)
@@ -91,7 +113,7 @@ bool Lobby::StartGame(unsigned playerId)
 
 	if (playerId != m_hostId) return false;
 
-	if (m_players.size() < K_MIN_PLAYERS) return false;
+	if (m_players.size() < kMinPlayers) return false;
 
 	m_gameStarted.store(true);
 	return true;
@@ -116,9 +138,3 @@ unsigned Lobby::GetHostId() const
 {
 	return m_hostId;
 }
-
-const std::vector<ChatMessage>& Lobby::GetChatMessages() const
-{
-	return m_chatMessages;
-}
-

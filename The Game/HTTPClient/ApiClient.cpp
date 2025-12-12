@@ -148,28 +148,39 @@ bool ApiClient::SendChatMessage(const std::string& message)
 
 std::optional<std::vector<ChatMessage>> ApiClient::GetNewMessages(unsigned afterId)
 {
+	static std::chrono::steady_clock::time_point lastRequest;
+	static std::optional < std::vector<ChatMessage>> cachedMessages;
+
+	auto now = std::chrono::steady_clock::now();
+
+	if (now - lastRequest < std::chrono::milliseconds(50) && cachedMessages) return cachedMessages;
+
 	const std::string url = m_serverURL + "/lobby/" + m_lobbyId
 		+ "/chat/messages?after=" + std::to_string(afterId);
 	cpr::Response response = cpr::Get(
 		cpr::Url{ url },
-		cpr::Header{ {"Content-Type", "application/json"} }
+		cpr::Header{ {"Content-Type", "application/json"} },
+		cpr::Timeout{ 500 }
 	);
 
 	if (response.error || response.status_code != 200) return std::nullopt;
 
 	auto json = crow::json::load(response.text);
-	if (!json) return std::nullopt;
+	if (!json || !json.has("messages")) return std::nullopt;
 
 	std::vector<ChatMessage> result;
 	auto messagesJson = json["messages"];
-	for (const auto& messageJson : messagesJson)
+	for (const auto& message : messagesJson)
 	{
 		result.emplace_back(
-			messageJson["id"].i(),
-			messageJson["username"].s(),
-			messageJson["message"].s());
+			message["id"].i(),
+			message["username"].s(),
+			message["message"].s());
 	}
-	return result;
+
+	lastRequest = now;
+	cachedMessages = result.empty() ? std::nullopt : std::make_optional(result);
+	return cachedMessages;
 }
 
 bool ApiClient::SendPing(const std::string& lobbyId, unsigned playerId)
@@ -256,7 +267,7 @@ std::vector<std::string> ApiClient::GetLobbyPlayers(const std::string& lobbyId) 
 	auto json = crow::json::load(response.text);
 	if (!json) return players;
 
-	for (auto& p : json["players"])
+	for (const auto& p : json["players"])
 	{
 		players.push_back(p.s());
 	}

@@ -2,6 +2,7 @@ export module Lobby;
 
 import <stdint.h>;
 import <vector>;
+import <deque>;
 import <unordered_map>;
 import <atomic>;
 import <mutex>;
@@ -29,6 +30,7 @@ public:
 	explicit Lobby(const std::string& lobbyId, unsigned hostId, const std::string& username);
 	bool AddPlayer(unsigned playerId, const std::string& playerUsername);
 	void AddChatMessage(const std::string& username, const std::string& message);
+	std::optional<std::vector<ChatMessage>> GetMessagesAfter(unsigned afterId) const;
 
 	RemoveResult RemovePlayer(unsigned playerId);
 	void UpdatePlayerPing(unsigned playerId);
@@ -41,24 +43,22 @@ public:
 	bool IsPlayerHost(unsigned playerId) const;
 	unsigned GetHostId() const;
 
-	const std::vector<ChatMessage>& GetChatMessages() const;
-
 private:
 	Lobby() = delete;
 
 public:
-	static constexpr uint8_t K_MIN_PLAYERS{ 2u };
-	static constexpr uint8_t K_MAX_PLAYERS{ 5u };
+	inline static constexpr size_t kMaxChatMessages{ 200 };
+	inline static constexpr uint8_t kMinPlayers{ 2u };
+	inline static constexpr uint8_t kMaxPlayers{ 5u };
 
 private:
 	std::string m_lobbyId;
-	unsigned m_hostId;	
+	unsigned m_hostId;
 
 	std::unordered_map<unsigned, std::shared_ptr<Player>> m_players;
 	std::unordered_map<unsigned, std::chrono::steady_clock::time_point> m_lastPingPlayer;
-
-	std::vector<ChatMessage> m_chatMessages;
 	unsigned m_lastMessageId{ 0u };
+	std::deque<ChatMessage> m_chatBuffer;
 	std::atomic<bool> m_gameStarted{ false };
-	std::mutex m_mutex;
+	mutable std::mutex m_mutex;
 };

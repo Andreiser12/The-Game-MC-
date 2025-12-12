@@ -64,12 +64,19 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api) :
 	chatEditBox->onReturnKeyPress([this, chatEditBox]()
 		{
 			const std::string messageSent = chatEditBox->getText().toStdString();
-			if (messageSent.size())
-			{
-				m_apiClient.SendChatMessage(messageSent);
-				chatEditBox->setText("");
-			}
+			if (messageSent.empty() || messageSent.size() > 500) return;
+
+			std::thread([this, messageSent]()
+				{
+					if (!m_apiClient.SendChatMessage(messageSent))
+					{
+						m_chat->addLine("(ERROR) Failed to send message", tgui::Color::Red);
+					}
+				}).detach();
+
+			chatEditBox->setText("");
 		});
+		
 	chatGroup->add(chatEditBox);
 
 	auto sendButton = tgui::Button::create("Send");
@@ -109,15 +116,44 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api) :
 
 void GamePanel::Update()
 {
-	if (m_chatClock.getElapsedTime().asMilliseconds() < 200) return;
+	if (m_chatClock.getElapsedTime().asMilliseconds() < 50) return;
 
 	m_chatClock.restart();
-	const auto newMessages = m_apiClient.GetNewMessages(m_lastMessageId);
-	if (!newMessages) return;
 
-	for (const auto& newMessage : *newMessages)
+	const auto& newMessages = m_apiClient.GetNewMessages(m_lastMessageId);
+	if (!newMessages || newMessages->empty()) return;
+
+	for (const auto& newMessage : newMessages.value())
 	{
 		m_chat->addLine(newMessage.username + ": " + newMessage.message);
-		m_lastMessageId = newMessage.id;
+		m_lastMessageId = std::max(newMessage.id, m_lastMessageId);
 	}
+
+}
+
+void GamePanel::SetupPlayerSlots()
+{
+	const auto& playerUsernames = m_apiClient.GetLobbyPlayers(m_apiClient.GetLobbyId());
+	const auto slots = GetSlotsForPlayerCount(playerUsernames.size());
+
+	if (slots.empty()) return;
+
+	for (std::size_t index = 0; index < playerUsernames.size(); ++index)
+	{
+		auto userLabel = tgui::Label::create(playerUsernames[index]);
+		userLabel->setSize({ "17.5%", "17.5%" });
+		userLabel->setPosition({ 
+			tgui::String(std::to_string(slots[index].xPercent) + "%"),
+			tgui::String(std::to_string(slots[index].yPercent) + "%")
+			});
+		userLabel->setTextSize(25);
+		userLabel->setOrigin(0.5f, 0.5f);
+
+		m_root->add(userLabel);
+	}
+}
+
+void GamePanel::OnGameStarted()
+{
+	SetupPlayerSlots();
 }

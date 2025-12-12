@@ -119,10 +119,10 @@ void MainMenuWindow::Update()
 	if (m_gamePanel)
 	{
 		m_gamePanel->Update();
+		return;
 	}
-	if (m_gameStartedLocally) return;
-
-	if (m_lobbyPollCheck.getElapsedTime().asMilliseconds() < 500) return;
+	if (m_gameStartedLocally ||
+		m_lobbyPollCheck.getElapsedTime().asMilliseconds() < 500) return;
 
 	m_lobbyPollCheck.restart();
 	if (m_apiClient.GetLobbyId().empty()) return;
@@ -132,6 +132,7 @@ void MainMenuWindow::Update()
 	if (lobbyState.value().m_status == "GAME_STARTED" && !m_gamePanel)
 	{
 		m_gamePanel = std::make_shared<GamePanel>(m_mainMenu, m_apiClient);
+		m_gamePanel->OnGameStarted();
 		m_gameStartedLocally = true;
 	}
 }

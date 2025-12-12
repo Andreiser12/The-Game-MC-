@@ -7,12 +7,37 @@
 #include <SFML/System.hpp>
 
 #include "ApiClient.h"
+#include <array>
+#include <span>
+
+struct PlayerSlot
+{
+	float xPercent;
+	float yPercent;
+};
+
+using SlotArray = std::span<const PlayerSlot>;
 
 class GamePanel
 {
 public:
 	GamePanel(tgui::Gui& gui, ApiClient& api);
 	void Update();
+	void SetupPlayerSlots();
+	void OnGameStarted();
+
+private:
+	inline SlotArray GetSlotsForPlayerCount(size_t count)
+	{
+		switch (count)
+		{
+			case 2: return k_slots2;
+			case 3: return k_slots3;
+			case 4: return k_slots4;
+			case 5: return k_slots5;
+			default: return {};
+		}
+	}
 
 private:
 	unsigned m_lastMessageId{ 0u };
@@ -20,6 +45,28 @@ private:
 	tgui::ChatBox::Ptr m_chat;
 	sf::Clock m_chatClock;
 	ApiClient& m_apiClient;
+
+	inline static constexpr std::array<PlayerSlot, 2> k_slots2{ {
+		{55.f, 25.f},
+		{55.f, 87.5f}} };
+
+	inline static constexpr std::array<PlayerSlot, 3> k_slots3{ {
+		{55.f, 25.f},
+		{55.f, 87.5f},
+		{80.f, 75.f}} };
+
+	inline static constexpr std::array<PlayerSlot, 4> k_slots4{ {
+		{55.f, 25.f},
+		{10.f, 50.f},
+		{90.f, 50.f},
+		{50.f, 90.f}} };
+
+	inline static constexpr std::array<PlayerSlot, 5> k_slots5{ {
+		{55.f, 25.f},
+		{15.f, 35.f},
+		{15.f, 70.f},
+		{85.f, 75.f},
+		{85.f, 35.f}} };
 
 };
 

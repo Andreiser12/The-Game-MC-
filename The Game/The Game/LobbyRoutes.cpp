@@ -152,7 +152,7 @@ crow::response LobbyRoutes::GetLobbyState(const std::string& lobbyId)
 
 	data["hostId"] = lobby->GetHostId();
 
-	if (lobby->GetPlayers().size() < Lobby::K_MIN_PLAYERS)
+	if (lobby->GetPlayers().size() < Lobby::kMinPlayers)
 	{
 		data["status"] = "NOT_ENOUGH_PLAYERS";
 		data["message"] = "Waiting for players.";
@@ -194,7 +194,7 @@ crow::response LobbyRoutes::StartMatch(const crow::request& request)
 	
 	if (lobby->GetPlayers().empty()) return crow::response(409, "Lobby empty.");
 
-	if (lobby->GetPlayers().size() < Lobby::K_MIN_PLAYERS)
+	if (lobby->GetPlayers().size() < Lobby::kMinPlayers)
 	{
 		data["status"] = "NOT_ENOUGH_PLAYERS";
 		data["message"] = "Waiting for players.";
@@ -254,26 +254,36 @@ crow::response LobbyRoutes::SendChatMessage(const crow::request& req)
 
 crow::response LobbyRoutes::GetNewMessages(const crow::request& request, const std::string& lobbyId)
 {
-	auto afterString = request.url_params.get("after");
-	unsigned afterId = 0u;
-	if (afterString) afterId = std::stoul(afterString);
-	
+	unsigned afterId{ 0u };
+	if (auto afterString = request.url_params.get("after"))
+	{
+		try {
+			afterId = std::stoul(afterString);
+		}
+		catch (...)
+		{
+			return crow::response(400, "Invalid 'after' parameter");
+		}
+	}
+
 	auto lobby = m_manager.GetLobby(lobbyId);
 	if (!lobby) return crow::response(404, "Lobby not found");
 
+	const auto& newMessages = lobby->GetMessagesAfter(afterId);
+	if (!newMessages || newMessages->empty()) return crow::response(204, "No content");
+
 	crow::json::wvalue data;
 	crow::json::wvalue::list messageList;
-	const auto& messages = lobby->GetChatMessages();
-	for (const auto& chatMessage : messages)
+	messageList.reserve(newMessages->size());
+
+	for (const auto& newMsg : newMessages.value())
 	{
-		if (chatMessage.id > afterId)
-		{
-			crow::json::wvalue messageJson;
-			messageJson["id"] = chatMessage.id;
-			messageJson["username"] = chatMessage.username;
-			messageJson["message"] = chatMessage.message;
-			messageList.push_back(messageJson);
-		}
+		crow::json::wvalue messageJson;
+		messageJson["id"] = newMsg.id;
+		messageJson["username"] = newMsg.username;
+		messageJson["message"] = newMsg.message;
+		messageJson["timestamp"] = std::chrono::system_clock::now().time_since_epoch().count();
+		messageList.push_back(std::move(messageJson));
 	}
 	data["messages"] = std::move(messageList);
 

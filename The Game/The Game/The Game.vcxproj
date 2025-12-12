@@ -163,6 +163,8 @@
     <ClCompile Include="DatabaseManager.cpp" />
     <ClCompile Include="Deck.cpp" />
     <ClCompile Include="FundamentalCard.cpp" />
+    <ClCompile Include="GreedyAI.cpp" />
+    <ClCompile Include="GreedyAI.cppm" />
     <ClCompile Include="Lobby.cpp" />
     <ClCompile Include="Lobby.cppm" />
     <ClCompile Include="LobbyManager.cpp" />

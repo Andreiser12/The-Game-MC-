@@ -90,5 +90,11 @@
     <ClCompile Include="AuthenticationRoutes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GreedyAI.cppm">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GreedyAI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

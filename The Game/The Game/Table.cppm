@@ -7,6 +7,7 @@ import <unordered_set>;
 import <algorithm>;
 import <random>;
 import <chrono>;
+import <span>;
 
 import Card;
 import Player;
@@ -34,6 +35,7 @@ public:
 
 	Deck& GetDeck(const Deck::DeckType &type, const Deck::DeckNumber &number);
 	const DeckStack& GetMainDeck() const;
+	std::span<Deck*> GetAllDecks();
 
 private:
 	uint8_t m_nrPlayers;

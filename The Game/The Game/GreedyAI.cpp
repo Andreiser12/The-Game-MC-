@@ -3,23 +3,23 @@ module GreedyAI;
 
 std::optional<AIMove>GreedyAI::FindBestMove(const Player& currentPlayer, Table& table)
 {
-	std::vector<AIMove> moves;
+	std::vector<AIMove> moves;// verificam toate u_set
 
-	auto scoreMove = [&](Deck& deck, Card<uint16_t>& card) {
+	auto scoreMove = [&](const Deck& deck, const Card<uint16_t>& card) {
 		auto topCard = deck.GetTopCard().getId();
 		return std::abs(topCard - card.getId());
 		};
 
-	/*for (auto& card : currentPlayer.GetCards())
+	for (auto& card : currentPlayer.GetCards())
 	{
-		for (auto& deck : table.getAllDecks())
+		for (auto& deck : table.GetAllDecks())
 		{
-			if (table.CheckCard(deck, card))
+			if (table.CheckCard(*deck, card))
 			{
-				moves.push_back(&deck, card, scoreMove);
+				moves.push_back({ deck, card, scoreMove(*deck, card)});
 			}
 		}
-	}*/
+	}
 
 	if (moves.empty())
 	{

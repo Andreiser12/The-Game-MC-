@@ -131,6 +131,19 @@ Deck& Table::GetDeck(const Deck::DeckType& type, const Deck::DeckNumber& number)
 	throw std::out_of_range("Invalid deck type or number.");
 }
 
+std::span<Deck*> Table::GetAllDecks()
+{
+	static std::array<Deck*, 4> decks{
+		&m_AscendingDeckFirst,
+		&m_AscendingDeckSecond,
+		&m_DescendingDeckFirst,
+		&m_DescendingDeckSecond
+	};
+
+	return decks;
+}
+
+
 const DeckStack& Table::GetMainDeck() const
 {
 	return m_mainDeck;

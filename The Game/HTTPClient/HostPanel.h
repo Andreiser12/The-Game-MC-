@@ -14,7 +14,7 @@ public:
 		ApiClient& apiClient,
 		const std::string& lobbyId,
 		std::function<bool(ApiClient&)> onLeave,
-		std::function<void()> onStart);
+		std::function<bool(ApiClient&)> onStart);
 
 	static void RefreshPlayersList();
 	static void UpdateStartButton();

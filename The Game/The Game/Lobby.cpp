@@ -22,9 +22,6 @@ bool Lobby::AddPlayer(unsigned playerId, const std::string& playerUsername)
 
 	if (m_players.size() == 1) m_hostId = playerId;
 
-
-	if (m_players.size() >= K_MIN_PLAYERS)
-		m_gameStarted.store(true);
 	return true;
 }
 
@@ -85,6 +82,19 @@ std::vector<unsigned> Lobby::GetInactivePlayers(std::chrono::seconds timeout)
 bool Lobby::IsFull() const
 {
 	return m_players.size() == K_MAX_PLAYERS;
+}
+
+bool Lobby::StartGame(unsigned playerId)
+{
+	std::lock_guard<std::mutex> lock(m_mutex);
+	if (m_gameStarted.load()) return false;
+
+	if (playerId != m_hostId) return false;
+
+	if (m_players.size() < K_MIN_PLAYERS) return false;
+
+	m_gameStarted.store(true);
+	return true;
 }
 
 bool Lobby::HasGameStarted() const

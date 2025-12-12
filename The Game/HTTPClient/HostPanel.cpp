@@ -13,7 +13,7 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	ApiClient& apiClient,
 	const std::string& lobbyId,
 	std::function<bool(ApiClient&)> onLeave,
-	std::function<void()> onStart)
+	std::function<bool(ApiClient&)> onStart)
 {
 	auto background = tgui::Picture::create("assets/images/background.png");
 	background->setSize({ "100%", "100%" });
@@ -109,9 +109,12 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	startButton->setVisible(isHost);
 	startButton->setEnabled(isHost && enoughPlayers);
 
-	startButton->onPress([onStart]()
+	startButton->onPress([onStart, &apiClient]()
 	{
-			if (onStart) onStart();
+			if (onStart)
+			{
+				onStart(apiClient);
+			}	
 	});
 
 	panel->add(leaveButton);
@@ -146,7 +149,7 @@ void HostPanel::UpdateStartButton()
 		return;
 
 	bool isHost = (s_playerId == s_hostId);
-	bool enoughPlayers = (playersListBox->getItemCount() >= 2);
+	bool enoughPlayers = (playersListBox->getItemCount() >= 2u);
 
 	startButton->setVisible(isHost);
 	startButton->setEnabled(isHost && enoughPlayers);

@@ -26,7 +26,6 @@ export struct ChatMessage
 export class Lobby
 {
 public:
-	Lobby() = delete;
 	explicit Lobby(const std::string& lobbyId, unsigned hostId, const std::string& username);
 	bool AddPlayer(unsigned playerId, const std::string& playerUsername);
 	void AddChatMessage(const std::string& username, const std::string& message);
@@ -36,12 +35,16 @@ public:
 	std::vector<unsigned> GetInactivePlayers(std::chrono::seconds timeout);
 
 	bool IsFull() const;
+	bool StartGame(unsigned playerId);
 	bool HasGameStarted() const;
 	const std::unordered_map<unsigned, std::shared_ptr<Player>>& GetPlayers() const;
 	bool IsPlayerHost(unsigned playerId) const;
 	unsigned GetHostId() const;
 
 	const std::vector<ChatMessage>& GetChatMessages() const;
+
+private:
+	Lobby() = delete;
 
 public:
 	static constexpr uint8_t K_MIN_PLAYERS{ 2u };
@@ -55,7 +58,7 @@ private:
 	std::unordered_map<unsigned, std::chrono::steady_clock::time_point> m_lastPingPlayer;
 
 	std::vector<ChatMessage> m_chatMessages;
-	unsigned m_lastMessageId{ 0 };
+	unsigned m_lastMessageId{ 0u };
 	std::atomic<bool> m_gameStarted{ false };
 	std::mutex m_mutex;
 };

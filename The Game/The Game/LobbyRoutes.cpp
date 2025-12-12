@@ -188,8 +188,7 @@ crow::response LobbyRoutes::StartMatch(const crow::request& request)
 	auto lobby = m_manager.GetLobby(lobbyId);
 	if (!lobby) return crow::response(404, "Lobby not found");
 
-	if (!lobby->IsPlayerHost(playerId)) return crow::response
-	(409, "Player is not host.");
+	if (!lobby->IsPlayerHost(playerId)) return crow::response(409, "Player is not host.");
 
 	crow::json::wvalue data;
 	
@@ -208,10 +207,11 @@ crow::response LobbyRoutes::StartMatch(const crow::request& request)
 		data["message"] = "Game already in progress.";
 		return crow::response(200, data);
 	}
+
+	if (!lobby->StartGame(playerId)) return crow::response(409, "Start rejected.");
 	
 	data["status"] = "GAME_STARTED";
 	data["message"] = "Game has started.";
-
 	return crow::response(200, data);
 }
 
@@ -255,7 +255,7 @@ crow::response LobbyRoutes::SendChatMessage(const crow::request& req)
 crow::response LobbyRoutes::GetNewMessages(const crow::request& request, const std::string& lobbyId)
 {
 	auto afterString = request.url_params.get("after");
-	unsigned afterId = 0;
+	unsigned afterId = 0u;
 	if (afterString) afterId = std::stoul(afterString);
 	
 	auto lobby = m_manager.GetLobby(lobbyId);

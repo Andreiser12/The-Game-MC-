@@ -47,7 +47,7 @@ tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 						apiClient,
 						lobbyId,
 						[lobbyId](ApiClient& api) { return api.LeaveLobby(lobbyId, api.GetPlayerId()); },
-						[](){}
+						[lobbyId](ApiClient& api) { return api.StartMatch(lobbyId, api.GetPlayerId()); }
 					);
 					gui.add(host);
 					return true;
@@ -74,7 +74,7 @@ tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 				apiClient,
 				lobbyId,
 				[lobbyId](ApiClient& api) { return api.LeaveLobby(lobbyId, api.GetPlayerId()); },
-				[]() {}
+				[lobbyId](ApiClient& api) { return api.StartMatch(lobbyId, api.GetPlayerId()); }
 			);
 			gui.add(hostPanel);
 		}

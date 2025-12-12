@@ -99,11 +99,6 @@ void MainMenuWindow::LoadWidgets()
 
 	m_mainMenu.add(exitButton);
 	exitButton->onClick([this] {ExitButtonPressed(); });
-
-	//open the game
-
-	/*auto gamePanel = GamePanel::Create(m_mainMenu, m_apiClient);
-	m_mainMenu.add(gamePanel);*/
 }
 
 void MainMenuWindow::Draw()
@@ -117,6 +112,28 @@ void MainMenuWindow::Draw()
 	if (m_bgSprite)
 		m_window.draw(*m_bgSprite);*/
 	m_mainMenu.draw();
+}
+
+void MainMenuWindow::Update()
+{
+	if (m_gamePanel)
+	{
+		m_gamePanel->Update();
+	}
+	if (m_gameStartedLocally) return;
+
+	if (m_lobbyPollCheck.getElapsedTime().asMilliseconds() < 500) return;
+
+	m_lobbyPollCheck.restart();
+	if (m_apiClient.GetLobbyId().empty()) return;
+	auto lobbyState = m_apiClient.GetLobbyState(m_apiClient.GetLobbyId());
+	if (!lobbyState) return;
+
+	if (lobbyState.value().m_status == "GAME_STARTED" && !m_gamePanel)
+	{
+		m_gamePanel = std::make_shared<GamePanel>(m_mainMenu, m_apiClient);
+		m_gameStartedLocally = true;
+	}
 }
 
 void MainMenuWindow::ExitButtonPressed()

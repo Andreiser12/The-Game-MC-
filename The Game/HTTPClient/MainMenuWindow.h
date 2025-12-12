@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <vector>
+#include <array>
 #include <optional>
 
 class MainMenuWindow : IWindow
@@ -22,6 +23,7 @@ public:
 	MainMenuWindow(sf::RenderWindow& window, ApiClient& api);
 	void HandleEvent(sf::Event event) override;
 	void Draw() override;
+	void Update();
 
 	void ExitButtonPressed();
 	void SettingsButtonPressed();
@@ -34,6 +36,9 @@ private:
 	sf::RenderWindow& m_window;
 	tgui::Gui m_mainMenu;
 	tgui::Picture::Ptr m_background;
+	std::shared_ptr<GamePanel> m_gamePanel;
+	sf::Clock m_lobbyPollCheck;
+	bool m_gameStartedLocally{ false };
 
 	unsigned m_resolutionIndex{ 8u };
 	std::vector<sf::Vector2u> m_resolutions = {

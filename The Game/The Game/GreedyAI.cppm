@@ -4,6 +4,7 @@ import <optional>;
 import <vector>;
 import <ranges>;
 import <cmath>;
+import <set>;
 
 import Card;
 import Deck;
@@ -14,7 +15,7 @@ export struct AIMove
 {
 	Deck* deck;
 	Card<uint16_t> card;
-	unsigned score;
+	int score;
 };
 
 export class GreedyAI
@@ -22,5 +23,5 @@ export class GreedyAI
 public:
 	[[nodiscard]] static std::optional<AIMove>FindBestMove(const Player& currentPlayer, Table& table);
 
-	static void PlayTurn(const Player& currentPlayer, Table& table, uint8_t minCards);
+	static void PlayTurn(Player& currentPlayer, Table& table, uint8_t minCards);
 };

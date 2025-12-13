@@ -48,8 +48,12 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 
 					s_running.store(true);
 				}
+				else
+				{
+					auto errorPopupPanel = ErrorPopupPanel::Create(gui, lobbyId);
+					gui.add(errorPopupPanel);
+				}
 			}
-
 		});
 
 	auto backButton = tgui::Button::create("Back");

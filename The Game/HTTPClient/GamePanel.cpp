@@ -133,9 +133,16 @@ void GamePanel::Update()
 
 void GamePanel::SetupPlayerSlots()
 {
-	const auto& playerUsernames = m_apiClient.GetLobbyPlayers(m_apiClient.GetLobbyId());
-	const auto slots = GetSlotsForPlayerCount(playerUsernames.size());
+	auto playerUsernames = m_apiClient.GetLobbyPlayers(m_apiClient.GetLobbyId());
+	const std::string currentPlayer = m_apiClient.GetUsername();
 
+	auto it = std::find(playerUsernames.begin(), playerUsernames.end(), currentPlayer);
+	if (it != playerUsernames.end())
+	{
+		std::rotate(playerUsernames.begin(), it, playerUsernames.end());
+	}
+
+	const auto slots = GetSlotsForPlayerCount(playerUsernames.size());
 	if (slots.empty()) return;
 
 	for (std::size_t index = 0; index < playerUsernames.size(); ++index)
@@ -148,6 +155,11 @@ void GamePanel::SetupPlayerSlots()
 			});
 		userLabel->setTextSize(25);
 		userLabel->setOrigin(0.5f, 0.5f);
+
+		if (index == 0)
+		{
+			userLabel->getRenderer()->setTextColor(tgui::Color::Yellow);
+		}
 
 		m_root->add(userLabel);
 	}

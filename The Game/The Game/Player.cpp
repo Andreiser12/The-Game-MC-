@@ -128,3 +128,25 @@ bool Player::operator<(Player& other) const
 	}
 	return m_userprofile.PerformanceScore() > other.GetUserProfile().PerformanceScore();
 }
+
+
+
+
+void Player::SetTimeOut(bool value)
+{
+	m_hasTimeOut = value;
+}
+void Player::SetIncative(bool value)
+{
+	m_isInactive = value;
+}
+
+bool Player::HasTimeOut() const
+{
+	return m_hasTimeOut;
+}
+
+bool Player::IsInactive() const
+{
+	return m_isInactive;
+}

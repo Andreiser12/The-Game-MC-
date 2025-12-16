@@ -1,5 +1,7 @@
 module Table;
 
+import GreedyAI;
+
 constexpr static unsigned HOURS_TO_SECONDS{ 3600u };
 
 constexpr static uint8_t  TWO_PLAYERS{ 2u };
@@ -268,6 +270,13 @@ bool Table::AllCardsPlaced() const
 
 bool Table::PlayerTurn(Player& player, uint8_t minCards)
 {
+
+	if (player.HasTimeOut() || player.IsInactive())
+	{
+		GreedyAI::PlayTurn(player, *this, minCards);
+		return true;
+	}
+
 	uint8_t cardsPlaced = 0u;
 	bool continueTurn = true;
 

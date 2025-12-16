@@ -32,6 +32,9 @@ public:
 
 	void SetCards(const PlayerHand& cards);
 
+	void SetTimeOut(bool value);
+	void SetIncative(bool value);
+
 	unsigned GetPlayerID() const;
 	const std::string& GetUsername() const;
 	const PlayerHand& GetCards() const;
@@ -40,11 +43,19 @@ public:
 
 	bool operator<(Player& other) const;
 
+	bool HasTimeOut() const;
+	bool IsInactive() const;
+
+	
+
 private:
 	unsigned m_playerID;
 	std::string m_username;
 	UserProfile m_userprofile;
 	PlayerHand m_cards;
-	uint8_t m_cardsPlacedRound=0;
+	uint8_t m_cardsPlacedRound{ 0 };
+
+	bool m_hasTimeOut{ false };
+	bool m_isInactive{ false };
 };
 

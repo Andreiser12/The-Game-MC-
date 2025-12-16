@@ -148,6 +148,7 @@
     <ClInclude Include="RegisterWindow.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SettingsPanel.h" />
+    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ApiClient.cpp" />
@@ -164,6 +165,7 @@
     <ClCompile Include="PlayPanel.cpp" />
     <ClCompile Include="RegisterWindow.cpp" />
     <ClCompile Include="SettingsPanel.cpp" />
+    <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="HTTPClient.rc" />

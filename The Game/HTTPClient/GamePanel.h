@@ -7,6 +7,7 @@
 #include <SFML/System.hpp>
 
 #include "ApiClient.h"
+#include "Utils.h"
 #include <array>
 #include <span>
 
@@ -47,8 +48,8 @@ private:
 	ApiClient& m_apiClient;
 
 	inline static constexpr std::array<PlayerSlot, 2> k_slots2{ {
-		{55.f, 25.f},
-		{55.f, 87.5f}} };
+		{45.0f, 75.0f},
+		{45.0f, 13.0f}} };
 
 	inline static constexpr std::array<PlayerSlot, 3> k_slots3{ {
 		{55.f, 25.f},
@@ -68,5 +69,5 @@ private:
 		{85.f, 75.f},
 		{85.f, 35.f}} };
 
+	inline static constexpr uint8_t kmaxChars{ 15u };
 };
-

@@ -102,7 +102,7 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api) :
 		{
 			if (toggleChatButton->getText().toStdString() == "^")
 			{
-				toggleChatButton->setText(">");
+				toggleChatButton->setText("<");
 				chatGroup->setVisible(false);
 			}
 			else
@@ -145,23 +145,54 @@ void GamePanel::SetupPlayerSlots()
 	const auto slots = GetSlotsForPlayerCount(playerUsernames.size());
 	if (slots.empty()) return;
 
-	for (std::size_t index = 0; index < playerUsernames.size(); ++index)
+	for (std::size_t index = 0; index < playerUsernames.size(); index++)
 	{
-		auto userLabel = tgui::Label::create(playerUsernames[index]);
-		userLabel->setSize({ "17.5%", "17.5%" });
-		userLabel->setPosition({ 
+		auto userPanel = tgui::Panel::create({ "14%", "12%" });
+		userPanel->setPosition(
 			tgui::String(std::to_string(slots[index].xPercent) + "%"),
 			tgui::String(std::to_string(slots[index].yPercent) + "%")
-			});
-		userLabel->setTextSize(25);
+		);
+		userPanel->getRenderer()->setBackgroundColor(tgui::Color::Transparent);
+		userPanel->getRenderer()->setBorders(1);
+		userPanel->getRenderer()->setBorderColor(tgui::Color::Black);
+		userPanel->getRenderer()->setOpacity(0.95f);
+
+		auto infoPanel = tgui::Panel::create({"70%", "100%"});
+		infoPanel->setPosition({ "30%", "0%" });
+		infoPanel->getRenderer()->setBackgroundColor(tgui::Color(40, 40, 40));
+
+		auto userLabel = tgui::Label::create(Utils::TruncateText(
+			tgui::String(playerUsernames[index]), kmaxChars));
+		userLabel->setAutoSize(false);
+		userLabel->setSize({ "90%", "40%" });
+		userLabel->setPosition({ "50%", "50%" });
 		userLabel->setOrigin(0.5f, 0.5f);
+		userLabel->setTextSize(20);
+		userLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+		userLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+		userLabel->getRenderer()->setTextColor(tgui::Color::White);
 
 		if (index == 0)
 		{
 			userLabel->getRenderer()->setTextColor(tgui::Color::Yellow);
 		}
 
-		m_root->add(userLabel);
+		infoPanel->add(userLabel);
+
+		auto avatarPanel = tgui::Panel::create({"32.5%", "100%"});
+		avatarPanel->setPosition({ "0%", "0%" });
+		avatarPanel->getRenderer()->setBackgroundColor(tgui::Color(40, 40, 40));
+
+		auto userAvatar = tgui::Picture::create("assets/images/playerDefaultAvatar.jpg");
+		userAvatar->setSize({ "100%", "100%" });
+		userAvatar->setPosition({ "0%", "0%" });
+		userAvatar->setIgnoreMouseEvents(true);
+		
+		avatarPanel->add(userAvatar);
+
+		userPanel->add(avatarPanel);
+		userPanel->add(infoPanel);
+		m_root->add(userPanel);
 	}
 }
 

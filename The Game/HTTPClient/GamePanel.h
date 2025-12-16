@@ -52,15 +52,15 @@ private:
 		{45.0f, 13.0f}} };
 
 	inline static constexpr std::array<PlayerSlot, 3> k_slots3{ {
-		{55.f, 25.f},
-		{55.f, 87.5f},
-		{80.f, 75.f}} };
+		{45.0f, 75.0f},
+		{72.5f, 42.0f},
+		{13.0f, 42.0f}} };
 
 	inline static constexpr std::array<PlayerSlot, 4> k_slots4{ {
-		{55.f, 25.f},
-		{10.f, 50.f},
-		{90.f, 50.f},
-		{50.f, 90.f}} };
+		{45.0f, 75.0f},
+		{72.5f, 46.0f},
+		{45.0f, 13.0f},
+		{13.0f, 45.0f}} };
 
 	inline static constexpr std::array<PlayerSlot, 5> k_slots5{ {
 		{55.f, 25.f},

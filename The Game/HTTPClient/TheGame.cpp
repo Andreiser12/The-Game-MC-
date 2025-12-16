@@ -7,8 +7,8 @@
 #include <cpr/cpr.h>
 #include <crow.h>
 
-constexpr static unsigned LOGIN_WIDTH{ 640u };
-constexpr static unsigned LOGIN_HEIGHT{ 480u };
+static inline constexpr unsigned LOGIN_WIDTH{ 640u };
+static inline constexpr unsigned LOGIN_HEIGHT{ 480u };
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -31,7 +31,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			while ((eventOpt = connectionFailedWindow.pollEvent()))
 			{
 				sf::Event& event = *eventOpt;
-
 
 				if (event.is<sf::Event::Closed>())
 				{

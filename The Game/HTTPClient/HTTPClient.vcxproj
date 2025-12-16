@@ -157,7 +157,7 @@
     <ClCompile Include="ExitPanel.cpp" />
     <ClCompile Include="GamePanel.cpp" />
     <ClCompile Include="HostPanel.cpp" />
-    <ClCompile Include="HTTPClient.cpp" />
+    <ClCompile Include="TheGame.cpp" />
     <ClCompile Include="IWindow.cpp" />
     <ClCompile Include="JoinPanel.cpp" />
     <ClCompile Include="LoginWindow.cpp" />

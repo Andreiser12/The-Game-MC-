@@ -17,11 +17,19 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api) :
 
 	canvas->clear(tgui::Color::Transparent);
 
+	const sf::Vector2f canvasSize{
+		static_cast<float>(canvas->getSize().x),
+		static_cast<float>(canvas->getSize().y)
+	};
+
+	const float baseSize = std::min(canvasSize.x, canvasSize.y);
+	const float tableRadius = baseSize * 0.35f;
+
 	sf::CircleShape tableShape;
-	tableShape.setRadius(200.f);
+	tableShape.setRadius(tableRadius);
 	tableShape.setPointCount(100);
 	tableShape.setFillColor(sf::Color(20, 100, 20));
-	tableShape.setOutlineThickness(10.f);
+	tableShape.setOutlineThickness(baseSize * 0.01f);
 	tableShape.setOutlineColor(sf::Color(60, 30, 10));
 	tableShape.setScale({ 2.f, 1.2f });
 
@@ -29,8 +37,8 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api) :
 	float tableHeight = tableShape.getRadius() * 2.f * tableShape.getScale().y;
 
 	tableShape.setPosition(
-		{ (canvas->getSize().x - tableWidth) / 2.f,
-		(canvas->getSize().y - tableHeight) / 2.f }
+		{ (canvasSize.x - tableWidth) / 2.f,
+		(canvasSize.y - tableHeight) / 2.f }
 	);
 
 	canvas->draw(tableShape);
@@ -128,14 +136,12 @@ void GamePanel::Update()
 		m_chat->addLine(newMessage.username + ": " + newMessage.message);
 		m_lastMessageId = std::max(newMessage.id, m_lastMessageId);
 	}
-
 }
 
 void GamePanel::SetupPlayerSlots()
 {
 	auto playerUsernames = m_apiClient.GetLobbyPlayers(m_apiClient.GetLobbyId());
 	const std::string currentPlayer = m_apiClient.GetUsername();
-
 	auto it = std::find(playerUsernames.begin(), playerUsernames.end(), currentPlayer);
 	if (it != playerUsernames.end())
 	{

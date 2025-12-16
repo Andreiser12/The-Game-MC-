@@ -74,7 +74,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="HTTPClient.cpp">
+    <ClCompile Include="TheGame.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ApiClient.cpp">

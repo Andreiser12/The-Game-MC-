@@ -8,20 +8,17 @@ static constexpr int RISK_WEIGHT = 1;
 
 std::optional<AIMove>GreedyAI::FindBestMove(const Player& currentPlayer, Table& table)
 {
-	std::vector<AIMove> moves;// verificam toate u_set
+	std::vector<AIMove> moves;
 
-	auto scoreMove = [&](const Deck& deck, const Card<uint16_t>& card) {
-		auto topCard = deck.GetTopCard().getId();
-		return std::abs(topCard - card.getId());
-		};
-
-	for (auto& card : currentPlayer.GetCards())
+	for (const auto& card : currentPlayer.GetCards())
 	{
-		for (auto& deck : table.GetAllDecks())
+		for (const auto& deck : table.GetAllDecks())
 		{
 			if (table.CheckCard(*deck, card))
 			{
-				moves.push_back({ deck, card, scoreMove(*deck, card) });
+				AIMove move{deck, card, 0};
+				move.score = HeuristicTree::Evaluate(move, table, table.GetPlayers());
+				moves.push_back(move);
 			}
 		}
 	}
@@ -30,15 +27,24 @@ std::optional<AIMove>GreedyAI::FindBestMove(const Player& currentPlayer, Table& 
 	{
 		return std::nullopt;
 	}
-	//auto bestMove = std::ranges::min_element(moves, {}, [](const AIMove& move) {return move.score; });
-	auto bestMove = std::ranges::min_element(moves, {}, &AIMove::score);
+	
+	auto bestMove = std::ranges::min_element(moves, {}, [](const AIMove& m) { return m.score; });
 
 	return *bestMove;
 }
 
 void GreedyAI::PlayTurn(Player& currentPlayer, Table& table, uint8_t minCards)
 {
-
+	for (int i = 0; i < minCards; i++)
+	{
+		auto bestMove = FindBestMove(currentPlayer, table);
+		if (!bestMove)
+		{
+			break;
+		}
+		table.PlaceCardOnDeck(*bestMove.value().deck, bestMove.value().card);
+		currentPlayer.RemoveCard(bestMove.value().card.getId());
+	}
 }
 
 int HeuristicTree::Evaluate(const AIMove& move, const Table& table, std::span<const Player> players)

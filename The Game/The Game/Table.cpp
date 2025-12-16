@@ -214,6 +214,11 @@ void Table::PlayGame()
 	}
 }
 
+std::span<const Player> Table::GetPlayers() const
+{
+	return {m_Players.data(), m_Players.size()};
+}
+
 void Table::DisplayTableState() const
 {
 	std::cout << "Deck state:\n";

@@ -36,6 +36,7 @@ public:
 	Deck& GetDeck(const Deck::DeckType &type, const Deck::DeckNumber &number);
 	const DeckStack& GetMainDeck() const;
 	std::span<Deck*> GetAllDecks();
+	std::span<const Player> GetPlayers() const;
 
 private:
 	uint8_t m_nrPlayers;

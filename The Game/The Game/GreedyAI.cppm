@@ -31,8 +31,6 @@ export struct HeuristicTree
 export class GreedyAI
 {
 public:
-
-
 	[[nodiscard]] static std::optional<AIMove>FindBestMove(const Player& currentPlayer, Table& table);
 
 	static void PlayTurn(Player& currentPlayer, Table& table, uint8_t minCards);

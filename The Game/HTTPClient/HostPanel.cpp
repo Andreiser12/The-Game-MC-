@@ -25,6 +25,7 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	panel->getRenderer()->setBorders({ 2 });
 	panel->getRenderer()->setBorderColor(tgui::Color::Black);
 	panel->getRenderer()->setRoundedBorderRadius(15);
+	panel->setWidgetName("HostPanel");
 
 	auto lobbyIdLabel = tgui::Label::create("Lobby ID: " + lobbyId);
 	lobbyIdLabel->setSize({ "30%", "10%" });
@@ -62,6 +63,7 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	usernameLabel->setTextSize(24);
 	
 	apiClient.StartPingThread(lobbyId, apiClient.GetPlayerId());
+	apiClient.StartLobbyWatcher();
 
 	s_running.store(true);
 	s_updateThread = std::thread([&apiClient, lobbyId]() {
@@ -84,6 +86,7 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	leaveButton->onPress([panel, &apiClient, onLeave]()
 		{
 			apiClient.StopPingThread();
+			apiClient.StopLobbyWatcher();
 			StopUpdateThread();
 			playersListBox = nullptr;
 			startButton = nullptr;

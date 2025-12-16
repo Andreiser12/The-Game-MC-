@@ -39,6 +39,19 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 	joinLobbyButton->onPress([&gui, onJoinLobby, &apiClient, lobbyEditBox, panel]()
 		{
 			std::string lobbyId = lobbyEditBox->getText().toStdString();
+			std::string errorMessage;
+
+			if (lobbyId.empty())
+				errorMessage = "Lobby ID can't be empty";
+			else if (lobbyId.size() != 6u)
+				errorMessage = "Lobby must be 6 characters long";
+
+			if (!errorMessage.empty())
+			{
+				auto errorPopupPanel = ErrorPopupPanel::Create(gui, errorMessage);
+				gui.add(errorPopupPanel);
+				return;
+			}
 			if (onJoinLobby)
 			{
 				if (onJoinLobby(apiClient, lobbyId))
@@ -50,7 +63,7 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 				}
 				else
 				{
-					auto errorPopupPanel = ErrorPopupPanel::Create(gui, lobbyId);
+					auto errorPopupPanel = ErrorPopupPanel::Create(gui, "Invalid Lobby ID");
 					gui.add(errorPopupPanel);
 				}
 			}

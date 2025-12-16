@@ -6,6 +6,13 @@
 #include <vector>
 #include <optional>
 
+enum class ClientEvent
+{
+	None,
+	PlayerLeft,
+	LobbyClosed,
+	HostLeftLobby
+};
 struct ChatMessage
 {
 	unsigned id;
@@ -40,10 +47,16 @@ public:
 	void StartPingThread(const std::string& lobbyId, unsigned playerId);
 	void StopPingThread();
 
+	ClientEvent GetEvent() const;
+	void ClearEvent();
+
+	void StartLobbyWatcher();
+	void StopLobbyWatcher();
+
 	void SetUsername(const std::string& username);
 	void SetPlayerId(unsigned playerId);
 	void SetLobbyId(const std::string& lobbyId);
-
+	
 	const std::string& GetUsername() const;
 	unsigned GetPlayerId() const;
 	const std::string& GetLobbyId() const;
@@ -60,6 +73,8 @@ private:
 	std::string m_lobbyId;
 	unsigned m_playerId;
 	std::atomic<bool> m_pingRunning{ false };
-	std::thread m_pingThread;
+	std::jthread m_pingThread;
+	std::atomic<ClientEvent> m_event{ ClientEvent::None };
+	std::jthread m_lobbyWatcher;
 };
 

@@ -1,6 +1,6 @@
 #include "ErrorPopupPanel.h"
 
-tgui::Panel::Ptr ErrorPopupPanel::Create(tgui::Gui& gui, const std::string& lobbyEntered)
+tgui::Panel::Ptr ErrorPopupPanel::Create(tgui::Gui& gui, const std::string& message, std::function<void()> onClose)
 {
    
     auto errorPopupPanel = tgui::Panel::create({ "25%", "25%" });
@@ -21,23 +21,21 @@ tgui::Panel::Ptr ErrorPopupPanel::Create(tgui::Gui& gui, const std::string& lobb
     okButton->getRenderer()->setTexture("assets/images/buttons.png");
     okButton->getRenderer()->setBorderColor(tgui::Color::Black);
     okButton->getRenderer()->setBorders(1);
-    okButton->onPress([errorPopupPanel]()
+    okButton->onPress([errorPopupPanel, onClose]()
         {
             errorPopupPanel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(150));
-
+            if (onClose) onClose();
         });
     errorPopupPanel->add(okButton);
 
-    auto errorLabel = tgui::Label::create();
+    auto errorLabel = tgui::Label::create(message);
     errorLabel->setSize({ "60%", "40%" });
     errorLabel->setPosition({ "50%", "45%" });
     errorLabel->setTextSize(24);
     errorLabel->setOrigin(0.5f, 0.5f);
     errorLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
     errorLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-    if (lobbyEntered.empty()) errorLabel->setText("Lobby ID can't be empty");
-    else if (lobbyEntered.size() != 6u) errorLabel->setText("Lobby must be 6 characters long");
-    else errorLabel->setText("Invalid Lobby ID");
+    
     errorPopupPanel->add(errorLabel);
 
     return errorPopupPanel;

@@ -125,6 +125,34 @@ void MainMenuWindow::Update()
 		m_lobbyPollCheck.getElapsedTime().asMilliseconds() < 500) return;
 
 	m_lobbyPollCheck.restart();
+
+	auto event = m_apiClient.GetEvent();
+	switch (event)
+	{
+	case ClientEvent::PlayerLeft:
+		HostPanel::RefreshPlayersList();
+		HostPanel::UpdateStartButton();
+		m_apiClient.ClearEvent();
+		return;
+
+	case ClientEvent::LobbyClosed:
+	{
+		ShutdownLobby();
+
+		auto errorPopupPanel = ErrorPopupPanel::Create(m_mainMenu, "Lobby was closed by host.",
+			[this]() {  });
+		m_mainMenu.add(errorPopupPanel);
+		return;
+	}
+
+	case ClientEvent::HostLeftLobby:
+		ShutdownLobby();
+		return;
+
+	default:
+		break;
+	}
+
 	if (m_apiClient.GetLobbyId().empty()) return;
 	auto lobbyState = m_apiClient.GetLobbyState(m_apiClient.GetLobbyId());
 	if (!lobbyState) return;
@@ -135,6 +163,8 @@ void MainMenuWindow::Update()
 		m_gamePanel->OnGameStarted();
 		m_gameStartedLocally = true;
 	}
+
+
 }
 
 void MainMenuWindow::ExitButtonPressed()
@@ -200,6 +230,31 @@ void MainMenuWindow::PlayPanelPressed()
 		}
 	);
 	m_mainMenu.add(playPanel);
+}
+
+void MainMenuWindow::CloseHostPanel()
+{
+	auto hostPanel = m_mainMenu.get<tgui::Panel>("HostPanel");
+	if (hostPanel)
+	{
+		m_mainMenu.remove(hostPanel);
+		HostPanel::StopUpdateThread();
+		m_apiClient.StopPingThread();
+		m_apiClient.StopLobbyWatcher();
+	}
+}
+
+void MainMenuWindow::ShutdownLobby()
+{
+	m_apiClient.StopLobbyWatcher();
+	m_apiClient.StopPingThread();
+
+	CloseHostPanel();
+
+	m_apiClient.SetLobbyId("");
+	m_apiClient.SetPlayerId(0);
+
+	m_apiClient.ClearEvent();
 }
 
 void MainMenuWindow::HandleEvent(sf::Event event)

@@ -23,6 +23,8 @@ public:
 	void ExitButtonPressed();
 	void SettingsButtonPressed();
 	void PlayPanelPressed();
+	void CloseHostPanel();
+	void ShutdownLobby();
 
 private:
 	void LoadWidgets() override;

@@ -70,19 +70,21 @@ bool ApiClient::LeaveLobby(const std::string& lobbyId, unsigned playerId)
 
 	if (response.error || response.status_code != 200) return false;
 
-	std::string text = response.text;
 	auto json = crow::json::load(response.text);
-	if (!json) return false;
+	if (!json || !json.has("status"))
+		return false;
 
-	bool success = json["status"].s() == "LOBBY_DELETED" || json["status"].s() == "PLAYER_LEFT";
-	if (success)
-	{
-		m_playerId = 0u;
-		m_lobbyId.clear();
-	}
-	return success;
+	const std::string status = json["status"].s();
+	if (status == "PLAYER_LEFT")
+		m_event.store(ClientEvent::PlayerLeft);
+	else if (status == "LOBBY_DELETED")
+		m_event.store(ClientEvent::HostLeftLobby);
+	else return false;
+
+	m_playerId = 0u;
+	m_lobbyId.clear();
+	return true;
 }
-
 std::optional<LobbyState> ApiClient::GetLobbyState(const std::string& lobbyId)
 {
 	const std::string url = m_serverURL + "/lobby/info/" + lobbyId;
@@ -205,19 +207,60 @@ bool ApiClient::SendPing(const std::string& lobbyId, unsigned playerId)
 
 void ApiClient::StartPingThread(const std::string& lobbyId, unsigned playerId)
 {
-	m_pingRunning.store(true);
-	m_pingThread = std::thread([this, lobbyId, playerId]() {
-		while (m_pingRunning.load()) {
-			std::this_thread::sleep_for(std::chrono::seconds(5));
-			SendPing(lobbyId, playerId);
-		}
+	StopPingThread();
+
+	m_pingThread = std::jthread([this, lobbyId, playerId](std::stop_token st)
+		{
+			while (!st.stop_requested())
+			{
+				std::this_thread::sleep_for(std::chrono::seconds(5));
+				SendPing(lobbyId, playerId);
+			}
 		});
-	m_pingThread.detach();
 }
 
 void ApiClient::StopPingThread()
 {
-	m_pingRunning.store(false);
+	m_pingThread.request_stop();
+}
+
+ClientEvent ApiClient::GetEvent() const
+{
+	return m_event.load();
+}
+
+void ApiClient::ClearEvent()
+{
+	m_event.store(ClientEvent::None);
+}
+
+void ApiClient::StartLobbyWatcher()
+{
+	m_lobbyWatcher = std::jthread([this](std::stop_token st)
+		{
+			while (!st.stop_requested())
+			{
+				std::string lobbyId = GetLobbyId();
+				
+				if (lobbyId.empty()) return;
+				auto lobby = GetLobbyState(lobbyId);
+				if (!lobby || lobby->m_status == "LOBBY_DELETED")
+				{
+					m_event.store(ClientEvent::LobbyClosed);
+					return;
+				}
+				std::this_thread::sleep_for(std::chrono::seconds(1));
+			}
+		});
+}
+
+void ApiClient::StopLobbyWatcher()
+{
+	if (m_lobbyWatcher.joinable())
+	{
+		m_lobbyWatcher.request_stop();
+		m_lobbyWatcher.join();
+	}
 }
 
 void ApiClient::SetUsername(const std::string& username)

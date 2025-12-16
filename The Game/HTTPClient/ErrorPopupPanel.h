@@ -8,7 +8,8 @@
 class ErrorPopupPanel
 {
 public:
-	static tgui::Panel::Ptr Create(tgui::Gui& gui, const std::string& lobbyEntered);
+	static tgui::Panel::Ptr Create(tgui::Gui& gui, 
+		const std::string& message, std::function<void()> onClose = nullptr);
 
 private:
 

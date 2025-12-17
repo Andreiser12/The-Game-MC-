@@ -12,12 +12,12 @@ std::optional<AIMove>GreedyAI::FindBestMove(const Player& currentPlayer, Table& 
 
 	for (const auto& card : currentPlayer.GetCards())
 	{
-		for (const auto& deckPtr : table.GetAllDecks())
+		for (const auto& deckReference : table.GetAllDecks())
 		{
-			auto& deck = *deckPtr;
+			auto& deck = deckReference.get();
 			if (table.CheckCard(deck, card))
 			{
-				AIMove move{&deck, card, 0};
+				AIMove move{deck, card, 0};
 				move.score = HeuristicTree::Evaluate(move, table, table.GetPlayers());
 				moves.push_back(move);
 			}
@@ -43,7 +43,7 @@ void GreedyAI::PlayTurn(Player& currentPlayer, Table& table, uint8_t minCards)
 		{
 			break;
 		}
-		table.PlaceCardOnDeck(*bestMove.value().deck, bestMove.value().card);
+		table.PlaceCardOnDeck(bestMove.value().deck, bestMove.value().card);
 		currentPlayer.RemoveCard(bestMove.value().card.getId());
 	}
 }
@@ -62,14 +62,14 @@ int HeuristicTree::Evaluate(const AIMove& move, const Table& table, std::span<co
 
 int HeuristicTree::LocalScore(const AIMove& move)
 {
-	auto topCard = static_cast<int>(move.deck->GetTopCard().getId());
+	auto topCard = static_cast<int>(move.deck.get().GetTopCard().getId());
 	auto cardId = static_cast<int>(move.card.getId());
 	return (std::abs(cardId - topCard));
 
 }
 int HeuristicTree::BackwardsBonus(const AIMove& move)
 {
-	auto topCard = static_cast<int>(move.deck->GetTopCard().getId());
+	auto topCard = static_cast<int>(move.deck.get().GetTopCard().getId());
 	auto cardId = static_cast<int>(move.card.getId());
 
 	if (std::abs(cardId - topCard) == 10)
@@ -90,7 +90,7 @@ int HeuristicTree::GlobalPenalty(const AIMove& move, const Table& table, std::sp
 
 		for (const auto& card : player.GetCards())
 		{
-			if (table.CheckCard(*move.deck, card))
+			if (table.CheckCard(move.deck, card))
 			{
 				validMoves++;
 			}
@@ -115,7 +115,7 @@ int HeuristicTree::GlobalPenalty(const AIMove& move, const Table& table, std::sp
 
 int HeuristicTree::RiskPenalty(const AIMove& move, const Table& table)
 {
-	int topCard = static_cast<int>(move.deck->GetTopCard().getId());
+	int topCard = static_cast<int>(move.deck.get().GetTopCard().getId());
 	int cardId = static_cast<int>(move.card.getId());
 	int gap = std::abs(cardId - topCard);
 

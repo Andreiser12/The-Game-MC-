@@ -13,7 +13,7 @@ import Table;
 
 export struct AIMove
 {
-	Deck* deck;
+	std::reference_wrapper<Deck> deck;
 	Card<uint16_t> card;
 	int score;
 };

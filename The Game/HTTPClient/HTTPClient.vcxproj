@@ -135,6 +135,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="ApiClient.h" />
+    <ClInclude Include="CardWidget.h" />
     <ClInclude Include="ConnectionFailedWindow.h" />
     <ClInclude Include="ErrorPopupPanel.h" />
     <ClInclude Include="ExitPanel.h" />
@@ -152,6 +153,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ApiClient.cpp" />
+    <ClCompile Include="CardWidget.cpp" />
     <ClCompile Include="ConnectionFailedWindow.cpp" />
     <ClCompile Include="ErrorPopupPanel.cpp" />
     <ClCompile Include="ExitPanel.cpp" />

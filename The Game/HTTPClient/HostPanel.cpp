@@ -22,7 +22,7 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	auto panel = tgui::Panel::create({ "40%", "40%" });
 	panel->setPosition({ "50%", "50%" });
 	panel->setOrigin(0.5f, 0.5f);
-	panel->getRenderer()->setBorders({ 2 });
+	panel->getRenderer()->setBorders(2);
 	panel->getRenderer()->setBorderColor(tgui::Color::Black);
 	panel->getRenderer()->setRoundedBorderRadius(15);
 	panel->setWidgetName("HostPanel");
@@ -30,7 +30,7 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	auto lobbyIdLabel = tgui::Label::create("Lobby ID: " + lobbyId);
 	lobbyIdLabel->setSize({ "30%", "10%" });
 	lobbyIdLabel->setPosition({"62.5%", "7.5%"});
-	lobbyIdLabel->getRenderer()->setBorders({ 1 });
+	lobbyIdLabel->getRenderer()->setBorders(1);
 	lobbyIdLabel->getRenderer()->setBorderColor(tgui::Color::Black);
 	lobbyIdLabel->getRenderer()->setBackgroundColor(tgui::Color(128, 128, 128));
 	lobbyIdLabel->getRenderer()->setOpacity(0.7f);
@@ -56,7 +56,7 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	auto usernameLabel = tgui::Label::create(apiClient.GetUsername());
 	usernameLabel->setSize({ "25%", "8%" });
 	usernameLabel->setPosition({ "25%", "7.5%" });
-	usernameLabel->getRenderer()->setBorders({ 1 });
+	usernameLabel->getRenderer()->setBorders(1);
 	usernameLabel->getRenderer()->setBorderColor(tgui::Color::Black);
 	usernameLabel->getRenderer()->setBackgroundColor(tgui::Color(128, 128, 128));
 	usernameLabel->getRenderer()->setOpacity(0.7f);

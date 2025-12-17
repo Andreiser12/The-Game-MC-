@@ -8,6 +8,9 @@
 
 #include "ApiClient.h"
 #include "Utils.h"
+#include "CardWidget.h"
+#include <vector>
+#include <memory>
 #include <array>
 #include <span>
 
@@ -39,6 +42,8 @@ private:
 			default: return {};
 		}
 	}
+	void CreatePlayerHand(size_t playerIndex, size_t cardCount, const PlayerSlot& slot);
+	void CreateMyHand(const std::vector<unsigned>& myCardValues, const PlayerSlot& slot);
 
 private:
 	unsigned m_lastMessageId{ 0u };
@@ -63,11 +68,12 @@ private:
 		{13.0f, 45.0f}} };
 
 	inline static constexpr std::array<PlayerSlot, 5> k_slots5{ {
-		{55.f, 25.f},
-		{15.f, 35.f},
-		{15.f, 70.f},
-		{85.f, 75.f},
-		{85.f, 35.f}} };
-
+		{43.0f, 73.0f},
+		{72.0f, 46.0f},
+		{58.0f, 16.0f},
+		{31.0f, 15.0f},
+		{14.0f, 46.0f}} };
+	
 	inline static constexpr uint8_t kmaxChars{ 15u };
+	std::vector<std::shared_ptr<CardWidget>> m_myCards;
 };

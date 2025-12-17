@@ -119,12 +119,9 @@ bool ApiClient::StartMatch(const std::string& lobbyId, unsigned playerId)
 		cpr::Header{ {"Content-Type", "application/json"} });
 
 	if (response.error || response.status_code != 200) return false;
+	auto json = crow::json::load(response.text);
 
-	std::string matchStart = response.text;
-	matchStart.erase(
-		std::remove_if(matchStart.begin(), matchStart.end(), ::isspace), matchStart.end());
-
-	return matchStart == "STARTED";
+	return json["status"].s() == "GAME_STARTED";
 }
 
 bool ApiClient::SendChatMessage(const std::string& message)

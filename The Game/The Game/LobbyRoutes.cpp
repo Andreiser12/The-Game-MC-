@@ -149,8 +149,14 @@ crow::response LobbyRoutes::GetLobbyState(const std::string& lobbyId)
 	if (!lobby) return crow::response(404, "Lobby not found");
 
 	crow::json::wvalue data;
-
 	data["hostId"] = lobby->GetHostId();
+
+	if (lobby->HasGameStarted())
+	{
+		data["status"] = "GAME_STARTED";
+		data["message"] = "Match is ongoing.";
+		return crow::response(200, data);
+	}
 
 	if (lobby->GetPlayers().size() < Lobby::kMinPlayers)
 	{
@@ -166,15 +172,9 @@ crow::response LobbyRoutes::GetLobbyState(const std::string& lobbyId)
 		return crow::response(200, data);
 	}
 
-	if (lobby->HasGameStarted())
-	{
-		data["status"] = "GAME_STARTED";
-		data["message"] = "Match is ongoing.";
-		return crow::response(200, data);
-	}
 	data["status"] = "WAITING_FOR_PLAYERS";
 	data["message"] = "Match hasn't started.";
-	return crow::response(data);
+	return crow::response(200, data);
 }
 
 crow::response LobbyRoutes::StartMatch(const crow::request& request)
@@ -189,11 +189,10 @@ crow::response LobbyRoutes::StartMatch(const crow::request& request)
 	if (!lobby) return crow::response(404, "Lobby not found");
 
 	if (!lobby->IsPlayerHost(playerId)) return crow::response(409, "Player is not host.");
-
-	crow::json::wvalue data;
 	
 	if (lobby->GetPlayers().empty()) return crow::response(409, "Lobby empty.");
 
+	crow::json::wvalue data;
 	if (lobby->GetPlayers().size() < Lobby::kMinPlayers)
 	{
 		data["status"] = "NOT_ENOUGH_PLAYERS";

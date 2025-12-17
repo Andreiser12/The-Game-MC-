@@ -20,6 +20,15 @@ import DatabaseManager;
 export class Table
 {
 public:
+	enum class DeckIndex : std::size_t 
+	{
+		FirstAscending = 0,
+		SecondAscending = 1,
+		FirstDescending = 2,
+		SecondDescending = 3
+	};
+
+public:
 	Table(uint8_t nrPlayers);
 
 	bool isDeckEmpty() const;
@@ -37,8 +46,10 @@ public:
 
 	Deck& GetDeck(const Deck::DeckType &type, const Deck::DeckNumber &number);
 	const DeckStack& GetMainDeck() const;
-	std::span<std::unique_ptr<Deck>> GetAllDecks();
+	std::span<std::reference_wrapper<Deck>> GetAllDecks();
 	std::span<const Player> GetPlayers() const;
+
+	constexpr std::size_t GetDeckIndex(DeckIndex index) noexcept;
 
 private:
 	uint8_t m_nrPlayers;

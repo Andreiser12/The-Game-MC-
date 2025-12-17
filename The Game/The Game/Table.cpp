@@ -115,28 +115,40 @@ bool Table::CheckCard(const Deck& deck, const Card<uint16_t>& card) const
 	}
 }
 
+constexpr std::size_t Table::GetDeckIndex(DeckIndex index) noexcept
+{
+	return static_cast<std::size_t>(index);
+}
+
 Deck& Table::GetDeck(const Deck::DeckType& type, const Deck::DeckNumber& number)
 {
 	if (type == Deck::DeckType::Ascending)
 	{
-		/*if (number == Deck::DeckNumber::First)
-			return m_AscendingDeckFirst;
+		if (number == Deck::DeckNumber::First)
+			return *m_allDecks[GetDeckIndex(DeckIndex::FirstAscending)];
 		else if (number == Deck::DeckNumber::Second)
-			return m_AscendingDeckSecond;*/
+			return *m_allDecks[GetDeckIndex(DeckIndex::SecondAscending)];
 	}
 	else if (type == Deck::DeckType::Descending)
 	{
-		/*if (number == Deck::DeckNumber::First)
-			return m_DescendingDeckFirst;
+		if (number == Deck::DeckNumber::First)
+			return *m_allDecks[GetDeckIndex(DeckIndex::FirstDescending)];
 		else if (number == Deck::DeckNumber::Second)
-			return m_DescendingDeckSecond;*/
+			return *m_allDecks[GetDeckIndex(DeckIndex::SecondDescending)];
 	}
 	throw std::out_of_range("Invalid deck type or number.");
 }
 
-std::span<std::unique_ptr<Deck>> Table::GetAllDecks()
+std::span<std::reference_wrapper<Deck>> Table::GetAllDecks()
 {
-	return m_allDecks;
+	static std::array<std::reference_wrapper<Deck>, 4> decks{
+		*m_allDecks[0],
+		*m_allDecks[1],
+		*m_allDecks[2],
+		*m_allDecks[3]
+	};
+
+	return {decks};
 }
 
 
@@ -201,11 +213,11 @@ std::span<const Player> Table::GetPlayers() const
 
 void Table::DisplayTableState() const
 {
-	/*std::cout << "Deck state:\n";
-	std::cout << "Ascending first: " << m_AscendingDeckFirst.GetTopCard().getId() << "\n";
-	std::cout << "Ascending second: " << m_AscendingDeckSecond.GetTopCard().getId() << "\n";
-	std::cout << "Descending first: " << m_DescendingDeckFirst.GetTopCard().getId() << "\n";
-	std::cout << "Descending second: " << m_DescendingDeckSecond.GetTopCard().getId() << "\n";*/
+	std::cout << "Deck state:\n";
+	std::cout << "Ascending first: " << m_allDecks[0]->GetTopCard().getId() << "\n";
+	std::cout << "Ascending second: " << m_allDecks[1]->GetTopCard().getId() << "\n";
+	std::cout << "Descending first: " << m_allDecks[2]->GetTopCard().getId() << "\n";
+	std::cout << "Descending second: " << m_allDecks[3]->GetTopCard().getId() << "\n";
 }
 
 bool Table::CanPlayerPlayMinCards(const Player& player, uint8_t minCards) 
@@ -213,18 +225,20 @@ bool Table::CanPlayerPlayMinCards(const Player& player, uint8_t minCards)
 	if (player.GetCardsCount() < minCards)
 		return false;
 	uint8_t validCardsCount = 0;
-	//for (const Card<uint16_t>& card : player.GetCards())
-	//{
-	//	/*if (CheckCard(m_AscendingDeckFirst, card) ||
-	//		CheckCard(m_AscendingDeckSecond, card) ||
-	//		CheckCard(m_DescendingDeckFirst, card) ||
-	//		CheckCard(m_DescendingDeckSecond, card))
-	//	{
-	//		validCardsCount++;
-	//		if (validCardsCount >= minCards)
-	//			return true;
-	//	}*/
-	//}
+	for (const Card<uint16_t>& card : player.GetCards())
+	{
+		for (auto& deck : GetAllDecks())
+		{
+			if (CheckCard(deck, card))
+			{
+				validCardsCount++;
+				if (validCardsCount >= minCards)
+				{
+					return true;
+				}
+			}
+		}
+	}
 	return false;
 }
 
@@ -284,31 +298,31 @@ bool Table::PlayerTurn(Player& player, uint8_t minCards)
 		unsigned deckChoice;
 		std::cin >> deckChoice;
 
-		Deck* chosenDeck = nullptr;
-		/*switch (deckChoice)
-		{
-		case 1u:
-			chosenDeck = &m_AscendingDeckFirst;
-			break;
-		case 2u:
-			chosenDeck = &m_AscendingDeckSecond;
-			break;
-		case 3u:
-			chosenDeck = &m_DescendingDeckFirst;
-			break;
-		case 4u:
-			chosenDeck = &m_DescendingDeckSecond;
-			break;
-		default:
-			continue;
-		}*/
-
+		Deck& chosenDeck = [&]() ->Deck& {
+			switch (deckChoice)
+			{
+			case 1u:
+				return GetDeck(Deck::DeckType::Ascending, Deck::DeckNumber::First);
+				break;
+			case 2u:
+				return GetDeck(Deck::DeckType::Ascending, Deck::DeckNumber::Second);
+				break;
+			case 3u:
+				return GetDeck(Deck::DeckType::Descending, Deck::DeckNumber::First);
+				break;
+			case 4u:
+				return GetDeck(Deck::DeckType::Descending, Deck::DeckNumber::Second);
+				break;
+			default:
+				throw std::invalid_argument("Invalid deck choice");
+			}}();
+	
 		Card cardToPlace(cardId);
-		if (!CheckCard(*chosenDeck, cardToPlace)) {
+		if (!CheckCard(chosenDeck, cardToPlace)) {
 			continue;
 		}
 
-		PlaceCardOnDeck(*chosenDeck, cardToPlace);
+		PlaceCardOnDeck(chosenDeck, cardToPlace);
 		player.RemoveCard(cardId);
 		cardsPlaced++;
 

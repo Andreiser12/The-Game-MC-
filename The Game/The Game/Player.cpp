@@ -5,8 +5,8 @@ constexpr static uint8_t MINIMUM_CARDS{ 2u };
 Player::Player(unsigned playerID, const std::string& name) :
 	m_playerID{playerID}, m_username{name} {}
 
-Player::Player(unsigned playerID, const PlayerHand& cards, const UserProfile& userprofile) :
-	m_playerID{ playerID }, m_cards { cards }, m_userprofile{ userprofile }  {}
+Player::Player(unsigned playerID, const PlayerHand& cards) :
+	m_playerID{ playerID }, m_cards { cards }  {}
 
 Player::~Player() {}
 
@@ -115,22 +115,10 @@ size_t Player::GetCardsCount() const
 	return m_cards.size();
 }
 
-UserProfile& Player::GetUserProfile()
-{
-	return m_userprofile;
-}
-
 bool Player::operator<(Player& other) const
 {
-	if (m_userprofile.PerformanceScore() == other.GetUserProfile().PerformanceScore())
-	{
-		return m_userprofile.GetUsername() < other.GetUserProfile().GetUsername();
-	}
-	return m_userprofile.PerformanceScore() > other.GetUserProfile().PerformanceScore();
+	return this->m_playerID < other.GetPlayerID();
 }
-
-
-
 
 void Player::SetTimeOut(bool value)
 {

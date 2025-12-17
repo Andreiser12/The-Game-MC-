@@ -8,7 +8,6 @@ import <cstddef>;
 import <functional>;
 
 import Card;
-import UserProfile;	
 import Deck;
 
 export using PlayerHand = std::unordered_set<Card<uint16_t>, CardsSetHashFunction<uint16_t>, CardsEqual<uint16_t>>;
@@ -17,8 +16,7 @@ export class Player
 {
 public:
 	Player(unsigned playerID, const std::string& name);
-	Player(unsigned playerID, const PlayerHand& cards,
-		const UserProfile& userprofile);
+	Player(unsigned playerID, const PlayerHand& cards);
 	~Player();
 
 	void PlaceCards(Deck& chosenDeck);
@@ -39,7 +37,6 @@ public:
 	const std::string& GetUsername() const;
 	const PlayerHand& GetCards() const;
 	size_t GetCardsCount() const;
-	UserProfile& GetUserProfile();
 
 	bool operator<(Player& other) const;
 
@@ -51,7 +48,6 @@ public:
 private:
 	unsigned m_playerID;
 	std::string m_username;
-	UserProfile m_userprofile;
 	PlayerHand m_cards;
 	uint8_t m_cardsPlacedRound{ 0 };
 

@@ -18,11 +18,6 @@ constexpr static uint8_t MIN_CARDS_EMPTY_DECK{ 1u };
 Table::Table(uint8_t nrPlayers) :
 	m_nrPlayers{ nrPlayers }
 {
-	
-	/*m_AscendingDeckFirst = Deck(Deck::DeckType::Ascending, Deck::DeckNumber::First);
-	m_AscendingDeckSecond = Deck(Deck::DeckType::Ascending, Deck::DeckNumber::Second);
-	m_DescendingDeckFirst = Deck(Deck::DeckType::Descending, Deck::DeckNumber::First);
-	m_DescendingDeckSecond = Deck(Deck::DeckType::Descending, Deck::DeckNumber::Second);*/
 	m_allDecks[0] = std::make_unique<Deck>(Deck::DeckType::Ascending, Deck::DeckNumber::First);
 	m_allDecks[1] = std::make_unique<Deck>(Deck::DeckType::Ascending, Deck::DeckNumber::Second);
 	m_allDecks[2] = std::make_unique<Deck>(Deck::DeckType::Descending, Deck::DeckNumber::First);
@@ -64,9 +59,8 @@ void Table::SetupPlayers()
 	for (uint8_t i = 0; i < m_nrPlayers && i<players.size(); i++)
 	{
 		const auto& player = players[i];
-		UserProfile profile(player.GetUsername());
 		PlayerHand emptyCards;
-		m_Players.push_back(Player(player.GetID(), emptyCards, profile));
+		m_Players.push_back(Player(player.GetID(), emptyCards));
 	}
 	uint8_t cardsPerPlayer;
 	switch (m_nrPlayers)
@@ -125,17 +119,17 @@ Deck& Table::GetDeck(const Deck::DeckType& type, const Deck::DeckNumber& number)
 {
 	if (type == Deck::DeckType::Ascending)
 	{
-		if (number == Deck::DeckNumber::First)
+		/*if (number == Deck::DeckNumber::First)
 			return m_AscendingDeckFirst;
 		else if (number == Deck::DeckNumber::Second)
-			return m_AscendingDeckSecond;
+			return m_AscendingDeckSecond;*/
 	}
 	else if (type == Deck::DeckType::Descending)
 	{
-		if (number == Deck::DeckNumber::First)
+		/*if (number == Deck::DeckNumber::First)
 			return m_DescendingDeckFirst;
 		else if (number == Deck::DeckNumber::Second)
-			return m_DescendingDeckSecond;
+			return m_DescendingDeckSecond;*/
 	}
 	throw std::out_of_range("Invalid deck type or number.");
 }
@@ -156,25 +150,17 @@ void Table::PlayGame()
 	bool gameRunning = true;
 	bool gameWon = false;
 	uint8_t currentPlayerIndex = 0u;
-	std::cout << "\nThe game started!\n";
-	std::cout << "Number of players: " << static_cast<uint8_t>(m_nrPlayers) << "\n";
-	std::cout << "Cards in  deck: " << m_mainDeck.size() << "\n";
 	auto startTime = std::chrono::high_resolution_clock::now();
 
 	while (gameRunning)
 	{
 		if (AllCardsPlaced())
 		{
-			std::cout << "Congratulations! All 98 cards placed!\n";
 			gameWon = true;
 			gameRunning = false;
 			break;
 		}
 		Player& currentPlayer = m_Players[currentPlayerIndex];
-
-		std::cout << "Player " << currentPlayer.GetUserProfile().GetUsername() << "'s turn.\n";
-		std::cout << "Cards: " << currentPlayer.GetCardsCount() << "\n";
-		std::cout << "Cards on deck: " << m_mainDeck.size() << "\n";
 
 		DisplayTableState();
 
@@ -182,8 +168,6 @@ void Table::PlayGame()
 
 		if (!CanPlayerPlayMinCards(currentPlayer, minCards))
 		{
-			std::cout << currentPlayer.GetUserProfile().GetUsername() << " can't place " <<
-				static_cast<uint8_t>(minCards) << " cards! Game Over!\n";
 			gameWon = false;
 			gameRunning = false;
 			break;
@@ -192,7 +176,6 @@ void Table::PlayGame()
 
 		if (!turnSucces)
 		{
-			std::cout << "Error while placing cards! Game Over!\n";
 			gameWon = false;
 			gameRunning = false;
 			break;
@@ -205,14 +188,9 @@ void Table::PlayGame()
 	m_time = static_cast<unsigned>(duration.count());
 
 	double hours = static_cast<double>(m_time / HOURS_TO_SECONDS);
-	std::cout << "Final game stats:\n";
-	std::cout << "Result: " << (gameWon ? "Victory!" : "Defeat!") << "\n";
-	std::cout << "Time played: " << hours << " hours\n";
 	for (Player& player : m_Players)
 	{
 		size_t finalCards = player.GetCardsCount();
-		player.GetUserProfile().UpdateStats(hours, gameWon, finalCards);
-		std::cout << player.GetUserProfile().GetUsername() << " - Cards left: " << finalCards << "\n";
 	}
 }
 
@@ -223,11 +201,11 @@ std::span<const Player> Table::GetPlayers() const
 
 void Table::DisplayTableState() const
 {
-	std::cout << "Deck state:\n";
+	/*std::cout << "Deck state:\n";
 	std::cout << "Ascending first: " << m_AscendingDeckFirst.GetTopCard().getId() << "\n";
 	std::cout << "Ascending second: " << m_AscendingDeckSecond.GetTopCard().getId() << "\n";
 	std::cout << "Descending first: " << m_DescendingDeckFirst.GetTopCard().getId() << "\n";
-	std::cout << "Descending second: " << m_DescendingDeckSecond.GetTopCard().getId() << "\n";
+	std::cout << "Descending second: " << m_DescendingDeckSecond.GetTopCard().getId() << "\n";*/
 }
 
 bool Table::CanPlayerPlayMinCards(const Player& player, uint8_t minCards) 
@@ -235,25 +213,24 @@ bool Table::CanPlayerPlayMinCards(const Player& player, uint8_t minCards)
 	if (player.GetCardsCount() < minCards)
 		return false;
 	uint8_t validCardsCount = 0;
-	for (const Card<uint16_t>& card : player.GetCards())
-	{
-		if (CheckCard(m_AscendingDeckFirst, card) ||
-			CheckCard(m_AscendingDeckSecond, card) ||
-			CheckCard(m_DescendingDeckFirst, card) ||
-			CheckCard(m_DescendingDeckSecond, card))
-		{
-			validCardsCount++;
-			if (validCardsCount >= minCards)
-				return true;
-		}
-	}
+	//for (const Card<uint16_t>& card : player.GetCards())
+	//{
+	//	/*if (CheckCard(m_AscendingDeckFirst, card) ||
+	//		CheckCard(m_AscendingDeckSecond, card) ||
+	//		CheckCard(m_DescendingDeckFirst, card) ||
+	//		CheckCard(m_DescendingDeckSecond, card))
+	//	{
+	//		validCardsCount++;
+	//		if (validCardsCount >= minCards)
+	//			return true;
+	//	}*/
+	//}
 	return false;
 }
 
 void Table::PlaceCardOnDeck(Deck& deck, const Card<uint16_t>& card)
 {
 	deck.PushCard(card);
-	std::cout << " [Card " << card.getId() << " placed on deck]\n";
 }
 
 bool Table::AllCardsPlaced() const
@@ -282,14 +259,10 @@ bool Table::PlayerTurn(Player& player, uint8_t minCards)
 
 	while (continueTurn)
 	{
-		std::cout << "Your cards: ";
 		player.PrintCards();
 
 		if (cardsPlaced >= minCards)
 		{
-			std::cout << "You already placed " << static_cast<int>(cardsPlaced) << " cards.(minimum = " << static_cast<int>(minCards) << ")\n";
-			std::cout << "Would you like to place another card? (1=Yes, 0=No): ";
-
 			unsigned choice;
 			std::cin >> choice;
 			if (choice == 0u)
@@ -298,28 +271,21 @@ bool Table::PlayerTurn(Player& player, uint8_t minCards)
 				break;
 			}
 		}
-		std::cout << "Choose card's ID you want to place: ";
+
 		uint16_t cardId;
 		std::cin >> cardId;
 
 		if (!player.FindCard(cardId))
 		{
-			std::cout << "Invalid card!\n";
 			continue;
 		}
 
-		std::cout << "Choose deck:\n";
-		std::cout << "1 - Ascending First\n";
-		std::cout << "2 - Ascending Second\n";
-		std::cout << "3 - Descending First\n";
-		std::cout << "4 - Descending Second\n";
 		DisplayTableState();
-		std::cout << "Choice: ";
 		unsigned deckChoice;
 		std::cin >> deckChoice;
 
 		Deck* chosenDeck = nullptr;
-		switch (deckChoice)
+		/*switch (deckChoice)
 		{
 		case 1u:
 			chosenDeck = &m_AscendingDeckFirst;
@@ -334,13 +300,11 @@ bool Table::PlayerTurn(Player& player, uint8_t minCards)
 			chosenDeck = &m_DescendingDeckSecond;
 			break;
 		default:
-			std::cout << "Invalid choice\n";
 			continue;
-		}
+		}*/
 
 		Card cardToPlace(cardId);
 		if (!CheckCard(*chosenDeck, cardToPlace)) {
-			std::cout << "The card can't be placed on this deck!\n";
 			continue;
 		}
 
@@ -348,11 +312,8 @@ bool Table::PlayerTurn(Player& player, uint8_t minCards)
 		player.RemoveCard(cardId);
 		cardsPlaced++;
 
-		std::cout << "Card " << cardId << " was placed succesfully!\n";
-
 		if (player.GetCardsCount() == 0)
 		{
-			std::cout << "You ran out of cards!\n";
 			continueTurn = false;
 			break;
 		}
@@ -360,7 +321,6 @@ bool Table::PlayerTurn(Player& player, uint8_t minCards)
 	if (!isDeckEmpty() && cardsPlaced > 0)
 	{
 		uint8_t cardsToDraw = std::min(static_cast<uint8_t>(cardsPlaced), static_cast<uint8_t>(m_mainDeck.size()));
-		std::cout << "You draw " << static_cast<uint8_t>(cardsToDraw) << " new cards.\n";
 		player.DrawCards(m_mainDeck);
 	}
 	return cardsPlaced >= minCards;

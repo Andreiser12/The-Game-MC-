@@ -13,7 +13,6 @@ import <array>;
 
 import Card;
 import Player;
-import UserProfile;
 import Deck;
 import DatabaseManager;
 //import GreedyAI;
@@ -46,10 +45,6 @@ private:
 	std::vector<Player> m_Players;
 	DeckStack m_mainDeck;
 	std::array<std::unique_ptr<Deck>, 4> m_allDecks;
-	Deck m_AscendingDeckFirst;
-	Deck m_AscendingDeckSecond;
-	Deck m_DescendingDeckFirst;
-	Deck m_DescendingDeckSecond;
 
 	unsigned int m_time;
 };

@@ -30,9 +30,6 @@
     <ClCompile Include="Card.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UserProfile.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="FundamentalCard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -52,9 +49,6 @@
       <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="Player.cppm">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UserProfile.cppm">
       <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="Table.cppm">

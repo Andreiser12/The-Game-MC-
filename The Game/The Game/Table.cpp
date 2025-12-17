@@ -18,10 +18,16 @@ constexpr static uint8_t MIN_CARDS_EMPTY_DECK{ 1u };
 Table::Table(uint8_t nrPlayers) :
 	m_nrPlayers{ nrPlayers }
 {
-	m_AscendingDeckFirst = Deck(Deck::DeckType::Ascending, Deck::DeckNumber::First);
+	
+	/*m_AscendingDeckFirst = Deck(Deck::DeckType::Ascending, Deck::DeckNumber::First);
 	m_AscendingDeckSecond = Deck(Deck::DeckType::Ascending, Deck::DeckNumber::Second);
 	m_DescendingDeckFirst = Deck(Deck::DeckType::Descending, Deck::DeckNumber::First);
-	m_DescendingDeckSecond = Deck(Deck::DeckType::Descending, Deck::DeckNumber::Second);
+	m_DescendingDeckSecond = Deck(Deck::DeckType::Descending, Deck::DeckNumber::Second);*/
+	m_allDecks[0] = std::make_unique<Deck>(Deck::DeckType::Ascending, Deck::DeckNumber::First);
+	m_allDecks[1] = std::make_unique<Deck>(Deck::DeckType::Ascending, Deck::DeckNumber::Second);
+	m_allDecks[2] = std::make_unique<Deck>(Deck::DeckType::Descending, Deck::DeckNumber::First);
+	m_allDecks[3] = std::make_unique<Deck>(Deck::DeckType::Descending, Deck::DeckNumber::Second);
+
 	m_time = 0u;
 	Shuffle();
 	SetupPlayers();
@@ -52,8 +58,9 @@ void Table::Shuffle()
 
 void Table::SetupPlayers()
 {
-	DatabaseManager database{ "gameDB.db" };
-	auto players = database.GetUsers();
+	//DatabaseManager database{ "gameDB.db" };
+	auto database = std::make_unique<DatabaseManager>("gameDB.db");
+	auto players = database->GetUsers();
 	for (uint8_t i = 0; i < m_nrPlayers && i<players.size(); i++)
 	{
 		const auto& player = players[i];
@@ -133,16 +140,9 @@ Deck& Table::GetDeck(const Deck::DeckType& type, const Deck::DeckNumber& number)
 	throw std::out_of_range("Invalid deck type or number.");
 }
 
-std::span<Deck*> Table::GetAllDecks()
+std::span<std::unique_ptr<Deck>> Table::GetAllDecks()
 {
-	static std::array<Deck*, 4> decks{
-		&m_AscendingDeckFirst,
-		&m_AscendingDeckSecond,
-		&m_DescendingDeckFirst,
-		&m_DescendingDeckSecond
-	};
-
-	return decks;
+	return m_allDecks;
 }
 
 

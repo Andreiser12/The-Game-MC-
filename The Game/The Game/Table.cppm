@@ -8,6 +8,8 @@ import <algorithm>;
 import <random>;
 import <chrono>;
 import <span>;
+import <memory>;
+import <array>;  
 
 import Card;
 import Player;
@@ -36,13 +38,14 @@ public:
 
 	Deck& GetDeck(const Deck::DeckType &type, const Deck::DeckNumber &number);
 	const DeckStack& GetMainDeck() const;
-	std::span<Deck*> GetAllDecks();
+	std::span<std::unique_ptr<Deck>> GetAllDecks();
 	std::span<const Player> GetPlayers() const;
 
 private:
 	uint8_t m_nrPlayers;
 	std::vector<Player> m_Players;
 	DeckStack m_mainDeck;
+	std::array<std::unique_ptr<Deck>, 4> m_allDecks;
 	Deck m_AscendingDeckFirst;
 	Deck m_AscendingDeckSecond;
 	Deck m_DescendingDeckFirst;

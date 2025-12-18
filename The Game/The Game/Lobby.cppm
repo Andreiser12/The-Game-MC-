@@ -9,6 +9,8 @@ import <mutex>;
 import <chrono>;
 
 import Player;
+import Table;
+import Card;
 
 export enum class RemoveResult
 {
@@ -43,6 +45,9 @@ public:
 	bool IsPlayerHost(unsigned playerId) const;
 	unsigned GetHostId() const;
 
+	std::optional<std::vector<unsigned>> GetPlayerCards(unsigned playerId) const;
+	bool PlayCard(unsigned playerId, unsigned cardId, unsigned deckIndex);
+
 private:
 	Lobby() = delete;
 
@@ -60,5 +65,7 @@ private:
 	unsigned m_lastMessageId{ 0u };
 	std::deque<ChatMessage> m_chatBuffer;
 	std::atomic<bool> m_gameStarted{ false };
+	std::unique_ptr<Table> m_table;
 	mutable std::mutex m_mutex;
+
 };

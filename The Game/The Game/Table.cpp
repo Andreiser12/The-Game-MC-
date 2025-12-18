@@ -2,8 +2,6 @@ module Table;
 
 import GreedyAI;
 
-constexpr static unsigned HOURS_TO_SECONDS{ 3600u };
-
 constexpr static uint8_t  TWO_PLAYERS{ 2u };
 constexpr static uint8_t  CARDS_TWO_PLAYERS{ 8u };
 
@@ -15,19 +13,43 @@ constexpr static uint8_t  CARDS_DEFAULT_PLAYERS{ 6u };
 constexpr static uint8_t MIN_CARDS_NORMAL{ 2u };
 constexpr static uint8_t MIN_CARDS_EMPTY_DECK{ 1u };
 
-Table::Table(uint8_t nrPlayers) :
-	m_nrPlayers{ nrPlayers }
+Table::Table(const std::vector<std::pair<unsigned, std::string>>& lobbyPlayers) :
+	m_nrPlayers{ static_cast<uint8_t>(lobbyPlayers.size())}
 {
 	m_allDecks[0] = std::make_unique<Deck>(Deck::DeckType::Ascending, Deck::DeckNumber::First);
 	m_allDecks[1] = std::make_unique<Deck>(Deck::DeckType::Ascending, Deck::DeckNumber::Second);
 	m_allDecks[2] = std::make_unique<Deck>(Deck::DeckType::Descending, Deck::DeckNumber::First);
 	m_allDecks[3] = std::make_unique<Deck>(Deck::DeckType::Descending, Deck::DeckNumber::Second);
 
-	m_time = 0u;
 	Shuffle();
-	SetupPlayers();
 
-	std::sort(m_Players.begin(), m_Players.end());
+	size_t cardsPerPlayer;
+	switch (m_nrPlayers)
+	{
+	case 2:
+		cardsPerPlayer = 8;
+		break;
+	case 3:
+		cardsPerPlayer = 7;
+		break;
+	case 4:
+		cardsPerPlayer = 6;
+		break;
+	case 5:
+		cardsPerPlayer = 6;
+		break;
+	default:
+		cardsPerPlayer = 6;
+		break;
+	}
+	for (const auto& [id, username] : lobbyPlayers)
+	{
+		Player player(id, username);
+		player.SetupCards(m_mainDeck, cardsPerPlayer);
+		m_playersMap.emplace(id, std::move(player));
+	}
+
+	//std::sort(m_Players.begin(), m_Players.end());
 }
 
 bool Table::isDeckEmpty() const
@@ -40,7 +62,7 @@ void Table::Shuffle()
 	std::vector<Card<uint16_t>> copyCards;
 	copyCards.reserve(98);
 
-	for (uint16_t i = 2u; i <= 99u; ++i)
+	for (uint16_t i = 2u; i < 100u; i++)
 		copyCards.emplace_back(i);
 
 	std::random_device rd;
@@ -49,38 +71,6 @@ void Table::Shuffle()
 	
 	for (auto& card : copyCards)
 		m_mainDeck.push(std::move(card));
-}
-
-void Table::SetupPlayers()
-{
-	//DatabaseManager database{ "gameDB.db" };
-	auto database = std::make_unique<DatabaseManager>("gameDB.db");
-	auto players = database->GetUsers();
-	for (uint8_t i = 0; i < m_nrPlayers && i<players.size(); i++)
-	{
-		const auto& player = players[i];
-		PlayerHand emptyCards;
-		m_Players.push_back(Player(player.GetID(), emptyCards));
-	}
-	uint8_t cardsPerPlayer;
-	switch (m_nrPlayers)
-	{
-	case TWO_PLAYERS:
-		cardsPerPlayer = CARDS_TWO_PLAYERS;
-		break;
-
-	case THREE_PLAYERS:
-		cardsPerPlayer = CARDS_THREE_PLAYERS;
-		break;
-
-	default:
-		cardsPerPlayer = CARDS_DEFAULT_PLAYERS;
-		break;
-	}
-	for (auto& player : m_Players)
-	{
-		player.SetupCards(m_mainDeck, cardsPerPlayer);
-	}
 }
 
 bool Table::BackwardsTrick(const Deck& deck, const Card<uint16_t>& card) const
@@ -174,8 +164,6 @@ void Table::PlayGame()
 		}
 		Player& currentPlayer = m_Players[currentPlayerIndex];
 
-		DisplayTableState();
-
 		uint8_t minCards = isDeckEmpty() ? MIN_CARDS_EMPTY_DECK : MIN_CARDS_NORMAL;
 
 		if (!CanPlayerPlayMinCards(currentPlayer, minCards))
@@ -195,11 +183,6 @@ void Table::PlayGame()
 		currentPlayerIndex = (currentPlayerIndex + 1) % m_nrPlayers;
 	}
 
-	auto endTime = std::chrono::high_resolution_clock::now();
-	auto duration = std::chrono::duration(endTime - startTime);
-	m_time = static_cast<unsigned>(duration.count());
-
-	double hours = static_cast<double>(m_time / HOURS_TO_SECONDS);
 	for (Player& player : m_Players)
 	{
 		size_t finalCards = player.GetCardsCount();
@@ -211,13 +194,9 @@ std::span<const Player> Table::GetPlayers() const
 	return {m_Players.data(), m_Players.size()};
 }
 
-void Table::DisplayTableState() const
+const std::unordered_map<unsigned, Player>& Table::GetPlayersMap() const
 {
-	std::cout << "Deck state:\n";
-	std::cout << "Ascending first: " << m_allDecks[0]->GetTopCard().getId() << "\n";
-	std::cout << "Ascending second: " << m_allDecks[1]->GetTopCard().getId() << "\n";
-	std::cout << "Descending first: " << m_allDecks[2]->GetTopCard().getId() << "\n";
-	std::cout << "Descending second: " << m_allDecks[3]->GetTopCard().getId() << "\n";
+	return m_playersMap;
 }
 
 bool Table::CanPlayerPlayMinCards(const Player& player, uint8_t minCards) 
@@ -294,7 +273,6 @@ bool Table::PlayerTurn(Player& player, uint8_t minCards)
 			continue;
 		}
 
-		DisplayTableState();
 		unsigned deckChoice;
 		std::cin >> deckChoice;
 

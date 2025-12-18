@@ -61,7 +61,7 @@ public:
 	unsigned GetPlayerId() const;
 	const std::string& GetLobbyId() const;
 	std::vector<std::string> GetLobbyPlayers(const std::string& lobbyId) const;
-
+	std::optional<std::vector<unsigned>> GetPlayerCards() const;
 
 private:
 	ApiClient() = delete;
@@ -77,4 +77,3 @@ private:
 	std::atomic<ClientEvent> m_event{ ClientEvent::None };
 	std::jthread m_lobbyWatcher;
 };
-

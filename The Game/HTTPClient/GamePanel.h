@@ -42,8 +42,8 @@ private:
 			default: return {};
 		}
 	}
-	void CreatePlayerHand(size_t playerIndex, size_t cardCount, const PlayerSlot& slot);
-	void CreateMyHand(const std::vector<unsigned>& myCardValues, const PlayerSlot& slot);
+	void CreatePlayerHand(size_t playerIndex, const PlayerSlot& slot);
+	void CreateMyHand(const PlayerSlot& slot);
 
 private:
 	unsigned m_lastMessageId{ 0u };

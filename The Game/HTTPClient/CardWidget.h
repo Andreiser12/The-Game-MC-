@@ -1,6 +1,7 @@
 #pragma once
 #include "TGUI/TGUI.hpp"
 #include <string>
+#include <optional>
 
 class CardWidget
 {
@@ -32,5 +33,7 @@ private:
 
 	tgui::Panel::Ptr m_cardPanel;
 	tgui::Label::Ptr m_idLabel;
+	tgui::Picture::Ptr m_frontSide;
+	tgui::Picture::Ptr m_backSide;
 };
 

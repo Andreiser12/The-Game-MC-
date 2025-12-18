@@ -3,7 +3,7 @@
 CardWidget::CardWidget(unsigned id, bool isOwner) :
 	m_id{id},
 	m_isOwner{isOwner},
-	m_faceState{isOwner ? FaceState::FaceUp : FaceState::FaceUp}
+	m_faceState{isOwner ? FaceState::FaceUp : FaceState::FaceDown}
 {
 	CreateCardWidget();
 }
@@ -54,6 +54,17 @@ void CardWidget::CreateCardWidget()
 	m_cardPanel->getRenderer()->setBorderColor(tgui::Color::Black);
 	m_cardPanel->getRenderer()->setRoundedBorderRadius(5);
 
+	m_frontSide = tgui::Picture::create("assets/images/cardFrontSide.png");
+	m_frontSide->setSize({ "100%", "100%" });
+	m_frontSide->setPosition({ "0%", "0%" });
+	m_cardPanel->add(m_frontSide);
+	m_frontSide->moveToBack();
+
+	m_backSide = tgui::Picture::create("assets/images/cardBackSide.jpg");
+	m_backSide->setSize({ "100%", "100%" });
+	m_backSide->setPosition({ "0%", "0%" });
+	m_cardPanel->add(m_backSide);
+
 	m_idLabel = tgui::Label::create(tgui::String(m_id));
 	m_idLabel->setPosition({ "50%", "50%" });
 	m_idLabel->setOrigin(0.5f, 0.5f);
@@ -69,12 +80,14 @@ void CardWidget::UpdateCardAppearance()
 {
 	if (m_faceState == FaceState::FaceUp)
 	{
+		m_frontSide->setVisible(true);
 		m_idLabel->setVisible(true);
-		m_cardPanel->getRenderer()->setBackgroundColor(tgui::Color::White);
+		m_backSide->setVisible(false);
 	}
 	else
 	{
+		m_frontSide->setVisible(false);
 		m_idLabel->setVisible(false);
-		m_cardPanel->getRenderer()->setBackgroundColor(tgui::Color(180, 30, 30));
+		m_backSide->setVisible(true);
 	}
 }

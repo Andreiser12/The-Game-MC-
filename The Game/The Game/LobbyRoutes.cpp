@@ -68,6 +68,12 @@ void LobbyRoutes::Register(crow::SimpleApp& app)
 		([this](const crow::request& req) {
 		return this->PlayerPing(req);
 			});
+	
+	CROW_ROUTE(app, "/lobby/<string>/players/<uint>/cards").methods("GET"_method)
+		([this](const std::string& lobbyId, unsigned playerId)
+			{
+				return this->GetPlayerCards(lobbyId, playerId);
+			});
 }
 
 crow::response LobbyRoutes::CreateLobby(const crow::request& request)
@@ -305,4 +311,22 @@ crow::response LobbyRoutes::PlayerPing(const crow::request& request)
 	crow::json::wvalue data;
 	data["status"] = "OK";
 	return crow::response(data);
+}
+
+crow::response LobbyRoutes::GetPlayerCards(const std::string& lobbyId, unsigned playerId)
+{
+	auto lobby = m_manager.GetLobby(lobbyId);
+	if (!lobby) return crow::response(404, "Lobby does not exist");
+
+	auto cardsOpt = lobby->GetPlayerCards(playerId);
+	if (!cardsOpt) return crow::response(409, "Game state does not allow getting cards");
+
+	crow::json::wvalue data;
+	crow::json::wvalue::list cardList;
+	for (unsigned cardId: cardsOpt.value())
+	{
+		cardList.push_back(cardId);
+	}
+	data["cards"] = std::move(cardList);
+	return crow::response(200, data);
 }

@@ -115,6 +115,13 @@ bool Lobby::StartGame(unsigned playerId)
 
 	if (m_players.size() < kMinPlayers) return false;
 
+	std::vector<std::pair<unsigned, std::string>> lobbyPlayers;
+	for (const auto& [id, player] : m_players)
+	{
+		lobbyPlayers.push_back({ id, player->GetUsername() });
+	}
+
+	m_table = std::make_unique<Table>(lobbyPlayers);
 	m_gameStarted.store(true);
 	return true;
 }
@@ -137,4 +144,31 @@ bool Lobby::IsPlayerHost(unsigned playerId) const
 unsigned Lobby::GetHostId() const
 {
 	return m_hostId;
+}
+
+std::optional<std::vector<unsigned>> Lobby::GetPlayerCards(unsigned playerId) const
+{
+	std::lock_guard lock(m_mutex);
+
+	if (!m_gameStarted || !m_table) return std::nullopt;
+
+	const auto& players = m_table->GetPlayersMap();
+	auto it = players.find(playerId);
+	if (it == players.end()) return std::nullopt;
+
+	std::vector<unsigned> playerCards;
+	for (const auto& card : it->second.GetCards())
+	{
+		playerCards.push_back(card.getId());
+	}
+	return playerCards;
+}
+
+bool Lobby::PlayCard(unsigned playerId, unsigned cardId, unsigned deckIndex)
+{
+	std::lock_guard lock(m_mutex);
+
+	if (!m_gameStarted || !m_table) return false;
+
+	return true;
 }

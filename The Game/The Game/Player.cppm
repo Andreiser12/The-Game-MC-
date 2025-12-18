@@ -10,12 +10,13 @@ import <functional>;
 import Card;
 import Deck;
 
-export using PlayerHand = std::unordered_set<Card<uint16_t>, CardsSetHashFunction<uint16_t>, CardsEqual<uint16_t>>;
+export using PlayerHand = std::unordered_set<Card<uint16_t>,
+	CardsSetHashFunction<uint16_t>, CardsEqual<uint16_t>>;
 
 export class Player
 {
 public:
-	Player(unsigned playerID, const std::string& name);
+	Player(unsigned playerID, const std::string& username);
 	Player(unsigned playerID, const PlayerHand& cards);
 	~Player();
 
@@ -43,13 +44,14 @@ public:
 	bool HasTimeOut() const;
 	bool IsInactive() const;
 
-	
+private:
+	Player() = delete;
 
 private:
 	unsigned m_playerID;
 	std::string m_username;
 	PlayerHand m_cards;
-	uint8_t m_cardsPlacedRound{ 0 };
+	uint8_t m_cardsPlacedRound{ 0u };
 
 	bool m_hasTimeOut{ false };
 	bool m_isInactive{ false };

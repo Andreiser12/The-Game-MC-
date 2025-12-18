@@ -313,3 +313,22 @@ std::vector<std::string> ApiClient::GetLobbyPlayers(const std::string& lobbyId) 
 	}
 	return players;
 }
+
+std::optional<std::vector<unsigned>> ApiClient::GetPlayerCards() const
+{
+	auto url = m_serverURL + "/lobby/" + m_lobbyId + "/players/" +
+		std::to_string(m_playerId) + "/cards";
+	cpr::Response response = cpr::Get(cpr::Url{ url });
+	if (response.status_code != 200) return std::nullopt;
+
+	std::vector<unsigned> playerCards;
+
+	auto json = crow::json::load(response.text);
+	if (!json) return std::nullopt;
+
+	for (const auto& card : json["cards"])
+	{
+		playerCards.push_back(card.i());
+	}
+	return playerCards;
+}

@@ -2,8 +2,8 @@ module Player;
 
 constexpr static uint8_t MINIMUM_CARDS{ 2u };
 
-Player::Player(unsigned playerID, const std::string& name) :
-	m_playerID{playerID}, m_username{name} {}
+Player::Player(unsigned playerID, const std::string& username) :
+	m_playerID{playerID}, m_username{username} {}
 
 Player::Player(unsigned playerID, const PlayerHand& cards) :
 	m_playerID{ playerID }, m_cards { cards }  {}
@@ -12,7 +12,7 @@ Player::~Player() {}
 
 void Player::PlaceCards(Deck& chosenDeck)
 {
-	uint8_t cardsPlaced = 0;
+	uint8_t cardsPlaced = 0u;
 	while (GetCardsCount() || cardsPlaced < MINIMUM_CARDS)
 	{
 		std::cout << "Which card would you like to place?"

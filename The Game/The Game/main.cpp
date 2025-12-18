@@ -13,8 +13,6 @@ import AuthenticationRoutes;
 
 int main()
 {	
-	Table table(3);
-
 	DatabaseManager database{ "gameDB.db" };
 
 	crow::SimpleApp app;

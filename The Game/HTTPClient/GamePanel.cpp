@@ -9,7 +9,7 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api) :
 	auto gamePanel = tgui::Panel::create({ "100%", "100%" });
 	m_root->add(gamePanel);
 
-	auto gameBackground = tgui::Picture::create("assets/images/gameBackground2.jpg");
+	auto gameBackground = tgui::Picture::create("assets/images/gameBackground.jpg");
 	gameBackground->setSize({ "100%", "100%" });
 	gameBackground->setPosition({ "0%", "0%" });
 	gamePanel->add(gameBackground);
@@ -157,18 +157,6 @@ void GamePanel::SetupPlayerSlots()
 	const auto slots = GetSlotsForPlayerCount(playerUsernames.size());
 	if (slots.empty()) return;
 
-	size_t cardsPerPlayer;
-	switch (playerUsernames.size())
-	{
-	case 2: cardsPerPlayer = 8; break;
-	case 3: cardsPerPlayer = 7; break;
-	case 4: cardsPerPlayer = 6; break;
-	case 5: cardsPerPlayer = 6; break;
-	default: cardsPerPlayer = 6;  break;
-	}
-
-	const std::vector<unsigned> myCards = { 5, 12, 23, 34, 45, 56, 67, 78 };
-
 	for (std::size_t index = 0; index < playerUsernames.size(); index++)
 	{
 		auto userPanel = tgui::Panel::create({ "14%", "12%" });
@@ -199,11 +187,11 @@ void GamePanel::SetupPlayerSlots()
 		if (index == 0)
 		{
 			userLabel->getRenderer()->setTextColor(tgui::Color::Yellow);
-			CreateMyHand(myCards, slots[index]);
+			CreateMyHand(slots[index]);
 		}
 		else
 		{
-			CreatePlayerHand(index, cardsPerPlayer, slots[index]);
+			CreatePlayerHand(index, slots[index]);
 		}
 
 		infoPanel->add(userLabel);
@@ -229,11 +217,13 @@ void GamePanel::OnGameStarted()
 	SetupPlayerSlots();
 }
 
-void GamePanel::CreatePlayerHand(size_t playerIndex, size_t cardCount, const PlayerSlot& slot)
+void GamePanel::CreatePlayerHand(size_t playerIndex, const PlayerSlot& slot)
 {
-	constexpr float cardWidth{ 2.5f };
-	constexpr float cardHeight{ 7.0f };
+	constexpr float cardWidth{ 2.25f };
+	constexpr float cardHeight{ 6.5f };
 	constexpr float cardSpacing{ 0.20f };
+	auto playerCards = m_apiClient.GetPlayerCards();
+	const size_t cardCount = playerCards.has_value() ? playerCards.value().size() : 3;
 
 	const float totalWidth{ (cardWidth + cardSpacing) * cardCount - cardSpacing };
 	float startX{ slot.xPercent + 7.0f - (totalWidth / 2.0f) };
@@ -241,7 +231,7 @@ void GamePanel::CreatePlayerHand(size_t playerIndex, size_t cardCount, const Pla
 
 	for (size_t i = 0; i < cardCount; i++)
 	{
-		auto card = std::make_shared<CardWidget>(0, false);
+		auto card = std::make_shared<CardWidget>(0u, false);
 		card->SetSize(
 			tgui::String(std::to_string(cardWidth) + "%"),
 			tgui::String(std::to_string(cardHeight) + "%")
@@ -255,13 +245,16 @@ void GamePanel::CreatePlayerHand(size_t playerIndex, size_t cardCount, const Pla
 	}
 }
 
-void GamePanel::CreateMyHand(const std::vector<unsigned>& myCardValues, const PlayerSlot& slot)
+void GamePanel::CreateMyHand(const PlayerSlot& slot)
 {
-	constexpr float cardWidth{ 2.5f };
-	constexpr float cardHeight{ 7.0f };
+	const auto& playerCards = m_apiClient.GetPlayerCards();
+	if (!playerCards) return;
+
+	constexpr float cardWidth{ 2.25f };
+	constexpr float cardHeight{ 6.5f };
 	constexpr float cardSpacing{ 0.20f };
 
-	const size_t cardCount = myCardValues.size();
+	const size_t cardCount = playerCards.value().size();
 	const float totalWidth{ (cardWidth + cardSpacing) * cardCount - cardSpacing };
 	const float startX{ slot.xPercent + 7.0f - (totalWidth / 2.0f) };
 	const float startY{ slot.yPercent - cardHeight };
@@ -269,7 +262,7 @@ void GamePanel::CreateMyHand(const std::vector<unsigned>& myCardValues, const Pl
 
 	for (size_t i = 0; i < cardCount; i++)
 	{
-		auto card = std::make_shared<CardWidget>(myCardValues[i], true);
+		auto card = std::make_shared<CardWidget>(playerCards.value()[i], true);
 		card->SetSize(
 			tgui::String(std::to_string(cardWidth) + "%"),
 			tgui::String(std::to_string(cardHeight) + "%")

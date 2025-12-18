@@ -137,8 +137,6 @@
     <ClInclude Include="ApiClient.h" />
     <ClInclude Include="CardWidget.h" />
     <ClInclude Include="ConnectionFailedWindow.h" />
-    <ClInclude Include="ErrorPopupPanel.h" />
-    <ClInclude Include="ExitPanel.h" />
     <ClInclude Include="GamePanel.h" />
     <ClInclude Include="HostPanel.h" />
     <ClInclude Include="IWindow.h" />
@@ -148,15 +146,12 @@
     <ClInclude Include="PlayPanel.h" />
     <ClInclude Include="RegisterWindow.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="SettingsPanel.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ApiClient.cpp" />
     <ClCompile Include="CardWidget.cpp" />
     <ClCompile Include="ConnectionFailedWindow.cpp" />
-    <ClCompile Include="ErrorPopupPanel.cpp" />
-    <ClCompile Include="ExitPanel.cpp" />
     <ClCompile Include="GamePanel.cpp" />
     <ClCompile Include="HostPanel.cpp" />
     <ClCompile Include="TheGame.cpp" />
@@ -166,7 +161,6 @@
     <ClCompile Include="MainMenuWindow.cpp" />
     <ClCompile Include="PlayPanel.cpp" />
     <ClCompile Include="RegisterWindow.cpp" />
-    <ClCompile Include="SettingsPanel.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>

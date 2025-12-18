@@ -184,7 +184,7 @@ void MainMenuWindow::ExitButtonPressed()
 
 void MainMenuWindow::SettingsButtonPressed()
 {
-	auto settingsPanel = SettingsPanel::Create(
+	auto settingsPanel = Utils::CreateSettingsPanel(
 		m_mainMenu,
 		m_resolutionIndex,
 		m_isFullscreen,

@@ -25,6 +25,9 @@
     <Filter Include="Source Files\Windows">
       <UniqueIdentifier>{12ddd0df-aab1-47ac-9bca-6834e09e8bd2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Game">
+      <UniqueIdentifier>{87b739af-3f19-4c26-8290-23658462b5e9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h">
@@ -33,25 +36,16 @@
     <ClInclude Include="ApiClient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ExitPanel.h">
-      <Filter>Header Files\Panels</Filter>
-    </ClInclude>
     <ClInclude Include="GamePanel.h">
       <Filter>Header Files\Panels</Filter>
     </ClInclude>
     <ClInclude Include="HostPanel.h">
       <Filter>Header Files\Panels</Filter>
     </ClInclude>
-    <ClInclude Include="SettingsPanel.h">
-      <Filter>Header Files\Panels</Filter>
-    </ClInclude>
     <ClInclude Include="PlayPanel.h">
       <Filter>Header Files\Panels</Filter>
     </ClInclude>
     <ClInclude Include="JoinPanel.h">
-      <Filter>Header Files\Panels</Filter>
-    </ClInclude>
-    <ClInclude Include="ErrorPopupPanel.h">
       <Filter>Header Files\Panels</Filter>
     </ClInclude>
     <ClInclude Include="ConnectionFailedWindow.h">
@@ -83,12 +77,6 @@
     <ClCompile Include="ApiClient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ErrorPopupPanel.cpp">
-      <Filter>Source Files\Panels</Filter>
-    </ClCompile>
-    <ClCompile Include="ExitPanel.cpp">
-      <Filter>Source Files\Panels</Filter>
-    </ClCompile>
     <ClCompile Include="GamePanel.cpp">
       <Filter>Source Files\Panels</Filter>
     </ClCompile>
@@ -96,9 +84,6 @@
       <Filter>Source Files\Panels</Filter>
     </ClCompile>
     <ClCompile Include="PlayPanel.cpp">
-      <Filter>Source Files\Panels</Filter>
-    </ClCompile>
-    <ClCompile Include="SettingsPanel.cpp">
       <Filter>Source Files\Panels</Filter>
     </ClCompile>
     <ClCompile Include="ConnectionFailedWindow.cpp">

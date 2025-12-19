@@ -21,6 +21,8 @@ public:
 	void SetPosition(const tgui::String& x, const tgui::String& y);
 	void SetSize(const tgui::String& width, const tgui::String& height);
 	void SetDraggable(bool draggable);
+	void UpdateDragPosition(tgui::Vector2f mousePos);
+	void CancelDrag();
 
 private:
 	void CreateCardWidget();
@@ -35,5 +37,8 @@ private:
 	tgui::Label::Ptr m_idLabel;
 	tgui::Picture::Ptr m_frontSide;
 	tgui::Picture::Ptr m_backSide;
+	bool m_isDragging{ false };
+	tgui::Vector2f m_dragOffset;
+	tgui::Vector2f m_originalPosition;
 };
 

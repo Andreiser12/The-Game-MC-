@@ -90,7 +90,7 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api) :
 
 			chatEditBox->setText("");
 		});
-		
+
 	chatGroup->add(chatEditBox);
 
 	auto sendButton = tgui::Button::create("Send");
@@ -126,6 +126,24 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api) :
 			}
 		});
 	gamePanel->add(toggleChatButton);
+
+	m_decks[0] = std::make_shared<DeckWidget>(DeckWidget::DeckType::Ascending);
+	m_decks[1] = std::make_shared<DeckWidget>(DeckWidget::DeckType::Ascending);
+	m_decks[2] = std::make_shared<DeckWidget>(DeckWidget::DeckType::Descending);
+	m_decks[3] = std::make_shared<DeckWidget>(DeckWidget::DeckType::Descending);
+	float xDeckPosition{ 42.5f };
+	constexpr float yDeckPosition{ 46.25f };
+	for (const auto& deck : m_decks)
+	{
+		auto deckPanel = deck->GetDeckPanel();
+		deckPanel->setSize({ "2.25%", "6.5%" });
+		deckPanel->setPosition({
+			tgui::String(std::to_string(xDeckPosition) + "%"),
+			tgui::String(std::to_string(yDeckPosition) + "%")
+			});
+		xDeckPosition += 3.75f;
+		m_root->add(deckPanel);
+	}
 }
 
 void GamePanel::Update()
@@ -217,6 +235,31 @@ void GamePanel::OnGameStarted()
 	SetupPlayerSlots();
 }
 
+void GamePanel::HandleMouseEvent(const sf::Event& event)
+{
+	if (!event.is<sf::Event::MouseMoved>()) return;
+
+	const auto& mouseMove = event.getIf<sf::Event::MouseMoved>();
+	if (!mouseMove) return;
+
+	tgui::Vector2f mousePos(
+		static_cast<float>(mouseMove->position.x),
+		static_cast<float>(mouseMove->position.y));
+
+	for (auto& card : m_myCards)
+	{
+		card->UpdateDragPosition(mousePos);
+	}
+}
+
+void GamePanel::ResetAllDrags()
+{
+	for (auto& card : m_myCards)
+	{
+		card->CancelDrag();
+	}
+}
+
 void GamePanel::CreatePlayerHand(size_t playerIndex, const PlayerSlot& slot)
 {
 	constexpr float cardWidth{ 2.25f };
@@ -275,6 +318,6 @@ void GamePanel::CreateMyHand(const PlayerSlot& slot)
 
 		card->SetDraggable(true);
 		m_root->add(card->GetWidget());
-		m_myCards.push_back(card);
+		m_myCards.emplace_back(card);
 	}
 }

@@ -48,7 +48,7 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 
 			if (!errorMessage.empty())
 			{
-				auto errorPopupPanel = ErrorPopupPanel::Create(gui, errorMessage);
+				auto errorPopupPanel = Utils::CreateErrorPopupPanel(gui, errorMessage);
 				gui.add(errorPopupPanel);
 				return;
 			}
@@ -63,7 +63,7 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 				}
 				else
 				{
-					auto errorPopupPanel = ErrorPopupPanel::Create(gui, "Invalid Lobby ID");
+					auto errorPopupPanel = Utils::CreateErrorPopupPanel(gui, "Invalid Lobby ID");
 					gui.add(errorPopupPanel);
 				}
 			}

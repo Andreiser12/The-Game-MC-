@@ -1,9 +1,9 @@
 #include "CardWidget.h"
 
 CardWidget::CardWidget(unsigned id, bool isOwner) :
-	m_id{id},
-	m_isOwner{isOwner},
-	m_faceState{isOwner ? FaceState::FaceUp : FaceState::FaceDown}
+	m_id{ id },
+	m_isOwner{ isOwner },
+	m_faceState{ isOwner ? FaceState::FaceUp : FaceState::FaceDown }
 {
 	CreateCardWidget();
 }
@@ -46,10 +46,25 @@ void CardWidget::SetDraggable(bool draggable)
 	}
 }
 
+void CardWidget::UpdateDragPosition(tgui::Vector2f mousePos)
+{
+	if (!m_isDragging || !m_isOwner) return;
+
+	tgui::Vector2f newPos = mousePos - m_dragOffset;
+	m_cardPanel->setPosition(newPos);
+}
+
+void CardWidget::CancelDrag()
+{
+	if (!m_isDragging) return;
+
+	m_isDragging = false;
+	m_cardPanel->setPosition(m_originalPosition);
+}
+
 void CardWidget::CreateCardWidget()
 {
 	m_cardPanel = tgui::Panel::create({ "100%", "100%" });
-	m_cardPanel->getRenderer()->setBackgroundColor(tgui::Color::White);
 	m_cardPanel->getRenderer()->setBorders(2);
 	m_cardPanel->getRenderer()->setBorderColor(tgui::Color::Black);
 	m_cardPanel->getRenderer()->setRoundedBorderRadius(5);
@@ -73,6 +88,29 @@ void CardWidget::CreateCardWidget()
 	m_idLabel->setIgnoreMouseEvents(true);
 
 	m_cardPanel->add(m_idLabel);
+
+	if (m_isOwner)
+	{
+		m_cardPanel->onMousePress([this](tgui::Vector2f mousePos) {
+
+			m_isDragging = true;
+			m_originalPosition = m_cardPanel->getPosition();
+			m_dragOffset = mousePos;
+			m_cardPanel->moveToFront();
+			});
+		m_cardPanel->onMouseRelease([this]() {
+
+			m_isDragging = false;
+			m_cardPanel->setPosition(m_originalPosition);
+			});
+
+		m_cardPanel->setMouseCursor(tgui::Cursor::Type::Hand);
+	}
+	else
+	{
+		m_cardPanel->setMouseCursor(tgui::Cursor::Type::Arrow);
+	}
+
 	UpdateCardAppearance();
 }
 

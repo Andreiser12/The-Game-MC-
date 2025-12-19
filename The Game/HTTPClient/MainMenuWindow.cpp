@@ -1,6 +1,6 @@
 ﻿#include "MainMenuWindow.h"
 
-constexpr static unsigned int K_TEXT_SIZE{ 24u };
+constexpr static uint8_t K_TEXT_SIZE{ 24u };
 
 MainMenuWindow::MainMenuWindow(sf::RenderWindow& window, ApiClient& api) :
 	m_window{ window },
@@ -50,7 +50,6 @@ MainMenuWindow::MainMenuWindow(sf::RenderWindow& window, ApiClient& api) :
 
 void MainMenuWindow::LoadWidgets()
 {
-
 	auto playButton = tgui::Button::create();
 	auto profileButton = tgui::Button::create();
 	auto settingsButton = tgui::Button::create();
@@ -139,7 +138,7 @@ void MainMenuWindow::Update()
 	{
 		ShutdownLobby();
 
-		auto errorPopupPanel = ErrorPopupPanel::Create(m_mainMenu, "Lobby was closed by host.",
+		auto errorPopupPanel = Utils::CreateErrorPopupPanel(m_mainMenu, "Lobby was closed by host.",
 			[this]() {  });
 		m_mainMenu.add(errorPopupPanel);
 		return;
@@ -163,13 +162,11 @@ void MainMenuWindow::Update()
 		m_gamePanel->OnGameStarted();
 		m_gameStartedLocally = true;
 	}
-
-
 }
 
 void MainMenuWindow::ExitButtonPressed()
 {
-	auto exitPanel = ExitPanel::Create(
+	auto exitPanel = Utils::CreateExitPanel(
 		m_mainMenu,
 		[this]() {
 			m_window.close();
@@ -260,4 +257,16 @@ void MainMenuWindow::ShutdownLobby()
 void MainMenuWindow::HandleEvent(sf::Event event)
 {
 	m_mainMenu.handleEvent(event);
+
+	if (m_gamePanel)
+	{
+		if (event.is<sf::Event::FocusLost>())
+		{
+			m_gamePanel->ResetAllDrags();
+		}
+		else
+		{
+			m_gamePanel->HandleMouseEvent(event);
+		}
+	}
 }

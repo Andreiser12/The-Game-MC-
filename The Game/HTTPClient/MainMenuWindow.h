@@ -1,11 +1,9 @@
 #pragma once
-
-#include "ExitPanel.h"
-#include "SettingsPanel.h"
 #include "PlayPanel.h"
 #include "IWindow.h"
 #include "ApiClient.h"
 #include "GamePanel.h"
+#include "Utils.h"
 
 #include <iostream>
 #include <vector>

@@ -63,6 +63,13 @@ public:
 	std::vector<std::string> GetLobbyPlayers(const std::string& lobbyId) const;
 	std::optional<std::vector<unsigned>> GetPlayerCards() const;
 
+	void StartNetworkLoop();
+	void StopNetworkLoop();
+
+	std::vector<std::string> SnapshotPlayers() const;
+	std::optional<LobbyState> SnapShotLobbyState() const;
+	std::optional<std::vector<ChatMessage>> SnapshotNewChat() const;
+
 private:
 	ApiClient() = delete;
 

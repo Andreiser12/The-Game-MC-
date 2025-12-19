@@ -1,14 +1,11 @@
 #pragma once
-#include "SFML/Graphics.hpp"
-#include "TGUI/TGUI.hpp"
-#include "TGUI/Core.hpp"
-#include "TGUI/Widgets/Button.hpp"
-#include "TGUI/Backend/SFML-Graphics.hpp"
 #include <SFML/System.hpp>
 
 #include "ApiClient.h"
 #include "Utils.h"
 #include "CardWidget.h"
+#include "DeckWidget.h"
+
 #include <vector>
 #include <memory>
 #include <array>
@@ -29,6 +26,8 @@ public:
 	void Update();
 	void SetupPlayerSlots();
 	void OnGameStarted();
+	void HandleMouseEvent(const sf::Event& event);
+	void ResetAllDrags();
 
 private:
 	inline SlotArray GetSlotsForPlayerCount(size_t count)
@@ -54,7 +53,7 @@ private:
 
 	inline static constexpr std::array<PlayerSlot, 2> k_slots2{ {
 		{45.0f, 75.0f},
-		{45.0f, 13.0f}} };
+		{45.0f, 15.0f}} };
 
 	inline static constexpr std::array<PlayerSlot, 3> k_slots3{ {
 		{45.0f, 75.0f},
@@ -64,7 +63,7 @@ private:
 	inline static constexpr std::array<PlayerSlot, 4> k_slots4{ {
 		{45.0f, 75.0f},
 		{72.5f, 46.0f},
-		{45.0f, 13.0f},
+		{45.0f, 15.0f},
 		{13.0f, 45.0f}} };
 
 	inline static constexpr std::array<PlayerSlot, 5> k_slots5{ {
@@ -76,4 +75,5 @@ private:
 	
 	inline static constexpr uint8_t kmaxChars{ 15u };
 	std::vector<std::shared_ptr<CardWidget>> m_myCards;
+	std::array<std::shared_ptr<DeckWidget>, 4> m_decks;
 };

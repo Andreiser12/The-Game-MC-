@@ -1,0 +1,50 @@
+#include "DeckWidget.h"
+
+DeckWidget::DeckWidget(DeckType deckType) : m_deckType{deckType}
+{
+	m_deckType == DeckType::Ascending ? m_lastId = 1u : m_lastId = 100u;
+	CreateDeckWidget();
+}
+
+void DeckWidget::CreateDeckWidget()
+{
+	m_deckPanel = tgui::Panel::create({ "100%", "100%" });
+	m_deckPanel->getRenderer()->setBorderColor(tgui::Color::Black);
+	m_deckPanel->getRenderer()->setBorders(2);
+	m_deckPanel->getRenderer()->setRoundedBorderRadius(5);
+
+	m_frontSide = tgui::Picture::create("assets/images/cardFrontSide.png");
+	m_frontSide->setSize({ "100%", "100%" });
+	m_frontSide->setPosition({ "0%", "0%" });
+	m_deckPanel->add(m_frontSide);
+	m_frontSide->moveToBack();
+
+	m_topIdLabel = tgui::Label::create(tgui::String(m_lastId));
+	m_topIdLabel->setPosition({ "50%", "50%" });
+	m_topIdLabel->setOrigin(0.5f, 0.5f);
+	m_topIdLabel->setTextSize(20);
+	m_topIdLabel->getRenderer()->setTextColor(tgui::Color::Black);
+	m_topIdLabel->setIgnoreMouseEvents(true);
+	m_deckPanel->add(m_topIdLabel);
+}
+
+DeckWidget::DeckType DeckWidget::GetDeckType() const
+{
+	return m_deckType;
+}
+
+uint16_t DeckWidget::GetLastId() const
+{
+	return m_lastId;
+}
+
+tgui::Panel::Ptr DeckWidget::GetDeckPanel() const
+{
+	return m_deckPanel;
+}
+
+void DeckWidget::SetLastId(uint16_t lastId)
+{
+	m_lastId = lastId;
+	m_topIdLabel->setText(tgui::String(lastId));
+}

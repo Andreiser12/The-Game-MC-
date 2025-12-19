@@ -137,6 +137,7 @@
     <ClInclude Include="ApiClient.h" />
     <ClInclude Include="CardWidget.h" />
     <ClInclude Include="ConnectionFailedWindow.h" />
+    <ClInclude Include="DeckWidget.h" />
     <ClInclude Include="GamePanel.h" />
     <ClInclude Include="HostPanel.h" />
     <ClInclude Include="IWindow.h" />
@@ -152,6 +153,7 @@
     <ClCompile Include="ApiClient.cpp" />
     <ClCompile Include="CardWidget.cpp" />
     <ClCompile Include="ConnectionFailedWindow.cpp" />
+    <ClCompile Include="DeckWidget.cpp" />
     <ClCompile Include="GamePanel.cpp" />
     <ClCompile Include="HostPanel.cpp" />
     <ClCompile Include="TheGame.cpp" />

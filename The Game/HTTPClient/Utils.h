@@ -19,7 +19,7 @@ public:
 		std::function<void()> onClose,
 		std::function<void(unsigned res, bool fullscreen, unsigned framerate)> onApply);
 
-	static tgui::Panel::Ptr	 CreateExitPanel(
+	static tgui::Panel::Ptr	CreateExitPanel(
 		tgui::Gui& gui,
 		std::function<void()> onYes,
 		std::function<void()> onNo);

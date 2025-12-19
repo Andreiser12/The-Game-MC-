@@ -7,7 +7,7 @@
 
 #include "ApiClient.h"
 #include "HostPanel.h"
-#include "ErrorPopupPanel.h"
+#include "Utils.h"
 
 class JoinPanel
 {

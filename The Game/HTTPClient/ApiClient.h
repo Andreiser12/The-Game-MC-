@@ -52,14 +52,10 @@ public:
 
 	void StartLobbyWatcher();
 	void StopLobbyWatcher();
-
-	void SetUsername(const std::string& username);
-	void SetPlayerId(unsigned playerId);
-	void SetLobbyId(const std::string& lobbyId);
 	
-	const std::string& GetUsername() const;
+	std::string GetUsername() const;
 	unsigned GetPlayerId() const;
-	const std::string& GetLobbyId() const;
+	std::string GetLobbyId() const;
 	std::vector<std::string> GetLobbyPlayers(const std::string& lobbyId) const;
 	std::optional<std::vector<unsigned>> GetPlayerCards() const;
 
@@ -67,20 +63,34 @@ public:
 	void StopNetworkLoop();
 
 	std::vector<std::string> SnapshotPlayers() const;
-	std::optional<LobbyState> SnapShotLobbyState() const;
-	std::optional<std::vector<ChatMessage>> SnapshotNewChat() const;
+	std::optional<LobbyState> SnapshotLobbyState() const;
+	std::optional<std::vector<ChatMessage>> SnapshotNewChat();
+
+	void SetUsername(const std::string& username);
+	void SetPlayerId(unsigned playerId);
+	void SetLobbyId(const std::string& lobbyId);
 
 private:
 	ApiClient() = delete;
 
 private:
-	mutable std::mutex m_mutex;
 	std::string m_serverURL;
+
+	mutable std::mutex m_mutex;
 	std::string m_username;
 	std::string m_lobbyId;
-	unsigned m_playerId;
-	std::atomic<bool> m_pingRunning{ false };
-	std::jthread m_pingThread;
+	unsigned m_playerId{ 0u };
 	std::atomic<ClientEvent> m_event{ ClientEvent::None };
+	std::atomic<bool> m_pingRunning{ false };
+
+	std::jthread m_netThread;
+	std::jthread m_pingThread;
 	std::jthread m_lobbyWatcher;
+
+	mutable std::mutex m_cacheMutex;
+	std::vector<std::string> m_cachedPlayers;
+	std::optional<LobbyState> m_cachedLobby;
+	std::optional<std::vector<ChatMessage>> m_cachedChat;
+
+	std::atomic<unsigned> m_afterChatId{ 0u };
 };

@@ -84,10 +84,9 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api) :
 				{
 					if (!m_apiClient.SendChatMessage(messageSent))
 					{
-						m_chat->addLine("(ERROR) Failed to send message", tgui::Color::Red);
+						m_chat->addLine("[Error]: Message has not been sent", tgui::Color::Red);
 					}
 				}).detach();
-
 			chatEditBox->setText("");
 		});
 
@@ -100,11 +99,17 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api) :
 	sendButton->onPress([this, chatEditBox]()
 		{
 			const std::string messageSent = chatEditBox->getText().toStdString();
-			if (messageSent.size())
-			{
-				m_apiClient.SendChatMessage(messageSent);
-				chatEditBox->setText("");
-			}
+			if (messageSent.empty() || messageSent.size() > 500) return;
+
+			std::thread([this, messageSent]()
+				{
+					if (!m_apiClient.SendChatMessage(messageSent))
+					{
+						m_chat->addLine("[Error]: Message has not been sent", tgui::Color::Red);
+					}
+				}).detach();
+
+			chatEditBox->setText("");
 		});
 	chatGroup->add(sendButton);
 
@@ -148,23 +153,19 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api) :
 
 void GamePanel::Update()
 {
-	if (m_chatClock.getElapsedTime().asMilliseconds() < 50) return;
-
-	m_chatClock.restart();
-
-	const auto& newMessages = m_apiClient.GetNewMessages(m_lastMessageId);
+	auto newMessages = m_apiClient.SnapshotNewChat();
 	if (!newMessages || newMessages->empty()) return;
 
-	for (const auto& newMessage : newMessages.value())
+	for (const auto& message : newMessages.value())
 	{
-		m_chat->addLine(newMessage.username + ": " + newMessage.message);
-		m_lastMessageId = std::max(newMessage.id, m_lastMessageId);
+		m_chat->addLine(message.username + ": " + message.message);
+		m_lastMessageId = std::max(m_lastMessageId, message.id);
 	}
 }
 
 void GamePanel::SetupPlayerSlots()
 {
-	auto playerUsernames = m_apiClient.GetLobbyPlayers(m_apiClient.GetLobbyId());
+	auto playerUsernames = m_apiClient.SnapshotPlayers();
 	const std::string currentPlayer = m_apiClient.GetUsername();
 	auto it = std::find(playerUsernames.begin(), playerUsernames.end(), currentPlayer);
 	if (it != playerUsernames.end())

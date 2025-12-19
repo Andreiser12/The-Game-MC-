@@ -31,8 +31,6 @@ public:
     std::optional<DB::User> GetUserByID(unsigned userID);
     std::optional<DB::User> GetUserByName(const std::string& username);
 
-    void PopulateDataBase();
-
     std::vector<DB::User> GetUsers();
 
 private:

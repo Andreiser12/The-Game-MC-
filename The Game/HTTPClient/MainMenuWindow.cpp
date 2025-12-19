@@ -80,7 +80,6 @@ void MainMenuWindow::LoadWidgets()
 	settingsButton->setPosition({ "50%", "62.5%" });
 	settingsButton->setOrigin(0.5f, 0.5f);
 	settingsButton->setText("Settings");
-	settingsButton->getRenderer()->setOpacity(0.7f);
 	settingsButton->getRenderer()->setTexture("assets/images/buttons.png");
 
 	m_mainMenu.add(settingsButton);
@@ -92,8 +91,6 @@ void MainMenuWindow::LoadWidgets()
 	exitButton->setPosition({ "50%", "72.5%" });
 	exitButton->setOrigin(0.5f, 0.5f);
 	exitButton->setText("Exit");
-	exitButton->getRenderer()->setOpacity(0.7f);
-	exitButton->getRenderer()->setBackgroundColor(tgui::Color::Yellow);
 	exitButton->getRenderer()->setTexture("assets/images/buttons.png");
 
 	m_mainMenu.add(exitButton);
@@ -129,7 +126,7 @@ void MainMenuWindow::Update()
 	switch (event)
 	{
 	case ClientEvent::PlayerLeft:
-		HostPanel::RefreshPlayersList();
+		HostPanel::RefreshPlayersList(m_apiClient);
 		HostPanel::UpdateStartButton();
 		m_apiClient.ClearEvent();
 		return;
@@ -137,10 +134,7 @@ void MainMenuWindow::Update()
 	case ClientEvent::LobbyClosed:
 	{
 		ShutdownLobby();
-
-		auto errorPopupPanel = Utils::CreateErrorPopupPanel(m_mainMenu, "Lobby was closed by host.",
-			[this]() {  });
-		m_mainMenu.add(errorPopupPanel);
+		m_mainMenu.add(Utils::CreateErrorPopupPanel(m_mainMenu, "Lobby was closed by host.", []() {}));
 		return;
 	}
 
@@ -235,7 +229,6 @@ void MainMenuWindow::CloseHostPanel()
 	if (hostPanel)
 	{
 		m_mainMenu.remove(hostPanel);
-		HostPanel::StopUpdateThread();
 		m_apiClient.StopPingThread();
 		m_apiClient.StopLobbyWatcher();
 	}
@@ -245,19 +238,16 @@ void MainMenuWindow::ShutdownLobby()
 {
 	m_apiClient.StopLobbyWatcher();
 	m_apiClient.StopPingThread();
-
 	CloseHostPanel();
 
 	m_apiClient.SetLobbyId("");
 	m_apiClient.SetPlayerId(0);
-
 	m_apiClient.ClearEvent();
 }
 
 void MainMenuWindow::HandleEvent(sf::Event event)
 {
 	m_mainMenu.handleEvent(event);
-
 	if (m_gamePanel)
 	{
 		if (event.is<sf::Event::FocusLost>())

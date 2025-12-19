@@ -16,7 +16,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_ int       nCmdShow)
 {
 	ApiClient api{ "http://localhost:18080" };
-	cpr::Response response = cpr::Get(cpr::Url{ "http://localhost:18080/users" });
+	cpr::Response response = cpr::Get(cpr::Url{ "http://localhost:18080/users" }, cpr::Timeout(300));
 	if ((int)response.status_code == 404 || response.primary_port!=18080)
 	{
 		sf::VideoMode connectionFailedMode = sf::VideoMode::getDesktopMode();
@@ -107,7 +107,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 			if (HostPanel::GetPlayersListBox())
 			{
-				HostPanel::RefreshPlayersList();
+				HostPanel::RefreshPlayersList(api);
 				HostPanel::UpdateStartButton();
 			}
 

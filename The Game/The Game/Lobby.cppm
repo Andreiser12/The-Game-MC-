@@ -52,7 +52,7 @@ private:
 	Lobby() = delete;
 
 public:
-	inline static constexpr size_t kMaxChatMessages{ 200 };
+	inline static constexpr size_t kMaxChatMessages{ 100 };
 	inline static constexpr uint8_t kMinPlayers{ 2u };
 	inline static constexpr uint8_t kMaxPlayers{ 5u };
 
@@ -65,7 +65,8 @@ private:
 	unsigned m_lastMessageId{ 0u };
 	std::deque<ChatMessage> m_chatBuffer;
 	std::atomic<bool> m_gameStarted{ false };
-	std::unique_ptr<Table> m_table;
 	mutable std::mutex m_mutex;
+
+	std::unique_ptr<Table> m_table;
 
 };

@@ -144,6 +144,7 @@
     <ClInclude Include="JoinPanel.h" />
     <ClInclude Include="LoginWindow.h" />
     <ClInclude Include="MainMenuWindow.h" />
+    <ClInclude Include="PileWidget.h" />
     <ClInclude Include="PlayPanel.h" />
     <ClInclude Include="RegisterWindow.h" />
     <ClInclude Include="Resource.h" />
@@ -156,7 +157,8 @@
     <ClCompile Include="DeckWidget.cpp" />
     <ClCompile Include="GamePanel.cpp" />
     <ClCompile Include="HostPanel.cpp" />
-    <ClCompile Include="TheGame.cpp" />
+    <ClCompile Include="PileWidget.cpp" />
+    <ClCompile Include="HTTPClient.cpp" />
     <ClCompile Include="IWindow.cpp" />
     <ClCompile Include="JoinPanel.cpp" />
     <ClCompile Include="LoginWindow.cpp" />

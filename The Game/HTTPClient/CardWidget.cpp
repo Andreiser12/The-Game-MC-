@@ -49,9 +49,9 @@ void CardWidget::SetDraggable(bool draggable)
 void CardWidget::UpdateDragPosition(tgui::Vector2f mousePos)
 {
 	if (!m_isDragging || !m_isOwner) return;
-
-	tgui::Vector2f newPos = mousePos - m_dragOffset;
-	m_cardPanel->setPosition(newPos);
+	tgui::Vector2f parentGlobal = m_cardPanel->getParent()->getAbsolutePosition();
+	tgui::Vector2f relativePos = mousePos - parentGlobal - m_dragOffset;
+	m_cardPanel->setPosition(relativePos);
 }
 
 void CardWidget::CancelDrag()
@@ -86,7 +86,6 @@ void CardWidget::CreateCardWidget()
 	m_idLabel->setTextSize(20);
 	m_idLabel->getRenderer()->setTextColor(tgui::Color::Black);
 	m_idLabel->setIgnoreMouseEvents(true);
-
 	m_cardPanel->add(m_idLabel);
 
 	if (m_isOwner)
@@ -94,14 +93,17 @@ void CardWidget::CreateCardWidget()
 		m_cardPanel->onMousePress([this](tgui::Vector2f mousePos) {
 
 			m_isDragging = true;
-			m_originalPosition = m_cardPanel->getPosition();
 			m_dragOffset = mousePos;
+			m_originalPosition = m_cardPanel->getPosition();
 			m_cardPanel->moveToFront();
 			});
 		m_cardPanel->onMouseRelease([this]() {
 
-			m_isDragging = false;
-			m_cardPanel->setPosition(m_originalPosition);
+			if (m_isDragging)
+			{
+				m_isDragging = false;
+				m_cardPanel->setPosition(m_originalPosition);
+			}
 			});
 
 		m_cardPanel->setMouseCursor(tgui::Cursor::Type::Hand);

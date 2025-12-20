@@ -5,6 +5,7 @@
 #include "Utils.h"
 #include "CardWidget.h"
 #include "DeckWidget.h"
+#include "PileWidget.h"
 
 #include <vector>
 #include <memory>
@@ -76,4 +77,5 @@ private:
 	inline static constexpr uint8_t kmaxChars{ 15u };
 	std::vector<std::shared_ptr<CardWidget>> m_myCards;
 	std::array<std::shared_ptr<DeckWidget>, 4> m_decks;
+	std::shared_ptr<PileWidget> m_pileWidget;
 };

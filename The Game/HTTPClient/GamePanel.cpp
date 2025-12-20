@@ -149,6 +149,14 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api) :
 		xDeckPosition += 3.75f;
 		m_root->add(deckPanel);
 	}
+	m_pileWidget = std::make_shared<PileWidget>(PileWidget());
+	auto pilePanel = m_pileWidget->GetPilePanel();
+	pilePanel->setSize({ "2.25%", "6.5%" });
+	pilePanel->setPosition({
+		tgui::String(std::to_string(xDeckPosition) + "%"),
+		tgui::String(std::to_string(yDeckPosition) + "%")
+		});
+	m_root->add(pilePanel);
 }
 
 void GamePanel::Update()
@@ -205,7 +213,6 @@ void GamePanel::SetupPlayerSlots()
 
 		if (index == 0)
 		{
-			userLabel->getRenderer()->setTextColor(tgui::Color::Yellow);
 			CreateMyHand(slots[index]);
 		}
 		else
@@ -302,7 +309,6 @@ void GamePanel::CreateMyHand(const PlayerSlot& slot)
 	const float totalWidth{ (cardWidth + cardSpacing) * cardCount - cardSpacing };
 	const float startX{ slot.xPercent + 7.0f - (totalWidth / 2.0f) };
 	const float startY{ slot.yPercent - cardHeight };
-	m_myCards.clear();
 
 	for (size_t i = 0; i < cardCount; i++)
 	{

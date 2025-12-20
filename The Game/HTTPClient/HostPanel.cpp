@@ -119,8 +119,7 @@ void HostPanel::RefreshPlayersList(ApiClient& apiClient)
 
 void HostPanel::UpdateStartButton()
 {
-	if (!startButton || !playersListBox)
-		return;
+	if (!startButton || !playersListBox) return;
 
 	bool isHost = (s_hostId == s_playerId);
 	bool enoughPlayers = (playersListBox->getItemCount() >= kMinPlayers);

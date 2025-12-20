@@ -16,6 +16,15 @@
     <Filter Include="Source Files\Lobby">
       <UniqueIdentifier>{8002eb56-7bd3-42dc-9305-3c68a166ba02}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Lobby">
+      <UniqueIdentifier>{d4703f98-ce34-4d0c-85cd-37914bda8a22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Database">
+      <UniqueIdentifier>{af687893-1178-43d0-83d6-0a923c20968f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Database">
+      <UniqueIdentifier>{0639d32a-e7ed-410b-8474-494ba727105b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -36,9 +45,6 @@
     <ClCompile Include="Deck.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DatabaseManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Card.cppm">
       <Filter>Header Files</Filter>
     </ClCompile>
@@ -52,21 +58,6 @@
       <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="Table.cppm">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DatabaseManager.cppm">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DatabaseStructures.cppm">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Lobby.cppm">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LobbyManager.cppm">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LobbyRoutes.cppm">
       <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="Lobby.cpp">
@@ -89,6 +80,24 @@
     </ClCompile>
     <ClCompile Include="GreedyAI.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Lobby.cppm">
+      <Filter>Header Files\Lobby</Filter>
+    </ClCompile>
+    <ClCompile Include="LobbyManager.cppm">
+      <Filter>Header Files\Lobby</Filter>
+    </ClCompile>
+    <ClCompile Include="LobbyRoutes.cppm">
+      <Filter>Header Files\Lobby</Filter>
+    </ClCompile>
+    <ClCompile Include="DatabaseManager.cppm">
+      <Filter>Header Files\Database</Filter>
+    </ClCompile>
+    <ClCompile Include="DatabaseStructures.cppm">
+      <Filter>Header Files\Database</Filter>
+    </ClCompile>
+    <ClCompile Include="DatabaseManager.cpp">
+      <Filter>Source Files\Database</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

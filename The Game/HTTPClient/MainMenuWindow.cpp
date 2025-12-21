@@ -7,9 +7,16 @@ MainMenuWindow::MainMenuWindow(sf::RenderWindow& window, ApiClient& api) :
 	m_mainMenu{ window },
 	m_apiClient{api}
 {
-	m_background = tgui::Picture::create("assets/images/background.png");
+	m_background = tgui::Picture::create("assets/images/mainMenuBackground.png");
 	m_background->setSize({ "100%", "100%" });
+	m_background->setPosition({ "0%", "0%" });
 	m_mainMenu.add(m_background);
+
+	auto gameTitle = tgui::Picture::create("assets/images/gameTitle.png");
+	gameTitle->setSize({ "50%", "50%" });
+	gameTitle->setPosition({ "50%", "15%" });
+	gameTitle->setOrigin(0.5f, 0.1f);
+	m_mainMenu.add(gameTitle);
 
 	/*const int frameCount = 60;
 	m_bgFrames.reserve(frameCount);

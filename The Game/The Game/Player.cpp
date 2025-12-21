@@ -3,10 +3,10 @@ module Player;
 constexpr static uint8_t MINIMUM_CARDS{ 2u };
 
 Player::Player(unsigned playerID, const std::string& username) :
-	m_playerID{playerID}, m_username{username} {}
+	m_playerId{playerID}, m_username{username} {}
 
 Player::Player(unsigned playerID, const PlayerHand& cards) :
-	m_playerID{ playerID }, m_cards { cards }  {}
+	m_playerId{ playerID }, m_cards { cards }  {}
 
 Player::~Player() {}
 
@@ -48,7 +48,7 @@ void Player::PrintCards() const
 	std::cout << std::endl;
 }
 
-void Player::DrawCards(DeckStack& deck)
+void Player::DrawCards(Pile& deck)
 {
 	while (!deck.empty() && m_cardsPlacedRound)
 	{
@@ -71,15 +71,15 @@ void Player::RemoveCard(uint16_t cardId)
 	m_cards.erase(cardToDelete);
 }
 
-inline const bool Player::IsCardValid(const Deck& chosenDeck, uint16_t cardID)
+inline const bool Player::IsCardValid(const Deck& chosenDeck, uint16_t cardId)
 {
 	return (chosenDeck.GetDeckType() == Deck::DeckType::Ascending
-		&& cardID > chosenDeck.GetTopCard().getId())
+		&& cardId > chosenDeck.GetTopCard().getId())
 		|| (chosenDeck.GetDeckType() == Deck::DeckType::Descending
-			&& cardID < chosenDeck.GetTopCard().getId());
+			&& cardId < chosenDeck.GetTopCard().getId());
 }
 
-void Player::SetupCards(DeckStack& deck, uint8_t cardsCount)
+void Player::SetupCards(Pile& deck, uint8_t cardsCount)
 {
 	Card<uint16_t> cardToPlace;
 	for (uint8_t i = 0; i < cardsCount; i++)
@@ -90,14 +90,9 @@ void Player::SetupCards(DeckStack& deck, uint8_t cardsCount)
 	}
 }
 
-void Player::SetCards(const PlayerHand& cards)
+unsigned Player::GetPlayerId() const
 {
-	m_cards = cards;
-}
-
-unsigned Player::GetPlayerID() const
-{
-	return m_playerID;
+	return m_playerId;
 }
 
 const std::string& Player::GetUsername() const
@@ -117,7 +112,7 @@ size_t Player::GetCardsCount() const
 
 bool Player::operator<(Player& other) const
 {
-	return this->m_playerID < other.GetPlayerID();
+	return this->m_playerId < other.GetPlayerId();
 }
 
 void Player::SetTimeOut(bool value)

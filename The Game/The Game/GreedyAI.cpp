@@ -15,7 +15,7 @@ std::optional<AIMove>GreedyAI::FindBestMove(const Player& currentPlayer, Table& 
 		for (const auto& deckReference : table.GetAllDecks())
 		{
 			auto& deck = deckReference.get();
-			if (table.CheckCard(deck, card))
+			if (table.CheckCard(deck.GetDeckIndex(), card))
 			{
 				AIMove move{deck, card, 0};
 				move.score = HeuristicTree::Evaluate(move, table, table.GetPlayers());
@@ -30,33 +30,30 @@ std::optional<AIMove>GreedyAI::FindBestMove(const Player& currentPlayer, Table& 
 	}
 	
 	auto bestMove = std::ranges::min_element(moves, {}, &AIMove::score);
-
 	return *bestMove;
 }
 
 void GreedyAI::PlayTurn(Player& currentPlayer, Table& table, uint8_t minCards)
 {
-	for (int i = 0; i < minCards; i++)
+	for (size_t i = 0; i < minCards; i++)
 	{
 		auto bestMove = FindBestMove(currentPlayer, table);
 		if (!bestMove)
 		{
 			break;
 		}
-		table.PlaceCardOnDeck(bestMove.value().deck, bestMove.value().card);
+		table.PlaceCardOnDeck(bestMove.value().deck.get().GetDeckIndex(), bestMove.value().card);
 		currentPlayer.RemoveCard(bestMove.value().card.getId());
 	}
 }
 
 int HeuristicTree::Evaluate(const AIMove& move, const Table& table, std::span<const Player> players)
 {
-	int score = 0;
-
+	int score{ 0 };
 	score += LOCAL_WEIGHT * LocalScore(move)
 		- BackwardsBonus(move)
 		+ GLOBAL_WEIGHT * GlobalPenalty(move, table, players)
 		+ RISK_WEIGHT * RiskPenalty(move, table);
-
 	return score;
 }
 
@@ -76,7 +73,6 @@ int HeuristicTree::BackwardsBonus(const AIMove& move)
 	{
 		return 10;
 	}
-
 	return 0;
 }
 
@@ -90,7 +86,7 @@ int HeuristicTree::GlobalPenalty(const AIMove& move, const Table& table, std::sp
 
 		for (const auto& card : player.GetCards())
 		{
-			if (table.CheckCard(move.deck, card))
+			if (table.CheckCard(move.deck.get().GetDeckIndex(), card))
 			{
 				validMoves++;
 			}
@@ -109,7 +105,6 @@ int HeuristicTree::GlobalPenalty(const AIMove& move, const Table& table, std::sp
 			penalty += 10;
 		}
 	}
-
 	return penalty;
 }
 
@@ -127,7 +122,5 @@ int HeuristicTree::RiskPenalty(const AIMove& move, const Table& table)
 	{
 		return 10;
 	}
-
 	return 0;
-
 }

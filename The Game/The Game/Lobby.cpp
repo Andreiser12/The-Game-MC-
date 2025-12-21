@@ -164,11 +164,17 @@ std::optional<std::vector<unsigned>> Lobby::GetPlayerCards(unsigned playerId) co
 	return playerCards;
 }
 
-bool Lobby::PlayCard(unsigned playerId, unsigned cardId, unsigned deckIndex)
+bool Lobby::PlayCard(unsigned playerId, uint8_t cardId, uint8_t deckId)
 {
 	std::lock_guard lock(m_mutex);
 
 	if (!m_gameStarted || !m_table) return false;
+	
+	auto player = m_table->GetPlayer(playerId);
+	auto card = player.FindCard(cardId);
+	if (!m_table->CheckCard(deckId, card)) return false;
 
+	m_table->PlaceCardOnDeck(deckId, card);
+	player.RemoveCard(card);
 	return true;
 }

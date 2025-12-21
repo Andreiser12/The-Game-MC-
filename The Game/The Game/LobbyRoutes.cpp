@@ -74,6 +74,12 @@ void LobbyRoutes::Register(crow::SimpleApp& app)
 			{
 				return this->GetPlayerCards(lobbyId, playerId);
 			});
+
+	CROW_ROUTE(app, "/lobby/<string>/players/<uint>/cards").methods("POST"_method)
+		([this](const crow::request& req, const std::string& lobbyId, unsigned playerId)
+			{
+				return this->PlayCard(req, lobbyId, playerId);
+			});
 }
 
 crow::response LobbyRoutes::CreateLobby(const crow::request& request)
@@ -310,13 +316,13 @@ crow::response LobbyRoutes::PlayerPing(const crow::request& request)
 
 	crow::json::wvalue data;
 	data["status"] = "OK";
-	return crow::response(data);
+	return crow::response(200, data);
 }
 
 crow::response LobbyRoutes::GetPlayerCards(const std::string& lobbyId, unsigned playerId)
 {
 	auto lobby = m_manager.GetLobby(lobbyId);
-	if (!lobby) return crow::response(404, "Lobby does not exist");
+	if (!lobby) return crow::response(404, "Lobby not found");
 
 	auto cardsOpt = lobby->GetPlayerCards(playerId);
 	if (!cardsOpt) return crow::response(409, "Game state does not allow getting cards");
@@ -328,5 +334,23 @@ crow::response LobbyRoutes::GetPlayerCards(const std::string& lobbyId, unsigned 
 		cardList.push_back(cardId);
 	}
 	data["cards"] = std::move(cardList);
+	return crow::response(200, data);
+}
+
+crow::response LobbyRoutes::PlayCard(const crow::request& request, const std::string& lobbyId, unsigned playerId)
+{
+	auto body = crow::json::load(request.body);
+	if (!body) return crow::response(400, "Invalid JSON");
+
+	auto lobby = m_manager.GetLobby(lobbyId);
+	if (!lobby) return crow::response(404, "Lobby not found");
+
+	if (!lobby->PlayCard(playerId, static_cast<uint8_t>(body["cardId"].i()),
+		static_cast<uint8_t>(body["deckId"].i())))
+	{
+		return crow::response(409, "Card cannot be placed");
+	}
+	crow::json::wvalue data;
+	data["status"] = "OK";
 	return crow::response(200, data);
 }

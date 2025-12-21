@@ -38,21 +38,21 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 		std::vector<unsigned>
 	{
 		30u,
-			60u,
-			120u,
-			144u,
-			180u
+		60u,
+		120u,
+		144u,
+		180u
 	});
 
 	auto panel = tgui::Panel::create({ "60%", "60%" });
 	panel->setPosition({ "50%", "50%" });
 	panel->getRenderer()->setBackgroundColor(tgui::Color(0, 0, 0, 180));
 	panel->getRenderer()->setBorders({ 2 });
-	panel->getRenderer()->setBorderColor(tgui::Color::White);
+	panel->getRenderer()->setBorderColor(tgui::Color::Black);
 	panel->getRenderer()->setRoundedBorderRadius(15);
 	panel->setOrigin(0.5f, 0.5f);
 
-	auto background = tgui::Picture::create("assets/images/background.png");
+	auto background = tgui::Picture::create("assets/images/mainMenuBackground.png");
 	background->setSize({ "100%", "100%" });
 
 	auto sidebar = tgui::Panel::create({ "20%", "100%" });
@@ -334,8 +334,10 @@ tgui::Panel::Ptr Utils::CreateExitPanel(tgui::Gui& gui,
 	auto panel = tgui::Panel::create({ "33.33%", "33.33%" });
 	panel->setPosition({ "50%", "50%" });
 	panel->setOrigin(0.5f, 0.5f);
+	panel->getRenderer()->setBorders(2);
+	panel->getRenderer()->setBorderColor(tgui::Color::Black);
 
-	auto background = tgui::Picture::create("assets/images/background.png");
+	auto background = tgui::Picture::create("assets/images/mainMenuBackground.png");
 	background->setSize({ "100%", "100%" });
 	panel->add(background);
 
@@ -383,7 +385,7 @@ tgui::Panel::Ptr Utils::CreateErrorPopupPanel(tgui::Gui& gui, const std::string&
 	errorPopupPanel->getRenderer()->setBorderColor(tgui::Color::Black);
 	errorPopupPanel->getRenderer()->setBorders(1);
 
-	auto background = tgui::Picture::create("assets/images/background.png");
+	auto background = tgui::Picture::create("assets/images/mainMenuBackground.png");
 	background->setSize({ "100%", "100%" });
 	errorPopupPanel->add(background);
 

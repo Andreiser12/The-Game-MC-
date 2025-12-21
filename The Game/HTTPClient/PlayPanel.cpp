@@ -6,20 +6,20 @@ tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 	std::function<void()> onJoin,
 	std::function<std::string(ApiClient&, const std::string&)> onHost)
 {
-	auto background = tgui::Picture::create("assets/images/background.png");
+	auto background = tgui::Picture::create("assets/images/mainMenuBackground.png");
 	background->setSize({ "100%", "100%" });
+	background->setPosition({ "0%", "0%" });
 
 	auto panel = tgui::Panel::create({"30%", "25%"});
 	panel->setPosition({ "50%", "50%" });
 	panel->getRenderer()->setBorders({ 2 });
 	panel->getRenderer()->setBorderColor(tgui::Color::Black);
-	panel->getRenderer()->setRoundedBorderRadius(15);
 	panel->setOrigin(0.5f, 0.5f);
 
-	auto titleLabel = tgui::Label::create("Select option");
+	auto titleLabel = tgui::Label::create("Select an option");
+	titleLabel->setPosition({ "50%", "35%" });
 	titleLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
 	titleLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-	titleLabel->setPosition({ "50%", "35%" });
 	titleLabel->setOrigin(0.5f, 0.5f);
 	titleLabel->setTextSize(26);
 

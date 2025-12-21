@@ -29,6 +29,7 @@ public:
 	void OnGameStarted();
 	void HandleMouseEvent(const sf::Event& event);
 	void ResetAllDrags();
+	void RemovePlacedCards();
 
 private:
 	inline SlotArray GetSlotsForPlayerCount(size_t count)

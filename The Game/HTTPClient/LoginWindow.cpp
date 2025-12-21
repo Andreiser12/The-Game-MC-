@@ -1,11 +1,12 @@
 #include "LoginWindow.h"
 
 LoginWindow::LoginWindow(sf::RenderWindow& window, ApiClient& api)
-	: m_login{window}, m_apiClient{api}
-{ 
-	 
-	m_background = tgui::Picture::create("assets/images/background.png");
+	: m_login{ window }, m_apiClient{ api }
+{
+
+	m_background = tgui::Picture::create("assets/images/mainMenuBackground.png");
 	m_background->setSize({ "100%", "100%" });
+	m_background->setPosition({ "0%", "0%" });
 	m_login.add(m_background);
 
 	LoadWidgets();

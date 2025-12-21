@@ -8,7 +8,7 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	std::function<bool(ApiClient&)> onLeave,
 	std::function<bool(ApiClient&)> onStart)
 {
-	auto background = tgui::Picture::create("assets/images/background.png");
+	auto background = tgui::Picture::create("assets/images/mainMenuBackground.png");
 	background->setSize({ "100%", "100%" });
 
 	auto panel = tgui::Panel::create({ "40%", "40%" });
@@ -16,7 +16,6 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	panel->setOrigin(0.5f, 0.5f);
 	panel->getRenderer()->setBorders(2);
 	panel->getRenderer()->setBorderColor(tgui::Color::Black);
-	panel->getRenderer()->setRoundedBorderRadius(15);
 	panel->setWidgetName("HostPanel");
 
 	auto lobbyIdLabel = tgui::Label::create("Lobby ID: " + lobbyId);

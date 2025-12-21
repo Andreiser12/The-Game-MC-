@@ -1,6 +1,6 @@
 #include "CardWidget.h"
 
-CardWidget::CardWidget(unsigned id, bool isOwner) :
+CardWidget::CardWidget(uint8_t id, bool isOwner) :
 	m_id{ id },
 	m_isOwner{ isOwner },
 	m_faceState{ isOwner ? FaceState::FaceUp : FaceState::FaceDown }
@@ -13,7 +13,7 @@ tgui::Panel::Ptr CardWidget::GetWidget() const
 	return m_cardPanel;
 }
 
-unsigned CardWidget::GetId() const
+uint8_t CardWidget::GetId() const
 {
 	return m_id;
 }
@@ -59,7 +59,38 @@ void CardWidget::CancelDrag()
 	if (!m_isDragging) return;
 
 	m_isDragging = false;
+	m_isOnDeck = false;
+	m_targetDeck = nullptr;
 	m_cardPanel->setPosition(m_originalPosition);
+}
+
+void CardWidget::CheckOnDeck(std::shared_ptr<DeckWidget> deckWidget)
+{
+	if (!m_isDragging) return;
+
+	if (IsNearDeck(deckWidget->GetDeckPanel()))
+	{
+		m_isOnDeck = true;
+		m_targetDeck = deckWidget;
+	}
+	else
+	{
+		if (m_targetDeck == deckWidget)
+		{
+			m_isOnDeck = false;
+			m_targetDeck = nullptr;
+		}
+	}
+}
+
+bool CardWidget::IsPlacedOnDeck() const
+{
+	return m_isPlacedOnDeck;
+}
+
+void CardWidget::MarkAsPlaced()
+{
+	m_isPlacedOnDeck = true;
 }
 
 void CardWidget::CreateCardWidget()
@@ -75,7 +106,7 @@ void CardWidget::CreateCardWidget()
 	m_cardPanel->add(m_frontSide);
 	m_frontSide->moveToBack();
 
-	m_backSide = tgui::Picture::create("assets/images/cardBackSide.jpg");
+	m_backSide = tgui::Picture::create("assets/images/carte2.jpg");
 	m_backSide->setSize({ "100%", "100%" });
 	m_backSide->setPosition({ "0%", "0%" });
 	m_cardPanel->add(m_backSide);
@@ -99,9 +130,26 @@ void CardWidget::CreateCardWidget()
 			});
 		m_cardPanel->onMouseRelease([this]() {
 
-			if (m_isDragging)
+			if (!m_isDragging) return;
+
+			m_isDragging = false;
+			if (m_isOnDeck && m_targetDeck && onCardPlaced)
 			{
-				m_isDragging = false;
+				if (onCardPlaced(m_id, m_targetDeck))
+				{
+					m_targetDeck->SetLastId(m_id);
+					m_isPlacedOnDeck = true;
+					m_cardPanel->setVisible(false);
+				}
+				else
+				{
+					m_cardPanel->setPosition(m_originalPosition);
+				}
+				m_isOnDeck = false;
+				m_targetDeck = nullptr;
+			}
+			else
+			{
 				m_cardPanel->setPosition(m_originalPosition);
 			}
 			});
@@ -130,4 +178,22 @@ void CardWidget::UpdateCardAppearance()
 		m_idLabel->setVisible(false);
 		m_backSide->setVisible(true);
 	}
+}
+
+bool CardWidget::IsNearDeck(const tgui::Panel::Ptr& deck)
+{
+	tgui::Vector2f cardPosition = m_cardPanel->getPosition();
+	tgui::Vector2f cardSize = m_cardPanel->getSize();
+	tgui::Vector2f cardCenter = cardPosition + (cardSize / 2.0f);
+
+	tgui::Vector2f deckPosition = deck->getPosition();
+	tgui::Vector2f deckSize = deck->getSize();
+	tgui::Vector2f deckCenter = deckPosition + (deckSize / 2.0f);
+
+	const float dx = cardCenter.x - deckCenter.x;
+	const float dy = cardCenter.y - deckCenter.y;
+	const float distance = std::sqrt(dx * dx + dy * dy);
+	const float threshold = std::max(cardSize.x, cardSize.y) * 0.8f;
+
+	return distance < threshold;
 }

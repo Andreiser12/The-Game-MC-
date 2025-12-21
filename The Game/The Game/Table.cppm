@@ -16,7 +16,6 @@ import Card;
 import Player;
 import Deck;
 import DatabaseManager;
-//import GreedyAI;
 
 export class Table
 {
@@ -32,22 +31,23 @@ public:
 public:
 	Table(const std::vector<std::pair<unsigned, std::string>>& lobbyPlayers);
 
-	bool isDeckEmpty() const;
+	bool IsPileEmpty() const;
 	void Shuffle();
-	bool BackwardsTrick(const Deck& deck, const Card<uint16_t>& card) const;
-	bool CheckCard(const Deck& deck, const Card<uint16_t>& card) const;
+	bool BackwardsTrick(uint8_t deckId, const Card<uint16_t>& card) const;
+	bool CheckCard(uint8_t deckId, const Card<uint16_t>& card) const;
 	void PlayGame();
 
 	bool CanPlayerPlayMinCards(const Player& player, uint8_t minCards);
-	void PlaceCardOnDeck(Deck& deck, const Card<uint16_t>& card);
+	void PlaceCardOnDeck(uint8_t deckIndex, const Card<uint16_t>& card);
 	bool AllCardsPlaced() const;
 	bool PlayerTurn(Player& player, uint8_t minCards);
 
 	Deck& GetDeck(const Deck::DeckType &type, const Deck::DeckNumber &number);
-	const DeckStack& GetMainDeck() const;
+	const Pile& GetMainDeck() const;
 	std::span<std::reference_wrapper<Deck>> GetAllDecks();
 	std::span<const Player> GetPlayers() const;
 	const std::unordered_map<unsigned, Player>& GetPlayersMap() const;
+	const Player& GetPlayer(unsigned playerId) const;
 
 	constexpr std::size_t GetDeckIndex(DeckIndex index) noexcept;
 
@@ -55,7 +55,7 @@ private:
 	uint8_t m_nrPlayers;
 	std::vector<Player> m_Players;
 	std::unordered_map<unsigned, Player> m_playersMap;
-	DeckStack m_mainDeck;
-	std::array<std::unique_ptr<Deck>, 4> m_allDecks;
+	Pile m_pile;
+	std::array<std::unique_ptr<Deck>, 4> m_decks;
 };
 

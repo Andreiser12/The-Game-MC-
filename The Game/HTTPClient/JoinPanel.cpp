@@ -7,7 +7,7 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 	std::function<void()> onBack,
 	std::function<bool(ApiClient&, std::string)> onJoinLobby)
 {
-	auto background = tgui::Picture::create("assets/images/background.png");
+	auto background = tgui::Picture::create("assets/images/mainMenuBackground.png");
 	background->setSize({ "100%", "100%" });
 
 	auto panel = tgui::Panel::create({ "30%", "25%" });
@@ -15,7 +15,6 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 	panel->setOrigin(0.5f, 0.5f);
 	panel->getRenderer()->setBorders({ 2 });
 	panel->getRenderer()->setBorderColor(tgui::Color::Black);
-	panel->getRenderer()->setRoundedBorderRadius(15);
 
 	auto lobbyEditBox = tgui::EditBox::create();
 	lobbyEditBox->setSize({ "45%", "25%" });
@@ -88,7 +87,6 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 	panel->add(lobbyEditBox);
 	panel->add(backButton);
 	panel->add(joinLobbyButton);
-
 	return panel;
 }
 void JoinPanel::StopUpdateThread()

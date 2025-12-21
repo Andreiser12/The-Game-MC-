@@ -1,21 +1,21 @@
 module Deck;
 
-Deck::Deck(DeckType deckType, DeckNumber deckNumber) :
-    m_deckType(deckType), m_deckNumber(deckNumber)
+Deck::Deck(DeckType deckType, DeckNumber deckNumber, uint8_t deckIndex) :
+    m_deckType{ deckType }, m_deckNumber{ deckNumber }, m_deckIndex{ deckIndex }
 {
     if (m_deckType == DeckType::Ascending)
     {
-        m_deck.push(FundamentalCard(ASCENDING_START_CARD));
+        m_pile.push(FundamentalCard(ASCENDING_START_CARD));
     }
     else
     {
-        m_deck.push(FundamentalCard(DESCENDING_START_CARD));
+        m_pile.push(FundamentalCard(DESCENDING_START_CARD));
     }
 }
 
-const DeckStack& Deck::GetDeck() const
+const Pile& Deck::GetDeck() const
 {
-    return m_deck;
+    return m_pile;
 }
 
 Deck::DeckType Deck::GetDeckType() const
@@ -30,10 +30,15 @@ Deck::DeckNumber Deck::GetDeckNumber() const
 
 const Card<uint16_t>& Deck::GetTopCard() const
 {
-    return m_deck.top();
+    return m_pile.top();
+}
+
+uint8_t Deck::GetDeckIndex() const
+{
+    return m_deckIndex;
 }
 
 void Deck::PushCard(const Card<uint16_t>& card)
 {
-    m_deck.push(card);
+    m_pile.push(card);
 }

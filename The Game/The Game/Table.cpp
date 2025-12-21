@@ -2,13 +2,13 @@ module Table;
 
 import GreedyAI;
 
-constexpr static uint8_t  TWO_PLAYERS{ 2u };
-constexpr static uint8_t  CARDS_TWO_PLAYERS{ 8u };
+constexpr static uint8_t TWO_PLAYERS{ 2u };
+constexpr static uint8_t CARDS_TWO_PLAYERS{ 8u };
 
 constexpr static uint8_t THREE_PLAYERS{ 3u };
-constexpr static uint8_t  CARDS_THREE_PLAYERS{ 7u };
+constexpr static uint8_t CARDS_THREE_PLAYERS{ 7u };
 
-constexpr static uint8_t  CARDS_DEFAULT_PLAYERS{ 6u };
+constexpr static uint8_t CARDS_DEFAULT_PLAYERS{ 6u };
 
 constexpr static uint8_t MIN_CARDS_NORMAL{ 2u };
 constexpr static uint8_t MIN_CARDS_EMPTY_DECK{ 1u };
@@ -16,11 +16,10 @@ constexpr static uint8_t MIN_CARDS_EMPTY_DECK{ 1u };
 Table::Table(const std::vector<std::pair<unsigned, std::string>>& lobbyPlayers) :
 	m_nrPlayers{ static_cast<uint8_t>(lobbyPlayers.size())}
 {
-	m_allDecks[0] = std::make_unique<Deck>(Deck::DeckType::Ascending, Deck::DeckNumber::First);
-	m_allDecks[1] = std::make_unique<Deck>(Deck::DeckType::Ascending, Deck::DeckNumber::Second);
-	m_allDecks[2] = std::make_unique<Deck>(Deck::DeckType::Descending, Deck::DeckNumber::First);
-	m_allDecks[3] = std::make_unique<Deck>(Deck::DeckType::Descending, Deck::DeckNumber::Second);
-
+	m_decks[0] = std::make_unique<Deck>(Deck::DeckType::Ascending, Deck::DeckNumber::First, 0u);
+	m_decks[1] = std::make_unique<Deck>(Deck::DeckType::Ascending, Deck::DeckNumber::Second, 1u);
+	m_decks[2] = std::make_unique<Deck>(Deck::DeckType::Descending, Deck::DeckNumber::First, 2u);
+	m_decks[3] = std::make_unique<Deck>(Deck::DeckType::Descending, Deck::DeckNumber::Second, 3u);
 	Shuffle();
 
 	size_t cardsPerPlayer;
@@ -45,16 +44,16 @@ Table::Table(const std::vector<std::pair<unsigned, std::string>>& lobbyPlayers) 
 	for (const auto& [id, username] : lobbyPlayers)
 	{
 		Player player(id, username);
-		player.SetupCards(m_mainDeck, cardsPerPlayer);
+		player.SetupCards(m_pile, cardsPerPlayer);
 		m_playersMap.emplace(id, std::move(player));
 	}
 
 	//std::sort(m_Players.begin(), m_Players.end());
 }
 
-bool Table::isDeckEmpty() const
+bool Table::IsPileEmpty() const
 {
-	return m_mainDeck.empty();
+	return m_pile.empty();
 }
 
 void Table::Shuffle()
@@ -70,18 +69,20 @@ void Table::Shuffle()
 	std::shuffle(copyCards.begin(), copyCards.end(), generator);
 	
 	for (auto& card : copyCards)
-		m_mainDeck.push(std::move(card));
+	{
+		m_pile.push(std::move(card));
+	}	
 }
 
-bool Table::BackwardsTrick(const Deck& deck, const Card<uint16_t>& card) const
+bool Table::BackwardsTrick(uint8_t deckId, const Card<uint16_t>& card) const
 {
-	const unsigned cardValue = card.getId();
-	const unsigned topCardValue = deck.GetTopCard().getId();
+	const uint8_t cardValue = card.getId();
+	const uint8_t topCardValue = m_decks[deckId]->GetTopCard().getId();
 
-	switch (deck.GetDeckType())
+	switch (m_decks[deckId]->GetDeckType())
 	{
 		case Deck::DeckType::Ascending:
-			return (topCardValue>=10u && topCardValue - 10u == cardValue);
+			return (topCardValue >= 10u && topCardValue - 10u == cardValue);
 		case Deck::DeckType::Descending:
 			return (topCardValue + 10u == cardValue);
 		default:
@@ -89,17 +90,17 @@ bool Table::BackwardsTrick(const Deck& deck, const Card<uint16_t>& card) const
 	}
 }
 
-bool Table::CheckCard(const Deck& deck, const Card<uint16_t>& card) const
+bool Table::CheckCard(uint8_t deckId, const Card<uint16_t>& card) const
 {
-	const unsigned cardValue = card.getId();
-	const unsigned topCardValue = deck.GetTopCard().getId();
+	const uint8_t cardValue = card.getId();
+	const uint8_t topCardValue = m_decks[deckId]->GetTopCard().getId();
 
-	switch (deck.GetDeckType())
+	switch (m_decks[deckId]->GetDeckType())
 	{
 	case Deck::DeckType::Ascending:
-		return cardValue > topCardValue || BackwardsTrick(deck, card);
+		return cardValue > topCardValue || BackwardsTrick(deckId, card);
 	case Deck::DeckType::Descending:
-		return cardValue < topCardValue || BackwardsTrick(deck, card);
+		return cardValue < topCardValue || BackwardsTrick(deckId, card);
 	default:
 		return false;
 	}
@@ -115,16 +116,16 @@ Deck& Table::GetDeck(const Deck::DeckType& type, const Deck::DeckNumber& number)
 	if (type == Deck::DeckType::Ascending)
 	{
 		if (number == Deck::DeckNumber::First)
-			return *m_allDecks[GetDeckIndex(DeckIndex::FirstAscending)];
+			return *m_decks[GetDeckIndex(DeckIndex::FirstAscending)];
 		else if (number == Deck::DeckNumber::Second)
-			return *m_allDecks[GetDeckIndex(DeckIndex::SecondAscending)];
+			return *m_decks[GetDeckIndex(DeckIndex::SecondAscending)];
 	}
 	else if (type == Deck::DeckType::Descending)
 	{
 		if (number == Deck::DeckNumber::First)
-			return *m_allDecks[GetDeckIndex(DeckIndex::FirstDescending)];
+			return *m_decks[GetDeckIndex(DeckIndex::FirstDescending)];
 		else if (number == Deck::DeckNumber::Second)
-			return *m_allDecks[GetDeckIndex(DeckIndex::SecondDescending)];
+			return *m_decks[GetDeckIndex(DeckIndex::SecondDescending)];
 	}
 	throw std::out_of_range("Invalid deck type or number.");
 }
@@ -132,19 +133,19 @@ Deck& Table::GetDeck(const Deck::DeckType& type, const Deck::DeckNumber& number)
 std::span<std::reference_wrapper<Deck>> Table::GetAllDecks()
 {
 	static std::array<std::reference_wrapper<Deck>, 4> decks{
-		*m_allDecks[0],
-		*m_allDecks[1],
-		*m_allDecks[2],
-		*m_allDecks[3]
+		*m_decks[0],
+		*m_decks[1],
+		*m_decks[2],
+		*m_decks[3]
 	};
 
 	return {decks};
 }
 
 
-const DeckStack& Table::GetMainDeck() const
+const Pile& Table::GetMainDeck() const
 {
-	return m_mainDeck;
+	return m_pile;
 }
 
 void Table::PlayGame()
@@ -164,7 +165,7 @@ void Table::PlayGame()
 		}
 		Player& currentPlayer = m_Players[currentPlayerIndex];
 
-		uint8_t minCards = isDeckEmpty() ? MIN_CARDS_EMPTY_DECK : MIN_CARDS_NORMAL;
+		uint8_t minCards = IsPileEmpty() ? MIN_CARDS_EMPTY_DECK : MIN_CARDS_NORMAL;
 
 		if (!CanPlayerPlayMinCards(currentPlayer, minCards))
 		{
@@ -199,41 +200,43 @@ const std::unordered_map<unsigned, Player>& Table::GetPlayersMap() const
 	return m_playersMap;
 }
 
+const Player& Table::GetPlayer(unsigned playerId) const
+{
+	auto it = m_playersMap.find(playerId);
+	if (it != m_playersMap.end()) return it->second;
+}
+
 bool Table::CanPlayerPlayMinCards(const Player& player, uint8_t minCards) 
 {
-	if (player.GetCardsCount() < minCards)
-		return false;
-	uint8_t validCardsCount = 0;
+	if (player.GetCardsCount() < minCards) return false;
+	uint8_t validCardsCount{0};
+
 	for (const Card<uint16_t>& card : player.GetCards())
 	{
-		for (auto& deck : GetAllDecks())
+		for (size_t deckIndex = 0; deckIndex<4; deckIndex++)
 		{
-			if (CheckCard(deck, card))
+			if (CheckCard(deckIndex, card))
 			{
 				validCardsCount++;
-				if (validCardsCount >= minCards)
-				{
-					return true;
-				}
+				if (validCardsCount >= minCards) return true;
 			}
 		}
 	}
 	return false;
 }
 
-void Table::PlaceCardOnDeck(Deck& deck, const Card<uint16_t>& card)
+void Table::PlaceCardOnDeck(uint8_t deckIndex, const Card<uint16_t>& card)
 {
-	deck.PushCard(card);
+	m_decks[deckIndex]->PushCard(card);
 }
 
 bool Table::AllCardsPlaced() const
 {
-	if (!isDeckEmpty())
-		return false;
+	if (!IsPileEmpty()) return false;
 
-	for (const Player& player : m_Players) {
-		if (player.GetCardsCount() > 0)
-			return false;
+	for (const auto& [id, player] : m_playersMap)
+	{
+		if (player.GetCardsCount()) return false;
 	}
 	return true;
 }
@@ -268,10 +271,7 @@ bool Table::PlayerTurn(Player& player, uint8_t minCards)
 		uint16_t cardId;
 		std::cin >> cardId;
 
-		if (!player.FindCard(cardId))
-		{
-			continue;
-		}
+		if (!player.FindCard(cardId)) continue;
 
 		unsigned deckChoice;
 		std::cin >> deckChoice;
@@ -281,26 +281,22 @@ bool Table::PlayerTurn(Player& player, uint8_t minCards)
 			{
 			case 1u:
 				return GetDeck(Deck::DeckType::Ascending, Deck::DeckNumber::First);
-				break;
 			case 2u:
 				return GetDeck(Deck::DeckType::Ascending, Deck::DeckNumber::Second);
-				break;
 			case 3u:
 				return GetDeck(Deck::DeckType::Descending, Deck::DeckNumber::First);
-				break;
 			case 4u:
 				return GetDeck(Deck::DeckType::Descending, Deck::DeckNumber::Second);
-				break;
 			default:
-				throw std::invalid_argument("Invalid deck choice");
+				break;
 			}}();
 	
 		Card cardToPlace(cardId);
-		if (!CheckCard(chosenDeck, cardToPlace)) {
+		if (!CheckCard(chosenDeck.GetDeckIndex(), cardToPlace)) {
 			continue;
 		}
 
-		PlaceCardOnDeck(chosenDeck, cardToPlace);
+		//PlaceCardOnDeck(chosenDeck, cardToPlace);
 		player.RemoveCard(cardId);
 		cardsPlaced++;
 
@@ -310,10 +306,10 @@ bool Table::PlayerTurn(Player& player, uint8_t minCards)
 			break;
 		}
 	}
-	if (!isDeckEmpty() && cardsPlaced > 0)
+	if (!IsPileEmpty() && cardsPlaced > 0)
 	{
-		uint8_t cardsToDraw = std::min(static_cast<uint8_t>(cardsPlaced), static_cast<uint8_t>(m_mainDeck.size()));
-		player.DrawCards(m_mainDeck);
+		uint8_t cardsToDraw = std::min(static_cast<uint8_t>(cardsPlaced), static_cast<uint8_t>(m_pile.size()));
+		player.DrawCards(m_pile);
 	}
 	return cardsPlaced >= minCards;
 }

@@ -46,7 +46,7 @@ public:
 	unsigned GetHostId() const;
 
 	std::optional<std::vector<unsigned>> GetPlayerCards(unsigned playerId) const;
-	bool PlayCard(unsigned playerId, unsigned cardId, unsigned deckIndex);
+	bool PlayCard(unsigned playerId, uint8_t cardId, uint8_t deckId);
 
 private:
 	Lobby() = delete;

@@ -27,7 +27,6 @@ export struct HeuristicTree
 	static int RiskPenalty(const AIMove& move, const Table& table);
 };
 
-
 export class GreedyAI
 {
 public:

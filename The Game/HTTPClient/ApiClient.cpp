@@ -81,10 +81,9 @@ bool ApiClient::LeaveLobby(const std::string& lobbyId, unsigned playerId)
 	if (!json || !json.has("status"))
 		return false;
 
-	const std::string status = json["status"].s();
-	if (status == "PLAYER_LEFT")
+	if (json["status"].s() == "PLAYER_LEFT")
 		m_event.store(ClientEvent::PlayerLeft);
-	else if (status == "LOBBY_DELETED")
+	else if (json["status"].s() == "LOBBY_DELETED")
 		m_event.store(ClientEvent::HostLeftLobby);
 	else return false;
 
@@ -182,6 +181,29 @@ std::optional<std::vector<ChatMessage>> ApiClient::GetNewMessages(unsigned after
 			message["message"].s());
 	}
 	return result;
+}
+
+bool ApiClient::PlayCard(uint8_t cardId, uint8_t deckId)
+{
+	const std::string url = m_serverURL + "/lobby/" + m_lobbyId
+		+ "/players/" + std::to_string(m_playerId) + "/cards";
+	const std::string jsonBody =
+		"{"
+		"\"cardId\":" + std::to_string(cardId) + "," 
+		"\"deckId\":" + std::to_string(deckId) +
+		"}";
+	cpr::Response response = cpr::Post(
+		cpr::Url{ url },
+		cpr::Body{ jsonBody },
+		cpr::Header{ {"Content-Type", "application/json"} },
+		kTimeout
+	);
+	if (response.error || response.status_code != 200) return false;
+
+	auto json = crow::json::load(response.text);
+	if (!json || !json.has("status")) return false;
+
+	return json["status"] == "OK";
 }
 
 bool ApiClient::SendPing(const std::string& lobbyId, unsigned playerId)

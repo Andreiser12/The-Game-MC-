@@ -58,7 +58,7 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api) :
 	m_chat->setSize({ "27.5%", "25%" });
 	m_chat->setPosition({ "0%", "0%" });
 	m_chat->setTextSize(25);
-	m_chat->setInheritedOpacity(0.7f);
+	m_chat->getRenderer()->setOpacity(0.7f);
 	chatGroup->add(m_chat);
 
 	auto chatEditBox = tgui::EditBox::create();
@@ -132,10 +132,10 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api) :
 		});
 	gamePanel->add(toggleChatButton);
 
-	m_decks[0] = std::make_shared<DeckWidget>(DeckWidget::DeckType::Ascending);
-	m_decks[1] = std::make_shared<DeckWidget>(DeckWidget::DeckType::Ascending);
-	m_decks[2] = std::make_shared<DeckWidget>(DeckWidget::DeckType::Descending);
-	m_decks[3] = std::make_shared<DeckWidget>(DeckWidget::DeckType::Descending);
+	m_decks[0] = std::make_shared<DeckWidget>(DeckWidget::DeckType::Ascending, 0u);
+	m_decks[1] = std::make_shared<DeckWidget>(DeckWidget::DeckType::Ascending, 1u);
+	m_decks[2] = std::make_shared<DeckWidget>(DeckWidget::DeckType::Descending, 2u);
+	m_decks[3] = std::make_shared<DeckWidget>(DeckWidget::DeckType::Descending, 3u);
 	float xDeckPosition{ 42.5f };
 	constexpr float yDeckPosition{ 46.25f };
 	for (const auto& deck : m_decks)
@@ -161,6 +161,7 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api) :
 
 void GamePanel::Update()
 {
+	RemovePlacedCards();
 	auto newMessages = m_apiClient.SnapshotNewChat();
 	if (!newMessages || newMessages->empty()) return;
 
@@ -257,6 +258,10 @@ void GamePanel::HandleMouseEvent(const sf::Event& event)
 	for (auto& card : m_myCards)
 	{
 		card->UpdateDragPosition(mousePos);
+		for (const auto& deck : m_decks)
+		{
+			card->CheckOnDeck(deck);
+		}
 	}
 }
 
@@ -266,6 +271,22 @@ void GamePanel::ResetAllDrags()
 	{
 		card->CancelDrag();
 	}
+}
+
+void GamePanel::RemovePlacedCards()
+{
+	m_myCards.erase(
+		std::remove_if(m_myCards.begin(), m_myCards.end(),
+			[this](const std::shared_ptr<CardWidget> card)
+			{
+				if (card->IsPlacedOnDeck())
+				{
+					m_root->remove(card->GetWidget());
+					return true;
+				}
+				return false;
+			}), 
+	m_myCards.end());
 }
 
 void GamePanel::CreatePlayerHand(size_t playerIndex, const PlayerSlot& slot)
@@ -322,7 +343,10 @@ void GamePanel::CreateMyHand(const PlayerSlot& slot)
 			tgui::String(std::to_string(cardX) + "%"),
 			tgui::String(std::to_string(startY) + "%")
 		);
-
+		card->onCardPlaced = [this](uint8_t cardId, std::shared_ptr<DeckWidget> deck) 
+		{
+			return m_apiClient.PlayCard(cardId, deck->GetDeckId());
+		};
 		card->SetDraggable(true);
 		m_root->add(card->GetWidget());
 		m_myCards.emplace_back(card);

@@ -3,8 +3,9 @@
 RegisterWindow::RegisterWindow(sf::RenderWindow& window, ApiClient& api)
 	: m_register{window}, m_apiClient{api}
 {
-	m_background = tgui::Picture::create("assets/images/background.png");
+	m_background = tgui::Picture::create("assets/images/mainMenuBackground.png");
 	m_background->setSize({ "100%", "100%" });
+	m_background->setPosition({ "0%", "0%" });
 	m_register.add(m_background);
 
 	LoadWidgets();

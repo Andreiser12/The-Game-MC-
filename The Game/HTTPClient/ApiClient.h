@@ -42,6 +42,7 @@ public:
 	bool StartMatch(const std::string& lobbyId, unsigned playerId);
 	bool SendChatMessage(const std::string& message);
 	std::optional<std::vector<ChatMessage>> GetNewMessages(unsigned afterId);
+	bool PlayCard(uint8_t cardId, uint8_t deckId);
 
 	bool SendPing(const std::string& lobbyId, unsigned playerId);
 	void StartPingThread(const std::string& lobbyId, unsigned playerId);

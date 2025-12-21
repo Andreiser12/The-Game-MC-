@@ -1,6 +1,6 @@
 #include "DeckWidget.h"
 
-DeckWidget::DeckWidget(DeckType deckType) : m_deckType{deckType}
+DeckWidget::DeckWidget(DeckType deckType, uint8_t deckId) : m_deckType{deckType}, m_deckId{deckId}
 {
 	m_deckType == DeckType::Ascending ? m_lastId = 1u : m_lastId = 100u;
 	CreateDeckWidget();
@@ -36,6 +36,11 @@ DeckWidget::DeckType DeckWidget::GetDeckType() const
 uint16_t DeckWidget::GetLastId() const
 {
 	return m_lastId;
+}
+
+uint8_t DeckWidget::GetDeckId() const
+{
+	return m_deckId;
 }
 
 tgui::Panel::Ptr DeckWidget::GetDeckPanel() const

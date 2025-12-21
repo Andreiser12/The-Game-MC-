@@ -22,19 +22,17 @@ public:
 
 	void PlaceCards(Deck& chosenDeck);
 	void PrintCards() const;
-	void DrawCards(DeckStack& deck);
+	void DrawCards(Pile& deck);
 	bool FindCard(uint16_t cardId) const;
 	void RemoveCard(uint16_t cardId);
 
-	const static inline bool IsCardValid(const Deck& chosenDeck, uint16_t cardID);
-	void SetupCards(DeckStack& deck, uint8_t cardsCount);
-
-	void SetCards(const PlayerHand& cards);
+	const static inline bool IsCardValid(const Deck& chosenDeck, uint16_t cardId);
+	void SetupCards(Pile& deck, uint8_t cardsCount);
 
 	void SetTimeOut(bool value);
 	void SetIncative(bool value);
 
-	unsigned GetPlayerID() const;
+	unsigned GetPlayerId() const;
 	const std::string& GetUsername() const;
 	const PlayerHand& GetCards() const;
 	size_t GetCardsCount() const;
@@ -48,7 +46,7 @@ private:
 	Player() = delete;
 
 private:
-	unsigned m_playerID;
+	unsigned m_playerId;
 	std::string m_username;
 	PlayerHand m_cards;
 	uint8_t m_cardsPlacedRound{ 0u };

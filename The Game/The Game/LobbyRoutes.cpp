@@ -1,4 +1,5 @@
 import LobbyRoutes;
+import SessionManager;
 #include "crow.h"
 
 constexpr static uint8_t K_LOBBY_ID_LENGTH{ 6u };
@@ -319,6 +320,8 @@ crow::response LobbyRoutes::PlayerPing(const crow::request& request)
 	if (!lobby) return crow::response(404, "Lobby not found");
 
 	lobby->UpdatePlayerPing(playerId);
+	auto& sessionManager = SessionManager::Instance();
+	sessionManager.UpdateActivity(playerId);
 
 	crow::json::wvalue data;
 	data["status"] = "OK";

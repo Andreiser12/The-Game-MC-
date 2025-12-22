@@ -23,6 +23,15 @@ void AuthenticationRoutes::Login(crow::SimpleApp& app)
 		});
 }
 
+void AuthenticationRoutes::Logout(crow::SimpleApp& app)
+{
+	CROW_ROUTE(app, "/logout").methods(crow::HTTPMethod::Post)(
+		[this](const crow::request& req)
+		{
+			return this->HandleLogout(req);
+		});
+}
+
 void AuthenticationRoutes::Users(crow::SimpleApp& app)
 {
 	CROW_ROUTE(app, "/users")([this]() {
@@ -87,6 +96,22 @@ crow::response AuthenticationRoutes::HandleLogin(const crow::request& req)
 	result["status"] = "ok";
 	result["id"] = userOptional->GetID();
 	result["username"] = userOptional->GetUsername();
+	return crow::response{ result };
+}
+
+crow::response AuthenticationRoutes::HandleLogout(const crow::request& req)
+{
+	auto body = crow::json::load(req.body);
+	if (!body)
+		return crow::response(400, "Invalid JSON");
+	 
+	unsigned playerId = body["playerId"].i();
+	auto& sessionManager = SessionManager::Instance();
+
+	sessionManager.Logout(playerId);
+
+	crow::json::wvalue result;
+	result["status"] = "ok";
 	return crow::response{ result };
 }
 

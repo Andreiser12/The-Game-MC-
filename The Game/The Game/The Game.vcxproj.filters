@@ -99,5 +99,8 @@
     <ClCompile Include="DatabaseManager.cpp">
       <Filter>Source Files\Database</Filter>
     </ClCompile>
+    <ClCompile Include="SessionManager.cppm">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -173,6 +173,7 @@
     <ClCompile Include="LobbyRoutes.cppm" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="SessionManager.cpp" />
     <ClCompile Include="SessionManager.cppm" />
     <ClCompile Include="Table.cpp" />
   </ItemGroup>

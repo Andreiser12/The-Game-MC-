@@ -12,7 +12,8 @@ public:
 	bool Login(unsigned playerId);
 	bool Logout(unsigned playerId);
 	void UpdateActivity(unsigned playerId);
-	bool IsOnline(unsigned playerId) const;
+	bool IsLoggedIn(unsigned playerId) const;
+	bool IsOnline(unsigned playerId, std::chrono::seconds timeout) const;
 	std::vector<unsigned> GetInactivePlayers(std::chrono::seconds timeout) const;
 private:
 	SessionManager() = default;

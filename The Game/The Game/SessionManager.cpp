@@ -19,3 +19,28 @@ bool SessionManager::Logout(unsigned playerId)
 	return m_lastPlayerActivity.erase(playerId) == 1;
 }
 
+void SessionManager::UpdateActivity(unsigned playerId)
+{
+	std::lock_guard<std::mutex> lock(m_mutex);
+	auto iterator = m_lastPlayerActivity.find(playerId);
+	if (iterator != m_lastPlayerActivity.end())
+		iterator->second = std::chrono::steady_clock::now();
+}
+
+bool SessionManager::IsLoggedIn(unsigned playerId) const
+{
+	std::lock_guard<std::mutex> lock(m_mutex);
+	return m_lastPlayerActivity.contains(playerId);
+}
+
+bool SessionManager::IsOnline(unsigned playerId, std::chrono::seconds timeout) const
+{
+	std::lock_guard<std::mutex> lock(m_mutex);
+	auto iteratorActivity = m_lastPlayerActivity.find(playerId);
+	if (iteratorActivity == m_lastPlayerActivity.end())
+		return false;
+	return std::chrono::steady_clock::now() - iteratorActivity->second < timeout;
+}
+
+
+

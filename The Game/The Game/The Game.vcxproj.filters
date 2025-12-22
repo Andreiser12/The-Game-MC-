@@ -102,5 +102,8 @@
     <ClCompile Include="SessionManager.cppm">
       <Filter>Header Files</Filter>
     </ClCompile>
+    <ClCompile Include="SessionManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

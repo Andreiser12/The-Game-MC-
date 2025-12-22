@@ -9,8 +9,8 @@ export class SessionManager
 {
 public:
 	static SessionManager& Instance();
-	void Login(unsigned playerId);
-	void Logout(unsigned playerId);
+	bool Login(unsigned playerId);
+	bool Logout(unsigned playerId);
 	void UpdateActivity(unsigned playerId);
 	bool IsOnline(unsigned playerId) const;
 	std::vector<unsigned> GetInactivePlayers(std::chrono::seconds timeout) const;

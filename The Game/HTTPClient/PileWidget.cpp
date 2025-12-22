@@ -7,7 +7,7 @@ PileWidget::PileWidget()
 	m_pilePanel->getRenderer()->setBorders(2);
 	m_pilePanel->getRenderer()->setRoundedBorderRadius(5);
 
-	m_backsidePicture = tgui::Picture::create("assets/images/cardBackSide.jpg");
+	m_backsidePicture = tgui::Picture::create("assets/images/cardBackside.png");
 	m_backsidePicture->setSize({ "100%", "100%" });
 	m_backsidePicture->setPosition({ "0%", "0%" });
 	m_backsidePicture->setIgnoreMouseEvents(true);

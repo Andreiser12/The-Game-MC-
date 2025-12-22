@@ -119,7 +119,7 @@
     <ClCompile Include="PileWidget.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
-    <ClCompile Include="HTTPClient.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
     <ClCompile Include="GamePanel.cpp">
@@ -132,10 +132,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="small.ico">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="HTTPClient.ico">
+    <Image Include="..\..\..\..\Downloads\TheGame.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

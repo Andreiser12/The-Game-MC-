@@ -106,7 +106,7 @@ void CardWidget::CreateCardWidget()
 	m_cardPanel->add(m_frontSide);
 	m_frontSide->moveToBack();
 
-	m_backSide = tgui::Picture::create("assets/images/carte2.jpg");
+	m_backSide = tgui::Picture::create("assets/images/cardBackside.png");
 	m_backSide->setSize({ "100%", "100%" });
 	m_backSide->setPosition({ "0%", "0%" });
 	m_cardPanel->add(m_backSide);

@@ -14,7 +14,7 @@ import AuthenticationRoutes;
 int main()
 {	
 	DatabaseManager database{ "gameDB.db" };
-
+ 
 	crow::SimpleApp app;
 	LobbyRoutes lobbyRoutes(LobbyManager::Instance(), database);
 	lobbyRoutes.Register(app);

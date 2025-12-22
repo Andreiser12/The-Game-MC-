@@ -1,8 +1,78 @@
 #include "APIClient.h"
 
 ApiClient::ApiClient(const std::string& serverURL) : m_serverURL{serverURL} {}
-
 static inline cpr::Timeout kTimeout{ 400 };
+
+LoginResult ApiClient::Login(const std::string& username)
+{
+	const std::string url = m_serverURL + "/login";
+	std::string jsonBody = "{\"username\":\"" + username + "\"}";
+
+	cpr::Response response = cpr::Post(
+		cpr::Url{ url },
+		cpr::Body{ jsonBody },
+		cpr::Header{ {"Content-Type", "application/json"} },
+		kTimeout
+	);
+
+	if (response.error || response.status_code != 200) return LoginResult::NetworkError;
+
+	auto json = crow::json::load(response.text);
+	if (!json)
+		return LoginResult::NetworkError;
+	
+	if (json["status"].s() != "ok")
+	{
+		std::string message = json["message"].s();
+		if (message == "You're already logged in!")
+			return LoginResult::AlreadyLoggedIn;
+		return LoginResult::UserNotFound;
+	}
+
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	m_username = username;
+	m_playerId = json["id"].i();
+
+	return LoginResult::Success;
+}
+
+bool ApiClient::Logout()
+{
+	unsigned playerIdCopy;
+	{
+		std::lock_guard<std::mutex> lock(m_mutex);
+		if (m_playerId == 0u)
+			return false;
+		playerIdCopy = m_playerId;
+	}
+
+	const std::string url = m_serverURL + "/logout";
+	std::string jsonBody = "{\"playerId\":" + std::to_string(playerIdCopy) + "}";
+
+	cpr::Response response = cpr::Post(
+		cpr::Url{ url },
+		cpr::Body{ jsonBody },
+		cpr::Header{ {"Content-Type", "application/json"} },
+		kTimeout
+	);
+
+	if (response.error || response.status_code != 200) return false;
+
+	{
+		std::lock_guard<std::mutex> lock(m_mutex);
+		m_playerId = 0;
+		m_username.clear();
+		m_lobbyId.clear();
+	}
+	return true;
+}
+
+bool ApiClient::IsLoggedIn()
+{
+	std::lock_guard<std::mutex> lock(m_mutex);
+	return m_playerId != 0u;
+}
 
 std::optional<std::string> ApiClient::CreateLobby(const std::string& username)
 {
@@ -87,7 +157,6 @@ bool ApiClient::LeaveLobby(const std::string& lobbyId, unsigned playerId)
 		m_event.store(ClientEvent::HostLeftLobby);
 	else return false;
 
-	m_playerId = 0u;
 	m_lobbyId.clear();
 	return true;
 }

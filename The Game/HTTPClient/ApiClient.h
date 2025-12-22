@@ -13,6 +13,15 @@ enum class ClientEvent
 	LobbyClosed,
 	HostLeftLobby
 };
+
+enum class LoginResult
+{
+	Success,
+	UserNotFound,
+	AlreadyLoggedIn,
+	NetworkError
+};
+
 struct ChatMessage
 {
 	unsigned id;
@@ -40,6 +49,10 @@ class ApiClient
 {
 public:
 	ApiClient(const std::string& serverURL);
+
+	LoginResult Login(const std::string& username);
+	bool Logout();
+	bool IsLoggedIn();
 	std::optional<std::string> CreateLobby(const std::string& username);
 	bool JoinLobby(const std::string& lobbyId,
 		const std::string& username);

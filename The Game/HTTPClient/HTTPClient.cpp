@@ -101,6 +101,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 				if (event.is<sf::Event::Closed>())
 				{
+					api.Logout();
 					menuWindow.close();
 				}
 			}

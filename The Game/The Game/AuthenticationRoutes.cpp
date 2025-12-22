@@ -86,7 +86,7 @@ crow::response AuthenticationRoutes::HandleLogin(const crow::request& req)
 	{
 		crow::json::wvalue result;
 		result["status"] = "fail";
-		result["message"] = "User not found!";
+		result["message"] = "You're already logged in!";
 		return crow::response{ result };
 	}
 

@@ -21,6 +21,7 @@ int main()
 	AuthenticationRoutes auth(database);
 	auth.Register(app);
 	auth.Login(app);
+	auth.Logout(app);
 	auth.Users(app);
 	app.port(18080).multithreaded().run();
 	return 0;

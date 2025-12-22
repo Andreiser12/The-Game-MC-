@@ -15,29 +15,34 @@ LoginWindow::LoginWindow(sf::RenderWindow& window, ApiClient& api)
 void LoginWindow::CheckLogin(tgui::EditBox::Ptr username)
 {
 	std::string usernameEntered = username->getText().toStdString();
-	cpr::Response r = cpr::Post(
-		cpr::Url{ "http://localhost:18080/login" },
-		cpr::Body{ "{\"username\": \"" + usernameEntered + "\"}" },
-		cpr::Header{ {"Content-Type", "application/json"} }
-	);
 
-	auto json = crow::json::load(r.text);
-
-	if (!json || json["status"].s() == "fail")
+	LoginResult result = m_apiClient.Login(usernameEntered);
+	if (result != LoginResult::Success)
 	{
 		auto errorLabel = tgui::Label::create();
-		errorLabel->setText("No account with this username has been found!");
+		switch (result)
+		{
+			case LoginResult::UserNotFound:
+				errorLabel->setText("No account with this username has been found!");
+				break;
+			case LoginResult::AlreadyLoggedIn:
+				errorLabel->setText("You're already logged in!");
+				break;
+			case LoginResult::NetworkError:
+				errorLabel->setText("Server error. Please try again!");
+				break;
+			default:
+				break;
+		}
 		errorLabel->getRenderer()->setTextColor(tgui::Color::Red);
 		errorLabel->setPosition({ "50%", "62.5%" });
 		errorLabel->setOrigin(0.5f, 0.5f);
 		errorLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
 		errorLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+		errorLabel->getRenderer()->setTextSize(20);
 		m_login.add(errorLabel);
-		errorLabel->setTextSize(16);
 		return;
 	}
-	m_apiClient.SetUsername(usernameEntered);
-	m_apiClient.SetPlayerId(json["id"].i());
 	m_isLoggedIn = true;
 }
 

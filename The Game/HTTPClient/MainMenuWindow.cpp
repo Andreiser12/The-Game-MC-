@@ -170,6 +170,7 @@ void MainMenuWindow::ExitButtonPressed()
 	auto exitPanel = Utils::CreateExitPanel(
 		m_mainMenu,
 		[this]() {
+			m_apiClient.Logout();
 			m_window.close();
 		},
 		[this]() {
@@ -248,7 +249,6 @@ void MainMenuWindow::ShutdownLobby()
 	CloseHostPanel();
 
 	m_apiClient.SetLobbyId("");
-	m_apiClient.SetPlayerId(0);
 	m_apiClient.ClearEvent();
 }
 

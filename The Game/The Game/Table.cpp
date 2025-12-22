@@ -111,6 +111,11 @@ constexpr std::size_t Table::GetDeckIndex(DeckIndex index) noexcept
 	return static_cast<std::size_t>(index);
 }
 
+std::size_t Table::GetDrawPileCount() const
+{
+	return m_pile.size();
+}
+
 Deck& Table::GetDeck(uint8_t deckId) const
 {
 	return *m_decks[deckId];

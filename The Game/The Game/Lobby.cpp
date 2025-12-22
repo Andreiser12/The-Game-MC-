@@ -192,3 +192,12 @@ std::optional<std::vector<DeckState>> Lobby::GetDecksState()
 	}
 	return decksState;
 }
+
+std::optional<size_t> Lobby::GetDrawPileCount() const
+{
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	if (!m_gameStarted || !m_table) return std::nullopt;
+
+	return m_table->GetDrawPileCount();
+}

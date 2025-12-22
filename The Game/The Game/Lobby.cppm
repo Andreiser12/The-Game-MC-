@@ -55,6 +55,8 @@ public:
 	bool PlayCard(unsigned playerId, uint8_t cardId, uint8_t deckId);
 	std::optional<std::vector<DeckState>> GetDecksState();
 
+	std::optional<size_t> GetDrawPileCount() const;
+
 private:
 	Lobby() = delete;
 

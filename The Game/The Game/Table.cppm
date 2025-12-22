@@ -51,6 +51,8 @@ public:
 
 	constexpr std::size_t GetDeckIndex(DeckIndex index) noexcept;
 
+	std::size_t GetDrawPileCount() const;
+
 private:
 	uint8_t m_nrPlayers;
 	std::vector<Player> m_Players;

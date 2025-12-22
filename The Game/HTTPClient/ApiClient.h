@@ -45,6 +45,11 @@ struct LobbyState
 	unsigned m_hostId;
 };
 
+struct GameTableState
+{
+	int drawPileCount = 0;
+};
+
 class ApiClient
 {
 public:
@@ -92,6 +97,8 @@ public:
 	void SetUsername(const std::string& username);
 	void SetPlayerId(unsigned playerId);
 	void SetLobbyId(const std::string& lobbyId);
+
+	std::optional<GameTableState> GetGameState(const std::string& lobbyId);
 
 private:
 	ApiClient() = delete;

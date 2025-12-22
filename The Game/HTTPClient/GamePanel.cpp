@@ -171,6 +171,16 @@ void GamePanel::Update()
 		m_chat->addLine(message.username + ": " + message.message);
 		m_lastMessageId = std::max(m_lastMessageId, message.id);
 	}
+
+	std::string currentLobbyId = m_apiClient.GetLobbyId();
+	if (currentLobbyId.empty()) return;
+
+	auto gameState = m_apiClient.GetGameState(currentLobbyId);
+
+	if (gameState.has_value())
+	{
+		m_pileWidget->UpdatePile(gameState->drawPileCount);
+	}
 }
 
 void GamePanel::UpdateDecks()

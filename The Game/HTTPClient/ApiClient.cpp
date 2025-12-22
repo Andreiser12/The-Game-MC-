@@ -567,3 +567,27 @@ std::optional<std::vector<DeckState>> ApiClient::SnapshotDecks() const
 	std::lock_guard<std::mutex> lk(m_cacheMutex);
 	return m_cachedDecks;
 }
+
+std::optional<GameTableState> ApiClient::GetGameState(const std::string& lobbyId)
+{
+	const std::string url = m_serverURL + "/lobby/" + lobbyId + "/gamestate";
+
+	cpr::Response response = cpr::Get(
+		cpr::Url{ url },
+		cpr::Header{ {"Content-Type", "application/json"} },
+		kTimeout
+	);
+
+	if (response.status_code != 200 || response.error) return std::nullopt;
+
+	auto json = crow::json::load(response.text);
+	if (!json) return std::nullopt;
+
+	GameTableState state;
+
+	if (json.has("drawPileCount")) {
+		state.drawPileCount = json["drawPileCount"].i();
+	}
+
+	return state;
+}

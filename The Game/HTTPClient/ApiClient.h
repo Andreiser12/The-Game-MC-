@@ -23,7 +23,14 @@ struct ChatMessage
 		id(i), username(std::move(u)), message(std::move(m)) {}
 };
 
-struct LobbyState {
+struct DeckState
+{
+	uint8_t deckId;
+	uint8_t topCardId;
+};
+
+struct LobbyState
+{
 	std::string m_status;
 	std::string m_message;
 	unsigned m_hostId;
@@ -43,6 +50,7 @@ public:
 	bool SendChatMessage(const std::string& message);
 	std::optional<std::vector<ChatMessage>> GetNewMessages(unsigned afterId);
 	bool PlayCard(uint8_t cardId, uint8_t deckId);
+	std::optional<std::vector<DeckState>> GetDeckState();
 
 	bool SendPing(const std::string& lobbyId, unsigned playerId);
 	void StartPingThread(const std::string& lobbyId, unsigned playerId);
@@ -66,6 +74,7 @@ public:
 	std::vector<std::string> SnapshotPlayers() const;
 	std::optional<LobbyState> SnapshotLobbyState() const;
 	std::optional<std::vector<ChatMessage>> SnapshotNewChat();
+	std::optional<std::vector<DeckState>> SnapshotDecks() const;
 
 	void SetUsername(const std::string& username);
 	void SetPlayerId(unsigned playerId);
@@ -92,6 +101,7 @@ private:
 	std::vector<std::string> m_cachedPlayers;
 	std::optional<LobbyState> m_cachedLobby;
 	std::optional<std::vector<ChatMessage>> m_cachedChat;
+	std::optional<std::vector<DeckState>> m_cachedDecks;
 
 	std::atomic<unsigned> m_afterChatId{ 0u };
 };

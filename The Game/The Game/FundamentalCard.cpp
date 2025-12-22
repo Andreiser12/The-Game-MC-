@@ -1,3 +1,3 @@
 module FundamentalCard;
 
-FundamentalCard::FundamentalCard(uint16_t id) : Card<std::uint16_t>{ id } {}
+FundamentalCard::FundamentalCard(uint8_t id) : Card<std::uint8_t>{ id } {}

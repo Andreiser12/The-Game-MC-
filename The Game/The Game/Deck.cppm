@@ -6,7 +6,7 @@ import <iostream>;
 import <stack>;
 
 using std::uint8_t;
-export using Pile = std::stack<Card<uint16_t>>;
+export using Pile = std::stack<Card<uint8_t>>;
 
 export class Deck
 {
@@ -25,20 +25,22 @@ public:
 	};
 
 public:
-	Deck() = default;
 	Deck(DeckType deckType, DeckNumber deckNumber, uint8_t deckIndex);
 
 	const Pile& GetDeck() const;
 	DeckType GetDeckType() const;
 	DeckNumber GetDeckNumber() const;
-	const Card<uint16_t>& GetTopCard() const;
+	const Card<uint8_t>& GetTopCard() const;
 	uint8_t GetDeckIndex() const;
 
-	void PushCard(const Card<uint16_t>& card);
+	void PushCard(const Card<uint8_t>& card);
 
 public:
 	constexpr static uint8_t ASCENDING_START_CARD{ 1u };
 	constexpr static uint8_t DESCENDING_START_CARD{ 100u };
+
+private:
+	Deck() = delete;
 
 private:
 	Pile m_pile;

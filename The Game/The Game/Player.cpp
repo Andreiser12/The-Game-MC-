@@ -5,9 +5,6 @@ constexpr static uint8_t MINIMUM_CARDS{ 2u };
 Player::Player(unsigned playerID, const std::string& username) :
 	m_playerId{playerID}, m_username{username} {}
 
-Player::Player(unsigned playerID, const PlayerHand& cards) :
-	m_playerId{ playerID }, m_cards { cards }  {}
-
 Player::~Player() {}
 
 void Player::PlaceCards(Deck& chosenDeck)
@@ -41,7 +38,7 @@ void Player::PlaceCards(Deck& chosenDeck)
 
 void Player::PrintCards() const
 {
-	for (const Card<uint16_t>& card : m_cards)
+	for (const Card<uint8_t>& card : m_cards)
 	{
 		std::cout << card;
 	}
@@ -52,26 +49,30 @@ void Player::DrawCards(Pile& deck)
 {
 	while (!deck.empty() && m_cardsPlacedRound)
 	{
-		Card<uint16_t> card = deck.top();
+		Card<uint8_t> card = deck.top();
 		deck.pop();
 		m_cards.emplace(card);
 		--m_cardsPlacedRound;
 	}
 }
 
-bool Player::FindCard(uint16_t cardId) const
+bool Player::FindCard(uint8_t cardId) const
 {
-	Card<uint16_t> cardToFind = Card(cardId);
+	Card<uint8_t> cardToFind = Card(cardId);
 	return m_cards.find(cardToFind) != m_cards.end();
 }
 
-void Player::RemoveCard(uint16_t cardId)
+void Player::RemoveCard(uint8_t cardId)
 {
-	Card<uint16_t> cardToDelete(cardId);
-	m_cards.erase(cardToDelete);
+	auto it = std::find_if(m_cards.begin(), m_cards.end(),
+		[cardId](const Card<uint8_t>& card)
+		{
+			return card.getId() == cardId;
+		});
+	if (it != m_cards.end()) m_cards.erase(it);
 }
 
-inline const bool Player::IsCardValid(const Deck& chosenDeck, uint16_t cardId)
+inline const bool Player::IsCardValid(const Deck& chosenDeck, uint8_t cardId)
 {
 	return (chosenDeck.GetDeckType() == Deck::DeckType::Ascending
 		&& cardId > chosenDeck.GetTopCard().getId())
@@ -81,7 +82,7 @@ inline const bool Player::IsCardValid(const Deck& chosenDeck, uint16_t cardId)
 
 void Player::SetupCards(Pile& deck, uint8_t cardsCount)
 {
-	Card<uint16_t> cardToPlace;
+	Card<uint8_t> cardToPlace;
 	for (uint8_t i = 0; i < cardsCount; i++)
 	{
 		cardToPlace = deck.top();

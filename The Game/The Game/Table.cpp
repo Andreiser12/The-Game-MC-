@@ -58,10 +58,10 @@ bool Table::IsPileEmpty() const
 
 void Table::Shuffle()
 {
-	std::vector<Card<uint16_t>> copyCards;
+	std::vector<Card<uint8_t>> copyCards;
 	copyCards.reserve(98);
 
-	for (uint16_t i = 2u; i < 100u; i++)
+	for (uint8_t i = 2u; i < 100u; i++)
 		copyCards.emplace_back(i);
 
 	std::random_device rd;
@@ -74,7 +74,7 @@ void Table::Shuffle()
 	}	
 }
 
-bool Table::BackwardsTrick(uint8_t deckId, const Card<uint16_t>& card) const
+bool Table::BackwardsTrick(uint8_t deckId, const Card<uint8_t>& card) const
 {
 	const uint8_t cardValue = card.getId();
 	const uint8_t topCardValue = m_decks[deckId]->GetTopCard().getId();
@@ -90,7 +90,7 @@ bool Table::BackwardsTrick(uint8_t deckId, const Card<uint16_t>& card) const
 	}
 }
 
-bool Table::CheckCard(uint8_t deckId, const Card<uint16_t>& card) const
+bool Table::CheckCard(uint8_t deckId, const Card<uint8_t>& card) const
 {
 	const uint8_t cardValue = card.getId();
 	const uint8_t topCardValue = m_decks[deckId]->GetTopCard().getId();
@@ -111,23 +111,9 @@ constexpr std::size_t Table::GetDeckIndex(DeckIndex index) noexcept
 	return static_cast<std::size_t>(index);
 }
 
-Deck& Table::GetDeck(const Deck::DeckType& type, const Deck::DeckNumber& number)
+Deck& Table::GetDeck(uint8_t deckId) const
 {
-	if (type == Deck::DeckType::Ascending)
-	{
-		if (number == Deck::DeckNumber::First)
-			return *m_decks[GetDeckIndex(DeckIndex::FirstAscending)];
-		else if (number == Deck::DeckNumber::Second)
-			return *m_decks[GetDeckIndex(DeckIndex::SecondAscending)];
-	}
-	else if (type == Deck::DeckType::Descending)
-	{
-		if (number == Deck::DeckNumber::First)
-			return *m_decks[GetDeckIndex(DeckIndex::FirstDescending)];
-		else if (number == Deck::DeckNumber::Second)
-			return *m_decks[GetDeckIndex(DeckIndex::SecondDescending)];
-	}
-	throw std::out_of_range("Invalid deck type or number.");
+	return *m_decks[deckId];
 }
 
 std::span<std::reference_wrapper<Deck>> Table::GetAllDecks()
@@ -143,7 +129,7 @@ std::span<std::reference_wrapper<Deck>> Table::GetAllDecks()
 }
 
 
-const Pile& Table::GetMainDeck() const
+const Pile& Table::GetPile() const
 {
 	return m_pile;
 }
@@ -200,10 +186,14 @@ const std::unordered_map<unsigned, Player>& Table::GetPlayersMap() const
 	return m_playersMap;
 }
 
-const Player& Table::GetPlayer(unsigned playerId) const
+Player& Table::GetPlayer(unsigned playerId)
 {
 	auto it = m_playersMap.find(playerId);
-	if (it != m_playersMap.end()) return it->second;
+	if (it == m_playersMap.end())
+	{
+		throw std::runtime_error("Player not found");
+	}
+	return it->second;
 }
 
 bool Table::CanPlayerPlayMinCards(const Player& player, uint8_t minCards) 
@@ -211,7 +201,7 @@ bool Table::CanPlayerPlayMinCards(const Player& player, uint8_t minCards)
 	if (player.GetCardsCount() < minCards) return false;
 	uint8_t validCardsCount{0};
 
-	for (const Card<uint16_t>& card : player.GetCards())
+	for (const Card<uint8_t>& card : player.GetCards())
 	{
 		for (size_t deckIndex = 0; deckIndex<4; deckIndex++)
 		{
@@ -225,7 +215,7 @@ bool Table::CanPlayerPlayMinCards(const Player& player, uint8_t minCards)
 	return false;
 }
 
-void Table::PlaceCardOnDeck(uint8_t deckIndex, const Card<uint16_t>& card)
+void Table::PlaceCardOnDeck(uint8_t deckIndex, const Card<uint8_t>& card)
 {
 	m_decks[deckIndex]->PushCard(card);
 }
@@ -268,7 +258,7 @@ bool Table::PlayerTurn(Player& player, uint8_t minCards)
 			}
 		}
 
-		uint16_t cardId;
+		uint8_t cardId;
 		std::cin >> cardId;
 
 		if (!player.FindCard(cardId)) continue;
@@ -280,13 +270,13 @@ bool Table::PlayerTurn(Player& player, uint8_t minCards)
 			switch (deckChoice)
 			{
 			case 1u:
-				return GetDeck(Deck::DeckType::Ascending, Deck::DeckNumber::First);
+				return GetDeck(0u);
 			case 2u:
-				return GetDeck(Deck::DeckType::Ascending, Deck::DeckNumber::Second);
+				return GetDeck(1u);
 			case 3u:
-				return GetDeck(Deck::DeckType::Descending, Deck::DeckNumber::First);
+				return GetDeck(2u);
 			case 4u:
-				return GetDeck(Deck::DeckType::Descending, Deck::DeckNumber::Second);
+				return GetDeck(3u);
 			default:
 				break;
 			}}();

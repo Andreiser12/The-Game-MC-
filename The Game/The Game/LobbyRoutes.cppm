@@ -29,6 +29,7 @@ private:
 	crow::response PlayerPing(const crow::request& request);
 	crow::response GetPlayerCards(const std::string& lobbyId, unsigned playerId);
 	crow::response PlayCard(const crow::request& request, const std::string& lobbyId, unsigned playerId);
+	crow::response GetDecksState(const std::string& lobbyId);
 
 private:
 	LobbyManager& m_manager;

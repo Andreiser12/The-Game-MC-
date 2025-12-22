@@ -26,6 +26,12 @@ export struct ChatMessage
 	std::string message;
 };
 
+export struct DeckState
+{
+	uint8_t deckId;
+	uint8_t topCardId;
+};
+
 export class Lobby
 {
 public:
@@ -47,6 +53,7 @@ public:
 
 	std::optional<std::vector<unsigned>> GetPlayerCards(unsigned playerId) const;
 	bool PlayCard(unsigned playerId, uint8_t cardId, uint8_t deckId);
+	std::optional<std::vector<DeckState>> GetDecksState();
 
 private:
 	Lobby() = delete;

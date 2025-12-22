@@ -5,11 +5,11 @@ Deck::Deck(DeckType deckType, DeckNumber deckNumber, uint8_t deckIndex) :
 {
     if (m_deckType == DeckType::Ascending)
     {
-        m_pile.push(FundamentalCard(ASCENDING_START_CARD));
+        m_pile.push(Card<uint8_t>(ASCENDING_START_CARD));
     }
     else
     {
-        m_pile.push(FundamentalCard(DESCENDING_START_CARD));
+        m_pile.push(Card<uint8_t>(DESCENDING_START_CARD));
     }
 }
 
@@ -28,7 +28,7 @@ Deck::DeckNumber Deck::GetDeckNumber() const
     return m_deckNumber;
 }
 
-const Card<uint16_t>& Deck::GetTopCard() const
+const Card<uint8_t>& Deck::GetTopCard() const
 {
     return m_pile.top();
 }
@@ -38,7 +38,7 @@ uint8_t Deck::GetDeckIndex() const
     return m_deckIndex;
 }
 
-void Deck::PushCard(const Card<uint16_t>& card)
+void Deck::PushCard(const Card<uint8_t>& card)
 {
     m_pile.push(card);
 }

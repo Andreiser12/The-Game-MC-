@@ -1,10 +1,8 @@
 module GreedyAI;
 
-static constexpr int LOCAL_WEIGHT = 1;
-static constexpr int GLOBAL_WEIGHT = 2;
-static constexpr int RISK_WEIGHT = 1;
-
-
+static constexpr int LOCAL_WEIGHT{ 1 };
+static constexpr int GLOBAL_WEIGHT{ 2 };
+static constexpr int RISK_WEIGHT{ 1 };
 
 std::optional<AIMove>GreedyAI::FindBestMove(const Player& currentPlayer, Table& table)
 {
@@ -64,6 +62,7 @@ int HeuristicTree::LocalScore(const AIMove& move)
 	return (std::abs(cardId - topCard));
 
 }
+
 int HeuristicTree::BackwardsBonus(const AIMove& move)
 {
 	auto topCard = static_cast<int>(move.deck.get().GetTopCard().getId());

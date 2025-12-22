@@ -206,6 +206,31 @@ bool ApiClient::PlayCard(uint8_t cardId, uint8_t deckId)
 	return json["status"] == "OK";
 }
 
+std::optional<std::vector<DeckState>> ApiClient::GetDeckState()
+{
+	const std::string url = m_serverURL + "/lobby/" + m_lobbyId +
+		"/decks";
+	cpr::Response response = cpr::Get(
+		cpr::Url{ url },
+		kTimeout
+	);
+
+	if (response.error || response.status_code != 200) return std::nullopt;
+
+	auto json = crow::json::load(response.text);
+	if (!json || !json.has("decks")) return std::nullopt;
+
+	std::vector<DeckState> deckStates;
+	for (const auto& deckJson : json["decks"])
+	{
+		DeckState deck;
+		deck.deckId = static_cast<uint8_t>(deckJson["deckId"].i());
+		deck.topCardId = static_cast<uint8_t>(deckJson["topCardId"].i());
+		deckStates.emplace_back(deck);
+	}
+	return std::make_optional(deckStates);
+}
+
 bool ApiClient::SendPing(const std::string& lobbyId, unsigned playerId)
 {
 	const std::string url = m_serverURL + "/lobby/ping";
@@ -339,7 +364,7 @@ std::vector<std::string> ApiClient::GetLobbyPlayers(const std::string& lobbyId) 
 
 std::optional<std::vector<unsigned>> ApiClient::GetPlayerCards() const
 {
-	auto url = m_serverURL + "/lobby/" + m_lobbyId + "/players/" +
+	const std::string url = m_serverURL + "/lobby/" + m_lobbyId + "/players/" +
 		std::to_string(m_playerId) + "/cards";
 	cpr::Response response = cpr::Get(cpr::Url{ url }, kTimeout);
 	if (response.status_code != 200) return std::nullopt;
@@ -365,6 +390,7 @@ void ApiClient::StartNetworkLoop()
 		auto lastLobby = std::chrono::steady_clock::now();
 		auto lastPlayers = std::chrono::steady_clock::now();
 		auto lastChat = std::chrono::steady_clock::now();
+		auto lastDecks = std::chrono::steady_clock::now();
 
 		while (!st.stop_requested())
 		{
@@ -424,6 +450,15 @@ void ApiClient::StartNetworkLoop()
 				}
 				lastChat = now;
 			}
+			if (now - lastDecks >= std::chrono::milliseconds(500))
+			{
+				auto decks = GetDeckState();
+				{
+					std::lock_guard<std::mutex> lk(m_cacheMutex);
+					m_cachedDecks = decks;
+				}
+				lastDecks = now;
+			}
 			std::this_thread::sleep_for(std::chrono::milliseconds(50));
 		}
 		});
@@ -456,4 +491,10 @@ std::optional<std::vector<ChatMessage>> ApiClient::SnapshotNewChat()
 	auto result = m_cachedChat;
 	m_cachedChat.reset();
 	return result;
+}
+
+std::optional<std::vector<DeckState>> ApiClient::SnapshotDecks() const
+{
+	std::lock_guard<std::mutex> lk(m_cacheMutex);
+	return m_cachedDecks;
 }

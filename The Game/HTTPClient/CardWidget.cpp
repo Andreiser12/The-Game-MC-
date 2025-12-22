@@ -137,7 +137,6 @@ void CardWidget::CreateCardWidget()
 			{
 				if (onCardPlaced(m_id, m_targetDeck))
 				{
-					m_targetDeck->SetLastId(m_id);
 					m_isPlacedOnDeck = true;
 					m_cardPanel->setVisible(false);
 				}

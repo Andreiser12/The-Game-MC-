@@ -2,8 +2,8 @@ export module FundamentalCard;
 
 import Card;
 
-export class FundamentalCard : public Card<std::uint16_t>
+export class FundamentalCard : public Card<std::uint8_t>
 {
 public:
-	FundamentalCard(uint16_t id);
+	FundamentalCard(uint8_t id);
 };

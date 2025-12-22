@@ -80,6 +80,12 @@ void LobbyRoutes::Register(crow::SimpleApp& app)
 			{
 				return this->PlayCard(req, lobbyId, playerId);
 			});
+
+	CROW_ROUTE(app, "/lobby/<string>/decks").methods("GET"_method)
+		([this](const std::string& lobbyId) 
+			{
+				return this->GetDecksState(lobbyId);
+			});
 }
 
 crow::response LobbyRoutes::CreateLobby(const crow::request& request)
@@ -352,5 +358,25 @@ crow::response LobbyRoutes::PlayCard(const crow::request& request, const std::st
 	}
 	crow::json::wvalue data;
 	data["status"] = "OK";
+	return crow::response(200, data);
+}
+
+crow::response LobbyRoutes::GetDecksState(const std::string& lobbyId)
+{
+	auto lobby = m_manager.GetLobby(lobbyId);
+	if (!lobby) return crow::response(404, "Lobby not found");
+
+	auto decksState = lobby->GetDecksState();
+	if (!decksState) return crow::response(409, "Game not started");
+
+	crow::json::wvalue data;
+	data["decks"] = crow::json::wvalue::list();
+	for (size_t i = 0; i < decksState.value().size(); i++)
+	{
+		crow::json::wvalue deck;
+		deck["deckId"] = decksState.value()[i].deckId;
+		deck["topCardId"] = decksState.value()[i].topCardId;
+		data["decks"][i] = std::move(deck);
+	}
 	return crow::response(200, data);
 }

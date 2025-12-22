@@ -162,6 +162,7 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api) :
 void GamePanel::Update()
 {
 	RemovePlacedCards();
+	UpdateDecks();
 	auto newMessages = m_apiClient.SnapshotNewChat();
 	if (!newMessages || newMessages->empty()) return;
 
@@ -169,6 +170,20 @@ void GamePanel::Update()
 	{
 		m_chat->addLine(message.username + ": " + message.message);
 		m_lastMessageId = std::max(m_lastMessageId, message.id);
+	}
+}
+
+void GamePanel::UpdateDecks()
+{
+	auto decksState = m_apiClient.SnapshotDecks();
+	if (!decksState) return;
+
+	for (const auto& deckState : decksState.value())
+	{
+		if (deckState.deckId < m_decks.size())
+		{
+			m_decks[deckState.deckId]->SetLastId(deckState.topCardId);
+		}
 	}
 }
 

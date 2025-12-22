@@ -2,7 +2,7 @@
 
 DeckWidget::DeckWidget(DeckType deckType, uint8_t deckId) : m_deckType{deckType}, m_deckId{deckId}
 {
-	m_deckType == DeckType::Ascending ? m_lastId = 1u : m_lastId = 100u;
+	m_lastId = (m_deckType == DeckType::Ascending) ? m_lastId = 1u : m_lastId = 100u;
 	CreateDeckWidget();
 }
 

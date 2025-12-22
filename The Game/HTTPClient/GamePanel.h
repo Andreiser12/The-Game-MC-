@@ -25,6 +25,7 @@ class GamePanel
 public:
 	GamePanel(tgui::Gui& gui, ApiClient& api);
 	void Update();
+	void UpdateDecks();
 	void SetupPlayerSlots();
 	void OnGameStarted();
 	void HandleMouseEvent(const sf::Event& event);

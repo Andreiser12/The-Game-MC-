@@ -33,21 +33,21 @@ public:
 
 	bool IsPileEmpty() const;
 	void Shuffle();
-	bool BackwardsTrick(uint8_t deckId, const Card<uint16_t>& card) const;
-	bool CheckCard(uint8_t deckId, const Card<uint16_t>& card) const;
+	bool BackwardsTrick(uint8_t deckId, const Card<uint8_t>& card) const;
+	bool CheckCard(uint8_t deckId, const Card<uint8_t>& card) const;
 	void PlayGame();
 
 	bool CanPlayerPlayMinCards(const Player& player, uint8_t minCards);
-	void PlaceCardOnDeck(uint8_t deckIndex, const Card<uint16_t>& card);
+	void PlaceCardOnDeck(uint8_t deckIndex, const Card<uint8_t>& card);
 	bool AllCardsPlaced() const;
 	bool PlayerTurn(Player& player, uint8_t minCards);
 
-	Deck& GetDeck(const Deck::DeckType &type, const Deck::DeckNumber &number);
-	const Pile& GetMainDeck() const;
+	Deck& GetDeck(uint8_t deckId) const;
+	const Pile& GetPile() const;
 	std::span<std::reference_wrapper<Deck>> GetAllDecks();
 	std::span<const Player> GetPlayers() const;
 	const std::unordered_map<unsigned, Player>& GetPlayersMap() const;
-	const Player& GetPlayer(unsigned playerId) const;
+	Player& GetPlayer(unsigned playerId);
 
 	constexpr std::size_t GetDeckIndex(DeckIndex index) noexcept;
 

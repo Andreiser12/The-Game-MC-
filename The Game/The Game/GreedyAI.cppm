@@ -14,7 +14,7 @@ import Table;
 export struct AIMove
 {
 	std::reference_wrapper<Deck> deck;
-	Card<uint16_t> card;
+	Card<uint8_t> card;
 	int score;
 };
 

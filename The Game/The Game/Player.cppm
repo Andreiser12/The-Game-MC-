@@ -10,23 +10,22 @@ import <functional>;
 import Card;
 import Deck;
 
-export using PlayerHand = std::unordered_set<Card<uint16_t>,
-	CardsSetHashFunction<uint16_t>, CardsEqual<uint16_t>>;
+export using PlayerHand = std::unordered_set<Card<uint8_t>,
+	CardsSetHashFunction<uint8_t>, CardsEqual<uint8_t>>;
 
 export class Player
 {
 public:
 	Player(unsigned playerID, const std::string& username);
-	Player(unsigned playerID, const PlayerHand& cards);
 	~Player();
 
 	void PlaceCards(Deck& chosenDeck);
 	void PrintCards() const;
 	void DrawCards(Pile& deck);
-	bool FindCard(uint16_t cardId) const;
-	void RemoveCard(uint16_t cardId);
+	bool FindCard(uint8_t cardId) const;
+	void RemoveCard(uint8_t cardId);
 
-	const static inline bool IsCardValid(const Deck& chosenDeck, uint16_t cardId);
+	const static inline bool IsCardValid(const Deck& chosenDeck, uint8_t cardId);
 	void SetupCards(Pile& deck, uint8_t cardsCount);
 
 	void SetTimeOut(bool value);

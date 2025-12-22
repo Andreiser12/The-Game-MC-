@@ -22,6 +22,6 @@ bool Card<Integer>::operator == (const Card<Integer>& other) const
 	return m_id == other.getId();
 }
 
-template class Card<std::uint16_t>;
-template std::ostream& operator<<(std::ostream&, const Card<std::uint16_t>&);
-template bool Card<std::uint16_t>::operator==(const Card<std::uint16_t>&) const;
+template class Card<std::uint8_t>;
+template std::ostream& operator<<(std::ostream&, const Card<std::uint8_t>&);
+template bool Card<std::uint8_t>::operator==(const Card<std::uint8_t>&) const;

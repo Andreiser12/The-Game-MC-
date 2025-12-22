@@ -8,20 +8,18 @@ Lobby::Lobby(const std::string& lobbyId, unsigned hostId, const std::string& use
 	m_players.emplace(hostId, hostPlayer);
 }
 
-bool Lobby::AddPlayer(unsigned playerId, const std::string& playerUsername)
+bool Lobby::AddPlayer(unsigned playerId, const std::string& username)
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
 	if (IsFull()) return false;
 
-	if (m_players.find(playerId) != m_players.end())
-		return false;
+	if (m_players.find(playerId) != m_players.end()) return false;
 
-	auto player = std::make_shared<Player>(playerId, playerUsername);
+	auto player = std::make_shared<Player>(playerId, username);
 	m_players[playerId] = player;
 	m_lastPingPlayer[playerId] = std::chrono::steady_clock::now();
 
 	if (m_players.size() == 1) m_hostId = playerId;
-
 	return true;
 }
 
@@ -167,14 +165,30 @@ std::optional<std::vector<unsigned>> Lobby::GetPlayerCards(unsigned playerId) co
 bool Lobby::PlayCard(unsigned playerId, uint8_t cardId, uint8_t deckId)
 {
 	std::lock_guard lock(m_mutex);
-
 	if (!m_gameStarted || !m_table) return false;
-	
-	auto player = m_table->GetPlayer(playerId);
-	auto card = player.FindCard(cardId);
+
+	auto& player = m_table->GetPlayer(playerId);
+	Card<uint8_t> card(cardId);
 	if (!m_table->CheckCard(deckId, card)) return false;
 
 	m_table->PlaceCardOnDeck(deckId, card);
-	player.RemoveCard(card);
+	player.RemoveCard(cardId);
 	return true;
+}
+
+std::optional<std::vector<DeckState>> Lobby::GetDecksState()
+{
+	std::lock_guard lock(m_mutex);
+
+	if (!m_gameStarted || !m_table) return std::nullopt;
+
+	std::vector<DeckState> decksState;
+	for (size_t i = 0; i < 4; i++)
+	{
+		DeckState deck;
+		deck.deckId = static_cast<uint8_t>(i);
+		deck.topCardId = m_table->GetDeck(static_cast<uint8_t>(i)).GetTopCard().getId();
+		decksState.emplace_back(deck);
+	}
+	return decksState;
 }

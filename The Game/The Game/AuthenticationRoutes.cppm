@@ -1,7 +1,8 @@
 module;
-#include "crow.h";
+#include "crow.h"
 export module AuthenticationRoutes;
 
+import SessionManager;
 import DatabaseManager;
 import DatabaseStructures;
 

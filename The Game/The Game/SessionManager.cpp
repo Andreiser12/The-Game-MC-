@@ -42,5 +42,16 @@ bool SessionManager::IsOnline(unsigned playerId, std::chrono::seconds timeout) c
 	return std::chrono::steady_clock::now() - iteratorActivity->second < timeout;
 }
 
+std::vector<unsigned> SessionManager::GetInactivePlayers(std::chrono::seconds timeout) const
+{
+	std::lock_guard<std::mutex> lock(m_mutex);
+	auto now = std::chrono::steady_clock::now();
+	std::vector<unsigned> inactivePlayers;
+	for(const auto &[playerId, lastActivity] : m_lastPlayerActivity)
+		if (now - lastActivity >= timeout)
+			inactivePlayers.emplace_back(playerId);
+	return inactivePlayers;
+}
+
 
 

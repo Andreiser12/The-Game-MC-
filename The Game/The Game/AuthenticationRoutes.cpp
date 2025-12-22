@@ -1,4 +1,5 @@
 import AuthenticationRoutes;
+import SessionManager;
 #include <crow.h>
 
 AuthenticationRoutes::AuthenticationRoutes(DatabaseManager& database)
@@ -60,21 +61,33 @@ crow::response AuthenticationRoutes::HandleLogin(const crow::request& req)
 		return crow::response(400, "Invalid JSON");
 	std::string username = body["username"].s();
 
-	auto user = m_database.GetUserByName(username);
-	if (user) {
-		crow::json::wvalue res;
-		res["status"] = "ok";
-		res["id"] = user->GetID();
-		res["username"] = user->GetUsername();
-		return crow::response{ res };
-	}
-	else
+	auto userOptional = m_database.GetUserByName(username);
+	if (!userOptional) 
 	{
-		crow::json::wvalue res;
-		res["status"] = "fail";
-		res["message"] = "User not found";
-		return crow::response{ res };
+		crow::json::wvalue result;
+		result["status"] = "fail";
+		result["message"] = "User not found";
+		return crow::response{ result };
 	}
+	
+	unsigned playerId = userOptional->GetID();
+	auto& sessionManager = SessionManager::Instance();
+
+	if (sessionManager.IsLoggedIn(playerId))
+	{
+		crow::json::wvalue result;
+		result["status"] = "fail";
+		result["message"] = "User not found!";
+		return crow::response{ result };
+	}
+
+	sessionManager.Login(playerId);
+
+	crow::json::wvalue result;
+	result["status"] = "ok";
+	result["id"] = userOptional->GetID();
+	result["username"] = userOptional->GetUsername();
+	return crow::response{ result };
 }
 
 crow::response AuthenticationRoutes::HandleUsers()

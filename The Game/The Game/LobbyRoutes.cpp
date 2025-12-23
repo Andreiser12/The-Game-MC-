@@ -12,7 +12,7 @@ inline static std::string GenerateLobbyId()
 	const std::string charset{ "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" };
 	std::string lobbyId;
 	lobbyId.reserve(K_LOBBY_ID_LENGTH);
-	for (uint8_t i = 0u; i < K_LOBBY_ID_LENGTH; i++)
+	for (size_t i = 0; i < K_LOBBY_ID_LENGTH; i++)
 	{
 		lobbyId += charset[dist(gen)];
 	}
@@ -20,56 +20,57 @@ inline static std::string GenerateLobbyId()
 }
 
 LobbyRoutes::LobbyRoutes(LobbyManager& manager, DatabaseManager& db)
-	: m_manager{manager},
-	m_db{db} {}
+	: m_manager{ manager },
+	m_db{ db } {
+}
 
 void LobbyRoutes::Register(crow::SimpleApp& app)
 {
 	CROW_ROUTE(app, "/lobby/create").methods("POST"_method)
 		([this](const crow::request& req) {
 		return this->CreateLobby(req);
-		});
+			});
 
 	CROW_ROUTE(app, "/lobby/join").methods("POST"_method)
 		([this](const crow::request& req) {
 		return this->JoinLobby(req);
-		});
+			});
 
 	CROW_ROUTE(app, "/lobby/leave").methods("POST"_method)
 		([this](const crow::request& req) {
 		return this->LeaveLobby(req);
-		});
+			});
 
 	CROW_ROUTE(app, "/lobby/info/<string>").methods("GET"_method)
 		([this](const std::string& lobbyId) {
 		return this->GetLobbyState(lobbyId);
-		});
+			});
 
 	CROW_ROUTE(app, "/lobby/start").methods("POST"_method)
 		([this](const crow::request& req) {
 		return this->StartMatch(req);
-		});
+			});
 
 	CROW_ROUTE(app, "/lobby/<string>/players").methods("GET"_method)
 		([&](const std::string& lobbyId) {
-			return this->FetchLobbyPlayers(lobbyId);
-		});
-	
+		return this->FetchLobbyPlayers(lobbyId);
+			});
+
 	CROW_ROUTE(app, "/lobby/chat/send").methods("POST"_method)
 		([this](const crow::request& req) {
-			return this->SendChatMessage(req);
-		});
+		return this->SendChatMessage(req);
+			});
 
 	CROW_ROUTE(app, "/lobby/<string>/chat/messages").methods("GET"_method)
 		([this](const crow::request& req, const std::string& lobbyId) {
 		return this->GetNewMessages(req, lobbyId);
-		});
-	
+			});
+
 	CROW_ROUTE(app, "/lobby/ping").methods("POST"_method)
 		([this](const crow::request& req) {
 		return this->PlayerPing(req);
 			});
-	
+
 	CROW_ROUTE(app, "/lobby/<string>/players/<uint>/cards").methods("GET"_method)
 		([this](const std::string& lobbyId, unsigned playerId)
 			{
@@ -83,7 +84,7 @@ void LobbyRoutes::Register(crow::SimpleApp& app)
 			});
 
 	CROW_ROUTE(app, "/lobby/<string>/decks").methods("GET"_method)
-		([this](const std::string& lobbyId) 
+		([this](const std::string& lobbyId)
 			{
 				return this->GetDecksState(lobbyId);
 			});
@@ -92,6 +93,18 @@ void LobbyRoutes::Register(crow::SimpleApp& app)
 		([this](const std::string& lobbyId)
 			{
 				return this->GetGameState(lobbyId);
+			});
+
+	CROW_ROUTE(app, "/lobby/<string>/players/<uint>/endturn").methods("GET"_method)
+		([this](const std::string& lobbyId, unsigned playerId)
+			{
+				return this->GetEndTurnState(lobbyId, playerId);
+			});
+
+	CROW_ROUTE(app, "/lobby/<string>/players/<uint>/endturn").methods("POST"_method)
+		([this](const std::string& lobbyId, unsigned playerId)
+			{
+				return this->EndTurn(lobbyId, playerId);
 			});
 }
 
@@ -123,7 +136,7 @@ crow::response LobbyRoutes::JoinLobby(const crow::request& request)
 	if (!userOpt) return crow::response(404, "User not found");
 	unsigned playerId = userOpt.value().GetID();
 
-	auto lobby = m_manager.GetLobby(lobbyId);	
+	auto lobby = m_manager.GetLobby(lobbyId);
 	if (!lobby) return crow::response(404, "Lobby not found");
 
 	if (!lobby->AddPlayer(playerId, username)) return crow::response
@@ -133,7 +146,6 @@ crow::response LobbyRoutes::JoinLobby(const crow::request& request)
 	data["status"] = "OK";
 	data["playerId"] = playerId;
 	data["lobbyId"] = lobbyId;
-
 	return crow::response(data);
 }
 
@@ -149,10 +161,8 @@ crow::response LobbyRoutes::LeaveLobby(const crow::request& request)
 	if (!lobby) return crow::response(404, "Lobby not found");
 
 	auto result = lobby->RemovePlayer(playerId);
-	if (result == RemoveResult::NotFound)
-	{
-		return crow::response(404, "Player not found");
-	}
+	if (result == RemoveResult::NotFound) return crow::response(404, "Player not found");
+
 	if (result == RemoveResult::HostRemoved)
 	{
 		m_manager.RemoveLobby(lobbyId);
@@ -214,7 +224,7 @@ crow::response LobbyRoutes::StartMatch(const crow::request& request)
 	if (!lobby) return crow::response(404, "Lobby not found");
 
 	if (!lobby->IsPlayerHost(playerId)) return crow::response(409, "Player is not host.");
-	
+
 	if (lobby->GetPlayers().empty()) return crow::response(409, "Lobby empty.");
 
 	crow::json::wvalue data;
@@ -233,7 +243,7 @@ crow::response LobbyRoutes::StartMatch(const crow::request& request)
 	}
 
 	if (!lobby->StartGame(playerId)) return crow::response(409, "Start rejected.");
-	
+
 	data["status"] = "GAME_STARTED";
 	data["message"] = "Game has started.";
 	return crow::response(200, data);
@@ -270,7 +280,7 @@ crow::response LobbyRoutes::SendChatMessage(const crow::request& req)
 	if (!lobby) return crow::response(404, "Lobby not found");
 
 	lobby->AddChatMessage(username, message);
-	
+
 	crow::json::wvalue data;
 	data["status"] = "OK";
 	return crow::response(200, data);
@@ -344,7 +354,7 @@ crow::response LobbyRoutes::GetPlayerCards(const std::string& lobbyId, unsigned 
 
 	crow::json::wvalue data;
 	crow::json::wvalue::list cardList;
-	for (unsigned cardId: cardsOpt.value())
+	for (unsigned cardId : cardsOpt.value())
 	{
 		cardList.push_back(cardId);
 	}
@@ -396,28 +406,52 @@ crow::response LobbyRoutes::GetGameState(const std::string& lobbyId)
 	if (!lobby) return crow::response(404, "Lobby not found");
 
 	auto drawPileCount = lobby->GetDrawPileCount();
-
 	auto decksState = lobby->GetDecksState();
 
-	if (!drawPileCount.has_value() || !decksState.has_value())
-	{
-		return crow::response(409, "Game not started");
-	}
+	if (!drawPileCount.has_value() || !decksState.has_value()) return crow::response(409, "Game not started");
 
 	crow::json::wvalue data;
-
-	data["drawPileCount"] = static_cast<unsigned int>(drawPileCount.value());
-
+	data["drawPileCount"] = static_cast<unsigned>(drawPileCount.value());
 	data["piles"] = crow::json::wvalue::list();
 	for (size_t i = 0; i < decksState.value().size(); i++)
 	{
 		crow::json::wvalue deck;
 		deck["count"] = 0;
-
 		deck["top"] = decksState.value()[i].topCardId;
-
 		data["piles"][i] = std::move(deck);
 	}
+	return crow::response(200, data);
+}
 
+crow::response LobbyRoutes::GetEndTurnState(const std::string& lobbyId, unsigned playerId)
+{
+	auto lobby = m_manager.GetLobby(lobbyId);
+	if (!lobby) return crow::response(404, "Lobby not found");
+
+	auto stateOpt = lobby->GetEndTurnState(playerId);
+	if (!stateOpt) return crow::response(409, "Game not started or invalid player");
+
+	crow::json::wvalue data;
+	data["isMyTurn"] = stateOpt.value().isMyTurn;
+	data["canEndTurn"] = stateOpt.value().canEndTurn;
+	data["cardsPlaced"] = stateOpt.value().cardsPlaced;
+	data["minRequiredCards"] = stateOpt.value().minRequiredCards;
+	return crow::response(200, data);
+}
+
+crow::response LobbyRoutes::EndTurn(const std::string& lobbyId, unsigned playerId)
+{
+	auto lobby = m_manager.GetLobby(lobbyId);
+	if (!lobby) return crow::response(404, "Lobby not found");
+
+	auto drawnCards = lobby->EndTurn(playerId);
+	if (!drawnCards) return crow::response(409, "End turn not allowed");
+
+	crow::json::wvalue data;
+	data["cards"] = crow::json::wvalue::list();
+	for (size_t i = 0; i<drawnCards.value().size(); i++)
+	{
+		data["cards"][i] = drawnCards.value()[i];
+	}
 	return crow::response(200, data);
 }

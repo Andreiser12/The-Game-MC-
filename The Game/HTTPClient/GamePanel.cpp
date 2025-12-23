@@ -157,12 +157,42 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api) :
 		tgui::String(std::to_string(yDeckPosition) + "%")
 		});
 	m_root->add(pilePanel);
+
+	m_endTurnButton = tgui::Button::create("End Turn");
+	m_endTurnButton->setSize({ "14%", "9%" });
+	m_endTurnButton->setPosition({ "85%", "90%" });
+	m_endTurnButton->getRenderer()->setBorders(2);
+	m_endTurnButton->getRenderer()->setBorderColor(tgui::Color(100, 20, 30));
+	m_endTurnButton->onSizeChange([this](tgui::Vector2f size)
+		{
+			m_endTurnButton->getRenderer()->setRoundedBorderRadius(size.y * 0.35f);
+		});
+	m_endTurnButton->setTextSize(22);
+	m_endTurnButton->getRenderer()->setRoundedBorderRadius(10);
+	m_endTurnButton->setEnabled(false);
+	m_endTurnButton->getRenderer()->setBackgroundColor(tgui::Color(150, 30, 45));
+	m_endTurnButton->getRenderer()->setBackgroundColorHover(tgui::Color(175, 40, 55));
+	m_endTurnButton->getRenderer()->setBackgroundColorDown(tgui::Color(120, 25, 35));
+	m_endTurnButton->getRenderer()->setBackgroundColorDisabled(tgui::Color(90, 70, 75));
+	m_endTurnButton->onPress([this]()
+		{
+			auto drawnCards = m_apiClient.EndTurn();
+			if (!drawnCards) return;
+
+			for (uint8_t card : drawnCards.value())
+			{
+				AddCardToHand(card);
+			}
+			m_endTurnButton->setEnabled(false);
+		});
+	m_root->add(m_endTurnButton);
 }
 
 void GamePanel::Update()
 {
 	RemovePlacedCards();
 	UpdateDecks();
+	UpdateEndTurnButton();
 	auto newMessages = m_apiClient.SnapshotNewChat();
 	if (!newMessages || newMessages->empty()) return;
 
@@ -176,11 +206,8 @@ void GamePanel::Update()
 	if (currentLobbyId.empty()) return;
 
 	auto gameState = m_apiClient.GetGameState(currentLobbyId);
-
-	if (gameState.has_value())
-	{
-		m_pileWidget->UpdatePile(gameState->drawPileCount);
-	}
+	if (!gameState) return;
+	m_pileWidget->UpdatePile(gameState->drawPileCount);
 }
 
 void GamePanel::UpdateDecks()
@@ -197,6 +224,13 @@ void GamePanel::UpdateDecks()
 	}
 }
 
+void GamePanel::UpdateEndTurnButton()
+{
+	auto endTurnState = m_apiClient.SnapshotEndTurnState();
+	if (!endTurnState) return;
+	m_endTurnButton->setEnabled(endTurnState.value().canEndTurn);
+}
+
 void GamePanel::SetupPlayerSlots()
 {
 	auto playerUsernames = m_apiClient.SnapshotPlayers();
@@ -210,7 +244,7 @@ void GamePanel::SetupPlayerSlots()
 	const auto slots = GetSlotsForPlayerCount(playerUsernames.size());
 	if (slots.empty()) return;
 
-	for (std::size_t index = 0; index < playerUsernames.size(); index++)
+	for (size_t index = 0; index < playerUsernames.size(); index++)
 	{
 		auto userPanel = tgui::Panel::create({ "14%", "12%" });
 		userPanel->setPosition(
@@ -239,6 +273,7 @@ void GamePanel::SetupPlayerSlots()
 
 		if (index == 0)
 		{
+			m_mySlot = slots[index];
 			CreateMyHand(slots[index]);
 		}
 		else
@@ -310,8 +345,8 @@ void GamePanel::RemovePlacedCards()
 					return true;
 				}
 				return false;
-			}), 
-	m_myCards.end());
+			}),
+		m_myCards.end());
 }
 
 void GamePanel::CreatePlayerHand(size_t playerIndex, const PlayerSlot& slot)
@@ -368,12 +403,53 @@ void GamePanel::CreateMyHand(const PlayerSlot& slot)
 			tgui::String(std::to_string(cardX) + "%"),
 			tgui::String(std::to_string(startY) + "%")
 		);
-		card->onCardPlaced = [this](uint8_t cardId, std::shared_ptr<DeckWidget> deck) 
-		{
-			return m_apiClient.PlayCard(cardId, deck->GetDeckId());
-		};
+		card->onCardPlaced = [this](uint8_t cardId, std::shared_ptr<DeckWidget> deck)
+			{
+				return m_apiClient.PlayCard(cardId, deck->GetDeckId());
+			};
 		card->SetDraggable(true);
 		m_root->add(card->GetWidget());
 		m_myCards.emplace_back(card);
 	}
+}
+
+void GamePanel::AddCardToHand(uint8_t cardId)
+{
+	if (!m_mySlot) return;
+
+	constexpr float cardWidth{ 2.25f };
+	constexpr float cardHeight{ 6.5f };
+	constexpr float cardSpacing{ 0.20f };
+
+	const size_t cardCount{ m_myCards.size() + 1 };
+	const float totalWidth
+	{ (cardWidth + cardSpacing) * cardCount - cardSpacing };
+
+	const float startX{ m_mySlot->xPercent + 7.0f - (totalWidth / 2.0f) };
+	const float startY{ m_mySlot->yPercent - cardHeight };
+
+	auto card = std::make_shared<CardWidget>(cardId, true);
+	card->SetSize(
+		tgui::String(std::to_string(cardWidth) + "%"),
+		tgui::String(std::to_string(cardHeight) + "%")
+	);
+
+	for (size_t i = 0; i < m_myCards.size(); i++)
+	{
+		const float cardX = startX + i * (cardWidth + cardSpacing);
+		m_myCards[i]->SetPosition(
+			tgui::String(std::to_string(cardX) + "%"),
+			tgui::String(std::to_string(startY) + "%")
+		);
+	}
+	const float newX
+	{ startX + m_myCards.size() * (cardWidth + cardSpacing) };
+	card->SetPosition(
+		tgui::String(std::to_string(newX) + "%"),
+		tgui::String(std::to_string(startY) + "%")
+	);
+
+	card->SetDraggable(true);
+	m_root->add(card->GetWidget());
+	m_myCards.push_back(card);
 }

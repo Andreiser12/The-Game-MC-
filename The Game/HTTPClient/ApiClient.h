@@ -50,6 +50,14 @@ struct GameTableState
 	int drawPileCount = 0;
 };
 
+struct EndTurnState
+{
+	bool isMyTurn;
+	bool canEndTurn;
+	uint8_t cardsPlaced;
+	uint8_t minRequiredCards;
+};
+
 class ApiClient
 {
 public:
@@ -69,6 +77,7 @@ public:
 	std::optional<std::vector<ChatMessage>> GetNewMessages(unsigned afterId);
 	bool PlayCard(uint8_t cardId, uint8_t deckId);
 	std::optional<std::vector<DeckState>> GetDeckState();
+	std::optional<EndTurnState> GetEndTurnState();
 
 	bool SendPing(const std::string& lobbyId, unsigned playerId);
 	void StartPingThread(const std::string& lobbyId, unsigned playerId);
@@ -85,6 +94,7 @@ public:
 	std::string GetLobbyId() const;
 	std::vector<std::string> GetLobbyPlayers(const std::string& lobbyId) const;
 	std::optional<std::vector<unsigned>> GetPlayerCards() const;
+	std::optional<std::vector<uint8_t>> EndTurn();
 
 	void StartNetworkLoop();
 	void StopNetworkLoop();
@@ -93,12 +103,12 @@ public:
 	std::optional<LobbyState> SnapshotLobbyState() const;
 	std::optional<std::vector<ChatMessage>> SnapshotNewChat();
 	std::optional<std::vector<DeckState>> SnapshotDecks() const;
+	std::optional<GameTableState> GetGameState(const std::string& lobbyId) const;
+	std::optional<EndTurnState> SnapshotEndTurnState() const;
 
 	void SetUsername(const std::string& username);
 	void SetPlayerId(unsigned playerId);
 	void SetLobbyId(const std::string& lobbyId);
-
-	std::optional<GameTableState> GetGameState(const std::string& lobbyId);
 
 private:
 	ApiClient() = delete;
@@ -122,6 +132,7 @@ private:
 	std::optional<LobbyState> m_cachedLobby;
 	std::optional<std::vector<ChatMessage>> m_cachedChat;
 	std::optional<std::vector<DeckState>> m_cachedDecks;
+	std::optional<EndTurnState> m_cachedEndTurnState;
 
 	std::atomic<unsigned> m_afterChatId{ 0u };
 };

@@ -32,6 +32,14 @@ export struct DeckState
 	uint8_t topCardId;
 };
 
+export struct EndTurnState
+{
+	bool isMyTurn;
+	bool canEndTurn;
+	uint8_t cardsPlaced;
+	uint8_t minRequiredCards;
+};
+
 export class Lobby
 {
 public:
@@ -53,10 +61,11 @@ public:
 
 	std::optional<std::vector<unsigned>> GetPlayerCards(unsigned playerId) const;
 	bool PlayCard(unsigned playerId, uint8_t cardId, uint8_t deckId);
-	std::optional<std::vector<DeckState>> GetDecksState();
-
+	std::optional<std::vector<DeckState>> GetDecksState() const;
 	std::optional<size_t> GetDrawPileCount() const;
-
+	std::optional<EndTurnState> GetEndTurnState(unsigned playerId) const;
+	std::optional<std::vector<uint8_t>> EndTurn(unsigned playerId);
+ 
 private:
 	Lobby() = delete;
 
@@ -77,5 +86,4 @@ private:
 	mutable std::mutex m_mutex;
 
 	std::unique_ptr<Table> m_table;
-
 };

@@ -14,7 +14,7 @@ constexpr static uint8_t MIN_CARDS_NORMAL{ 2u };
 constexpr static uint8_t MIN_CARDS_EMPTY_DECK{ 1u };
 
 Table::Table(const std::vector<std::pair<unsigned, std::string>>& lobbyPlayers) :
-	m_nrPlayers{ static_cast<uint8_t>(lobbyPlayers.size())}
+	m_playerCount{ static_cast<uint8_t>(lobbyPlayers.size())}
 {
 	m_decks[0] = std::make_unique<Deck>(Deck::DeckType::Ascending, Deck::DeckNumber::First, 0u);
 	m_decks[1] = std::make_unique<Deck>(Deck::DeckType::Ascending, Deck::DeckNumber::Second, 1u);
@@ -23,7 +23,7 @@ Table::Table(const std::vector<std::pair<unsigned, std::string>>& lobbyPlayers) 
 	Shuffle();
 
 	size_t cardsPerPlayer;
-	switch (m_nrPlayers)
+	switch (m_playerCount)
 	{
 	case 2:
 		cardsPerPlayer = 8;
@@ -164,15 +164,8 @@ void Table::PlayGame()
 			gameRunning = false;
 			break;
 		}
-		bool turnSucces = PlayerTurn(currentPlayer, minCards);
 
-		if (!turnSucces)
-		{
-			gameWon = false;
-			gameRunning = false;
-			break;
-		}
-		currentPlayerIndex = (currentPlayerIndex + 1) % m_nrPlayers;
+		currentPlayerIndex = (currentPlayerIndex + 1) % m_playerCount;
 	}
 
 	for (Player& player : m_Players)
@@ -236,75 +229,20 @@ bool Table::AllCardsPlaced() const
 	return true;
 }
 
-bool Table::PlayerTurn(Player& player, uint8_t minCards)
+std::vector<uint8_t> Table::EndTurn(unsigned playerId)
 {
-
-	if (player.HasTimeOut() || player.IsInactive())
-	{
-		GreedyAI::PlayTurn(player, *this, minCards);
-		return true;
-	}
-
-	uint8_t cardsPlaced = 0u;
-	bool continueTurn = true;
-
-	while (continueTurn)
-	{
-		player.PrintCards();
-
-		if (cardsPlaced >= minCards)
-		{
-			unsigned choice;
-			std::cin >> choice;
-			if (choice == 0u)
-			{
-				continueTurn = false;
-				break;
-			}
-		}
-
-		uint8_t cardId;
-		std::cin >> cardId;
-
-		if (!player.FindCard(cardId)) continue;
-
-		unsigned deckChoice;
-		std::cin >> deckChoice;
-
-		Deck& chosenDeck = [&]() ->Deck& {
-			switch (deckChoice)
-			{
-			case 1u:
-				return GetDeck(0u);
-			case 2u:
-				return GetDeck(1u);
-			case 3u:
-				return GetDeck(2u);
-			case 4u:
-				return GetDeck(3u);
-			default:
-				break;
-			}}();
+	Player& player = GetPlayer(playerId);
 	
-		Card cardToPlace(cardId);
-		if (!CheckCard(chosenDeck.GetDeckIndex(), cardToPlace)) {
-			continue;
-		}
-
-		//PlaceCardOnDeck(chosenDeck, cardToPlace);
-		player.RemoveCard(cardId);
-		cardsPlaced++;
-
-		if (player.GetCardsCount() == 0)
-		{
-			continueTurn = false;
-			break;
-		}
-	}
-	if (!IsPileEmpty() && cardsPlaced > 0)
+	const uint8_t cardsPlaced = player.GetCardsPlacedRound();
+	uint8_t drawCount = static_cast<uint8_t>(std::min<std::size_t>(cardsPlaced, m_pile.size()));
+	std::vector<uint8_t> drawnCards;
+	for (uint8_t i = 0; i < drawCount; i++)
 	{
-		uint8_t cardsToDraw = std::min(static_cast<uint8_t>(cardsPlaced), static_cast<uint8_t>(m_pile.size()));
-		player.DrawCards(m_pile);
+		Card<uint8_t> card = m_pile.top();
+		m_pile.pop();
+		player.AddCard(card);
+		drawnCards.emplace_back(card.getId());
 	}
-	return cardsPlaced >= minCards;
+	player.ResetCardsPlaced();
+	return drawnCards;
 }

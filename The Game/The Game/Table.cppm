@@ -40,7 +40,7 @@ public:
 	bool CanPlayerPlayMinCards(const Player& player, uint8_t minCards);
 	void PlaceCardOnDeck(uint8_t deckIndex, const Card<uint8_t>& card);
 	bool AllCardsPlaced() const;
-	bool PlayerTurn(Player& player, uint8_t minCards);
+	std::vector<uint8_t> EndTurn(unsigned playerId);
 
 	Deck& GetDeck(uint8_t deckId) const;
 	const Pile& GetPile() const;
@@ -54,7 +54,7 @@ public:
 	std::size_t GetDrawPileCount() const;
 
 private:
-	uint8_t m_nrPlayers;
+	uint8_t m_playerCount;
 	std::vector<Player> m_Players;
 	std::unordered_map<unsigned, Player> m_playersMap;
 	Pile m_pile;

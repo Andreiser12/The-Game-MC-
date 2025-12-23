@@ -19,14 +19,15 @@ public:
 	Player(unsigned playerID, const std::string& username);
 	~Player();
 
-	void PlaceCards(Deck& chosenDeck);
+	void AddCard(const Card<uint8_t>& card);
 	void PrintCards() const;
 	void DrawCards(Pile& deck);
 	bool FindCard(uint8_t cardId) const;
 	void RemoveCard(uint8_t cardId);
 
-	const static inline bool IsCardValid(const Deck& chosenDeck, uint8_t cardId);
 	void SetupCards(Pile& deck, uint8_t cardsCount);
+	void IncrementCardsPlaced();
+	void ResetCardsPlaced();
 
 	void SetTimeOut(bool value);
 	void SetIncative(bool value);
@@ -35,6 +36,7 @@ public:
 	const std::string& GetUsername() const;
 	const PlayerHand& GetCards() const;
 	size_t GetCardsCount() const;
+	uint8_t GetCardsPlacedRound() const;
 
 	bool operator<(Player& other) const;
 

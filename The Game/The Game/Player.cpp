@@ -7,33 +7,9 @@ Player::Player(unsigned playerID, const std::string& username) :
 
 Player::~Player() {}
 
-void Player::PlaceCards(Deck& chosenDeck)
+void Player::AddCard(const Card<uint8_t>& card)
 {
-	uint8_t cardsPlaced = 0u;
-	while (GetCardsCount() || cardsPlaced < MINIMUM_CARDS)
-	{
-		std::cout << "Which card would you like to place?"
-			<< std::endl;
-		PrintCards();
-		unsigned cardToPlace;
-
-		std::cin >> cardToPlace;
-		while (!FindCard(cardToPlace))
-		{
-			std::cout << "This card doesn't exist." <<
-				std::endl << "Pleace choose an existing card: ";
-			std::cin >> cardToPlace;
-		}
-		if (!IsCardValid(chosenDeck, cardToPlace))
-		{
-			std::cout << "You can't place this card on this deck!"
-				<< std::endl;
-			continue;
-		}
-		RemoveCard(cardToPlace);
-		++cardsPlaced;
-	}
-	m_cardsPlacedRound = cardsPlaced;
+	m_cards.emplace(card);
 }
 
 void Player::PrintCards() const
@@ -72,14 +48,6 @@ void Player::RemoveCard(uint8_t cardId)
 	if (it != m_cards.end()) m_cards.erase(it);
 }
 
-inline const bool Player::IsCardValid(const Deck& chosenDeck, uint8_t cardId)
-{
-	return (chosenDeck.GetDeckType() == Deck::DeckType::Ascending
-		&& cardId > chosenDeck.GetTopCard().getId())
-		|| (chosenDeck.GetDeckType() == Deck::DeckType::Descending
-			&& cardId < chosenDeck.GetTopCard().getId());
-}
-
 void Player::SetupCards(Pile& deck, uint8_t cardsCount)
 {
 	Card<uint8_t> cardToPlace;
@@ -89,6 +57,16 @@ void Player::SetupCards(Pile& deck, uint8_t cardsCount)
 		deck.pop();
 		m_cards.emplace(cardToPlace);
 	}
+}
+
+void Player::IncrementCardsPlaced()
+{
+	++m_cardsPlacedRound;
+}
+
+void Player::ResetCardsPlaced()
+{
+	m_cardsPlacedRound = 0u;
 }
 
 unsigned Player::GetPlayerId() const
@@ -109,6 +87,11 @@ const PlayerHand& Player::GetCards() const
 size_t Player::GetCardsCount() const
 {
 	return m_cards.size();
+}
+
+uint8_t Player::GetCardsPlacedRound() const
+{
+	return m_cardsPlacedRound;
 }
 
 bool Player::operator<(Player& other) const

@@ -26,6 +26,7 @@ public:
 	GamePanel(tgui::Gui& gui, ApiClient& api);
 	void Update();
 	void UpdateDecks();
+	void UpdateEndTurnButton();
 	void SetupPlayerSlots();
 	void OnGameStarted();
 	void HandleMouseEvent(const sf::Event& event);
@@ -46,6 +47,7 @@ private:
 	}
 	void CreatePlayerHand(size_t playerIndex, const PlayerSlot& slot);
 	void CreateMyHand(const PlayerSlot& slot);
+	void AddCardToHand(uint8_t cardId);
 
 private:
 	unsigned m_lastMessageId{ 0u };
@@ -80,4 +82,6 @@ private:
 	std::vector<std::shared_ptr<CardWidget>> m_myCards;
 	std::array<std::shared_ptr<DeckWidget>, 4> m_decks;
 	std::shared_ptr<PileWidget> m_pileWidget;
+	std::optional<PlayerSlot> m_mySlot;
+	tgui::Button::Ptr m_endTurnButton;
 };

@@ -1,6 +1,6 @@
 #include "APIClient.h"
 
-ApiClient::ApiClient(const std::string& serverURL) : m_serverURL{serverURL} {}
+ApiClient::ApiClient(const std::string& serverURL) : m_serverURL{ serverURL } {}
 static inline cpr::Timeout kTimeout{ 400 };
 
 LoginResult ApiClient::Login(const std::string& username)
@@ -20,7 +20,7 @@ LoginResult ApiClient::Login(const std::string& username)
 	auto json = crow::json::load(response.text);
 	if (!json)
 		return LoginResult::NetworkError;
-	
+
 	if (json["status"].s() != "ok")
 	{
 		std::string message = json["message"].s();
@@ -81,9 +81,9 @@ std::optional<std::string> ApiClient::CreateLobby(const std::string& username)
 		"\",\"playerId\":\"" + std::to_string(m_playerId) + "\"}";
 
 	cpr::Response response = cpr::Post(
-		cpr::Url{url},
-		cpr::Body{jsonBody},
-		cpr::Header{{"Content-Type", "application/json"}},
+		cpr::Url{ url },
+		cpr::Body{ jsonBody },
+		cpr::Header{ {"Content-Type", "application/json"} },
 		kTimeout
 	);
 
@@ -140,7 +140,7 @@ bool ApiClient::LeaveLobby(const std::string& lobbyId, unsigned playerId)
 		"}";
 	cpr::Response response = cpr::Post(
 		cpr::Url{ url },
-		cpr::Body{jsonBody},
+		cpr::Body{ jsonBody },
 		cpr::Header{ {"Content-Type", "application/json"} },
 		kTimeout
 	);
@@ -164,10 +164,10 @@ std::optional<LobbyState> ApiClient::GetLobbyState(const std::string& lobbyId)
 {
 	const std::string url = m_serverURL + "/lobby/info/" + lobbyId;
 	cpr::Response response = cpr::Get
-		(cpr::Url{ url },
-		cpr::Header{{"Content-Type", "application/json"}},
+	(cpr::Url{ url },
+		cpr::Header{ {"Content-Type", "application/json"} },
 		kTimeout
-		);
+	);
 
 	if (response.error || response.status_code != 200) return std::nullopt;
 
@@ -191,7 +191,7 @@ bool ApiClient::StartMatch(const std::string& lobbyId, unsigned playerId)
 
 	cpr::Response response = cpr::Post(
 		cpr::Url{ url },
-		cpr::Body{jsonBody},
+		cpr::Body{ jsonBody },
 		cpr::Header{ {"Content-Type", "application/json"} },
 		kTimeout
 	);
@@ -258,7 +258,7 @@ bool ApiClient::PlayCard(uint8_t cardId, uint8_t deckId)
 		+ "/players/" + std::to_string(m_playerId) + "/cards";
 	const std::string jsonBody =
 		"{"
-		"\"cardId\":" + std::to_string(cardId) + "," 
+		"\"cardId\":" + std::to_string(cardId) + ","
 		"\"deckId\":" + std::to_string(deckId) +
 		"}";
 	cpr::Response response = cpr::Post(
@@ -300,6 +300,33 @@ std::optional<std::vector<DeckState>> ApiClient::GetDeckState()
 	return std::make_optional(deckStates);
 }
 
+std::optional<EndTurnState> ApiClient::GetEndTurnState()
+{
+	if (m_lobbyId.empty() || m_playerId == 0u) return std::nullopt;
+
+	const std::string url = m_serverURL + "/lobby/" + m_lobbyId +
+		"/players/" + std::to_string(m_playerId) + "/endturn";
+	cpr::Response response = cpr::Get(
+		cpr::Url{ url },
+		cpr::Header{ {"Content-Type", "application/json"} },
+		kTimeout
+	);
+	if (response.error || response.status_code != 200) return std::nullopt;
+
+	auto json = crow::json::load(response.text);
+	if (!json
+		|| !json.has("isMyTurn")
+		|| !json.has("canEndTurn")
+		|| !json.has("cardsPlaced")
+		|| !json.has("minRequiredCards")) return std::nullopt;
+	EndTurnState state;
+	state.isMyTurn = json["isMyTurn"].b();
+	state.canEndTurn = json["canEndTurn"].b();
+	state.cardsPlaced = static_cast<uint8_t>(json["cardsPlaced"].i());
+	state.minRequiredCards = static_cast<uint8_t>(json["minRequiredCards"].i());
+	return state;
+}
+
 bool ApiClient::SendPing(const std::string& lobbyId, unsigned playerId)
 {
 	const std::string url = m_serverURL + "/lobby/ping";
@@ -321,7 +348,6 @@ bool ApiClient::SendPing(const std::string& lobbyId, unsigned playerId)
 void ApiClient::StartPingThread(const std::string& lobbyId, unsigned playerId)
 {
 	StopPingThread();
-
 	m_pingThread = std::jthread([this, lobbyId, playerId](std::stop_token st)
 		{
 			while (!st.stop_requested())
@@ -355,7 +381,7 @@ void ApiClient::StartLobbyWatcher()
 			while (!st.stop_requested())
 			{
 				std::string lobbyId = GetLobbyId();
-				
+
 				if (lobbyId.empty()) return;
 				auto lobby = GetLobbyState(lobbyId);
 				if (!lobby || lobby->m_status == "LOBBY_DELETED")
@@ -450,6 +476,30 @@ std::optional<std::vector<unsigned>> ApiClient::GetPlayerCards() const
 	return playerCards;
 }
 
+std::optional<std::vector<uint8_t>> ApiClient::EndTurn()
+{
+	if (m_lobbyId.empty() || m_playerId == 0u) return std::nullopt;
+
+	const std::string url = m_serverURL + "/lobby/" + m_lobbyId +
+		"/players/" + std::to_string(m_playerId) + "/endturn";
+	cpr::Response response = cpr::Post(
+		cpr::Url{ url },
+		cpr::Header{ {"Content-Type", "application/json" } },
+		kTimeout
+	);
+	if (response.error || response.status_code != 200) return std::nullopt;
+
+	auto json = crow::json::load(response.text);
+	if (!json || !json.has("cards")) return std::nullopt;
+
+	std::vector<uint8_t> drawnCards;
+	for (const auto& card : json["cards"])
+	{
+		drawnCards.emplace_back(static_cast<uint8_t>(card.i()));
+	}
+	return std::make_optional(drawnCards);
+}
+
 void ApiClient::StartNetworkLoop()
 {
 	StopNetworkLoop();
@@ -460,6 +510,7 @@ void ApiClient::StartNetworkLoop()
 		auto lastPlayers = std::chrono::steady_clock::now();
 		auto lastChat = std::chrono::steady_clock::now();
 		auto lastDecks = std::chrono::steady_clock::now();
+		auto lastEndTurn = std::chrono::steady_clock::now();
 
 		while (!st.stop_requested())
 		{
@@ -528,6 +579,15 @@ void ApiClient::StartNetworkLoop()
 				}
 				lastDecks = now;
 			}
+			if (now - lastEndTurn >= std::chrono::milliseconds(500))
+			{
+				auto endTurn = GetEndTurnState();
+				{
+					std::lock_guard<std::mutex> lk(m_cacheMutex);
+					m_cachedEndTurnState = endTurn;
+				}
+				lastEndTurn = now;
+			}
 			std::this_thread::sleep_for(std::chrono::milliseconds(50));
 		}
 		});
@@ -568,7 +628,7 @@ std::optional<std::vector<DeckState>> ApiClient::SnapshotDecks() const
 	return m_cachedDecks;
 }
 
-std::optional<GameTableState> ApiClient::GetGameState(const std::string& lobbyId)
+std::optional<GameTableState> ApiClient::GetGameState(const std::string& lobbyId) const
 {
 	const std::string url = m_serverURL + "/lobby/" + lobbyId + "/gamestate";
 
@@ -578,16 +638,17 @@ std::optional<GameTableState> ApiClient::GetGameState(const std::string& lobbyId
 		kTimeout
 	);
 
-	if (response.status_code != 200 || response.error) return std::nullopt;
+	if (response.error || response.status_code != 200) return std::nullopt;
 
 	auto json = crow::json::load(response.text);
-	if (!json) return std::nullopt;
+	if (!json || !json.has("drawPileCount")) return std::nullopt;
 
 	GameTableState state;
-
-	if (json.has("drawPileCount")) {
-		state.drawPileCount = json["drawPileCount"].i();
-	}
-
+	state.drawPileCount = json["drawPileCount"].i();
 	return state;
+}
+
+std::optional<EndTurnState> ApiClient::SnapshotEndTurnState() const
+{
+	return m_cachedEndTurnState;
 }

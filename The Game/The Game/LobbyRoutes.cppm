@@ -32,6 +32,8 @@ private:
 	crow::response PlayCard(const crow::request& request, const std::string& lobbyId, unsigned playerId);
 	crow::response GetDecksState(const std::string& lobbyId);
 	crow::response GetGameState(const std::string& lobbyId);
+	crow::response GetEndTurnState(const std::string& lobbyId, unsigned playerId);
+	crow::response EndTurn(const std::string& lobbyId, unsigned playerId);
 
 private:
 	LobbyManager& m_manager;

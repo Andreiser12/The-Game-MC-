@@ -173,10 +173,11 @@ bool Lobby::PlayCard(unsigned playerId, uint8_t cardId, uint8_t deckId)
 
 	m_table->PlaceCardOnDeck(deckId, card);
 	player.RemoveCard(cardId);
+	player.IncrementCardsPlaced();
 	return true;
 }
 
-std::optional<std::vector<DeckState>> Lobby::GetDecksState()
+std::optional<std::vector<DeckState>> Lobby::GetDecksState() const
 {
 	std::lock_guard lock(m_mutex);
 
@@ -196,8 +197,28 @@ std::optional<std::vector<DeckState>> Lobby::GetDecksState()
 std::optional<size_t> Lobby::GetDrawPileCount() const
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
-
 	if (!m_gameStarted || !m_table) return std::nullopt;
 
 	return m_table->GetDrawPileCount();
+}
+
+std::optional<EndTurnState> Lobby::GetEndTurnState(unsigned playerId) const
+{
+	std::lock_guard lock(m_mutex);
+	if (!m_gameStarted || !m_table) return std::nullopt;
+
+	auto& player = m_table->GetPlayer(playerId);
+	EndTurnState state;
+	state.isMyTurn = true;
+	state.cardsPlaced = player.GetCardsPlacedRound();
+	const bool pileEmpty = m_table->GetDrawPileCount() == 0;
+	state.minRequiredCards = (pileEmpty == true) ? 1u : 2u;
+	state.canEndTurn = state.cardsPlaced >= state.minRequiredCards;
+	return state;
+}
+
+std::optional<std::vector<uint8_t>> Lobby::EndTurn(unsigned playerId)
+{
+	if (!m_gameStarted || !m_table) return std::nullopt;
+	return m_table->EndTurn(playerId);
 }

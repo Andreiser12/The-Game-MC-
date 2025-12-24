@@ -17,6 +17,13 @@ import Player;
 import Deck;
 import DatabaseManager;
 
+export enum class GameResult 
+{
+	Ongoing,
+	Won,
+	Lost,
+};
+
 export class Table
 {
 public:
@@ -38,7 +45,7 @@ public:
 	void AdvanceTurn();
 	void PlayGame();
 
-	bool CanPlayerPlayMinCards(const Player& player, uint8_t minCards);
+	bool CanPlayerPlayMinCards(const Player& player, uint8_t minCards) const;
 	void PlaceCardOnDeck(uint8_t deckIndex, const Card<uint8_t>& card);
 	bool AllCardsPlaced() const;
 	std::vector<uint8_t> EndTurn(unsigned playerId);
@@ -48,12 +55,15 @@ public:
 	std::span<std::reference_wrapper<Deck>> GetAllDecks() const;
 	std::span<const Player> GetPlayers() const;
 	const std::unordered_map<unsigned, Player>& GetPlayersMap() const;
+	const Player& GetPlayer(unsigned playerId) const;
 	Player& GetPlayer(unsigned playerId);
 	unsigned GetCurrentPlayerId() const;
 
 	constexpr std::size_t GetDeckIndex(DeckIndex index) noexcept;
 
 	std::size_t GetDrawPileCount() const;
+
+	GameResult CheckGameResult() const;
 
 private:
 	uint8_t m_playerCount;

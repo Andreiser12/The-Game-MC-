@@ -22,6 +22,13 @@ enum class LoginResult
 	NetworkError
 };
 
+enum class GameResult
+{
+	Ongoing,
+	Won,
+	Lost,
+};
+
 struct ChatMessage
 {
 	unsigned id;
@@ -101,6 +108,8 @@ public:
 	std::optional<std::vector<uint8_t>> GetPlayerCards() const;
 	std::optional<std::vector<uint8_t>> EndTurn();
 	std::optional<TurnState> GetTurnState() const;
+	std::optional<GameResult> ParseGameResult(const std::string& result) const;
+	std::optional<GameResult> GetGameResult(const std::string& lobbyId) const;
 
 	void StartNetworkLoop();
 	void StopNetworkLoop();
@@ -113,6 +122,7 @@ public:
 	std::optional<EndTurnState> SnapshotEndTurnState() const;
 	std::optional<GameTableState> SnapshotGameTableState() const;
 	std::optional<TurnState> SnapshotTurnState() const;
+	std::optional<GameResult> SnapshotGameResult() const;
 
 	void SetUsername(const std::string& username);
 	void SetPlayerId(unsigned playerId);
@@ -143,6 +153,7 @@ private:
 	std::optional<GameTableState> m_cachedGameTableState;
 	std::optional<EndTurnState> m_cachedEndTurnState;
 	std::optional<TurnState> m_cachedTurnState;
+	std::optional<GameResult> m_cachedGameResult;
 
 	std::atomic<unsigned> m_afterChatId{ 0u };
 };

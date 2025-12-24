@@ -104,6 +104,25 @@ void MainMenuWindow::LoadWidgets()
 	exitButton->onClick([this] {ExitButtonPressed(); });
 }
 
+void MainMenuWindow::GoBackToMenu()
+{
+	const std::string lobbyId = m_apiClient.GetLobbyId();
+	const unsigned playerId = m_apiClient.GetPlayerId();
+
+	if (!lobbyId.empty() && playerId != 0)
+		m_apiClient.LeaveLobby(lobbyId, playerId);
+
+	m_apiClient.StopNetworkLoop();
+	CloseHostPanel();
+	m_apiClient.SetLobbyId("");
+
+	if (m_gamePanel)
+		m_gamePanel.reset();
+	m_apiClient.SetLobbyId("");
+	m_gameStartedLocally = false;
+}
+
+
 void MainMenuWindow::Draw()
 {
 	/*if (m_bgSprite && m_bgClock.getElapsedTime().asSeconds() >= m_bgFrameDuration)
@@ -159,7 +178,7 @@ void MainMenuWindow::Update()
 
 	if (lobbyState.value().m_status == "GAME_STARTED" && !m_gamePanel)
 	{
-		m_gamePanel = std::make_shared<GamePanel>(m_mainMenu, m_apiClient);
+		m_gamePanel = std::make_shared<GamePanel>(m_mainMenu, m_apiClient, [this]() { GoBackToMenu(); });
 		m_gamePanel->OnGameStarted();
 		m_gameStartedLocally = true;
 	}

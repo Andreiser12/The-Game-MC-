@@ -57,6 +57,7 @@ public:
 	std::optional<size_t> GetDrawPileCount() const;
 	std::optional<EndTurnState> GetEndTurnState(unsigned playerId) const;
 	std::optional<TurnState> GetTurnState(unsigned playerId) const;
+	const Table* GetTable() const;
 
 	RemoveResult RemovePlayer(unsigned playerId);
 	void UpdatePlayerPing(unsigned playerId);

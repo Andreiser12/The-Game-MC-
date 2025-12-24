@@ -94,6 +94,12 @@ void LobbyRoutes::Register(crow::SimpleApp& app)
 			{
 				return this->GetGameState(lobbyId);
 			});
+	
+	CROW_ROUTE(app, "/lobby/<string>/game/result").methods("GET"_method)
+		([this](const std::string& lobbyId)
+			{
+				return this->GetGameResult(lobbyId);
+			});
 
 	CROW_ROUTE(app, "/lobby/<string>/players/<uint>/endturn").methods("GET"_method)
 		([this](const std::string& lobbyId, unsigned playerId)
@@ -472,5 +478,36 @@ crow::response LobbyRoutes::GetTurnState(const std::string& lobbyId, unsigned pl
 	crow::json::wvalue data;
 	data["isMyTurn"] = turnOpt.value().isMyTurn;
 	data["currentPlayerId"] = turnOpt.value().currentPlayerId;
+	return crow::response(200, data);
+}
+
+crow::response LobbyRoutes::GetGameResult(const std::string& lobbyId)
+{
+	auto lobby = m_manager.GetLobby(lobbyId);
+	if (!lobby) return crow::response(404, "Lobby not found");
+	
+	if (!lobby->HasGameStarted())
+		return crow::response(409, "Game not started");
+
+	const Table* table = lobby->GetTable();
+	if (!table)
+		return crow::response(409, "Game not started");
+
+	GameResult result = table->CheckGameResult();
+
+	crow::json::wvalue data;
+	switch (result)
+	{
+		case GameResult::Won:
+			data["result"] = "won";
+			break;
+		case GameResult::Lost:
+			data["result"] = "lost";
+			break;
+		case GameResult::Ongoing:
+			data["result"] = "ongoing";
+			break;
+	}
+
 	return crow::response(200, data);
 }

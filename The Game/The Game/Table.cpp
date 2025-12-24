@@ -122,6 +122,20 @@ std::size_t Table::GetDrawPileCount() const
 	return m_pile.size();
 }
 
+GameResult Table::CheckGameResult() const
+{
+	if (AllCardsPlaced())
+		return GameResult::Won;
+
+	const Player& currentPlayer = GetPlayer(GetCurrentPlayerId());
+	uint8_t minCards = IsPileEmpty() ? 1u : 2u;
+
+	if (!CanPlayerPlayMinCards(currentPlayer, minCards))
+		return GameResult::Lost;
+
+	return GameResult::Ongoing;
+}
+
 Deck& Table::GetDeck(uint8_t deckId) const
 {
 	return *m_decks[deckId];
@@ -190,14 +204,19 @@ const std::unordered_map<unsigned, Player>& Table::GetPlayersMap() const
 	return m_playersMap;
 }
 
-Player& Table::GetPlayer(unsigned playerId) 
+const Player& Table::GetPlayer(unsigned playerId) const
 {
 	auto it = m_playersMap.find(playerId);
 	if (it == m_playersMap.end())
-	{
 		throw std::runtime_error("Player not found");
-	}
 	return it->second;
+}
+
+Player& Table::GetPlayer(unsigned playerId) 
+{
+	return const_cast<Player&>(
+		static_cast<const Table&>(*this).GetPlayer(playerId)
+		);
 }
 
 unsigned Table::GetCurrentPlayerId() const
@@ -205,7 +224,7 @@ unsigned Table::GetCurrentPlayerId() const
 	return m_turnOrder[m_currentTurnIndex];
 }
 
-bool Table::CanPlayerPlayMinCards(const Player& player, uint8_t minCards) 
+bool Table::CanPlayerPlayMinCards(const Player& player, uint8_t minCards) const
 {
 	if (player.GetCardsCount() < minCards) return false;
 	uint8_t validCardsCount{0};

@@ -1,10 +1,11 @@
 ﻿#include "GamePanel.h"
 
-GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api) :
-	m_apiClient{ api }
+GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
+	std::function<void()> onExit) :
+	m_gui{ gui }, m_apiClient{ api }, m_onExitToMenu{ std::move(onExit) }
 {
 	m_root = tgui::Group::create({ "100%", "100%" });
-	gui.add(m_root);
+	m_gui.add(m_root);
 
 	auto gamePanel = tgui::Panel::create({ "100%", "100%" });
 	m_root->add(gamePanel);
@@ -181,18 +182,30 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api) :
 
 			RebuildMyHand();
 			m_endTurnButton->setEnabled(false);
+
 		});
 	m_root->add(m_endTurnButton);
 }
 
 void GamePanel::UpdateGame()
 {
+	if (m_gameFinished)
+		return;
+
 	RemovePlacedCards();
 	UpdateDecks();
 	UpdateChat();
 	UpdateEndTurnButton();
 	UpdateTurnState();
 	UpdateTableState();
+
+	auto result = m_apiClient.SnapshotGameResult();
+	if(result && *result != GameResult::Ongoing)
+	{
+		m_gameFinished = true;
+		HandleGameResult(*result);
+	}
+	
 }
 
 void GamePanel::UpdateDecks()
@@ -366,6 +379,12 @@ void GamePanel::RemovePlacedCards()
 		m_myCards.end());
 }
 
+GamePanel::~GamePanel()
+{
+	if (m_root)
+		m_gui.remove(m_root);
+}
+
 void GamePanel::CreatePlayerHand(size_t playerIndex, const PlayerSlot& slot)
 {
 	constexpr float cardWidth{ 2.25f };
@@ -443,4 +462,56 @@ void GamePanel::RebuildMyHand()
 {
 	ClearMyHand();
 	CreateMyHand();
+}
+
+void GamePanel::HandleGameResult(GameResult result)
+{
+	if (result == GameResult::Ongoing) return;
+
+	for (auto& card : m_myCards)
+		card->SetDraggable(false);
+
+	m_endTurnButton->setEnabled(false);
+
+	ShowGameResultOverlay(result);
+}
+
+void GamePanel::ShowGameResultOverlay(GameResult result)
+{
+	auto overlay = tgui::Panel::create({ "100%", "100%" });
+	overlay->getRenderer()->setBackgroundColor(
+		tgui::Color(0, 0, 0, 180)
+	);
+
+	auto dialog = tgui::Panel::create({ "40%", "30%" });
+	dialog->setPosition({ "50%", "50%" });
+	dialog->setOrigin(0.5f, 0.5f);
+	dialog->getRenderer()->setBackgroundColor(tgui::Color(40, 40, 40));
+	dialog->getRenderer()->setBorders(2);
+	dialog->getRenderer()->setBorderColor(tgui::Color::White);
+
+	auto label = tgui::Label::create(
+		result == GameResult::Won ? "YOU WON!" : "YOU LOST!"
+	);
+	label->setTextSize(36);
+	label->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+	label->setPosition({ "50%", "30%" });
+	label->setOrigin(0.5f, 0.5f);
+
+	auto button = tgui::Button::create("Back to Menu");
+	button->setSize({ "40%", "20%" });
+	button->setPosition({ "50%", "70%" });
+	button->setOrigin(0.5f, 0.5f);
+	button->setTextSize(20);
+
+	button->onPress([this]()
+	{
+		if (m_onExitToMenu)
+			m_onExitToMenu();
+	});
+
+	dialog->add(label);
+	dialog->add(button);
+	overlay->add(dialog);
+	m_root->add(overlay);
 }

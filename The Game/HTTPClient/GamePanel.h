@@ -23,7 +23,8 @@ using SlotArray = std::span<const PlayerSlot>;
 class GamePanel
 {
 public:
-	GamePanel(tgui::Gui& gui, ApiClient& api);
+	explicit GamePanel(tgui::Gui& gui, ApiClient& api,
+		std::function<void()> onExit);
 	void UpdateGame();
 	void UpdateDecks();
 	void UpdateEndTurnButton();
@@ -35,6 +36,7 @@ public:
 	void HandleMouseEvent(const sf::Event& event);
 	void ResetAllDrags();
 	void RemovePlacedCards();
+	~GamePanel();
 
 private:
 	inline SlotArray GetSlotsForPlayerCount(size_t count)
@@ -52,13 +54,17 @@ private:
 	void CreateMyHand();
 	void ClearMyHand();
 	void RebuildMyHand();
+	void HandleGameResult(GameResult result);
+	void ShowGameResultOverlay(GameResult result);
 
 private:
 	unsigned m_lastMessageId{ 0u };
+	tgui::Gui& m_gui;
 	tgui::Group::Ptr m_root;
 	tgui::ChatBox::Ptr m_chat;
 	sf::Clock m_chatClock;
 	ApiClient& m_apiClient;
+	std::function<void()> m_onExitToMenu;
 
 	inline static constexpr std::array<PlayerSlot, 2> k_slots2{ {
 		{45.0f, 75.0f},
@@ -90,4 +96,5 @@ private:
 	tgui::Button::Ptr m_endTurnButton;
 
 	bool m_isMyTurn{ false };
+	bool m_gameFinished{ false };
 };

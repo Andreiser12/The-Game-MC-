@@ -519,6 +519,33 @@ std::optional<TurnState> ApiClient::GetTurnState() const
 	return state;
 }
 
+std::optional<GameResult> ApiClient::ParseGameResult(const std::string& result) const
+{
+	if (result == "ongoing") return GameResult::Ongoing;
+	if (result == "won") return GameResult::Won;
+	if (result == "lost") return GameResult::Lost;
+	return std::nullopt;
+}
+
+std::optional<GameResult> ApiClient::GetGameResult(const std::string& lobbyId) const
+{
+	const std::string url = m_serverURL + "/lobby/" + lobbyId + "/game/result";
+	cpr::Response response = cpr::Get
+	(cpr::Url{ url },
+		cpr::Header{ {"Content-Type", "application/json"} },
+		kTimeout
+	);
+
+	if (response.error || response.status_code != 200) return std::nullopt;
+
+	auto json = crow::json::load(response.text);
+	if (!json || !json.has("result")) return std::nullopt;
+
+	auto result = ParseGameResult(json["result"].s());
+	if (!result) return std::nullopt;
+	return result;
+}
+
 void ApiClient::StartNetworkLoop()
 {
 	StopNetworkLoop();
@@ -532,10 +559,18 @@ void ApiClient::StartNetworkLoop()
 		auto lastEndTurn = std::chrono::steady_clock::now();
 		auto lastGameTabelState = std::chrono::steady_clock::now();
 		auto lastTurnState = std::chrono::steady_clock::now();
-			
+		auto lastGameResult = std::chrono::steady_clock::now();
+
 		while (!st.stop_requested())
 		{
-			if (m_lobbyId.empty() || m_playerId == 0u)
+			std::string lobbyId;
+			unsigned playerId;
+			{
+				std::lock_guard<std::mutex> lock(m_mutex);
+				lobbyId = m_lobbyId;
+				playerId = m_playerId;
+			}
+			if (lobbyId.empty() || playerId == 0u)
 			{
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
 				continue;
@@ -544,12 +579,12 @@ void ApiClient::StartNetworkLoop()
 			auto now = std::chrono::steady_clock::now();
 			if (now - lastPing >= std::chrono::seconds(10))
 			{
-				SendPing(m_lobbyId, m_playerId);
+				SendPing(lobbyId, playerId);
 				lastPing = now;
 			}
 			if (now - lastLobby >= std::chrono::seconds(2))
 			{
-				auto lobby = GetLobbyState(m_lobbyId);
+				auto lobby = GetLobbyState(lobbyId);
 				{
 					std::lock_guard<std::mutex> lk(m_cacheMutex);
 					m_cachedLobby = lobby;
@@ -563,7 +598,7 @@ void ApiClient::StartNetworkLoop()
 			}
 			if (now - lastPlayers >= std::chrono::milliseconds(500))
 			{
-				auto players = GetLobbyPlayers(m_lobbyId);
+				auto players = GetLobbyPlayers(lobbyId);
 				{
 					std::lock_guard<std::mutex> lk(m_cacheMutex);
 					m_cachedPlayers = std::move(players);
@@ -611,7 +646,7 @@ void ApiClient::StartNetworkLoop()
 			}
 			if (now - lastGameTabelState >= std::chrono::milliseconds(500))
 			{
-				auto gameTableState = GetTableState(m_lobbyId);
+				auto gameTableState = GetTableState(lobbyId);
 				{
 					std::lock_guard<std::mutex> lk(m_cacheMutex);
 					m_cachedGameTableState = gameTableState;
@@ -626,6 +661,15 @@ void ApiClient::StartNetworkLoop()
 					m_cachedTurnState = turnState;
 				}
 				lastTurnState = now;
+			}
+			if (now - lastGameResult >= std::chrono::seconds(1))
+			{
+				auto result = GetGameResult(lobbyId);
+				{
+					std::lock_guard<std::mutex> lk(m_cacheMutex);
+					m_cachedGameResult = result;
+				}
+				lastGameResult = now;
 			}
 			std::this_thread::sleep_for(std::chrono::milliseconds(50));
 		}
@@ -689,15 +733,24 @@ std::optional<GameTableState> ApiClient::GetTableState(const std::string& lobbyI
 
 std::optional<EndTurnState> ApiClient::SnapshotEndTurnState() const
 {
+	std::lock_guard<std::mutex> lk(m_cacheMutex);
 	return m_cachedEndTurnState;
 }
 
 std::optional<GameTableState> ApiClient::SnapshotGameTableState() const
 {
+	std::lock_guard<std::mutex> lk(m_cacheMutex);
 	return m_cachedGameTableState;
 }
 
 std::optional<TurnState> ApiClient::SnapshotTurnState() const
 {
+	std::lock_guard<std::mutex> lk(m_cacheMutex);
 	return m_cachedTurnState;
+}
+
+std::optional<GameResult> ApiClient::SnapshotGameResult() const
+{
+	std::lock_guard<std::mutex> lk(m_cacheMutex);
+	return m_cachedGameResult;
 }

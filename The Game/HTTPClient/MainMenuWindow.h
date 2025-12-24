@@ -26,6 +26,7 @@ public:
 
 private:
 	void LoadWidgets() override;
+	void GoBackToMenu();
 
 private:
 	sf::RenderWindow& m_window;

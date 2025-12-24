@@ -38,6 +38,8 @@ public:
 	void RemovePlacedCards();
 	~GamePanel();
 
+	void OnTurnTimeout();
+
 private:
 	inline SlotArray GetSlotsForPlayerCount(size_t count)
 	{
@@ -97,4 +99,8 @@ private:
 
 	bool m_isMyTurn{ false };
 	bool m_gameFinished{ false };
+
+	tgui::Label::Ptr m_timerLabel;
+	float m_timeLeft{60.0f};
+	sf::Clock m_deltaTimeClock;
 };

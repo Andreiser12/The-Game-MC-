@@ -17,7 +17,8 @@ namespace AssistantAI {
 
     int BackwardsBonus(uint8_t card, const DeckState& deck)
     {
-        if (std::abs(static_cast<int>(card) - static_cast<int>(deck.topCard)) == 10) {
+        if (std::abs(static_cast<int>(card) - static_cast<int>(deck.topCard)) == 10)
+        {
             return 10;
         }
         return 0;

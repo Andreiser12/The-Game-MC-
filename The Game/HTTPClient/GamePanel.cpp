@@ -185,12 +185,63 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 
 		});
 	m_root->add(m_endTurnButton);
+
+	m_timerLabel = tgui::Label::create();
+	m_timerLabel->setPosition("85%", "5%");
+	m_timerLabel->setSize("12%", "6%");
+	m_timerLabel->setText("01:00");
+	m_timerLabel->setTextSize(24);
+	m_timerLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+	m_timerLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+
+	m_timerLabel->getRenderer()->setTextColor(tgui::Color::White);
+	m_timerLabel->getRenderer()->setBorders(2);
+	m_timerLabel->getRenderer()->setBorderColor(tgui::Color(50, 100, 200));
+	m_timerLabel->getRenderer()->setBackgroundColor(tgui::Color(0, 0, 0, 150));
+
+	m_root->add(m_timerLabel);
 }
 
 void GamePanel::UpdateGame()
 {
 	if (m_gameFinished)
 		return;
+
+	float daeltaTime = m_deltaTimeClock.restart().asSeconds();
+
+	if (m_isMyTurn)
+	{
+		m_timeLeft -= daeltaTime;
+
+		if (m_timeLeft <= 0.0f)
+		{
+			m_timeLeft = 0.0f;
+			OnTurnTimeout();
+		}
+
+		int seconds = static_cast<int>(m_timeLeft);
+		std::string secStr = std::to_string(seconds);
+		if (seconds < 10)
+		{
+			secStr = "0" + secStr;
+		}
+
+		m_timerLabel->setText("00:" + secStr);
+
+		if (seconds <= 10)
+		{
+			m_timerLabel->getRenderer()->setTextColor(tgui::Color::Red);
+		}
+		else
+		{
+			m_timerLabel->getRenderer()->setTextColor(tgui::Color::White);
+		}
+	}
+	else
+	{
+		m_timerLabel->setText("WAIT");
+		m_timerLabel->getRenderer()->setTextColor(tgui::Color(200, 200, 200));
+	}
 
 	RemovePlacedCards();
 	UpdateDecks();
@@ -252,6 +303,14 @@ void GamePanel::UpdateTurnState()
 {
 	auto turnState = m_apiClient.SnapshotTurnState();
 	if (!turnState) return;
+
+	bool serverSaysItIsMyTurn = turnState.value().isMyTurn;
+
+	if (serverSaysItIsMyTurn && !m_isMyTurn)
+	{
+		m_timeLeft = 60.0f;
+		m_timerLabel->getRenderer()->setTextColor(tgui::Color::White);
+	}
 
 	m_isMyTurn = turnState.value().isMyTurn;
 
@@ -383,6 +442,18 @@ GamePanel::~GamePanel()
 {
 	if (m_root)
 		m_gui.remove(m_root);
+}
+
+void GamePanel::OnTurnTimeout()
+{
+	auto drawnCards = m_apiClient.EndTurn();
+	m_isMyTurn = false;
+
+	if (drawnCards)
+	{
+		RebuildMyHand();
+		m_endTurnButton->setEnabled(false);
+	}
 }
 
 void GamePanel::CreatePlayerHand(size_t playerIndex, const PlayerSlot& slot)

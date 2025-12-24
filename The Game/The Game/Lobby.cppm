@@ -7,6 +7,7 @@ import <unordered_map>;
 import <atomic>;
 import <mutex>;
 import <chrono>;
+import <algorithm>;
 
 import Player;
 import Table;
@@ -34,10 +35,15 @@ export struct DeckState
 
 export struct EndTurnState
 {
-	bool isMyTurn;
 	bool canEndTurn;
 	uint8_t cardsPlaced;
 	uint8_t minRequiredCards;
+};
+
+export struct TurnState
+{
+	bool isMyTurn;
+	unsigned currentPlayerId;
 };
 
 export class Lobby
@@ -47,6 +53,10 @@ public:
 	bool AddPlayer(unsigned playerId, const std::string& playerUsername);
 	void AddChatMessage(const std::string& username, const std::string& message);
 	std::optional<std::vector<ChatMessage>> GetMessagesAfter(unsigned afterId) const;
+	std::optional<std::vector<DeckState>> GetDecksState() const;
+	std::optional<size_t> GetDrawPileCount() const;
+	std::optional<EndTurnState> GetEndTurnState(unsigned playerId) const;
+	std::optional<TurnState> GetTurnState(unsigned playerId) const;
 
 	RemoveResult RemovePlayer(unsigned playerId);
 	void UpdatePlayerPing(unsigned playerId);
@@ -59,11 +69,8 @@ public:
 	bool IsPlayerHost(unsigned playerId) const;
 	unsigned GetHostId() const;
 
-	std::optional<std::vector<unsigned>> GetPlayerCards(unsigned playerId) const;
+	std::optional<std::vector<uint8_t>> GetPlayerCards(unsigned playerId) const;
 	bool PlayCard(unsigned playerId, uint8_t cardId, uint8_t deckId);
-	std::optional<std::vector<DeckState>> GetDecksState() const;
-	std::optional<size_t> GetDrawPileCount() const;
-	std::optional<EndTurnState> GetEndTurnState(unsigned playerId) const;
 	std::optional<std::vector<uint8_t>> EndTurn(unsigned playerId);
  
 private:

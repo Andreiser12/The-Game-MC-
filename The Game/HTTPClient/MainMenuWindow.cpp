@@ -121,7 +121,7 @@ void MainMenuWindow::Update()
 {
 	if (m_gamePanel)
 	{
-		m_gamePanel->Update();
+		m_gamePanel->UpdateGame();
 		return;
 	}
 	if (m_gameStartedLocally ||

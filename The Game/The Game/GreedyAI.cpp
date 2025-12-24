@@ -13,7 +13,7 @@ std::optional<AIMove>GreedyAI::FindBestMove(const Player& currentPlayer, Table& 
 		for (const auto& deckReference : table.GetAllDecks())
 		{
 			auto& deck = deckReference.get();
-			if (table.CheckCard(deck.GetDeckIndex(), card))
+			if (table.PlayCard(currentPlayer.GetPlayerId(), deck.GetDeckIndex(), card))
 			{
 				AIMove move{deck, card, 0};
 				move.score = HeuristicTree::Evaluate(move, table, table.GetPlayers());
@@ -77,15 +77,15 @@ int HeuristicTree::BackwardsBonus(const AIMove& move)
 
 int HeuristicTree::GlobalPenalty(const AIMove& move, const Table& table, std::span<const Player> players)
 {
-	int penalty = 0;
+	int penalty{ 0 };
 
 	for (const auto& player : players)
 	{
-		int validMoves = 0;
+		int validMoves{ 0 };
 
 		for (const auto& card : player.GetCards())
 		{
-			if (table.CheckCard(move.deck.get().GetDeckIndex(), card))
+			if (table.PlayCard(player.GetPlayerId(), move.deck.get().GetDeckIndex(), card))
 			{
 				validMoves++;
 			}

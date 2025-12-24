@@ -144,21 +144,19 @@ unsigned Lobby::GetHostId() const
 	return m_hostId;
 }
 
-std::optional<std::vector<unsigned>> Lobby::GetPlayerCards(unsigned playerId) const
+std::optional<std::vector<uint8_t>> Lobby::GetPlayerCards(unsigned playerId) const
 {
 	std::lock_guard lock(m_mutex);
 
 	if (!m_gameStarted || !m_table) return std::nullopt;
 
-	const auto& players = m_table->GetPlayersMap();
-	auto it = players.find(playerId);
-	if (it == players.end()) return std::nullopt;
-
-	std::vector<unsigned> playerCards;
-	for (const auto& card : it->second.GetCards())
+	const auto& player = m_table->GetPlayer(playerId);
+	std::vector<uint8_t> playerCards;
+	for (const auto& card : player.GetCards())
 	{
-		playerCards.push_back(card.getId());
+		playerCards.emplace_back(card.getId());
 	}
+	std::sort(playerCards.begin(), playerCards.end());
 	return playerCards;
 }
 
@@ -169,7 +167,7 @@ bool Lobby::PlayCard(unsigned playerId, uint8_t cardId, uint8_t deckId)
 
 	auto& player = m_table->GetPlayer(playerId);
 	Card<uint8_t> card(cardId);
-	if (!m_table->CheckCard(deckId, card)) return false;
+	if (!m_table->PlayCard(playerId, deckId, card)) return false;
 
 	m_table->PlaceCardOnDeck(deckId, card);
 	player.RemoveCard(cardId);
@@ -209,7 +207,6 @@ std::optional<EndTurnState> Lobby::GetEndTurnState(unsigned playerId) const
 
 	auto& player = m_table->GetPlayer(playerId);
 	EndTurnState state;
-	state.isMyTurn = true;
 	state.cardsPlaced = player.GetCardsPlacedRound();
 	const bool pileEmpty = m_table->GetDrawPileCount() == 0;
 	state.minRequiredCards = (pileEmpty == true) ? 1u : 2u;
@@ -217,8 +214,20 @@ std::optional<EndTurnState> Lobby::GetEndTurnState(unsigned playerId) const
 	return state;
 }
 
+std::optional<TurnState> Lobby::GetTurnState(unsigned playerId) const
+{
+	std::lock_guard lock(m_mutex);
+	if (!m_gameStarted || !m_table) return std::nullopt;
+
+	TurnState state;
+	state.currentPlayerId = m_table->GetCurrentPlayerId();
+	state.isMyTurn = (state.currentPlayerId == playerId);
+	return state;
+}
+
 std::optional<std::vector<uint8_t>> Lobby::EndTurn(unsigned playerId)
 {
 	if (!m_gameStarted || !m_table) return std::nullopt;
-	return m_table->EndTurn(playerId);
+	m_table->EndTurn(playerId);
+	return GetPlayerCards(playerId);
 }

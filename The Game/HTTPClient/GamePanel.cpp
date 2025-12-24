@@ -179,35 +179,20 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api) :
 			auto drawnCards = m_apiClient.EndTurn();
 			if (!drawnCards) return;
 
-			for (uint8_t card : drawnCards.value())
-			{
-				AddCardToHand(card);
-			}
+			RebuildMyHand();
 			m_endTurnButton->setEnabled(false);
 		});
 	m_root->add(m_endTurnButton);
 }
 
-void GamePanel::Update()
+void GamePanel::UpdateGame()
 {
 	RemovePlacedCards();
 	UpdateDecks();
+	UpdateChat();
 	UpdateEndTurnButton();
-	auto newMessages = m_apiClient.SnapshotNewChat();
-	if (!newMessages || newMessages->empty()) return;
-
-	for (const auto& message : newMessages.value())
-	{
-		m_chat->addLine(message.username + ": " + message.message);
-		m_lastMessageId = std::max(m_lastMessageId, message.id);
-	}
-
-	std::string currentLobbyId = m_apiClient.GetLobbyId();
-	if (currentLobbyId.empty()) return;
-
-	auto gameState = m_apiClient.GetGameState(currentLobbyId);
-	if (!gameState) return;
-	m_pileWidget->UpdatePile(gameState->drawPileCount);
+	UpdateTurnState();
+	UpdateTableState();
 }
 
 void GamePanel::UpdateDecks()
@@ -229,6 +214,38 @@ void GamePanel::UpdateEndTurnButton()
 	auto endTurnState = m_apiClient.SnapshotEndTurnState();
 	if (!endTurnState) return;
 	m_endTurnButton->setEnabled(endTurnState.value().canEndTurn);
+}
+
+void GamePanel::UpdateChat()
+{
+	auto newMessages = m_apiClient.SnapshotNewChat();
+	if (!newMessages) return;
+
+	for (const auto& message : newMessages.value())
+	{
+		m_chat->addLine(message.username + ": " + message.message);
+		m_lastMessageId = std::max(m_lastMessageId, message.id);
+	}
+}
+
+void GamePanel::UpdateTableState()
+{
+	auto tableState = m_apiClient.SnapshotGameTableState();
+	if (!tableState) return;
+	m_pileWidget->UpdatePile(tableState->drawPileCount);
+}
+
+void GamePanel::UpdateTurnState()
+{
+	auto turnState = m_apiClient.SnapshotTurnState();
+	if (!turnState) return;
+
+	m_isMyTurn = turnState.value().isMyTurn;
+
+	for (auto& card : m_myCards)
+	{
+		card->SetDraggable(m_isMyTurn);
+	}
 }
 
 void GamePanel::SetupPlayerSlots()
@@ -274,7 +291,7 @@ void GamePanel::SetupPlayerSlots()
 		if (index == 0)
 		{
 			m_mySlot = slots[index];
-			CreateMyHand(slots[index]);
+			CreateMyHand();
 		}
 		else
 		{
@@ -306,14 +323,14 @@ void GamePanel::OnGameStarted()
 
 void GamePanel::HandleMouseEvent(const sf::Event& event)
 {
-	if (!event.is<sf::Event::MouseMoved>()) return;
+	if (!event.is<sf::Event::MouseMoved>() || !m_isMyTurn) return;
 
-	const auto& mouseMove = event.getIf<sf::Event::MouseMoved>();
+	const auto& mouseMove{ event.getIf<sf::Event::MouseMoved>() };
 	if (!mouseMove) return;
 
-	tgui::Vector2f mousePos(
-		static_cast<float>(mouseMove->position.x),
-		static_cast<float>(mouseMove->position.y));
+	tgui::Vector2f mousePos
+	{ static_cast<float>(mouseMove->position.x),
+		static_cast<float>(mouseMove->position.y) };
 
 	for (auto& card : m_myCards)
 	{
@@ -377,7 +394,7 @@ void GamePanel::CreatePlayerHand(size_t playerIndex, const PlayerSlot& slot)
 	}
 }
 
-void GamePanel::CreateMyHand(const PlayerSlot& slot)
+void GamePanel::CreateMyHand()
 {
 	const auto& playerCards = m_apiClient.GetPlayerCards();
 	if (!playerCards) return;
@@ -388,8 +405,8 @@ void GamePanel::CreateMyHand(const PlayerSlot& slot)
 
 	const size_t cardCount = playerCards.value().size();
 	const float totalWidth{ (cardWidth + cardSpacing) * cardCount - cardSpacing };
-	const float startX{ slot.xPercent + 7.0f - (totalWidth / 2.0f) };
-	const float startY{ slot.yPercent - cardHeight };
+	const float startX{ m_mySlot->xPercent + 7.0f - (totalWidth / 2.0f) };
+	const float startY{ m_mySlot->yPercent - cardHeight };
 
 	for (size_t i = 0; i < cardCount; i++)
 	{
@@ -413,43 +430,17 @@ void GamePanel::CreateMyHand(const PlayerSlot& slot)
 	}
 }
 
-void GamePanel::AddCardToHand(uint8_t cardId)
+void GamePanel::ClearMyHand()
 {
-	if (!m_mySlot) return;
-
-	constexpr float cardWidth{ 2.25f };
-	constexpr float cardHeight{ 6.5f };
-	constexpr float cardSpacing{ 0.20f };
-
-	const size_t cardCount{ m_myCards.size() + 1 };
-	const float totalWidth
-	{ (cardWidth + cardSpacing) * cardCount - cardSpacing };
-
-	const float startX{ m_mySlot->xPercent + 7.0f - (totalWidth / 2.0f) };
-	const float startY{ m_mySlot->yPercent - cardHeight };
-
-	auto card = std::make_shared<CardWidget>(cardId, true);
-	card->SetSize(
-		tgui::String(std::to_string(cardWidth) + "%"),
-		tgui::String(std::to_string(cardHeight) + "%")
-	);
-
-	for (size_t i = 0; i < m_myCards.size(); i++)
+	for (auto& card : m_myCards)
 	{
-		const float cardX = startX + i * (cardWidth + cardSpacing);
-		m_myCards[i]->SetPosition(
-			tgui::String(std::to_string(cardX) + "%"),
-			tgui::String(std::to_string(startY) + "%")
-		);
+		m_root->remove(card->GetWidget());
 	}
-	const float newX
-	{ startX + m_myCards.size() * (cardWidth + cardSpacing) };
-	card->SetPosition(
-		tgui::String(std::to_string(newX) + "%"),
-		tgui::String(std::to_string(startY) + "%")
-	);
+	m_myCards.clear();
+}
 
-	card->SetDraggable(true);
-	m_root->add(card->GetWidget());
-	m_myCards.push_back(card);
+void GamePanel::RebuildMyHand()
+{
+	ClearMyHand();
+	CreateMyHand();
 }

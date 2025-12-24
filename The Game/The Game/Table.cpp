@@ -46,9 +46,8 @@ Table::Table(const std::vector<std::pair<unsigned, std::string>>& lobbyPlayers) 
 		Player player(id, username);
 		player.SetupCards(m_pile, cardsPerPlayer);
 		m_playersMap.emplace(id, std::move(player));
+		m_turnOrder.emplace_back(id);
 	}
-
-	//std::sort(m_Players.begin(), m_Players.end());
 }
 
 bool Table::IsPileEmpty() const
@@ -90,8 +89,10 @@ bool Table::BackwardsTrick(uint8_t deckId, const Card<uint8_t>& card) const
 	}
 }
 
-bool Table::CheckCard(uint8_t deckId, const Card<uint8_t>& card) const
+bool Table::PlayCard(unsigned playerId, uint8_t deckId, const Card<uint8_t>& card) const
 {
+	if (playerId != GetCurrentPlayerId()) return false;
+	
 	const uint8_t cardValue = card.getId();
 	const uint8_t topCardValue = m_decks[deckId]->GetTopCard().getId();
 
@@ -104,6 +105,11 @@ bool Table::CheckCard(uint8_t deckId, const Card<uint8_t>& card) const
 	default:
 		return false;
 	}
+}
+
+void Table::AdvanceTurn()
+{
+	m_currentTurnIndex = (m_currentTurnIndex + 1) % m_playerCount;
 }
 
 constexpr std::size_t Table::GetDeckIndex(DeckIndex index) noexcept
@@ -121,7 +127,7 @@ Deck& Table::GetDeck(uint8_t deckId) const
 	return *m_decks[deckId];
 }
 
-std::span<std::reference_wrapper<Deck>> Table::GetAllDecks()
+std::span<std::reference_wrapper<Deck>> Table::GetAllDecks() const
 {
 	static std::array<std::reference_wrapper<Deck>, 4> decks{
 		*m_decks[0],
@@ -184,7 +190,7 @@ const std::unordered_map<unsigned, Player>& Table::GetPlayersMap() const
 	return m_playersMap;
 }
 
-Player& Table::GetPlayer(unsigned playerId)
+Player& Table::GetPlayer(unsigned playerId) 
 {
 	auto it = m_playersMap.find(playerId);
 	if (it == m_playersMap.end())
@@ -192,6 +198,11 @@ Player& Table::GetPlayer(unsigned playerId)
 		throw std::runtime_error("Player not found");
 	}
 	return it->second;
+}
+
+unsigned Table::GetCurrentPlayerId() const
+{
+	return m_turnOrder[m_currentTurnIndex];
 }
 
 bool Table::CanPlayerPlayMinCards(const Player& player, uint8_t minCards) 
@@ -203,7 +214,7 @@ bool Table::CanPlayerPlayMinCards(const Player& player, uint8_t minCards)
 	{
 		for (size_t deckIndex = 0; deckIndex<4; deckIndex++)
 		{
-			if (CheckCard(deckIndex, card))
+			if (PlayCard(player.GetPlayerId(), deckIndex, card))
 			{
 				validCardsCount++;
 				if (validCardsCount >= minCards) return true;
@@ -231,6 +242,7 @@ bool Table::AllCardsPlaced() const
 
 std::vector<uint8_t> Table::EndTurn(unsigned playerId)
 {
+	if (playerId != GetCurrentPlayerId()) return {};
 	Player& player = GetPlayer(playerId);
 	
 	const uint8_t cardsPlaced = player.GetCardsPlacedRound();
@@ -244,5 +256,6 @@ std::vector<uint8_t> Table::EndTurn(unsigned playerId)
 		drawnCards.emplace_back(card.getId());
 	}
 	player.ResetCardsPlaced();
+	AdvanceTurn();
 	return drawnCards;
 }

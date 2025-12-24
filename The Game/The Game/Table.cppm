@@ -34,7 +34,8 @@ public:
 	bool IsPileEmpty() const;
 	void Shuffle();
 	bool BackwardsTrick(uint8_t deckId, const Card<uint8_t>& card) const;
-	bool CheckCard(uint8_t deckId, const Card<uint8_t>& card) const;
+	bool PlayCard(unsigned playerId, uint8_t deckId, const Card<uint8_t>& card) const;
+	void AdvanceTurn();
 	void PlayGame();
 
 	bool CanPlayerPlayMinCards(const Player& player, uint8_t minCards);
@@ -44,10 +45,11 @@ public:
 
 	Deck& GetDeck(uint8_t deckId) const;
 	const Pile& GetPile() const;
-	std::span<std::reference_wrapper<Deck>> GetAllDecks();
+	std::span<std::reference_wrapper<Deck>> GetAllDecks() const;
 	std::span<const Player> GetPlayers() const;
 	const std::unordered_map<unsigned, Player>& GetPlayersMap() const;
 	Player& GetPlayer(unsigned playerId);
+	unsigned GetCurrentPlayerId() const;
 
 	constexpr std::size_t GetDeckIndex(DeckIndex index) noexcept;
 
@@ -59,5 +61,7 @@ private:
 	std::unordered_map<unsigned, Player> m_playersMap;
 	Pile m_pile;
 	std::array<std::unique_ptr<Deck>, 4> m_decks;
+	std::vector<unsigned> m_turnOrder;
+	std::size_t m_currentTurnIndex{ 0 };
 };
 

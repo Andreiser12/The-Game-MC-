@@ -106,6 +106,12 @@ void LobbyRoutes::Register(crow::SimpleApp& app)
 			{
 				return this->EndTurn(lobbyId, playerId);
 			});
+
+	CROW_ROUTE(app, "/lobby/<string>/players/<uint>/turn").methods("GET"_method)
+		([this](const std::string& lobbyId, unsigned playerId)
+			{
+				return this->GetTurnState(lobbyId, playerId);
+			});
 }
 
 crow::response LobbyRoutes::CreateLobby(const crow::request& request)
@@ -354,7 +360,7 @@ crow::response LobbyRoutes::GetPlayerCards(const std::string& lobbyId, unsigned 
 
 	crow::json::wvalue data;
 	crow::json::wvalue::list cardList;
-	for (unsigned cardId : cardsOpt.value())
+	for (uint8_t cardId : cardsOpt.value())
 	{
 		cardList.push_back(cardId);
 	}
@@ -432,7 +438,6 @@ crow::response LobbyRoutes::GetEndTurnState(const std::string& lobbyId, unsigned
 	if (!stateOpt) return crow::response(409, "Game not started or invalid player");
 
 	crow::json::wvalue data;
-	data["isMyTurn"] = stateOpt.value().isMyTurn;
 	data["canEndTurn"] = stateOpt.value().canEndTurn;
 	data["cardsPlaced"] = stateOpt.value().cardsPlaced;
 	data["minRequiredCards"] = stateOpt.value().minRequiredCards;
@@ -453,5 +458,19 @@ crow::response LobbyRoutes::EndTurn(const std::string& lobbyId, unsigned playerI
 	{
 		data["cards"][i] = drawnCards.value()[i];
 	}
+	return crow::response(200, data);
+}
+
+crow::response LobbyRoutes::GetTurnState(const std::string& lobbyId, unsigned playerId)
+{
+	auto lobby = m_manager.GetLobby(lobbyId);
+	if (!lobby) return crow::response(404, "Lobby not found");
+
+	auto turnOpt = lobby->GetTurnState(playerId);
+	if (!turnOpt) return crow::response(409, "Cannot get player turn");
+
+	crow::json::wvalue data;
+	data["isMyTurn"] = turnOpt.value().isMyTurn;
+	data["currentPlayerId"] = turnOpt.value().currentPlayerId;
 	return crow::response(200, data);
 }

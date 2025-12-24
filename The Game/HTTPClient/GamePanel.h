@@ -24,9 +24,12 @@ class GamePanel
 {
 public:
 	GamePanel(tgui::Gui& gui, ApiClient& api);
-	void Update();
+	void UpdateGame();
 	void UpdateDecks();
 	void UpdateEndTurnButton();
+	void UpdateChat();
+	void UpdateTableState();
+	void UpdateTurnState();
 	void SetupPlayerSlots();
 	void OnGameStarted();
 	void HandleMouseEvent(const sf::Event& event);
@@ -46,8 +49,9 @@ private:
 		}
 	}
 	void CreatePlayerHand(size_t playerIndex, const PlayerSlot& slot);
-	void CreateMyHand(const PlayerSlot& slot);
-	void AddCardToHand(uint8_t cardId);
+	void CreateMyHand();
+	void ClearMyHand();
+	void RebuildMyHand();
 
 private:
 	unsigned m_lastMessageId{ 0u };
@@ -84,4 +88,6 @@ private:
 	std::shared_ptr<PileWidget> m_pileWidget;
 	std::optional<PlayerSlot> m_mySlot;
 	tgui::Button::Ptr m_endTurnButton;
+
+	bool m_isMyTurn{ false };
 };

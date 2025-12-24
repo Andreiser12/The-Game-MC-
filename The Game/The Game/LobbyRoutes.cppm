@@ -34,6 +34,7 @@ private:
 	crow::response GetGameState(const std::string& lobbyId);
 	crow::response GetEndTurnState(const std::string& lobbyId, unsigned playerId);
 	crow::response EndTurn(const std::string& lobbyId, unsigned playerId);
+	crow::response GetTurnState(const std::string& lobbyId, unsigned playerId);
 
 private:
 	LobbyManager& m_manager;

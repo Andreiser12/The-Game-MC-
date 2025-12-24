@@ -315,12 +315,10 @@ std::optional<EndTurnState> ApiClient::GetEndTurnState()
 
 	auto json = crow::json::load(response.text);
 	if (!json
-		|| !json.has("isMyTurn")
 		|| !json.has("canEndTurn")
 		|| !json.has("cardsPlaced")
 		|| !json.has("minRequiredCards")) return std::nullopt;
 	EndTurnState state;
-	state.isMyTurn = json["isMyTurn"].b();
 	state.canEndTurn = json["canEndTurn"].b();
 	state.cardsPlaced = static_cast<uint8_t>(json["cardsPlaced"].i());
 	state.minRequiredCards = static_cast<uint8_t>(json["minRequiredCards"].i());
@@ -457,22 +455,21 @@ std::vector<std::string> ApiClient::GetLobbyPlayers(const std::string& lobbyId) 
 	return players;
 }
 
-std::optional<std::vector<unsigned>> ApiClient::GetPlayerCards() const
+std::optional<std::vector<uint8_t>> ApiClient::GetPlayerCards() const
 {
 	const std::string url = m_serverURL + "/lobby/" + m_lobbyId + "/players/" +
 		std::to_string(m_playerId) + "/cards";
 	cpr::Response response = cpr::Get(cpr::Url{ url }, kTimeout);
-	if (response.status_code != 200) return std::nullopt;
+	if (response.error || response.status_code != 200) return std::nullopt;
 
-	std::vector<unsigned> playerCards;
-
+	std::vector<uint8_t> playerCards;
 	auto json = crow::json::load(response.text);
-	if (!json) return std::nullopt;
+	if (!json || !json.has("cards")) return std::nullopt;
 
 	for (const auto& card : json["cards"])
 	{
-		playerCards.push_back(card.i());
-	}
+		playerCards.push_back(static_cast<uint8_t>(card.i()));
+	};
 	return playerCards;
 }
 
@@ -500,6 +497,28 @@ std::optional<std::vector<uint8_t>> ApiClient::EndTurn()
 	return std::make_optional(drawnCards);
 }
 
+std::optional<TurnState> ApiClient::GetTurnState() const
+{
+	const std::string url = m_serverURL + "/lobby/" + m_lobbyId
+		+ "/players/" + std::to_string(m_playerId) + "/turn";
+	cpr::Response response = cpr::Get(
+		cpr::Url{ url },
+		cpr::Header{ {"Content-Type", "application/json"} },
+		kTimeout
+	);
+	if (response.error || response.status_code != 200) return std::nullopt;
+
+	auto json = crow::json::load(response.text);
+	if (!json 
+		|| !json.has("isMyTurn")
+		|| !json.has("currentPlayerId")) return std::nullopt;
+
+	TurnState state;
+	state.isMyTurn = json["isMyTurn"].b();
+	state.currentPlayerId = static_cast<unsigned>(json["currentPlayerId"].i());
+	return state;
+}
+
 void ApiClient::StartNetworkLoop()
 {
 	StopNetworkLoop();
@@ -511,7 +530,9 @@ void ApiClient::StartNetworkLoop()
 		auto lastChat = std::chrono::steady_clock::now();
 		auto lastDecks = std::chrono::steady_clock::now();
 		auto lastEndTurn = std::chrono::steady_clock::now();
-
+		auto lastGameTabelState = std::chrono::steady_clock::now();
+		auto lastTurnState = std::chrono::steady_clock::now();
+			
 		while (!st.stop_requested())
 		{
 			if (m_lobbyId.empty() || m_playerId == 0u)
@@ -588,6 +609,24 @@ void ApiClient::StartNetworkLoop()
 				}
 				lastEndTurn = now;
 			}
+			if (now - lastGameTabelState >= std::chrono::milliseconds(500))
+			{
+				auto gameTableState = GetTableState(m_lobbyId);
+				{
+					std::lock_guard<std::mutex> lk(m_cacheMutex);
+					m_cachedGameTableState = gameTableState;
+				}
+				lastGameTabelState = now;
+			}
+			if (now - lastTurnState >= std::chrono::milliseconds(500))
+			{
+				auto turnState = GetTurnState();
+				{
+					std::lock_guard<std::mutex> lk(m_cacheMutex);
+					m_cachedTurnState = turnState;
+				}
+				lastTurnState = now;
+			}
 			std::this_thread::sleep_for(std::chrono::milliseconds(50));
 		}
 		});
@@ -628,7 +667,7 @@ std::optional<std::vector<DeckState>> ApiClient::SnapshotDecks() const
 	return m_cachedDecks;
 }
 
-std::optional<GameTableState> ApiClient::GetGameState(const std::string& lobbyId) const
+std::optional<GameTableState> ApiClient::GetTableState(const std::string& lobbyId) const
 {
 	const std::string url = m_serverURL + "/lobby/" + lobbyId + "/gamestate";
 
@@ -651,4 +690,14 @@ std::optional<GameTableState> ApiClient::GetGameState(const std::string& lobbyId
 std::optional<EndTurnState> ApiClient::SnapshotEndTurnState() const
 {
 	return m_cachedEndTurnState;
+}
+
+std::optional<GameTableState> ApiClient::SnapshotGameTableState() const
+{
+	return m_cachedGameTableState;
+}
+
+std::optional<TurnState> ApiClient::SnapshotTurnState() const
+{
+	return m_cachedTurnState;
 }

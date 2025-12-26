@@ -1,13 +1,11 @@
 export module Table;
 
-import <iostream>;
 import <vector>;
 import <stack>;
 import <unordered_set>;
 import <unordered_map>;
 import <algorithm>;
 import <random>;
-import <chrono>;
 import <span>;
 import <memory>;
 import <array>;  
@@ -43,11 +41,11 @@ public:
 	bool BackwardsTrick(uint8_t deckId, const Card<uint8_t>& card) const;
 	bool PlayCard(unsigned playerId, uint8_t deckId, const Card<uint8_t>& card) const;
 	void AdvanceTurn();
-	void PlayGame();
 
 	bool CanPlayerPlayMinCards(const Player& player, uint8_t minCards) const;
 	void PlaceCardOnDeck(uint8_t deckIndex, const Card<uint8_t>& card);
-	bool AllCardsPlaced() const;
+	bool CheckWinCondition() const;
+	bool CheckLoseCondition() const;
 	std::vector<uint8_t> EndTurn(unsigned playerId);
 
 	Deck& GetDeck(uint8_t deckId) const;
@@ -58,12 +56,10 @@ public:
 	const Player& GetPlayer(unsigned playerId) const;
 	Player& GetPlayer(unsigned playerId);
 	unsigned GetCurrentPlayerId() const;
-
-	constexpr std::size_t GetDeckIndex(DeckIndex index) noexcept;
-
 	std::size_t GetDrawPileCount() const;
+	GameResult GetGameResult() const;
 
-	GameResult CheckGameResult() const;
+	constexpr std::size_t GetDeckIndex(DeckIndex index) const noexcept;
 
 private:
 	uint8_t m_playerCount;
@@ -73,5 +69,6 @@ private:
 	std::array<std::unique_ptr<Deck>, 4> m_decks;
 	std::vector<unsigned> m_turnOrder;
 	std::size_t m_currentTurnIndex{ 0 };
+	GameResult m_gameResult{ GameResult::Ongoing };
 };
 

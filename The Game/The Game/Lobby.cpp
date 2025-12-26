@@ -225,14 +225,16 @@ std::optional<TurnState> Lobby::GetTurnState(unsigned playerId) const
 	return state;
 }
 
-const Table* Lobby::GetTable() const
-{
-	return m_table.get();
-}
-
 std::optional<std::vector<uint8_t>> Lobby::EndTurn(unsigned playerId)
 {
 	if (!m_gameStarted || !m_table) return std::nullopt;
 	m_table->EndTurn(playerId);
 	return GetPlayerCards(playerId);
+}
+
+std::optional<GameResult> Lobby::GetGameResult() const
+{
+	if (!m_gameStarted || !m_table) return std::nullopt;
+
+	return m_table->GetGameResult();
 }

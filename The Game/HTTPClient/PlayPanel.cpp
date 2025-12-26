@@ -12,22 +12,26 @@ tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 
 	auto panel = tgui::Panel::create({"30%", "25%"});
 	panel->setPosition({ "50%", "50%" });
-	panel->getRenderer()->setBorders({ 2 });
+	panel->getRenderer()->setBorders(2);
 	panel->getRenderer()->setBorderColor(tgui::Color::Black);
 	panel->setOrigin(0.5f, 0.5f);
 
 	auto titleLabel = tgui::Label::create("Select an option");
-	titleLabel->setPosition({ "50%", "35%" });
+	titleLabel->setPosition({ "50%", "44%" });
 	titleLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
 	titleLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
 	titleLabel->setOrigin(0.5f, 0.5f);
+	titleLabel->getRenderer()->setTextColor(tgui::Color(245, 240, 230));
+	titleLabel->getRenderer()->setTextOutlineColor(tgui::Color(40, 25, 15));
+	titleLabel->getRenderer()->setTextOutlineThickness(1.5f);
 	titleLabel->setTextSize(26);
 
 	auto joinButton = tgui::Button::create("Join Lobby");
-	joinButton->setTextSize(22);
-	joinButton->getRenderer()->setTexture("assets/images/buttons.png");
 	joinButton->setSize({ "35%", "20%" });
 	joinButton->setPosition({ "5%","70%" });
+	joinButton->getRenderer()->setTexture("assets/images/buttons.png");
+	Utils::StyleButton(joinButton);
+	joinButton->setTextSize(22);
 	joinButton->onPress([&gui, onJoin, &apiClient, panel]() {
 		panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(150));
 		auto joinPanel = JoinPanel::Create(
@@ -60,16 +64,17 @@ tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 		});
 
 	auto hostButton = tgui::Button::create("Host Lobby");
-	hostButton->setTextSize(22);
 	hostButton->setSize({ "35%", "20%" });
-	hostButton->getRenderer()->setTexture("assets/images/buttons.png");
 	hostButton->setPosition({ "60%", "70%" });
+	hostButton->getRenderer()->setTexture("assets/images/buttons.png");
+	Utils::StyleButton(hostButton);
+	hostButton->setTextSize(22);
 	hostButton->onPress([&gui, panel, &apiClient, onHost]() {
 		if (onHost)
 		{
 			std::string lobbyId = onHost(apiClient, apiClient.GetUsername());
 			apiClient.SetLobbyId(lobbyId);
-			panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(120));
+			panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(150));
 			auto hostPanel = HostPanel::Create(gui,
 				apiClient,
 				lobbyId,
@@ -81,13 +86,12 @@ tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 		});
 
 	auto closeButton = tgui::Button::create("X");
-	closeButton->setTextSize(22);
 	closeButton->setSize({"10%", "10%"});
 	closeButton->setPosition({ "90%", "0%" });
 	closeButton->getRenderer()->setTexture("assets/images/buttons.png");
-	closeButton->getRenderer()->setBorders({ 1 });
-	closeButton->getRenderer()->setBorderColor(tgui::Color::White);
-	closeButton->getRenderer()->setRoundedBorderRadius(15);
+	closeButton->getRenderer()->setBorders(1);
+	Utils::StyleButton(closeButton);
+	closeButton->setTextSize(22);
 	closeButton->onPress([panel, onClose]() 
 		{
 			panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(150));
@@ -99,7 +103,6 @@ tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 	panel->add(joinButton);
 	panel->add(hostButton);
 	panel->add(titleLabel);
-
 	return panel;
 }
 

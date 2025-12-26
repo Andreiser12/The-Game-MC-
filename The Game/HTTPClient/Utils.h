@@ -10,7 +10,7 @@
 class Utils
 {
 public:
-	static tgui::String TruncateText(const tgui::String& text, unsigned maxChars);
+	static tgui::String TruncateText(const tgui::String& text, uint8_t maxChars);
 
 	static tgui::Panel::Ptr CreateSettingsPanel(tgui::Gui& gui,
 		unsigned resolutionIndex,
@@ -26,6 +26,8 @@ public:
 
 	static tgui::Panel::Ptr CreateErrorPopupPanel(tgui::Gui& gui,
 		const std::string& message, std::function<void()> onClose = nullptr);
+
+	static void StyleButton(const tgui::Button::Ptr& button);
 
 private:
 };

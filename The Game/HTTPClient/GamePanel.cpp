@@ -204,14 +204,13 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 
 void GamePanel::UpdateGame()
 {
-	if (m_gameFinished)
-		return;
+	if (m_gameFinished) return;
 
-	float daeltaTime = m_deltaTimeClock.restart().asSeconds();
+	float deltaTime = m_deltaTimeClock.restart().asSeconds();
 
 	if (m_isMyTurn)
 	{
-		m_timeLeft -= daeltaTime;
+		m_timeLeft -= deltaTime;
 
 		if (m_timeLeft <= 0.0f)
 		{
@@ -251,12 +250,11 @@ void GamePanel::UpdateGame()
 	UpdateTableState();
 
 	auto result = m_apiClient.SnapshotGameResult();
-	if(result && *result != GameResult::Ongoing)
+	if (result && *result != GameResult::Ongoing)
 	{
 		m_gameFinished = true;
 		HandleGameResult(*result);
 	}
-	
 }
 
 void GamePanel::UpdateDecks()
@@ -440,15 +438,13 @@ void GamePanel::RemovePlacedCards()
 
 GamePanel::~GamePanel()
 {
-	if (m_root)
-		m_gui.remove(m_root);
+	if (m_root) m_gui.remove(m_root);
 }
 
 void GamePanel::OnTurnTimeout()
 {
 	auto drawnCards = m_apiClient.EndTurn();
 	m_isMyTurn = false;
-
 	if (drawnCards)
 	{
 		RebuildMyHand();
@@ -458,15 +454,16 @@ void GamePanel::OnTurnTimeout()
 
 void GamePanel::CreatePlayerHand(size_t playerIndex, const PlayerSlot& slot)
 {
+	const auto& playerCards = m_apiClient.GetPlayerCards();
+	if (!playerCards) return;
+
 	constexpr float cardWidth{ 2.25f };
 	constexpr float cardHeight{ 6.5f };
 	constexpr float cardSpacing{ 0.20f };
-	auto playerCards = m_apiClient.GetPlayerCards();
-	const size_t cardCount = playerCards.has_value() ? playerCards.value().size() : 3;
-
+	const size_t cardCount{ playerCards.value().size() };
 	const float totalWidth{ (cardWidth + cardSpacing) * cardCount - cardSpacing };
-	float startX{ slot.xPercent + 7.0f - (totalWidth / 2.0f) };
-	float startY{ slot.yPercent - cardHeight };
+	const float startX{ slot.xPercent + 7.0f - (totalWidth / 2.0f) };
+	const float startY{ slot.yPercent - cardHeight };
 
 	for (size_t i = 0; i < cardCount; i++)
 	{
@@ -492,7 +489,6 @@ void GamePanel::CreateMyHand()
 	constexpr float cardWidth{ 2.25f };
 	constexpr float cardHeight{ 6.5f };
 	constexpr float cardSpacing{ 0.20f };
-
 	const size_t cardCount = playerCards.value().size();
 	const float totalWidth{ (cardWidth + cardSpacing) * cardCount - cardSpacing };
 	const float startX{ m_mySlot->xPercent + 7.0f - (totalWidth / 2.0f) };
@@ -505,7 +501,7 @@ void GamePanel::CreateMyHand()
 			tgui::String(std::to_string(cardWidth) + "%"),
 			tgui::String(std::to_string(cardHeight) + "%")
 		);
-		const float cardX = startX + i * (cardWidth + cardSpacing);
+		const float cardX{ startX + i * (cardWidth + cardSpacing) };
 		card->SetPosition(
 			tgui::String(std::to_string(cardX) + "%"),
 			tgui::String(std::to_string(startY) + "%")
@@ -540,10 +536,11 @@ void GamePanel::HandleGameResult(GameResult result)
 	if (result == GameResult::Ongoing) return;
 
 	for (auto& card : m_myCards)
+	{
 		card->SetDraggable(false);
-
+	}
+		
 	m_endTurnButton->setEnabled(false);
-
 	ShowGameResultOverlay(result);
 }
 
@@ -561,28 +558,26 @@ void GamePanel::ShowGameResultOverlay(GameResult result)
 	dialog->getRenderer()->setBorders(2);
 	dialog->getRenderer()->setBorderColor(tgui::Color::White);
 
-	auto label = tgui::Label::create(
+	auto gameResultLabel = tgui::Label::create(
 		result == GameResult::Won ? "YOU WON!" : "YOU LOST!"
 	);
-	label->setTextSize(36);
-	label->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
-	label->setPosition({ "50%", "30%" });
-	label->setOrigin(0.5f, 0.5f);
+	gameResultLabel->setTextSize(36);
+	gameResultLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+	gameResultLabel->setPosition({ "50%", "30%" });
+	gameResultLabel->setOrigin(0.5f, 0.5f);
 
-	auto button = tgui::Button::create("Back to Menu");
-	button->setSize({ "40%", "20%" });
-	button->setPosition({ "50%", "70%" });
-	button->setOrigin(0.5f, 0.5f);
-	button->setTextSize(20);
-
-	button->onPress([this]()
+	auto backToMenuButton = tgui::Button::create("Back to Menu");
+	backToMenuButton->setSize({ "40%", "20%" });
+	backToMenuButton->setPosition({ "50%", "70%" });
+	backToMenuButton->setOrigin(0.5f, 0.5f);
+	backToMenuButton->setTextSize(20);
+	backToMenuButton->onPress([this]()
 	{
-		if (m_onExitToMenu)
-			m_onExitToMenu();
+		if (m_onExitToMenu) m_onExitToMenu();
 	});
 
-	dialog->add(label);
-	dialog->add(button);
+	dialog->add(gameResultLabel);
+	dialog->add(backToMenuButton);
 	overlay->add(dialog);
 	m_root->add(overlay);
 }

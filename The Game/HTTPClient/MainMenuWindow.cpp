@@ -5,8 +5,9 @@ constexpr static uint8_t K_TEXT_SIZE{ 24u };
 MainMenuWindow::MainMenuWindow(sf::RenderWindow& window, ApiClient& api) :
 	m_window{ window },
 	m_mainMenu{ window },
-	m_apiClient{api}
+	m_apiClient{ api }
 {
+	m_mainMenu.setFont("assets/fonts/Cinzel-Regular.ttf");
 	m_background = tgui::Picture::create("assets/images/mainMenuBackground.png");
 	m_background->setSize({ "100%", "100%" });
 	m_background->setPosition({ "0%", "0%" });
@@ -17,6 +18,28 @@ MainMenuWindow::MainMenuWindow(sf::RenderWindow& window, ApiClient& api) :
 	gameTitle->setPosition({ "50%", "15%" });
 	gameTitle->setOrigin(0.5f, 0.1f);
 	m_mainMenu.add(gameTitle);
+
+	auto buttonsBackground = tgui::Picture::create("assets/images/buttonsBackground.png");
+	buttonsBackground->setSize({ "90%", "90%" });
+	buttonsBackground->setPosition({ "50%", "50%" });
+	buttonsBackground->setOrigin(0.5f, 0.5f);
+	m_mainMenu.add(buttonsBackground);
+
+	auto cardsImage = tgui::Picture::create("assets/images/cardsMainMenuImage.png");
+	cardsImage->setSize({ "67%", "67%" });
+	cardsImage->setPosition({ "80%", "60%" });
+	cardsImage->setOrigin(0.5f, 0.5f);
+	cardsImage->getRenderer()->setOpacity(0.95f);
+
+	auto cardsShadow = tgui::Picture::create("assets/images/cardsMainMenuImage.png");
+	cardsShadow->setSize({ "67%", "67%" });
+	cardsShadow->setPosition({ "80% + 5", "60% + 5" }); 
+	cardsShadow->setOrigin(0.5f, 0.5f);
+	cardsShadow->getRenderer()->setOpacity(0.3f);
+	m_mainMenu.add(cardsShadow);
+	m_mainMenu.add(cardsImage);
+
+	LoadWidgets();
 
 	/*const int frameCount = 60;
 	m_bgFrames.reserve(frameCount);
@@ -51,55 +74,46 @@ MainMenuWindow::MainMenuWindow(sf::RenderWindow& window, ApiClient& api) :
 
 		m_bgSprite->setScale(scale);
 	}*/
-
-	LoadWidgets();
 }
 
 void MainMenuWindow::LoadWidgets()
 {
 	auto playButton = tgui::Button::create();
-	auto profileButton = tgui::Button::create();
-	auto settingsButton = tgui::Button::create();
-	auto exitButton = tgui::Button::create();
-
-	playButton->setSize({ "16.67%", "5%" });
-	playButton->setPosition({ "50%", "42.5%" });
+	playButton->setSize({ "14%", "5%" });
+	playButton->setPosition({ "50%", "47.5%" });
 	playButton->setOrigin(0.5f, 0.5f);
 	playButton->setText("Play");
-	playButton->getRenderer()->setOpacity(0.7f);
 	playButton->getRenderer()->setTexture("assets/images/buttons.png");
-
+	Utils::StyleButton(playButton);
 	m_mainMenu.add(playButton);
 	playButton->onClick([this] {PlayPanelPressed(); });
-	playButton->setTextSize(K_TEXT_SIZE);
 
-	profileButton->setSize({ "16.67%", "5%" });
-	profileButton->setPosition({ "50%", "52.5%" });
+	auto profileButton = tgui::Button::create();
+	profileButton->setSize({ "14%", "5%" });
+	profileButton->setPosition({ "50%", "57.5%" });
 	profileButton->setOrigin(0.5f, 0.5f);
 	profileButton->setText("Profile");
-	profileButton->getRenderer()->setOpacity(0.7f);
 	profileButton->getRenderer()->setTexture("assets/images/buttons.png");
-
+	Utils::StyleButton(profileButton);
 	m_mainMenu.add(profileButton);
-	profileButton->setTextSize(K_TEXT_SIZE);
 
-	settingsButton->setSize({ "16.67%", "5%" });
-	settingsButton->setPosition({ "50%", "62.5%" });
+	auto settingsButton = tgui::Button::create();
+	settingsButton->setSize({ "14%", "5%" });
+	settingsButton->setPosition({ "50%", "67.5%" });
 	settingsButton->setOrigin(0.5f, 0.5f);
 	settingsButton->setText("Settings");
 	settingsButton->getRenderer()->setTexture("assets/images/buttons.png");
-
+	Utils::StyleButton(settingsButton);
 	m_mainMenu.add(settingsButton);
-	settingsButton->setTextSize(K_TEXT_SIZE);
 	settingsButton->onClick([this] { SettingsButtonPressed(); });
 
-	exitButton->setTextSize(K_TEXT_SIZE);
-	exitButton->setSize({ "16.67%", "5%" });
-	exitButton->setPosition({ "50%", "72.5%" });
+	auto exitButton = tgui::Button::create();
+	exitButton->setSize({ "14%", "5%" });
+	exitButton->setPosition({ "50%", "77.5%" });
 	exitButton->setOrigin(0.5f, 0.5f);
 	exitButton->setText("Exit");
 	exitButton->getRenderer()->setTexture("assets/images/buttons.png");
-
+	Utils::StyleButton(exitButton);
 	m_mainMenu.add(exitButton);
 	exitButton->onClick([this] {ExitButtonPressed(); });
 }
@@ -109,15 +123,13 @@ void MainMenuWindow::GoBackToMenu()
 	const std::string lobbyId = m_apiClient.GetLobbyId();
 	const unsigned playerId = m_apiClient.GetPlayerId();
 
-	if (!lobbyId.empty() && playerId != 0)
-		m_apiClient.LeaveLobby(lobbyId, playerId);
+	if (!lobbyId.empty() && playerId != 0) m_apiClient.LeaveLobby(lobbyId, playerId);
 
 	m_apiClient.StopNetworkLoop();
 	CloseHostPanel();
 	m_apiClient.SetLobbyId("");
 
-	if (m_gamePanel)
-		m_gamePanel.reset();
+	if (m_gamePanel) m_gamePanel.reset();
 	m_apiClient.SetLobbyId("");
 	m_gameStartedLocally = false;
 }
@@ -240,7 +252,7 @@ void MainMenuWindow::PlayPanelPressed()
 		m_apiClient,
 		[this]() {},
 		[this]() {},
-		[this](ApiClient& api, const std::string& user) 
+		[this](ApiClient& api, const std::string& user)
 		{
 			auto lobbyId = api.CreateLobby(user);
 			if (!lobbyId) return std::string{ "ERROR" };

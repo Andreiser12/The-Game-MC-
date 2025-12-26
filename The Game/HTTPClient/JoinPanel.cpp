@@ -13,7 +13,7 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 	auto panel = tgui::Panel::create({ "30%", "25%" });
 	panel->setPosition({ "50%", "50%" });
 	panel->setOrigin(0.5f, 0.5f);
-	panel->getRenderer()->setBorders({ 2 });
+	panel->getRenderer()->setBorders(2);
 	panel->getRenderer()->setBorderColor(tgui::Color::Black);
 
 	auto lobbyEditBox = tgui::EditBox::create();
@@ -22,10 +22,10 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 	lobbyEditBox->setDefaultText("Enter lobby ID");
 	lobbyEditBox->setOrigin(0.5f, 0.5f);
 	lobbyEditBox->setTextSize(26);
-	lobbyEditBox->onFocus([panel, lobbyEditBox]() {
+	lobbyEditBox->onFocus([lobbyEditBox]() {
 		lobbyEditBox->setDefaultText("");
 		});
-	lobbyEditBox->onUnfocus([panel, lobbyEditBox]()
+	lobbyEditBox->onUnfocus([lobbyEditBox]()
 		{
 			lobbyEditBox->setDefaultText("Enter lobby ID");
 		});
@@ -34,16 +34,15 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 	joinLobbyButton->setSize({ "35%", "20%" });
 	joinLobbyButton->setPosition({"60%", "70%"});
 	joinLobbyButton->getRenderer()->setTexture("assets/images/buttons.png");
+	Utils::StyleButton(joinLobbyButton);
 	joinLobbyButton->setTextSize(22);
 	joinLobbyButton->onPress([&gui, onJoinLobby, &apiClient, lobbyEditBox, panel]()
 		{
 			std::string lobbyId = lobbyEditBox->getText().toStdString();
 			std::string errorMessage;
 
-			if (lobbyId.empty())
-				errorMessage = "Lobby ID can't be empty";
-			else if (lobbyId.size() != 6u)
-				errorMessage = "Lobby must be 6 characters long";
+			if (lobbyId.empty()) errorMessage = "Lobby ID can't be empty";
+			else if (lobbyId.size() != 6u) errorMessage = "Lobby must be 6 characters long";
 
 			if (!errorMessage.empty())
 			{
@@ -57,7 +56,6 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 				{
 					panel->setVisible(false);
 					apiClient.StartPingThread(lobbyId, apiClient.GetPlayerId());
-
 					s_running.store(true);
 				}
 				else
@@ -72,6 +70,7 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 	backButton->setSize({ "35%", "20%" });
 	backButton->setPosition({ "10%", "70%" });
 	backButton->getRenderer()->setTexture("assets/images/buttons.png");
+	Utils::StyleButton(backButton);
 	backButton->setTextSize(22);
 	backButton->onPress([&apiClient, panel, onBack]()
 		{

@@ -140,6 +140,7 @@ private:
 	unsigned m_playerId{ 0u };
 	std::atomic<ClientEvent> m_event{ ClientEvent::None };
 	std::atomic<bool> m_pingRunning{ false };
+	std::atomic<unsigned> m_afterChatId{ 0u };
 
 	std::jthread m_netThread;
 	std::jthread m_pingThread;
@@ -155,5 +156,4 @@ private:
 	std::optional<TurnState> m_cachedTurnState;
 	std::optional<GameResult> m_cachedGameResult;
 
-	std::atomic<unsigned> m_afterChatId{ 0u };
 };

@@ -2,7 +2,6 @@
 #include "RegisterWindow.h"
 #include "MainMenuWindow.h"
 #include "ConnectionFailedWindow.h"
-#include "ApiClient.h"
 
 #include <cpr/cpr.h>
 #include <crow.h>
@@ -16,7 +15,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_ int       nCmdShow)
 {
 	sf::Image windowIcon;
-	if (!windowIcon.loadFromFile("assets/images/TheGame_32.png"))
+	if (!windowIcon.loadFromFile("assets/images/TheGame.png"))
 	{
 		throw std::runtime_error("TheGame.png file is missing");
 	}

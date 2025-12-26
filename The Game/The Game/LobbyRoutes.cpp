@@ -485,18 +485,12 @@ crow::response LobbyRoutes::GetGameResult(const std::string& lobbyId)
 {
 	auto lobby = m_manager.GetLobby(lobbyId);
 	if (!lobby) return crow::response(404, "Lobby not found");
-	
-	if (!lobby->HasGameStarted())
-		return crow::response(409, "Game not started");
 
-	const Table* table = lobby->GetTable();
-	if (!table)
-		return crow::response(409, "Game not started");
-
-	GameResult result = table->CheckGameResult();
+	auto gameResult = lobby->GetGameResult();
+	if (!gameResult) return crow::response(409, "Game has not started");
 
 	crow::json::wvalue data;
-	switch (result)
+	switch (gameResult.value())
 	{
 		case GameResult::Won:
 			data["result"] = "won";
@@ -508,6 +502,5 @@ crow::response LobbyRoutes::GetGameResult(const std::string& lobbyId)
 			data["result"] = "ongoing";
 			break;
 	}
-
 	return crow::response(200, data);
 }

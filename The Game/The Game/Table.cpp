@@ -112,7 +112,7 @@ void Table::AdvanceTurn()
 	m_currentTurnIndex = (m_currentTurnIndex + 1) % m_playerCount;
 }
 
-constexpr std::size_t Table::GetDeckIndex(DeckIndex index) noexcept
+constexpr std::size_t Table::GetDeckIndex(DeckIndex index) const noexcept
 {
 	return static_cast<std::size_t>(index);
 }
@@ -122,18 +122,9 @@ std::size_t Table::GetDrawPileCount() const
 	return m_pile.size();
 }
 
-GameResult Table::CheckGameResult() const
+GameResult Table::GetGameResult() const
 {
-	if (AllCardsPlaced())
-		return GameResult::Won;
-
-	const Player& currentPlayer = GetPlayer(GetCurrentPlayerId());
-	uint8_t minCards = IsPileEmpty() ? 1u : 2u;
-
-	if (!CanPlayerPlayMinCards(currentPlayer, minCards))
-		return GameResult::Lost;
-
-	return GameResult::Ongoing;
+	return m_gameResult;
 }
 
 Deck& Table::GetDeck(uint8_t deckId) const
@@ -149,49 +140,12 @@ std::span<std::reference_wrapper<Deck>> Table::GetAllDecks() const
 		*m_decks[2],
 		*m_decks[3]
 	};
-
 	return {decks};
 }
-
 
 const Pile& Table::GetPile() const
 {
 	return m_pile;
-}
-
-void Table::PlayGame()
-{
-	bool gameRunning = true;
-	bool gameWon = false;
-	uint8_t currentPlayerIndex = 0u;
-	auto startTime = std::chrono::high_resolution_clock::now();
-
-	while (gameRunning)
-	{
-		if (AllCardsPlaced())
-		{
-			gameWon = true;
-			gameRunning = false;
-			break;
-		}
-		Player& currentPlayer = m_Players[currentPlayerIndex];
-
-		uint8_t minCards = IsPileEmpty() ? MIN_CARDS_EMPTY_DECK : MIN_CARDS_NORMAL;
-
-		if (!CanPlayerPlayMinCards(currentPlayer, minCards))
-		{
-			gameWon = false;
-			gameRunning = false;
-			break;
-		}
-
-		currentPlayerIndex = (currentPlayerIndex + 1) % m_playerCount;
-	}
-
-	for (Player& player : m_Players)
-	{
-		size_t finalCards = player.GetCardsCount();
-	}
 }
 
 std::span<const Player> Table::GetPlayers() const
@@ -215,8 +169,7 @@ const Player& Table::GetPlayer(unsigned playerId) const
 Player& Table::GetPlayer(unsigned playerId) 
 {
 	return const_cast<Player&>(
-		static_cast<const Table&>(*this).GetPlayer(playerId)
-		);
+		static_cast<const Table&>(*this).GetPlayer(playerId));
 }
 
 unsigned Table::GetCurrentPlayerId() const
@@ -226,17 +179,17 @@ unsigned Table::GetCurrentPlayerId() const
 
 bool Table::CanPlayerPlayMinCards(const Player& player, uint8_t minCards) const
 {
-	if (player.GetCardsCount() < minCards) return false;
-	uint8_t validCardsCount{0};
+	if (static_cast<uint8_t>(player.GetCardsCount()) < minCards) return false;
+	uint8_t validCards{0u};
 
 	for (const Card<uint8_t>& card : player.GetCards())
 	{
-		for (size_t deckIndex = 0; deckIndex<4; deckIndex++)
+		for (size_t deckIndex = 0; deckIndex<m_decks.size(); deckIndex++)
 		{
 			if (PlayCard(player.GetPlayerId(), deckIndex, card))
 			{
-				validCardsCount++;
-				if (validCardsCount >= minCards) return true;
+				validCards++;
+				if (validCards >= minCards) return true;
 			}
 		}
 	}
@@ -248,7 +201,7 @@ void Table::PlaceCardOnDeck(uint8_t deckIndex, const Card<uint8_t>& card)
 	m_decks[deckIndex]->PushCard(card);
 }
 
-bool Table::AllCardsPlaced() const
+bool Table::CheckWinCondition() const
 {
 	if (!IsPileEmpty()) return false;
 
@@ -259,11 +212,18 @@ bool Table::AllCardsPlaced() const
 	return true;
 }
 
+bool Table::CheckLoseCondition() const
+{
+	const Player& currentPlayer = GetPlayer(GetCurrentPlayerId());
+	uint8_t minCards = m_pile.empty() ? 1u : 2u;
+	return !CanPlayerPlayMinCards(currentPlayer, minCards);
+}
+
 std::vector<uint8_t> Table::EndTurn(unsigned playerId)
 {
 	if (playerId != GetCurrentPlayerId()) return {};
-	Player& player = GetPlayer(playerId);
-	
+
+	Player& player = GetPlayer(playerId);	
 	const uint8_t cardsPlaced = player.GetCardsPlacedRound();
 	uint8_t drawCount = static_cast<uint8_t>(std::min<std::size_t>(cardsPlaced, m_pile.size()));
 	std::vector<uint8_t> drawnCards;
@@ -276,5 +236,13 @@ std::vector<uint8_t> Table::EndTurn(unsigned playerId)
 	}
 	player.ResetCardsPlaced();
 	AdvanceTurn();
+	if (CheckWinCondition())
+	{
+		m_gameResult = GameResult::Won;
+	}
+	if (CheckLoseCondition())
+	{
+		m_gameResult = GameResult::Lost;
+	}
 	return drawnCards;
 }

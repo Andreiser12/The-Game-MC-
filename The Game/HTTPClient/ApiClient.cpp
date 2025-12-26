@@ -1,7 +1,8 @@
 #include "APIClient.h"
 
-ApiClient::ApiClient(const std::string& serverURL) : m_serverURL{ serverURL } {}
 static inline cpr::Timeout kTimeout{ 400 };
+
+ApiClient::ApiClient(const std::string& serverURL) : m_serverURL{ serverURL } {}
 
 LoginResult ApiClient::Login(const std::string& username)
 {

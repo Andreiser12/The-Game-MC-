@@ -2,7 +2,6 @@ export module Deck;
 import Card;
 import FundamentalCard;
 
-import <iostream>;
 import <stack>;
 
 using std::uint8_t;

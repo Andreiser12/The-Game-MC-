@@ -2,6 +2,7 @@ export module Lobby;
 
 import <stdint.h>;
 import <vector>;
+import <array>;
 import <deque>;
 import <unordered_map>;
 import <atomic>;
@@ -12,6 +13,7 @@ import <algorithm>;
 import Player;
 import Table;
 import Card;
+import Deck;
 
 export enum class RemoveResult
 {
@@ -58,6 +60,8 @@ public:
 	std::optional<EndTurnState> GetEndTurnState(unsigned playerId) const;
 	std::optional<TurnState> GetTurnState(unsigned playerId) const;
 	std::optional<GameResult> GetGameResult() const;
+	std::optional<std::vector<uint8_t>> GetPlayerCards(unsigned playerId) const;
+	std::optional<std::array<bool, 4>> GetValidDecks(uint8_t cardId) const;
 
 	RemoveResult RemovePlayer(unsigned playerId);
 	void UpdatePlayerPing(unsigned playerId);
@@ -70,7 +74,6 @@ public:
 	bool IsPlayerHost(unsigned playerId) const;
 	unsigned GetHostId() const;
 
-	std::optional<std::vector<uint8_t>> GetPlayerCards(unsigned playerId) const;
 	bool PlayCard(unsigned playerId, uint8_t cardId, uint8_t deckId);
 	std::optional<std::vector<uint8_t>> EndTurn(unsigned playerId);
  

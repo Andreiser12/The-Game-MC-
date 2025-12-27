@@ -118,6 +118,12 @@ void LobbyRoutes::Register(crow::SimpleApp& app)
 			{
 				return this->GetTurnState(lobbyId, playerId);
 			});
+
+	CROW_ROUTE(app, "/lobby/<string>/decks/valid").methods("GET"_method)
+		([this](const crow::request& req, const std::string& lobbyId)
+			{
+				return this->GetValidDecks(req, lobbyId);
+			});
 }
 
 crow::response LobbyRoutes::CreateLobby(const crow::request& request)
@@ -501,6 +507,27 @@ crow::response LobbyRoutes::GetGameResult(const std::string& lobbyId)
 		case GameResult::Ongoing:
 			data["result"] = "ongoing";
 			break;
+	}
+	return crow::response(200, data);
+}
+
+crow::response LobbyRoutes::GetValidDecks(const crow::request& request, const std::string& lobbyId)
+{
+	auto body = crow::json::load(request.body);
+	if (!body) return crow::response(400, "Invalid JSON");
+
+	auto lobby = m_manager.GetLobby(lobbyId);
+	if (!lobby) return crow::response(404, "Lobby not found");
+
+	const uint8_t cardId = static_cast<uint8_t>(body["cardId"].i());
+	auto validDecksOpt{ lobby->GetValidDecks(cardId) };
+	if (!validDecksOpt) return crow::response(409, "Cannot get valid decks");
+
+	crow::json::wvalue data;
+	data["decks"] = crow::json::wvalue::list();
+	for (size_t i=0; i<validDecksOpt.value().size(); i++)
+	{
+		data["decks"][i] = validDecksOpt.value()[i];
 	}
 	return crow::response(200, data);
 }

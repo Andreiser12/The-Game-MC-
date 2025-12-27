@@ -81,8 +81,8 @@ void Table::Shuffle()
 
 bool Table::BackwardsTrick(uint8_t deckId, const Card<uint8_t>& card) const
 {
-	const uint8_t cardValue = card.getId();
-	const uint8_t topCardValue = m_decks[deckId]->GetTopCard().getId();
+	const uint8_t cardValue = card.GetId();
+	const uint8_t topCardValue = m_decks[deckId]->GetTopCard().GetId();
 
 	switch (m_decks[deckId]->GetDeckType())
 	{
@@ -99,8 +99,8 @@ bool Table::PlayCard(unsigned playerId, uint8_t deckId, const Card<uint8_t>& car
 {
 	if (playerId != GetCurrentPlayerId()) return false;
 	
-	const uint8_t cardValue = card.getId();
-	const uint8_t topCardValue = m_decks[deckId]->GetTopCard().getId();
+	const uint8_t cardValue = card.GetId();
+	const uint8_t topCardValue = m_decks[deckId]->GetTopCard().GetId();
 
 	switch (m_decks[deckId]->GetDeckType())
 	{
@@ -135,15 +135,15 @@ void Table::RunBotTurn(unsigned playerId)
 	Player& player = GetPlayer(playerId);
 
 	uint8_t minCardsToPlay = IsPileEmpty() ? MIN_CARDS_EMPTY_DECK : MIN_CARDS_NORMAL;
-	int cardsPlayed = 0;
-	bool canPlayMore = true;
+	int cardsPlayed{ 0 };
+	bool canPlayMore{ true };
 
 	while (canPlayMore)
 	{
 		std::vector<uint8_t> myHand;
 		for (const auto& card : player.GetCards())
 		{
-			myHand.push_back(card.getId());
+			myHand.push_back(card.GetId());
 		}
 
 		std::vector<AssistantAI::DeckState> deckStates;
@@ -153,7 +153,7 @@ void Table::RunBotTurn(unsigned playerId)
 			Deck& d = deckRef.get();
 			AssistantAI::DeckState ds;
 			ds.index = static_cast<int>(d.GetDeckIndex());
-			ds.topCard = d.GetTopCard().getId();
+			ds.topCard = d.GetTopCard().GetId();
 			ds.type = ConvertDeckType(d.GetDeckType());
 			deckStates.push_back(ds);
 		}
@@ -166,7 +166,7 @@ void Table::RunBotTurn(unsigned playerId)
 				std::vector<uint8_t> hand;
 				for (const auto& c : otherPlayer.GetCards()) 
 				{
-					hand.push_back(c.getId());
+					hand.push_back(c.GetId());
 				}
 				otherHands.push_back(hand);
 			}
@@ -199,7 +199,6 @@ void Table::RunBotTurn(unsigned playerId)
 
 		if (player.GetCardsCount() == 0) canPlayMore = false;
 	}
-
 	EndTurn(playerId);
 }
 
@@ -318,7 +317,7 @@ std::vector<uint8_t> Table::EndTurn(unsigned playerId)
 		Card<uint8_t> card = m_pile.top();
 		m_pile.pop();
 		player.AddCard(card);
-		drawnCards.emplace_back(card.getId());
+		drawnCards.emplace_back(card.GetId());
 	}
 	player.ResetCardsPlaced();
 	AdvanceTurn();

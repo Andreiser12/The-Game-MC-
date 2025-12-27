@@ -402,12 +402,40 @@ void GamePanel::HandleMouseEvent(const sf::Event& event)
 	{ static_cast<float>(mouseMove->position.x),
 		static_cast<float>(mouseMove->position.y) };
 
+	bool anyCardMoving{ false };
+	uint8_t movingCardId{ 0u };
 	for (auto& card : m_myCards)
 	{
+		auto oldPos{ card->GetWidget()->getPosition() };
 		card->UpdateDragPosition(mousePos);
+		auto newPos{ card->GetWidget()->getPosition() };
+		if (oldPos != newPos)
+		{
+			anyCardMoving = true;
+			movingCardId = card->GetId();
+		}
+
 		for (const auto& deck : m_decks)
 		{
 			card->CheckOnDeck(deck);
+		}
+	}
+
+	if (anyCardMoving)
+	{
+		auto validDecks = m_apiClient.SnapshotValidDecks(movingCardId);
+		if (!validDecks) return;
+
+		for (auto& deck : m_decks)
+		{
+			deck->SetHighlight(validDecks.value()[deck->GetDeckId()]);
+		}
+	}
+	else
+	{
+		for (const auto& deck : m_decks)
+		{
+			deck->ClearHighlight();
 		}
 	}
 }

@@ -4,6 +4,7 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <array>
 #include <optional>
 
 enum class ClientEvent
@@ -88,8 +89,7 @@ public:
 	bool SendChatMessage(const std::string& message);
 	std::optional<std::vector<ChatMessage>> GetNewMessages(unsigned afterId);
 	bool PlayCard(uint8_t cardId, uint8_t deckId);
-	std::optional<std::vector<DeckState>> GetDeckState();
-	std::optional<EndTurnState> GetEndTurnState();
+
 
 	bool SendPing(const std::string& lobbyId, unsigned playerId);
 	void StartPingThread(const std::string& lobbyId, unsigned playerId);
@@ -104,8 +104,6 @@ public:
 	std::string GetUsername() const;
 	unsigned GetPlayerId() const;
 	std::string GetLobbyId() const;
-	std::vector<std::string> GetLobbyPlayers(const std::string& lobbyId) const;
-	std::optional<std::vector<uint8_t>> GetPlayerCards() const;
 	std::optional<std::vector<uint8_t>> EndTurn();
 	std::optional<TurnState> GetTurnState() const;
 	std::optional<GameResult> ParseGameResult(const std::string& result) const;
@@ -116,6 +114,7 @@ public:
 
 	std::vector<std::string> SnapshotPlayers() const;
 	std::optional<LobbyState> SnapshotLobbyState() const;
+	std::optional<std::array<bool, 4>> SnapshotValidDecks(uint8_t cardId) const;
 	std::optional<std::vector<ChatMessage>> SnapshotNewChat();
 	std::optional<std::vector<DeckState>> SnapshotDecks() const;
 	std::optional<GameTableState> GetTableState(const std::string& lobbyId) const;
@@ -123,6 +122,11 @@ public:
 	std::optional<GameTableState> SnapshotGameTableState() const;
 	std::optional<TurnState> SnapshotTurnState() const;
 	std::optional<GameResult> SnapshotGameResult() const;
+	std::optional<std::vector<DeckState>> GetDeckState() const;
+	std::optional<EndTurnState> GetEndTurnState() const;
+	std::vector<std::string> GetLobbyPlayers(const std::string& lobbyId) const;
+	std::optional<std::vector<uint8_t>> GetPlayerCards() const;
+	std::optional<std::array<bool, 4>> GetValidDecks(uint8_t cardId) const;
 
 	void SetUsername(const std::string& username);
 	void SetPlayerId(unsigned playerId);
@@ -155,5 +159,5 @@ private:
 	std::optional<EndTurnState> m_cachedEndTurnState;
 	std::optional<TurnState> m_cachedTurnState;
 	std::optional<GameResult> m_cachedGameResult;
-
+	std::unordered_map<uint8_t, std::optional<std::array<bool, 4>>> m_cachedValidDecks;
 };

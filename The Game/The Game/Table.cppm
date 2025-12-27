@@ -39,7 +39,6 @@ public:
 	Table(const std::vector<std::pair<unsigned, std::string>>& lobbyPlayers);
 
 	bool IsPileEmpty() const;
-	void Shuffle();
 	bool BackwardsTrick(uint8_t deckId, const Card<uint8_t>& card) const;
 	bool PlayCard(unsigned playerId, uint8_t deckId, const Card<uint8_t>& card) const;
 	void AdvanceTurn();
@@ -64,6 +63,9 @@ public:
 	constexpr std::size_t GetDeckIndex(DeckIndex index) const noexcept;
 
 	void RunBotTurn(unsigned playerId);
+
+private:
+	void Shuffle();
 
 private:
 	uint8_t m_playerCount;

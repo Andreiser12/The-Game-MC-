@@ -1,10 +1,9 @@
 export module Player;
 
-import <iostream>;
-import <vector>;
 import <stack>;
 import <unordered_set>;
 import <cstddef>;
+import <string>;
 import <functional>;
 
 import Card;
@@ -20,7 +19,6 @@ public:
 	~Player();
 
 	void AddCard(const Card<uint8_t>& card);
-	void PrintCards() const;
 	void DrawCards(Pile& deck);
 	bool FindCard(uint8_t cardId) const;
 	void RemoveCard(uint8_t cardId);

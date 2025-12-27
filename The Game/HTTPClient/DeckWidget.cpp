@@ -13,6 +13,13 @@ void DeckWidget::CreateDeckWidget()
 	m_deckPanel->getRenderer()->setBorders(2);
 	m_deckPanel->getRenderer()->setRoundedBorderRadius(5);
 
+	m_highlightOverlay = tgui::Panel::create({ "100%", "100%" });
+	m_highlightOverlay->setPosition({ "0%", "0%" });
+	m_highlightOverlay->getRenderer()->setRoundedBorderRadius(5);
+	m_highlightOverlay->setVisible(false);
+	m_highlightOverlay->setIgnoreMouseEvents(true);
+	m_deckPanel->add(m_highlightOverlay);
+
 	m_frontSide = tgui::Picture::create("assets/images/cardFrontSide.png");
 	m_frontSide->setSize({ "100%", "100%" });
 	m_frontSide->setPosition({ "0%", "0%" });
@@ -52,4 +59,26 @@ void DeckWidget::SetLastId(uint16_t lastId)
 {
 	m_lastId = lastId;
 	m_topIdLabel->setText(tgui::String(lastId));
+}
+
+void DeckWidget::SetHighlight(bool canPlace)
+{
+	m_highlightOverlay->setVisible(true);
+
+	if (canPlace)
+	{
+		m_highlightOverlay->getRenderer()->setBackgroundColor(tgui::Color(0, 255, 0, 80));
+		m_deckPanel->getRenderer()->setBorderColor(tgui::Color(80, 80, 80));
+	}
+	else
+	{
+		m_highlightOverlay->getRenderer()->setBackgroundColor(tgui::Color(100, 100, 100, 100));
+		m_deckPanel->getRenderer()->setBorderColor(tgui::Color(80, 80, 80));
+	}
+}
+
+void DeckWidget::ClearHighlight()
+{
+	m_highlightOverlay->setVisible(false);
+	m_deckPanel->getRenderer()->setBackgroundColor(tgui::Color::Black);
 }

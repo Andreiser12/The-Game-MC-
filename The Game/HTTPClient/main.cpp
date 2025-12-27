@@ -21,7 +21,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	}
 	ApiClient api{ "http://localhost:18080" };
 	cpr::Response response = cpr::Get(cpr::Url{ "http://localhost:18080/users" }, cpr::Timeout(300));
-	if ((int)response.status_code == 404 || response.primary_port!=18080)
+	if (response.status_code == 404 || response.primary_port!=18080)
 	{
 		sf::VideoMode connectionFailedMode = sf::VideoMode::getDesktopMode();
 		connectionFailedMode.size = { LOGIN_WIDTH, LOGIN_HEIGHT };

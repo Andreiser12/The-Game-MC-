@@ -3,7 +3,7 @@
 LoginWindow::LoginWindow(sf::RenderWindow& window, ApiClient& api)
 	: m_login{ window }, m_apiClient{ api }
 {
-
+	m_login.setFont("assets/fonts/Cinzel-Regular.ttf");
 	m_background = tgui::Picture::create("assets/images/mainMenuBackground.png");
 	m_background->setSize({ "100%", "100%" });
 	m_background->setPosition({ "0%", "0%" });
@@ -15,10 +15,19 @@ LoginWindow::LoginWindow(sf::RenderWindow& window, ApiClient& api)
 void LoginWindow::CheckLogin(tgui::EditBox::Ptr username)
 {
 	std::string usernameEntered = username->getText().toStdString();
-
 	LoginResult result = m_apiClient.Login(usernameEntered);
 	if (result != LoginResult::Success)
 	{
+		m_login.remove(m_login.get("errorPanel"));
+
+		auto errorPanel = tgui::Panel::create({"55%", "8%"});
+		errorPanel->setPosition({ "50%", "62.5%" });
+		errorPanel->setOrigin(0.5f, 0.5f);
+		errorPanel->getRenderer()->setBackgroundColor(tgui::Color(30, 30, 30, 120));
+		errorPanel->getRenderer()->setBorders(2);
+		errorPanel->getRenderer()->setBorderColor(tgui::Color(200, 50, 50));
+		errorPanel->getRenderer()->setRoundedBorderRadius(8);
+
 		auto errorLabel = tgui::Label::create();
 		switch (result)
 		{
@@ -34,13 +43,18 @@ void LoginWindow::CheckLogin(tgui::EditBox::Ptr username)
 			default:
 				break;
 		}
-		errorLabel->getRenderer()->setTextColor(tgui::Color::Red);
-		errorLabel->setPosition({ "50%", "62.5%" });
+		errorLabel->getRenderer()->setTextColor(tgui::Color(255, 100, 100));
+		errorLabel->setPosition({ "50%", "50%" });
 		errorLabel->setOrigin(0.5f, 0.5f);
 		errorLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
 		errorLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-		errorLabel->getRenderer()->setTextSize(20);
-		m_login.add(errorLabel);
+		errorLabel->getRenderer()->setTextSize(16);
+		errorLabel->getRenderer()->setFont("assets/fonts/Arial.ttf");
+		errorLabel->getRenderer()->setTextOutlineColor(tgui::Color(100, 20, 20));
+		errorLabel->getRenderer()->setTextOutlineThickness(1.5f);
+
+		errorPanel->add(errorLabel);
+		m_login.add(errorPanel, "errorPanel");
 		return;
 	}
 	m_isLoggedIn = true;
@@ -68,7 +82,7 @@ void LoginWindow::LoadWidgets()
 	UpdateTextSize();
 	m_login.onViewChange([this] {UpdateTextSize(); });
 	auto editBoxUsername = tgui::EditBox::create();
-	editBoxUsername->setSize({ "66.67%", "12.5%" });
+	editBoxUsername->setSize({ "65%", "12.5%" });
 	editBoxUsername->setPosition({ "50%", "50%" });
 	editBoxUsername->getRenderer()->setTexture("assets/images/textBoxbackground2.png");
 	editBoxUsername->setOrigin(0.5f, 0.5f);
@@ -82,23 +96,23 @@ void LoginWindow::LoadWidgets()
 		});
 
 	auto loginButton = tgui::Button::create("Login");
-	loginButton->setSize({ "20%", "16.67%" }); 
+	loginButton->setSize({ "20%", "15%" }); 
+	loginButton->getRenderer()->setTexture("assets/images/buttons.png");
 	auto coordX = editBoxUsername->getSize().x - editBoxUsername->getPosition().x;
 	auto coordY = editBoxUsername->getSize().y*1.5f + editBoxUsername->getPosition().y;
 	loginButton->setPosition({ coordX, coordY });
+	Utils::StyleButton(loginButton);
 	m_login.add(loginButton);
-	loginButton->setTextSize(24); 
-	loginButton->getRenderer()->setTexture("assets/images/buttons.png");
 	loginButton->onClick([this, editBoxUsername] { CheckLogin(editBoxUsername); });
 
 	auto registerButton = tgui::Button::create("Register");
-	registerButton->setSize({ "20%", "16.67%" });
+	registerButton->setSize({ "20%", "15%" });
+	registerButton->getRenderer()->setTexture("assets/images/buttons.png");
 	coordX = editBoxUsername->getPosition().x + loginButton->getSize().x*0.7f;
 	coordY = editBoxUsername->getSize().y * 1.5f + editBoxUsername->getPosition().y;
 	registerButton->setPosition({ coordX, coordY });
-	registerButton->getRenderer()->setTexture("assets/images/buttons.png");
+	Utils::StyleButton(registerButton);
 	m_login.add(registerButton); 
-	registerButton->setTextSize(24);
 	registerButton->onClick([this] {
 		m_isRegisteredPressed = true;
 		m_onLoginWindow = false;

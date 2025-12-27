@@ -1,6 +1,7 @@
 #pragma once
 #include "IWindow.h"
 #include "ApiClient.h"
+#include "Utils.h"
 
 #include <cpr/cpr.h>
 #include <crow.h>

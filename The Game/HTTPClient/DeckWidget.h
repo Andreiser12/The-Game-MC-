@@ -20,6 +20,8 @@ public:
 	tgui::Panel::Ptr GetDeckPanel() const;
 
 	void SetLastId(uint16_t lastId);
+	void SetHighlight(bool canPlace);
+	void ClearHighlight();
 
 private:
 	uint16_t m_lastId;
@@ -27,6 +29,7 @@ private:
 	DeckType m_deckType;
 	
 	tgui::Panel::Ptr m_deckPanel;
+	tgui::Panel::Ptr m_highlightOverlay;
 	tgui::Label::Ptr m_topIdLabel;
 	tgui::Picture::Ptr m_frontSide;
 };

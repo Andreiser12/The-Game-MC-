@@ -7,7 +7,7 @@ ApiClient::ApiClient(const std::string& serverURL) : m_serverURL{ serverURL } {}
 LoginResult ApiClient::Login(const std::string& username)
 {
 	const std::string url = m_serverURL + "/login";
-	std::string jsonBody = "{\"username\":\"" + username + "\"}";
+	const std::string jsonBody = "{\"username\":\"" + username + "\"}";
 
 	cpr::Response response = cpr::Post(
 		cpr::Url{ url },
@@ -276,7 +276,7 @@ bool ApiClient::PlayCard(uint8_t cardId, uint8_t deckId)
 	return json["status"] == "OK";
 }
 
-std::optional<std::vector<DeckState>> ApiClient::GetDeckState()
+std::optional<std::vector<DeckState>> ApiClient::GetDeckState() const
 {
 	const std::string url = m_serverURL + "/lobby/" + m_lobbyId +
 		"/decks";
@@ -301,7 +301,7 @@ std::optional<std::vector<DeckState>> ApiClient::GetDeckState()
 	return std::make_optional(deckStates);
 }
 
-std::optional<EndTurnState> ApiClient::GetEndTurnState()
+std::optional<EndTurnState> ApiClient::GetEndTurnState() const
 {
 	if (m_lobbyId.empty() || m_playerId == 0u) return std::nullopt;
 
@@ -474,6 +474,32 @@ std::optional<std::vector<uint8_t>> ApiClient::GetPlayerCards() const
 	return playerCards;
 }
 
+std::optional<std::array<bool, 4>> ApiClient::GetValidDecks(uint8_t cardId) const
+{
+	const std::string url = m_serverURL + "/lobby/" + m_lobbyId
+		+ "/decks/valid";
+	const std::string jsonBody = "{\"cardId\":\"" + std::to_string(cardId) + "\"}";
+	cpr::Response response = cpr::Get(
+		cpr::Url{ url },
+		cpr::Body{ jsonBody },
+		cpr::Header{ { "Content-Type", "application/json" } },
+		kTimeout
+	);
+
+	if (response.error || response.status_code != 200) return std::nullopt;
+
+	auto json = crow::json::load(response.text);
+	if (!json || !json.has("decks")) return std::nullopt;
+
+	std::array<bool, 4> validDecks;
+	uint8_t deckIndex{ 0u };
+	for (const auto& deck : json["decks"])
+	{
+		validDecks[deckIndex++] = deck.b();
+	}
+	return std::make_optional(validDecks);
+}
+
 std::optional<std::vector<uint8_t>> ApiClient::EndTurn()
 {
 	if (m_lobbyId.empty() || m_playerId == 0u) return std::nullopt;
@@ -510,7 +536,7 @@ std::optional<TurnState> ApiClient::GetTurnState() const
 	if (response.error || response.status_code != 200) return std::nullopt;
 
 	auto json = crow::json::load(response.text);
-	if (!json 
+	if (!json
 		|| !json.has("isMyTurn")
 		|| !json.has("currentPlayerId")) return std::nullopt;
 
@@ -630,9 +656,45 @@ void ApiClient::StartNetworkLoop()
 			if (now - lastDecks >= std::chrono::milliseconds(500))
 			{
 				auto decks = GetDeckState();
+				bool decksChanged{ false };
 				{
 					std::lock_guard<std::mutex> lk(m_cacheMutex);
+					if (!m_cachedDecks.has_value() && decks.has_value())
+					{
+						decksChanged = true;
+					}
+					else if (m_cachedDecks.has_value() && decks.has_value())
+					{
+						if (m_cachedDecks->size() != decks->size())
+						{
+							decksChanged = true;
+						}
+						else
+						{
+							for (size_t i = 0; i < decks->size(); i++)
+							{
+								if (m_cachedDecks.value()[i].topCardId != decks.value()[i].topCardId)
+								{
+									decksChanged = true;
+									break;
+								}
+							}
+						}
+					}
 					m_cachedDecks = decks;
+					if (decksChanged)
+					{
+						auto playerCards = GetPlayerCards();
+						if (playerCards)
+						{
+							m_cachedValidDecks.clear();
+							for (uint8_t card : playerCards.value())
+							{
+								auto validDecks = GetValidDecks(card);
+								m_cachedValidDecks[card] = validDecks;
+							}
+						}
+					}
 				}
 				lastDecks = now;
 			}
@@ -698,6 +760,14 @@ std::optional<LobbyState> ApiClient::SnapshotLobbyState() const
 	return m_cachedLobby;
 }
 
+std::optional<std::array<bool, 4>> ApiClient::SnapshotValidDecks(uint8_t cardId) const
+{
+	std::lock_guard<std::mutex> lk(m_cacheMutex);
+	auto it = m_cachedValidDecks.find(cardId);
+	if (it != m_cachedValidDecks.end()) return it->second;
+	return std::nullopt;
+}
+
 std::optional<std::vector<ChatMessage>> ApiClient::SnapshotNewChat()
 {
 	std::lock_guard<std::mutex> lk(m_cacheMutex);
@@ -715,7 +785,6 @@ std::optional<std::vector<DeckState>> ApiClient::SnapshotDecks() const
 std::optional<GameTableState> ApiClient::GetTableState(const std::string& lobbyId) const
 {
 	const std::string url = m_serverURL + "/lobby/" + lobbyId + "/gamestate";
-
 	cpr::Response response = cpr::Get(
 		cpr::Url{ url },
 		cpr::Header{ {"Content-Type", "application/json"} },

@@ -3,17 +3,17 @@
 RegisterWindow::RegisterWindow(sf::RenderWindow& window, ApiClient& api)
 	: m_register{window}, m_apiClient{api}
 {
+	m_register.setFont("assets/fonts/Cinzel-Regular.ttf");
 	m_background = tgui::Picture::create("assets/images/mainMenuBackground.png");
 	m_background->setSize({ "100%", "100%" });
 	m_background->setPosition({ "0%", "0%" });
 	m_register.add(m_background);
-
 	LoadWidgets();
 }
 
 void RegisterWindow::UpdateTextSize()
 {
-	const float windowHeight = m_register.getView().getRect().height;
+	const float windowHeight{ m_register.getView().getRect().height };
 	m_register.setTextSize(static_cast<unsigned>(0.07f * windowHeight));
 }
 
@@ -38,15 +38,28 @@ void RegisterWindow::CheckRegister(tgui::EditBox::Ptr username)
 	auto json = crow::json::load(r.text);
 	if (!json || json["status"].s() == "fail")
 	{
-		auto errorLabel = tgui::Label::create();
-		errorLabel->setText("An account with this username already exists!");
-		errorLabel->getRenderer()->setTextColor(tgui::Color::Red);
-		errorLabel->setPosition({ "50%", "65%" });
+		m_register.remove(m_register.get("errorPanel"));
+		auto errorPanel = tgui::Panel::create({ "55%", "8%" });
+		errorPanel->setPosition({ "50%", "65%" });
+		errorPanel->setOrigin(0.5f, 0.5f);
+		errorPanel->getRenderer()->setBackgroundColor(tgui::Color(30, 30, 30, 120));
+		errorPanel->getRenderer()->setBorders(2);
+		errorPanel->getRenderer()->setBorderColor(tgui::Color(200, 50, 50));
+		errorPanel->getRenderer()->setRoundedBorderRadius(8);
+
+		auto errorLabel = tgui::Label::create("An account with this username already exists!");
+		errorLabel->getRenderer()->setTextColor(tgui::Color(255, 100, 100));
+		errorLabel->setPosition({ "50%", "50%" });
 		errorLabel->setOrigin(0.5f, 0.5f);
 		errorLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
 		errorLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-		m_register.add(errorLabel);
-		errorLabel->setTextSize(16);
+		errorLabel->getRenderer()->setTextSize(16);
+		errorLabel->getRenderer()->setFont("assets/fonts/Arial.ttf");
+		errorLabel->getRenderer()->setTextOutlineColor(tgui::Color(100, 20, 20));
+		errorLabel->getRenderer()->setTextOutlineThickness(1.5f);
+
+		errorPanel->add(errorLabel);
+		m_register.add(errorPanel, "errorPanel");
 		return;
 	}
 	m_apiClient.SetUsername(usernameEntered);
@@ -64,11 +77,10 @@ void RegisterWindow::LoadWidgets()
 	UpdateTextSize();
 	m_register.onViewChange([this] {UpdateTextSize(); });
 	auto editBoxUsername = tgui::EditBox::create();
-	editBoxUsername->setSize({ "66.67%", "12.5%" });
+	editBoxUsername->setSize({ "65%", "12.5%" });
 	editBoxUsername->setPosition({ "50%", "50%" });
 	editBoxUsername->setOrigin(0.5f, 0.5f);
 	editBoxUsername->setDefaultText("Username");
-	editBoxUsername->setWidgetName("usernameBox");
 	editBoxUsername->getRenderer()->setTexture("assets/images/textBoxbackground2.png");
 	m_register.add(editBoxUsername);
 	editBoxUsername->onFocus([this, editBoxUsername] {
@@ -79,23 +91,20 @@ void RegisterWindow::LoadWidgets()
 		});
 
 	auto registerButton = tgui::Button::create("Register");
-	registerButton->setSize({ "20%", "16.67%" });
-	registerButton->setPosition({
-		"usernameBox.w / 2 - registerButton.w / 2 + 30",
-		"usernameBox.bottom + 75"
-		});
 	registerButton->getRenderer()->setTexture("assets/images/buttons.png");
+	registerButton->setSize({ "20%", "15%" });
+	registerButton->setPosition({"50%", "80%"});
+	registerButton->setOrigin(0.5f, 0.5f);
+	Utils::StyleButton(registerButton);
 	m_register.add(registerButton);
-	registerButton->setTextSize(24);
-
 	registerButton->onClick([this, editBoxUsername] {CheckRegister(editBoxUsername); });
 
 	auto backButton = tgui::Button::create("Back");
 	backButton->setSize({ "10%", "12.5%" });
 	backButton->setPosition({ "3.5%", "5%" });
 	backButton->getRenderer()->setTexture("assets/images/buttons.png");
+	Utils::StyleButton(backButton);
 	m_register.add(backButton);
-	backButton->setTextSize(20);
 	backButton->onClick([this] { GoToLogin(); });
 }
 

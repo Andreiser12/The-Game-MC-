@@ -154,7 +154,7 @@ std::optional<std::vector<uint8_t>> Lobby::GetPlayerCards(unsigned playerId) con
 	std::vector<uint8_t> playerCards;
 	for (const auto& card : player.GetCards())
 	{
-		playerCards.emplace_back(card.getId());
+		playerCards.emplace_back(card.GetId());
 	}
 	std::sort(playerCards.begin(), playerCards.end());
 	return playerCards;
@@ -186,7 +186,7 @@ std::optional<std::vector<DeckState>> Lobby::GetDecksState() const
 	{
 		DeckState deck;
 		deck.deckId = static_cast<uint8_t>(i);
-		deck.topCardId = m_table->GetDeck(static_cast<uint8_t>(i)).GetTopCard().getId();
+		deck.topCardId = m_table->GetDeck(static_cast<uint8_t>(i)).GetTopCard().GetId();
 		decksState.emplace_back(deck);
 	}
 	return decksState;
@@ -235,6 +235,26 @@ std::optional<std::vector<uint8_t>> Lobby::EndTurn(unsigned playerId)
 std::optional<GameResult> Lobby::GetGameResult() const
 {
 	if (!m_gameStarted || !m_table) return std::nullopt;
-
 	return m_table->GetGameResult();
+}
+
+std::optional<std::array<bool, 4>> Lobby::GetValidDecks(uint8_t cardId) const
+{
+	if (!m_gameStarted || !m_table) return std::nullopt;
+	
+	std::array<bool, 4> validDecks;
+	for (uint8_t deckId = 0u; deckId < 4u; deckId++)
+	{
+		auto deck = m_table->GetDeck(deckId);
+		switch (deck.GetDeckType())
+		{
+		case Deck::DeckType::Ascending:
+			validDecks[deckId] = cardId > deck.GetTopCard().GetId();
+			break;
+		case Deck::DeckType::Descending:
+			validDecks[deckId] = cardId < deck.GetTopCard().GetId();
+			break;
+		}
+	}
+	return std::make_optional(validDecks);
 }

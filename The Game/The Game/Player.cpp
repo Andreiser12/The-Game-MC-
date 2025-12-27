@@ -12,15 +12,6 @@ void Player::AddCard(const Card<uint8_t>& card)
 	m_cards.emplace(card);
 }
 
-void Player::PrintCards() const
-{
-	for (const Card<uint8_t>& card : m_cards)
-	{
-		std::cout << card;
-	}
-	std::cout << std::endl;
-}
-
 void Player::DrawCards(Pile& deck)
 {
 	while (!deck.empty() && m_cardsPlacedRound)
@@ -43,7 +34,7 @@ void Player::RemoveCard(uint8_t cardId)
 	auto it = std::find_if(m_cards.begin(), m_cards.end(),
 		[cardId](const Card<uint8_t>& card)
 		{
-			return card.getId() == cardId;
+			return card.GetId() == cardId;
 		});
 	if (it != m_cards.end()) m_cards.erase(it);
 }

@@ -10,6 +10,8 @@ import <span>;
 import <memory>;
 import <array>;  
 
+#include "AssistantAI.h"
+
 import Card;
 import Player;
 import Deck;
@@ -60,6 +62,8 @@ public:
 	GameResult GetGameResult() const;
 
 	constexpr std::size_t GetDeckIndex(DeckIndex index) const noexcept;
+
+	void RunBotTurn(unsigned playerId);
 
 private:
 	uint8_t m_playerCount;

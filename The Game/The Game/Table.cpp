@@ -1,4 +1,4 @@
-module Table;
+﻿module Table;
 
 import GreedyAI;
 
@@ -12,6 +12,12 @@ constexpr static uint8_t CARDS_DEFAULT_PLAYERS{ 6u };
 
 constexpr static uint8_t MIN_CARDS_NORMAL{ 2u };
 constexpr static uint8_t MIN_CARDS_EMPTY_DECK{ 1u };
+
+AssistantAI::DeckType ConvertDeckType(Deck::DeckType type) 
+{
+	if (type == Deck::DeckType::Ascending) return AssistantAI::DeckType::Ascending;
+	return AssistantAI::DeckType::Descending;
+}
 
 Table::Table(const std::vector<std::pair<unsigned, std::string>>& lobbyPlayers) :
 	m_playerCount{ static_cast<uint8_t>(lobbyPlayers.size())}
@@ -109,12 +115,92 @@ bool Table::PlayCard(unsigned playerId, uint8_t deckId, const Card<uint8_t>& car
 
 void Table::AdvanceTurn()
 {
+	Player& currentPlayer = GetPlayer(GetCurrentPlayerId());
+
+	if (currentPlayer.HasTimeOut())
+	{
+		RunBotTurn(currentPlayer.GetPlayerId());
+	}
+
 	m_currentTurnIndex = (m_currentTurnIndex + 1) % m_playerCount;
 }
 
 constexpr std::size_t Table::GetDeckIndex(DeckIndex index) const noexcept
 {
 	return static_cast<std::size_t>(index);
+}
+
+void Table::RunBotTurn(unsigned playerId)
+{
+	Player& player = GetPlayer(playerId);
+
+	uint8_t minCardsToPlay = IsPileEmpty() ? MIN_CARDS_EMPTY_DECK : MIN_CARDS_NORMAL;
+	int cardsPlayed = 0;
+	bool canPlayMore = true;
+
+	while (canPlayMore)
+	{
+		std::vector<uint8_t> myHand;
+		for (const auto& card : player.GetCards())
+		{
+			myHand.push_back(card.getId());
+		}
+
+		std::vector<AssistantAI::DeckState> deckStates;
+		auto allDecks = GetAllDecks();
+
+		for (const auto& deckRef : allDecks) {
+			Deck& d = deckRef.get();
+			AssistantAI::DeckState ds;
+			ds.index = static_cast<int>(d.GetDeckIndex());
+			ds.topCard = d.GetTopCard().getId();
+			ds.type = ConvertDeckType(d.GetDeckType());
+			deckStates.push_back(ds);
+		}
+
+		std::vector<std::vector<uint8_t>> otherHands;
+		for (const auto& [id, otherPlayer] : m_playersMap)
+		{
+			if (id != playerId) 
+			{
+				std::vector<uint8_t> hand;
+				for (const auto& c : otherPlayer.GetCards()) 
+				{
+					hand.push_back(c.getId());
+				}
+				otherHands.push_back(hand);
+			}
+		}
+
+		auto resultOpt = AssistantAI::GreedyBot::FindBestMove(myHand, deckStates, otherHands);
+
+		if (!resultOpt.has_value()) 
+		{
+			canPlayMore = false;
+		}
+		else
+		{
+			auto move = resultOpt.value();
+
+			if (cardsPlayed >= minCardsToPlay && move.score > 5) 
+			{
+				canPlayMore = false;
+			}
+			else 
+			{
+				Card<uint8_t> cardObj(move.cardValue);
+				PlaceCardOnDeck(static_cast<uint8_t>(move.deckIndex), cardObj);
+				player.RemoveCard(move.cardValue);
+				player.IncrementCardsPlaced();
+
+				cardsPlayed++;
+			}
+		}
+
+		if (player.GetCardsCount() == 0) canPlayMore = false;
+	}
+
+	EndTurn(playerId);
 }
 
 std::size_t Table::GetDrawPileCount() const

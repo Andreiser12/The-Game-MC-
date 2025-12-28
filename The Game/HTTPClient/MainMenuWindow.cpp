@@ -95,6 +95,7 @@ void MainMenuWindow::LoadWidgets()
 	profileButton->setText("Profile");
 	profileButton->getRenderer()->setTexture("assets/images/buttons.png");
 	Utils::StyleButton(profileButton);
+	profileButton->onClick([this] { ProfileButtonPressed(); });
 	m_mainMenu.add(profileButton);
 
 	auto settingsButton = tgui::Button::create();
@@ -243,6 +244,25 @@ void MainMenuWindow::SettingsButtonPressed()
 		}
 	);
 	m_mainMenu.add(settingsPanel);
+}
+
+void MainMenuWindow::ProfileButtonPressed()
+{
+	auto userProfileExists = m_apiClient.GetUserProfile(m_apiClient.GetPlayerId());
+	if (!userProfileExists)
+	{
+		Utils::CreateErrorPopupPanel(m_mainMenu, "Could not load profile");
+		return;
+	}
+	auto panel = Utils::CreateProfilePanel(
+		userProfileExists.value(),
+		[this]
+		{
+			auto panel = m_mainMenu.get<tgui::Panel>("ProfilePanel");
+			if (panel) m_mainMenu.remove(panel); 
+		}
+	);
+	m_mainMenu.add(panel, "ProfilePanel");
 }
 
 void MainMenuWindow::PlayPanelPressed()

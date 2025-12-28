@@ -6,6 +6,7 @@
 #include <vector>
 #include <array>
 #include <optional>
+#include "UserProfile.h"
 
 enum class ClientEvent
 {
@@ -104,6 +105,7 @@ public:
 	std::string GetUsername() const;
 	unsigned GetPlayerId() const;
 	std::string GetLobbyId() const;
+	std::optional<UserProfile> GetUserProfile(unsigned playerId);
 	std::optional<std::vector<uint8_t>> EndTurn();
 	std::optional<TurnState> GetTurnState() const;
 	std::optional<GameResult> ParseGameResult(const std::string& result) const;

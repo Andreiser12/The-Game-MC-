@@ -302,6 +302,70 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 	return panel;
 }
 
+tgui::Panel::Ptr Utils::CreateProfilePanel(
+	const UserProfile& profile,
+	std::function<void()> onClose)
+{
+	auto panel = tgui::Panel::create({ "60%", "60%" });
+	panel->setPosition({ "20%", "20%" });
+
+	auto title = tgui::Label::create("PLAYER PROFILE");
+	title->getRenderer()->setTextStyle(tgui::TextStyle::Bold);
+	title->setTextSize(32);
+	title->setPosition({ "50%", "6%" });
+	title->setOrigin(0.5f, 0.f);
+	panel->add(title);
+
+	auto line = tgui::SeparatorLine::create();
+	line->setPosition({ "5%", "13%" });
+	line->setSize({ "90%", "2" });
+	panel->add(line);
+
+	auto username = tgui::Label::create("Username: " + profile.username);
+	username->setPosition({ "5%", "22%" });
+	username->setTextSize(24); 
+	panel->add(username);
+
+	auto gamesPlayed = tgui::Label::create("Games played: " + std::to_string(profile.gamesPlayed));
+	gamesPlayed->setPosition({ "5%", "34%" });
+	gamesPlayed->setTextSize(24);
+	panel->add(gamesPlayed);
+
+	auto gamesWon = tgui::Label::create("Games won: " + std::to_string(profile.gamesWon));
+	gamesWon->setPosition({ "5%", "46%" });
+	gamesWon->setTextSize(24);
+	panel->add(gamesWon);
+
+	auto hoursPlayed = tgui::Label::create("Hours played: " + std::to_string(profile.hoursPlayed));
+	hoursPlayed->setPosition({ "5%", "58%" });
+	hoursPlayed->setTextSize(24);
+	panel->add(hoursPlayed);
+
+	auto closeButton = tgui::Button::create("X");
+	closeButton->setSize({ "8%", "10%" });
+	closeButton->getRenderer()->setTexture("assets/images/buttons.png");
+	closeButton->getRenderer()->setBorders(1);
+	StyleButton(closeButton);
+	closeButton->setTextSize(22);
+	closeButton->setOrigin(1.f, 0.f);
+	closeButton->setPosition({ "98%", "2%" });
+	closeButton->onPress(
+		[panel, onClose]
+		{
+			panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(150));
+			if (onClose) onClose();
+		});
+	panel->add(closeButton);
+
+	panel->getRenderer()->setBackgroundColor({ 255, 255, 255, 210 });
+	panel->getRenderer()->setBorders({ 2 });
+	panel->getRenderer()->setBorderColor({ 60, 60, 60 });
+	panel->getRenderer()->setRoundedBorderRadius(18);
+	panel->getRenderer()->setOpacity(0.97f);
+
+	return panel;
+}
+
 tgui::Panel::Ptr Utils::CreateExitPanel(tgui::Gui& gui,
 	std::function<void()> onYes,
 	std::function<void()> onNo)

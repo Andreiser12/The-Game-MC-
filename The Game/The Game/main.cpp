@@ -23,6 +23,7 @@ int main()
 	auth.Login(app);
 	auth.Logout(app);
 	auth.Users(app);
+	auth.Profile(app);
 	app.port(18080).multithreaded().run();
 	return 0;
 }

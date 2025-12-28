@@ -154,6 +154,7 @@
     <ClInclude Include="PlayPanel.h" />
     <ClInclude Include="RegisterWindow.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="UserProfile.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>

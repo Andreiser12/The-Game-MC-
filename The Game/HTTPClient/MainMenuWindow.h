@@ -20,6 +20,7 @@ public:
 
 	void ExitButtonPressed();
 	void SettingsButtonPressed();
+	void ProfileButtonPressed();
 	void PlayPanelPressed();
 	void CloseHostPanel();
 	void ShutdownLobby();

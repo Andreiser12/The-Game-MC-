@@ -39,6 +39,15 @@ void AuthenticationRoutes::Users(crow::SimpleApp& app)
 	});
 }
 
+void AuthenticationRoutes::Profile(crow::SimpleApp& app)
+{
+	CROW_ROUTE(app, "/users/<uint>/profile").methods("GET"_method)
+		([this](unsigned playerId)
+		{
+			return this->HandleUserProfile(playerId);
+		});
+}
+
 crow::response AuthenticationRoutes::HandleRegister(const crow::request& req)
 {
 	auto body = crow::json::load(req.body);
@@ -127,4 +136,20 @@ crow::response AuthenticationRoutes::HandleUsers()
 			});
 	}
 	return crow::json::wvalue{ usersJson };
+}
+
+crow::response AuthenticationRoutes::HandleUserProfile(unsigned playerId)
+{
+	auto userExists = m_database.GetUserByID(playerId);
+	if (!userExists)
+		return crow::response(404, "User not found");
+
+	const auto& user = userExists.value();
+
+	crow::json::wvalue data;
+	data["username"] = user.GetUsername();
+	data["gamesPlayed"] = user.GetGamesPlayed();
+	data["gamesWon"] = user.GetGamesWon();
+	data["hoursPlayed"] = user.GetHoursPlayed();
+	return crow::response(200,data);
 }

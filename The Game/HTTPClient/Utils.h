@@ -6,6 +6,7 @@
 #include "TGUI/Backend/SFML-Graphics.hpp"
 #include <functional>
 #include <vector>
+#include "UserProfile.h"
 
 class Utils
 {
@@ -18,6 +19,10 @@ public:
 		unsigned framerateIndex,
 		std::function<void()> onClose,
 		std::function<void(unsigned res, bool fullscreen, unsigned framerate)> onApply);
+
+	static tgui::Panel::Ptr	CreateProfilePanel(
+		const UserProfile& profile,
+		std::function<void()> onClose);
 
 	static tgui::Panel::Ptr	CreateExitPanel(
 		tgui::Gui& gui,

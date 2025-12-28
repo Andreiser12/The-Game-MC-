@@ -438,6 +438,29 @@ std::string ApiClient::GetLobbyId() const
 	return m_lobbyId;
 }
 
+std::optional<UserProfile> ApiClient::GetUserProfile(unsigned playerId)
+{
+	const std::string url = m_serverURL + "/users/" + std::to_string(playerId) + "/profile";
+	cpr::Response response = cpr::Get
+	(cpr::Url{ url },
+		cpr::Header{ {"Content-Type", "application/json"} },
+		kTimeout
+	);
+
+	if (response.error || response.status_code != 200) return std::nullopt;
+
+	auto json = crow::json::load(response.text);
+	if (!json || !json.has("username") || !json.has("gamesPlayed") || !json.has("gamesWon") || !json.has("hoursPlayed"))
+		return std::nullopt;
+
+	UserProfile profile;
+	profile.username = json["username"].s();
+	profile.gamesPlayed = json["gamesPlayed"].u();
+	profile.gamesWon = json["gamesWon"].u();
+	profile.hoursPlayed = json["hoursPlayed"].d();
+	return profile;
+}
+
 std::vector<std::string> ApiClient::GetLobbyPlayers(const std::string& lobbyId) const
 {
 	const std::string url = m_serverURL + "/lobby/" + lobbyId + "/players";

@@ -19,6 +19,7 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 	auto lobbyEditBox = tgui::EditBox::create();
 	lobbyEditBox->setSize({ "45%", "25%" });
 	lobbyEditBox->setPosition({"50%", "40%"});
+	lobbyEditBox->getRenderer()->setTexture("assets/images/textBoxbackground2.png");
 	lobbyEditBox->setDefaultText("Enter lobby ID");
 	lobbyEditBox->setOrigin(0.5f, 0.5f);
 	lobbyEditBox->setTextSize(26);

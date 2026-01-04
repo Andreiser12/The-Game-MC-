@@ -61,19 +61,24 @@ void DeckWidget::SetLastId(uint16_t lastId)
 	m_topIdLabel->setText(tgui::String(lastId));
 }
 
-void DeckWidget::SetHighlight(bool canPlace)
+void DeckWidget::SetHighlight(bool canPlace, bool isBackwards)
 {
 	m_highlightOverlay->setVisible(true);
 
 	if (canPlace)
 	{
-		m_highlightOverlay->getRenderer()->setBackgroundColor(tgui::Color(0, 255, 0, 80));
-		m_deckPanel->getRenderer()->setBorderColor(tgui::Color(80, 80, 80));
+		if (isBackwards)
+		{
+			m_highlightOverlay->getRenderer()->setBackgroundColor(tgui::Color(148, 0, 211, 80));
+		}
+		else
+		{
+			m_highlightOverlay->getRenderer()->setBackgroundColor(tgui::Color(0, 255, 0, 80));
+		}
 	}
 	else
 	{
 		m_highlightOverlay->getRenderer()->setBackgroundColor(tgui::Color(100, 100, 100, 100));
-		m_deckPanel->getRenderer()->setBorderColor(tgui::Color(80, 80, 80));
 	}
 }
 

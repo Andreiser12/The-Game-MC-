@@ -122,7 +122,19 @@ void Table::AdvanceTurn()
 		RunBotTurn(currentPlayer.GetPlayerId());
 	}
 
-	m_currentTurnIndex = (m_currentTurnIndex + 1) % m_playerCount;
+	int attempts = 0;
+	do
+	{
+		m_currentTurnIndex = (m_currentTurnIndex + 1) % m_playerCount;
+		attempts++;
+
+		if (attempts >= m_playerCount) break;
+
+		if (!IsPileEmpty()) break;
+
+		if (GetPlayer(GetCurrentPlayerId()).GetCardsCount() > 0) break;
+
+	} while (true);
 }
 
 constexpr std::size_t Table::GetDeckIndex(DeckIndex index) const noexcept
@@ -325,7 +337,7 @@ std::vector<uint8_t> Table::EndTurn(unsigned playerId)
 	{
 		m_gameResult = GameResult::Won;
 	}
-	if (CheckLoseCondition())
+	else if (CheckLoseCondition())
 	{
 		m_gameResult = GameResult::Lost;
 	}

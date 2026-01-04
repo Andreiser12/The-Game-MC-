@@ -428,7 +428,27 @@ void GamePanel::HandleMouseEvent(const sf::Event& event)
 
 		for (auto& deck : m_decks)
 		{
-			deck->SetHighlight(validDecks.value()[deck->GetDeckId()]);
+			bool isValid = validDecks.value()[deck->GetDeckId()];
+			bool isBackwards = false;
+
+			int cardVal = static_cast<int>(movingCardId);
+			int deckVal = static_cast<int>(deck->GetLastId());
+
+			if (deck->GetDeckType() == DeckWidget::DeckType::Ascending)
+			{
+				if (cardVal == deckVal - 10) isBackwards = true;
+			}
+			else
+			{
+				if (cardVal == deckVal + 10) isBackwards = true;
+			}
+
+			if (isBackwards)
+			{
+				isValid = true;
+			}
+
+			deck->SetHighlight(isValid, isBackwards);
 		}
 	}
 	else

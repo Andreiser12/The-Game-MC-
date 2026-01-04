@@ -20,7 +20,7 @@ public:
 	tgui::Panel::Ptr GetDeckPanel() const;
 
 	void SetLastId(uint16_t lastId);
-	void SetHighlight(bool canPlace);
+	void SetHighlight(bool canPlace, bool isBackwards = false);
 	void ClearHighlight();
 
 private:

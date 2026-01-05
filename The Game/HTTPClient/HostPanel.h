@@ -20,6 +20,9 @@ public:
 	static void UpdateStartButton();
 	static inline tgui::ListBox::Ptr GetPlayersListBox() { return playersListBox; }
 
+	static void UpdateBackground(float deltaTime);
+	static void PreloadImages();
+
 private:
 	static inline tgui::ListBox::Ptr playersListBox{ nullptr };
 	static inline tgui::Button::Ptr startButton{ nullptr };

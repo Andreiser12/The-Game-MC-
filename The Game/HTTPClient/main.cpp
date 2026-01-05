@@ -5,6 +5,7 @@
 
 #include <cpr/cpr.h>
 #include <crow.h>
+#include <thread>
 
 static inline constexpr uint16_t LOGIN_WIDTH{ 640u };
 static inline constexpr uint16_t LOGIN_HEIGHT{ 480u };
@@ -63,6 +64,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	LoginWindow _login(loginWindow, api);
 	RegisterWindow _register(loginWindow, api);
 
+	std::thread backgroundLoader([]() {
+		HostPanel::PreloadImages();
+		});
+
 	while (loginWindow.isOpen())
 	{
 		std::optional<sf::Event> eventOpt;
@@ -97,6 +102,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		loginWindow.display();
 	}
 
+	if (backgroundLoader.joinable())
+	{
+		backgroundLoader.join();
+	}
+
 	if (_login.GetLoggedState() || _register.GetRegisteredState())
 	{
 		sf::VideoMode menuMode = sf::VideoMode::getDesktopMode();
@@ -106,8 +116,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			windowIcon.getPixelsPtr()
 		);
 		MainMenuWindow _menu(menuWindow, api);
+
+		sf::Clock animationClock;
+
+		//HostPanel::PreloadImages();
+
 		while (menuWindow.isOpen())
 		{
+			float deltaTime = animationClock.restart().asSeconds();
+
 			std::optional<sf::Event> eventOpt;
 			while ((eventOpt = menuWindow.pollEvent()))
 			{
@@ -126,6 +143,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			{
 				HostPanel::RefreshPlayersList(api);
 				HostPanel::UpdateStartButton();
+				HostPanel::UpdateBackground(deltaTime);
 			}
 
 			_menu.Update();

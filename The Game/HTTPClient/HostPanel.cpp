@@ -1,6 +1,37 @@
-#include "HostPanel.h"
+﻿#include "HostPanel.h"
 
 static constexpr uint8_t kMinPlayers{ 2u };
+
+static std::vector<tgui::Texture> s_frames;
+static tgui::Picture::Ptr s_backgroundPicture;
+static float s_animationTime = 0.0f;
+static int s_currentFrame = 0;
+static const float kFrameDuration = 0.04f;
+
+void HostPanel::PreloadImages()
+{
+	if (!s_frames.empty()) return;
+
+	const int totalFrames = 300;
+
+	for (int i = 0; i < totalFrames; i++)
+	{
+		std::stringstream ss;
+
+		ss << "assets/gif/TheGameLevelSequence."
+			<< std::setw(4) << std::setfill('0') << i
+			<< ".jpeg";
+
+		std::string path = ss.str();
+
+		try {
+			s_frames.emplace_back(path);
+		}
+		catch (...) {
+			std::cout << "Nu am putut incarca: " << path << std::endl;
+		}
+	}
+}
 
 tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	ApiClient& apiClient,
@@ -8,8 +39,20 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	std::function<bool(ApiClient&)> onLeave,
 	std::function<bool(ApiClient&)> onStart)
 {
-	auto background = tgui::Picture::create("assets/images/mainMenuBackground.png");
-	background->setSize({ "100%", "100%" });
+	//auto background = tgui::Picture::create("assets/images/mainMenuBackground.png");
+	//background->setSize({ "100%", "100%" });
+	PreloadImages();
+
+
+	if (!s_frames.empty())
+	{
+		s_backgroundPicture = tgui::Picture::create(s_frames[0]);
+	}
+	else
+	{
+		s_backgroundPicture = tgui::Picture::create("assets/images/mainMenuBackground.png");
+	}
+	s_backgroundPicture->setSize({ "100%", "100%" });
 
 	auto panel = tgui::Panel::create({ "40%", "40%" });
 	panel->setPosition({ "50%", "50%" });
@@ -93,8 +136,8 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	panel->add(startButton);
 	panel->add(lobbyIdLabel);
 	panel->add(playersListBox);
-	panel->add(background);
-	background->moveToBack();
+	panel->add(s_backgroundPicture);
+	s_backgroundPicture->moveToBack();
 	return panel;
 }
 
@@ -125,3 +168,19 @@ void HostPanel::UpdateStartButton()
 	startButton->setVisible(isHost);
 	startButton->setEnabled(isHost && enoughPlayers);
 }
+
+void HostPanel::UpdateBackground(float deltaTime)
+{
+	if (s_frames.empty() || !s_backgroundPicture) return;
+
+	s_animationTime += deltaTime;
+
+	while (s_animationTime >= kFrameDuration)
+	{
+		s_animationTime -= kFrameDuration;
+		s_currentFrame = (s_currentFrame + 1) % s_frames.size();
+	}
+
+	s_backgroundPicture->getRenderer()->setTexture(s_frames[s_currentFrame]);
+}
+

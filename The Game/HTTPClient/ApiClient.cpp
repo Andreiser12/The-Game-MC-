@@ -149,8 +149,7 @@ bool ApiClient::LeaveLobby(const std::string& lobbyId, unsigned playerId)
 	if (response.error || response.status_code != 200) return false;
 
 	auto json = crow::json::load(response.text);
-	if (!json || !json.has("status"))
-		return false;
+	if (!json || !json.has("status")) return false;
 
 	if (json["status"].s() == "PLAYER_LEFT")
 		m_event.store(ClientEvent::PlayerLeft);
@@ -161,6 +160,39 @@ bool ApiClient::LeaveLobby(const std::string& lobbyId, unsigned playerId)
 	m_lobbyId.clear();
 	return true;
 }
+
+std::optional<LeaveMatchResult> ApiClient::LeaveMatch()
+{
+	const std::string url = m_serverURL + "/lobbies/" + m_lobbyId
+		+ "/players/" + std::to_string(m_playerId);
+
+	cpr::Response response = cpr::Delete(
+		cpr::Url{ url },
+		cpr::Timeout(kTimeout)
+		);
+
+	if (response.error) return std::nullopt;
+
+	switch (response.status_code)
+	{
+	case 200:
+		break;
+	case 404:
+		return LeaveMatchResult::NotInLobby;
+	case 409:
+		return LeaveMatchResult::AlreadyLeft;
+	default:
+		return std::nullopt;
+	}
+
+	auto json = crow::json::load(response.text);
+	if (!json || !json.has("PLAYER_LEFT")) return std::nullopt;
+
+	if (json["PLAYER_LEFT"].s() == "SUCCESS") return LeaveMatchResult::Success;
+	if (json["PLAYER_LEFT"].s() == "ALREADY_LEFT") return LeaveMatchResult::AlreadyLeft;
+	return std::nullopt;
+}
+
 std::optional<LobbyState> ApiClient::GetLobbyState(const std::string& lobbyId)
 {
 	const std::string url = m_serverURL + "/lobby/info/" + lobbyId;

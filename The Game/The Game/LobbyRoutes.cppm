@@ -22,6 +22,7 @@ private:
 	crow::response CreateLobby(const crow::request& request);
 	crow::response JoinLobby(const crow::request& request);
 	crow::response LeaveLobby(const crow::request& request);
+	crow::response LeaveMatch(const std::string& lobbyId, unsigned playerId);
 	crow::response GetLobbyState(const std::string& lobbyId);
 	crow::response StartMatch(const crow::request& request);
 	crow::response FetchLobbyPlayers(const std::string& lobbyId);

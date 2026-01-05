@@ -75,6 +75,20 @@ RemoveResult Lobby::RemovePlayer(unsigned playerId)
 	return RemoveResult::Removed;
 }
 
+RemoveResult Lobby::RemoveMatchPlayer(unsigned playerId)
+{
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	if (!m_gameStarted || !m_table) return RemoveResult::NotFound;
+
+	bool isHost = (m_hostId == playerId);
+	
+	m_players.erase(playerId);
+	m_lastPingPlayer.erase(playerId);
+
+	return RemoveResult::Removed;
+}
+
 void Lobby::UpdatePlayerPing(unsigned playerId)
 {
 	std::lock_guard<std::mutex> lock(m_mutex);

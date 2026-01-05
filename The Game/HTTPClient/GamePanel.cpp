@@ -168,7 +168,7 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 		{
 			m_endTurnButton->getRenderer()->setRoundedBorderRadius(size.y * 0.35f);
 		});
-	m_endTurnButton->setTextSize(22);
+	m_endTurnButton->getRenderer()->setTextSize(22);
 	m_endTurnButton->getRenderer()->setRoundedBorderRadius(10);
 	m_endTurnButton->setEnabled(false);
 	m_endTurnButton->getRenderer()->setBackgroundColor(tgui::Color(150, 30, 45));
@@ -185,6 +185,28 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 
 		});
 	m_root->add(m_endTurnButton);
+
+	m_leaveMatchButton = tgui::Button::create("Leave Match");
+	m_leaveMatchButton->setSize("14%", "9%");
+	m_leaveMatchButton->setPosition("1%", "90%");
+	m_leaveMatchButton->getRenderer()->setBorders(2);
+	m_leaveMatchButton->onSizeChange([this](tgui::Vector2f size)
+		{
+			m_leaveMatchButton->getRenderer()->setRoundedBorderRadius(size.y * 0.35f);
+		});
+	m_leaveMatchButton->getRenderer()->setTextSize(22);
+	m_leaveMatchButton->getRenderer()->setRoundedBorderRadius(10);
+	m_leaveMatchButton->getRenderer()->setBackgroundColor(tgui::Color(75, 75, 80));
+	m_leaveMatchButton->getRenderer()->setTextColor(tgui::Color::White);
+	m_leaveMatchButton->getRenderer()->setBorderColor(tgui::Color(95, 95, 100));
+	m_leaveMatchButton->getRenderer()->setBackgroundColorHover(tgui::Color(85, 40, 45));
+	m_leaveMatchButton->getRenderer()->setBorderColorHover(tgui::Color(140, 60, 65));
+	m_leaveMatchButton->getRenderer()->setBackgroundColorDown(tgui::Color(60, 60, 65));
+	m_leaveMatchButton->onPress([this]()
+		{
+
+		});
+	m_root->add(m_leaveMatchButton);
 
 	m_timerLabel = tgui::Label::create();
 	m_timerLabel->setPosition("85%", "5%");

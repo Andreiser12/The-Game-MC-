@@ -31,6 +31,13 @@ enum class GameResult
 	Lost,
 };
 
+enum class LeaveMatchResult
+{
+	Success,
+	NotInLobby,
+	AlreadyLeft
+};
+
 struct ChatMessage
 {
 	unsigned id;
@@ -84,13 +91,13 @@ public:
 	bool JoinLobby(const std::string& lobbyId,
 		const std::string& username);
 	bool LeaveLobby(const std::string& lobbyId, unsigned playerId);
+	std::optional<LeaveMatchResult> LeaveMatch();
 	std::optional<LobbyState> GetLobbyState(const std::string& lobbyId);
 
 	bool StartMatch(const std::string& lobbyId, unsigned playerId);
 	bool SendChatMessage(const std::string& message);
 	std::optional<std::vector<ChatMessage>> GetNewMessages(unsigned afterId);
 	bool PlayCard(uint8_t cardId, uint8_t deckId);
-
 
 	bool SendPing(const std::string& lobbyId, unsigned playerId);
 	void StartPingThread(const std::string& lobbyId, unsigned playerId);

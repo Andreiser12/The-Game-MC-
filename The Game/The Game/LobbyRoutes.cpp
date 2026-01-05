@@ -19,10 +19,10 @@ inline static std::string GenerateLobbyId()
 	return lobbyId;
 }
 
-LobbyRoutes::LobbyRoutes(LobbyManager& manager, DatabaseManager& db)
-	: m_manager{ manager },
-	m_db{ db } {
-}
+LobbyRoutes::LobbyRoutes(LobbyManager& manager, DatabaseManager& db) :
+	m_manager{ manager },
+	m_db{ db } 
+{}
 
 void LobbyRoutes::Register(crow::SimpleApp& app)
 {
@@ -124,6 +124,12 @@ void LobbyRoutes::Register(crow::SimpleApp& app)
 			{
 				return this->GetValidDecks(req, lobbyId);
 			});
+
+	CROW_ROUTE(app, "/lobbies/<string>/players/<uint>").methods("DELETE"_method)
+		([this](const std::string& lobbyId, unsigned playerId)
+			{
+				return this->LeaveMatch(lobbyId, playerId);
+			});
 }
 
 crow::response LobbyRoutes::CreateLobby(const crow::request& request)
@@ -194,6 +200,17 @@ crow::response LobbyRoutes::LeaveLobby(const crow::request& request)
 	data["status"] = "PLAYER_LEFT";
 	data["message"] = "Player left lobby.";
 	return crow::response(200, data);
+}
+
+crow::response LobbyRoutes::LeaveMatch(const std::string& lobbyId, unsigned playerId)
+{
+	auto lobby = m_manager.GetLobby(lobbyId);
+	if (!lobby) return crow::response(404, "Lobby not found");
+
+
+
+	crow::json::wvalue data;
+ 	return crow::response(200, data);
 }
 
 crow::response LobbyRoutes::GetLobbyState(const std::string& lobbyId)

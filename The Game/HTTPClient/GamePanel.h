@@ -96,6 +96,7 @@ private:
 	std::shared_ptr<PileWidget> m_pileWidget;
 	std::optional<PlayerSlot> m_mySlot;
 	tgui::Button::Ptr m_endTurnButton;
+	tgui::Button::Ptr m_leaveMatchButton;
 
 	bool m_isMyTurn{ false };
 	bool m_gameFinished{ false };

@@ -64,6 +64,7 @@ public:
 	std::optional<std::array<bool, 4>> GetValidDecks(uint8_t cardId) const;
 
 	RemoveResult RemovePlayer(unsigned playerId);
+	RemoveResult RemoveMatchPlayer(unsigned playerId);
 	void UpdatePlayerPing(unsigned playerId);
 	std::vector<unsigned> GetInactivePlayers(std::chrono::seconds timeout);
 

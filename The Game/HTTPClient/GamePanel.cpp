@@ -11,14 +11,14 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	m_root->add(gamePanel);
 
 	auto gameBackground = tgui::Picture::create("assets/images/gameBackground.jpg");
-	gameBackground->setSize({ "100%", "100%" });
-	gameBackground->setPosition({ "0%", "0%" });
+	gameBackground->setSize( "100%", "100%" );
+	gameBackground->setPosition( "0%", "0%" );
 	gamePanel->add(gameBackground);
 	gameBackground->moveToBack();
 
 	auto canvas = tgui::CanvasSFML::create();
-	canvas->setSize({ "70%", "50%" });
-	canvas->setPosition({ "50%", "50%" });
+	canvas->setSize( "70%", "50%" );
+	canvas->setPosition( "50%", "50%" );
 	canvas->setOrigin(0.5f, 0.5f);
 	gamePanel->add(canvas);
 
@@ -52,19 +52,19 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	canvas->display();
 
 	auto chatGroup = tgui::Group::create({ "100%", "100%" });
-	chatGroup->setPosition({ "0%", "0%" });
+	chatGroup->setPosition( "0%", "0%" );
 	gamePanel->add(chatGroup);
 
 	m_chat = tgui::ChatBox::create();
-	m_chat->setSize({ "27.5%", "25%" });
-	m_chat->setPosition({ "0%", "0%" });
+	m_chat->setSize("27.5%", "25%" );
+	m_chat->setPosition( "0%", "0%" );
 	m_chat->setTextSize(25);
 	m_chat->getRenderer()->setOpacity(0.7f);
 	chatGroup->add(m_chat);
 
 	auto chatEditBox = tgui::EditBox::create();
-	chatEditBox->setSize({ "22.5%", "5%" });
-	chatEditBox->setPosition({ "0", "25%" });
+	chatEditBox->setSize( "22.5%", "5%" );
+	chatEditBox->setPosition("0", "25%" );
 	chatEditBox->setTextSize(25);
 	chatEditBox->getRenderer()->setOpacity(0.5f);
 	chatEditBox->setDefaultText("Message...");
@@ -94,8 +94,8 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	chatGroup->add(chatEditBox);
 
 	auto sendButton = tgui::Button::create("Send");
-	sendButton->setSize({ "5%", "5%" });
-	sendButton->setPosition({ "22.5%", "25%" });
+	sendButton->setSize( "5%", "5%" );
+	sendButton->setPosition( "22.5%", "25%" );
 	sendButton->setTextSize(25);
 	sendButton->onPress([this, chatEditBox]()
 		{
@@ -115,8 +115,8 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	chatGroup->add(sendButton);
 
 	auto toggleChatButton = tgui::Button::create("^");
-	toggleChatButton->setSize({ "3%", "3%" });
-	toggleChatButton->setPosition({ "24.5%", "0%" });
+	toggleChatButton->setSize( "3%", "3%" );
+	toggleChatButton->setPosition( "24.5%", "0%" );
 	toggleChatButton->setTextSize(25);
 	toggleChatButton->onPress([toggleChatButton, chatGroup]()
 		{
@@ -142,7 +142,7 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	for (const auto& deck : m_decks)
 	{
 		auto deckPanel = deck->GetDeckPanel();
-		deckPanel->setSize({ "2.25%", "6.5%" });
+		deckPanel->setSize( "2.25%", "6.5%" );
 		deckPanel->setPosition({
 			tgui::String(std::to_string(xDeckPosition) + "%"),
 			tgui::String(std::to_string(yDeckPosition) + "%")
@@ -152,7 +152,7 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	}
 	m_pileWidget = std::make_shared<PileWidget>(PileWidget());
 	auto pilePanel = m_pileWidget->GetPilePanel();
-	pilePanel->setSize({ "2.25%", "6.5%" });
+	pilePanel->setSize( "2.25%", "6.5%" );
 	pilePanel->setPosition({
 		tgui::String(std::to_string(xDeckPosition) + "%"),
 		tgui::String(std::to_string(yDeckPosition) + "%")
@@ -160,8 +160,8 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	m_root->add(pilePanel);
 
 	m_endTurnButton = tgui::Button::create("End Turn");
-	m_endTurnButton->setSize({ "14%", "9%" });
-	m_endTurnButton->setPosition({ "85%", "90%" });
+	m_endTurnButton->setSize( "14%", "9%" );
+	m_endTurnButton->setPosition( "85%", "90%" );
 	m_endTurnButton->getRenderer()->setBorders(2);
 	m_endTurnButton->getRenderer()->setBorderColor(tgui::Color(100, 20, 30));
 	m_endTurnButton->onSizeChange([this](tgui::Vector2f size)
@@ -453,8 +453,8 @@ void GamePanel::HandleMouseEvent(const sf::Event& event)
 			bool isValid = validDecks.value()[deck->GetDeckId()];
 			bool isBackwards = false;
 
-			int cardVal = static_cast<int>(movingCardId);
-			int deckVal = static_cast<int>(deck->GetLastId());
+			uint8_t cardVal = static_cast<uint8_t>(movingCardId);
+			uint8_t deckVal = static_cast<uint8_t>(deck->GetLastId());
 
 			if (deck->GetDeckType() == DeckWidget::DeckType::Ascending)
 			{
@@ -622,7 +622,7 @@ void GamePanel::ShowGameResultOverlay(GameResult result)
 	);
 
 	auto dialog = tgui::Panel::create({ "40%", "30%" });
-	dialog->setPosition({ "50%", "50%" });
+	dialog->setPosition( "50%", "50%" );
 	dialog->setOrigin(0.5f, 0.5f);
 	dialog->getRenderer()->setBackgroundColor(tgui::Color(40, 40, 40));
 	dialog->getRenderer()->setBorders(2);
@@ -633,12 +633,12 @@ void GamePanel::ShowGameResultOverlay(GameResult result)
 	);
 	gameResultLabel->setTextSize(36);
 	gameResultLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
-	gameResultLabel->setPosition({ "50%", "30%" });
+	gameResultLabel->setPosition( "50%", "30%" );
 	gameResultLabel->setOrigin(0.5f, 0.5f);
 
 	auto backToMenuButton = tgui::Button::create("Back to Menu");
-	backToMenuButton->setSize({ "40%", "20%" });
-	backToMenuButton->setPosition({ "50%", "70%" });
+	backToMenuButton->setSize( "40%", "20%" );
+	backToMenuButton->setPosition( "50%", "70%" );
 	backToMenuButton->setOrigin(0.5f, 0.5f);
 	backToMenuButton->setTextSize(20);
 	backToMenuButton->onPress([this]()

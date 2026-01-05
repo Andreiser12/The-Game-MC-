@@ -173,24 +173,11 @@ std::optional<LeaveMatchResult> ApiClient::LeaveMatch()
 
 	if (response.error) return std::nullopt;
 
-	switch (response.status_code)
-	{
-	case 200:
-		break;
-	case 404:
-		return LeaveMatchResult::NotInLobby;
-	case 409:
-		return LeaveMatchResult::AlreadyLeft;
-	default:
-		return std::nullopt;
-	}
-
 	auto json = crow::json::load(response.text);
 	if (!json || !json.has("PLAYER_LEFT")) return std::nullopt;
 
 	if (json["PLAYER_LEFT"].s() == "SUCCESS") return LeaveMatchResult::Success;
-	if (json["PLAYER_LEFT"].s() == "ALREADY_LEFT") return LeaveMatchResult::AlreadyLeft;
-	return std::nullopt;
+	return LeaveMatchResult::NotInLobby;
 }
 
 std::optional<LobbyState> ApiClient::GetLobbyState(const std::string& lobbyId)

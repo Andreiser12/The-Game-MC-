@@ -14,6 +14,6 @@ public:
 private:
 	tgui::Panel::Ptr m_pilePanel;
 	int m_lastCardCount = -1;
-	//tgui::Picture::Ptr m_backsidePicture;
+	tgui::Picture::Ptr m_backsidePicture;
 };
 

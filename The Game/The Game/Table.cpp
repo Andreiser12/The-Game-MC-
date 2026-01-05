@@ -343,3 +343,24 @@ std::vector<uint8_t> Table::EndTurn(unsigned playerId)
 	}
 	return drawnCards;
 }
+
+bool Table::RemovePlayer(unsigned playerId)
+{
+	auto it = m_playersMap.find(playerId);
+	if (it == m_playersMap.end()) return false;
+
+	MoveCardsToPile(it->second);
+	m_playersMap.erase(playerId);
+	--m_playerCount;
+	return true;
+}
+
+void Table::MoveCardsToPile(Player& player)
+{
+	auto& cards = player.GetCards();
+
+	for (auto& card : cards)
+	{
+		m_pile.push(std::move(card));
+	}
+}

@@ -81,11 +81,11 @@ RemoveResult Lobby::RemoveMatchPlayer(unsigned playerId)
 
 	if (!m_gameStarted || !m_table) return RemoveResult::NotFound;
 
-	bool isHost = (m_hostId == playerId);
-	
+	bool result = m_table->RemovePlayer(playerId);
+	if (!result) return RemoveResult::NotFound;
+
 	m_players.erase(playerId);
 	m_lastPingPlayer.erase(playerId);
-
 	return RemoveResult::Removed;
 }
 

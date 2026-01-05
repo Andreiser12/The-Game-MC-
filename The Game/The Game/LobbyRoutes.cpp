@@ -21,8 +21,9 @@ inline static std::string GenerateLobbyId()
 
 LobbyRoutes::LobbyRoutes(LobbyManager& manager, DatabaseManager& db) :
 	m_manager{ manager },
-	m_db{ db } 
-{}
+	m_db{ db }
+{
+}
 
 void LobbyRoutes::Register(crow::SimpleApp& app)
 {
@@ -94,7 +95,7 @@ void LobbyRoutes::Register(crow::SimpleApp& app)
 			{
 				return this->GetGameState(lobbyId);
 			});
-	
+
 	CROW_ROUTE(app, "/lobby/<string>/game/result").methods("GET"_method)
 		([this](const std::string& lobbyId)
 			{
@@ -207,10 +208,18 @@ crow::response LobbyRoutes::LeaveMatch(const std::string& lobbyId, unsigned play
 	auto lobby = m_manager.GetLobby(lobbyId);
 	if (!lobby) return crow::response(404, "Lobby not found");
 
-
-
 	crow::json::wvalue data;
- 	return crow::response(200, data);
+	const auto result = lobby->RemoveMatchPlayer(playerId);
+	switch (result)
+	{
+	case RemoveResult::Removed:
+		data["PLAYER_LEFT"] = "SUCCESS";
+		return crow::response(200, data);
+	case RemoveResult::NotFound:
+		return crow::response(404);
+	}
+
+	return crow::response(500);
 }
 
 crow::response LobbyRoutes::GetLobbyState(const std::string& lobbyId)
@@ -483,7 +492,7 @@ crow::response LobbyRoutes::EndTurn(const std::string& lobbyId, unsigned playerI
 
 	crow::json::wvalue data;
 	data["cards"] = crow::json::wvalue::list();
-	for (size_t i = 0; i<drawnCards.value().size(); i++)
+	for (size_t i = 0; i < drawnCards.value().size(); i++)
 	{
 		data["cards"][i] = drawnCards.value()[i];
 	}
@@ -515,15 +524,15 @@ crow::response LobbyRoutes::GetGameResult(const std::string& lobbyId)
 	crow::json::wvalue data;
 	switch (gameResult.value())
 	{
-		case GameResult::Won:
-			data["result"] = "won";
-			break;
-		case GameResult::Lost:
-			data["result"] = "lost";
-			break;
-		case GameResult::Ongoing:
-			data["result"] = "ongoing";
-			break;
+	case GameResult::Won:
+		data["result"] = "won";
+		break;
+	case GameResult::Lost:
+		data["result"] = "lost";
+		break;
+	case GameResult::Ongoing:
+		data["result"] = "ongoing";
+		break;
 	}
 	return crow::response(200, data);
 }
@@ -542,7 +551,7 @@ crow::response LobbyRoutes::GetValidDecks(const crow::request& request, const st
 
 	crow::json::wvalue data;
 	data["decks"] = crow::json::wvalue::list();
-	for (size_t i=0; i<validDecksOpt.value().size(); i++)
+	for (size_t i = 0; i < validDecksOpt.value().size(); i++)
 	{
 		data["decks"][i] = validDecksOpt.value()[i];
 	}

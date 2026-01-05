@@ -7,9 +7,6 @@
 #include "DeckWidget.h"
 #include "PileWidget.h"
 
-#include <vector>
-#include <memory>
-#include <array>
 #include <span>
 
 struct PlayerSlot

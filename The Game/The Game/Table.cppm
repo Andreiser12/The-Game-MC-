@@ -48,6 +48,7 @@ public:
 	bool CheckWinCondition() const;
 	bool CheckLoseCondition() const;
 	std::vector<uint8_t> EndTurn(unsigned playerId);
+	bool RemovePlayer(unsigned playerId);
 
 	Deck& GetDeck(uint8_t deckId) const;
 	const Pile& GetPile() const;
@@ -66,6 +67,7 @@ public:
 
 private:
 	void Shuffle();
+	void MoveCardsToPile(Player& player);
 
 private:
 	uint8_t m_playerCount;

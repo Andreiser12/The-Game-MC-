@@ -8,12 +8,12 @@ PileWidget::PileWidget()
 	m_pilePanel->getRenderer()->setBorders(2);
 	m_pilePanel->getRenderer()->setRoundedBorderRadius(5);
 
-	/*m_backsidePicture = tgui::Picture::create("assets/images/cardBackside.png");
+	m_backsidePicture = tgui::Picture::create("assets/images/cardBackside.png");
 	m_backsidePicture->setSize({ "100%", "100%" });
 	m_backsidePicture->setPosition({ "0%", "0%" });
 	m_backsidePicture->setIgnoreMouseEvents(true);
 	m_pilePanel->add(m_backsidePicture);
-	m_backsidePicture->moveToBack();*/
+	m_backsidePicture->moveToBack();
 }
 
 tgui::Panel::Ptr PileWidget::GetPilePanel() const
@@ -39,9 +39,8 @@ void PileWidget::UpdatePile(int cardCount)
 
     for (int i = visualLayers - 1; i >= 0; --i)
     {
-        auto cardPic = tgui::Picture::create("assets/images/cardBackSide.jpg");
-
-        cardPic->setSize({ "100%", "100%" });
+        auto cardPic = tgui::Picture::create("assets/images/cardBackside.png");
+        cardPic->setSize( "100%", "100%" );
         cardPic->setIgnoreMouseEvents(true);
         cardPic->setOrigin(0.5f, 0.5f);
 

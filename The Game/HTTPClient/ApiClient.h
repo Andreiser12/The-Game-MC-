@@ -1,12 +1,12 @@
 #pragma once
+
+#include "UserProfile.h"
 #include "crow.h"
 #include <cpr/cpr.h>
-#include <string>
 #include <memory>
 #include <vector>
 #include <array>
 #include <optional>
-#include "UserProfile.h"
 
 enum class ClientEvent
 {

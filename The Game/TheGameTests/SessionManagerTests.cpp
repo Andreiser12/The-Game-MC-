@@ -1,6 +1,7 @@
 #include "CppUnitTest.h"
 #include <chrono>
 #include <thread>
+#include <ranges>
 using namespace std::chrono_literals;
 import SessionManager; 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -51,6 +52,27 @@ namespace TheGameTests
 			std::this_thread::sleep_for(50ms);
 			Assert::IsFalse(sessionManager.IsOnline(401, 1ms));
 			sessionManager.Logout(401);
+		}
+		TEST_METHOD(UpdateActivity_RefreshesOnlineStatus)
+		{
+			auto& sessionManager = SessionManager::Instance();
+			sessionManager.Login(500);
+			std::this_thread::sleep_for(30ms);
+			sessionManager.UpdateActivity(500);
+			Assert::IsTrue(sessionManager.IsOnline(500, 10ms));
+			sessionManager.Logout(500);
+		}
+		TEST_METHOD(GetInactivePlayers_FindInactiveUsers)
+		{
+			auto& sessionManager = SessionManager::Instance();
+			sessionManager.Login(600);
+			sessionManager.Login(601);
+			std::this_thread::sleep_for(20ms);
+			auto inactive = sessionManager.GetInactivePlayers(1ms);
+			Assert::IsTrue(std::ranges::find(inactive, 600) != inactive.end());
+			Assert::IsTrue(std::ranges::find(inactive, 601) != inactive.end());
+			sessionManager.Logout(600);
+			sessionManager.Logout(601);
 		}
 	};
 }

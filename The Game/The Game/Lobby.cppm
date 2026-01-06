@@ -3,8 +3,8 @@ export module Lobby;
 import <stdint.h>;
 import <vector>;
 import <array>;
-import <deque>;
 import <unordered_map>;
+import <deque>;
 import <atomic>;
 import <mutex>;
 import <chrono>;
@@ -48,6 +48,29 @@ export struct TurnState
 	unsigned currentPlayerId;
 };
 
+export enum class GameResult
+{
+	Ongoing,
+	Won,
+	Lost,
+	NotEnoughPlayers
+};
+
+export struct PlayerState
+{
+	std::string username;
+	bool isInMatch;
+};
+
+export struct PlayerInfo
+{
+	unsigned playerId;
+	std::string username;
+	bool isConnected{ true };
+
+	PlayerInfo (unsigned p, std::string u) : playerId{p}, username{std::move(u)} {}
+};
+
 export class Lobby
 {
 public:
@@ -62,8 +85,10 @@ public:
 	std::optional<GameResult> GetGameResult() const;
 	std::optional<std::vector<uint8_t>> GetPlayerCards(unsigned playerId) const;
 	std::optional<std::array<bool, 4>> GetValidDecks(uint8_t cardId) const;
+	std::optional<std::vector<PlayerState>> GetPlayerStates() const;
 
 	RemoveResult RemovePlayer(unsigned playerId);
+	void MarkPlayerAsDisconnected(unsigned playerId);
 	RemoveResult RemoveMatchPlayer(unsigned playerId);
 	void UpdatePlayerPing(unsigned playerId);
 	std::vector<unsigned> GetInactivePlayers(std::chrono::seconds timeout);
@@ -71,12 +96,13 @@ public:
 	bool IsFull() const;
 	bool StartGame(unsigned playerId);
 	bool HasGameStarted() const;
-	const std::unordered_map<unsigned, std::shared_ptr<Player>>& GetPlayers() const;
+	const std::unordered_map<unsigned, PlayerInfo>& GetPlayers() const;
 	bool IsPlayerHost(unsigned playerId) const;
 	unsigned GetHostId() const;
 
 	bool PlayCard(unsigned playerId, uint8_t cardId, uint8_t deckId);
 	std::optional<std::vector<uint8_t>> EndTurn(unsigned playerId);
+	void UpdateGameResult();
  
 private:
 	Lobby() = delete;
@@ -90,11 +116,12 @@ private:
 	std::string m_lobbyId;
 	unsigned m_hostId;
 
-	std::unordered_map<unsigned, std::shared_ptr<Player>> m_players;
+	std::unordered_map<unsigned, PlayerInfo> m_players;
 	std::unordered_map<unsigned, std::chrono::steady_clock::time_point> m_lastPingPlayer;
 	unsigned m_lastMessageId{ 0u };
 	std::deque<ChatMessage> m_chatBuffer;
 	std::atomic<bool> m_gameStarted{ false };
+	GameResult m_gameResult{ GameResult::Ongoing };
 	mutable std::mutex m_mutex;
 
 	std::unique_ptr<Table> m_table;

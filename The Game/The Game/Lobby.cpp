@@ -4,8 +4,7 @@ Lobby::Lobby(const std::string& lobbyId, unsigned hostId, const std::string& use
 	m_lobbyId{lobbyId},
 	m_hostId{hostId}
 {
-	auto hostPlayer = std::make_shared<Player>(hostId, username);
-	m_players.emplace(hostId, hostPlayer);
+	m_players.try_emplace(hostId, hostId, username);
 }
 
 bool Lobby::AddPlayer(unsigned playerId, const std::string& username)
@@ -15,8 +14,7 @@ bool Lobby::AddPlayer(unsigned playerId, const std::string& username)
 
 	if (m_players.find(playerId) != m_players.end()) return false;
 
-	auto player = std::make_shared<Player>(playerId, username);
-	m_players[playerId] = player;
+	m_players.try_emplace(playerId, playerId, username);
 	m_lastPingPlayer[playerId] = std::chrono::steady_clock::now();
 
 	if (m_players.size() == 1) m_hostId = playerId;
@@ -63,7 +61,7 @@ RemoveResult Lobby::RemovePlayer(unsigned playerId)
 	m_players.erase(it);
 	m_lastPingPlayer.erase(playerId);
 
-	if (isHost) 
+	if (isHost)
 	{
 		m_hostId = 0u;
 		return RemoveResult::HostRemoved;
@@ -75,17 +73,42 @@ RemoveResult Lobby::RemovePlayer(unsigned playerId)
 	return RemoveResult::Removed;
 }
 
+void Lobby::MarkPlayerAsDisconnected(unsigned playerId)
+{
+	auto it = m_players.find(playerId);
+	if (it == m_players.end()) return;
+
+	it->second.isConnected = false;
+
+	if (m_table) m_table->RemovePlayer(playerId);
+	m_lastPingPlayer.erase(playerId);
+}
+
 RemoveResult Lobby::RemoveMatchPlayer(unsigned playerId)
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
-
 	if (!m_gameStarted || !m_table) return RemoveResult::NotFound;
+
+	auto playerIt = m_players.find(playerId);
+	if (playerIt != m_players.end())
+	{
+		playerIt->second.isConnected = false;
+	}
 
 	bool result = m_table->RemovePlayer(playerId);
 	if (!result) return RemoveResult::NotFound;
 
-	m_players.erase(playerId);
 	m_lastPingPlayer.erase(playerId);
+
+	size_t activePlayers{ 0 };
+	for (const auto& [id, player] : m_players)
+	{
+		if (player.isConnected && m_table->HasPlayer(id))
+		{
+			++activePlayers;
+		}
+	}
+	if (activePlayers < kMinPlayers) m_gameResult = GameResult::NotEnoughPlayers;
 	return RemoveResult::Removed;
 }
 
@@ -108,7 +131,7 @@ std::vector<unsigned> Lobby::GetInactivePlayers(std::chrono::seconds timeout)
 	for (auto& [playerId, lastPing] : m_lastPingPlayer)
 	{
 		if (now - lastPing > timeout)
-			inactive.push_back(playerId);
+			inactive.emplace_back(playerId);
 	}
 	return inactive;
 }
@@ -130,7 +153,7 @@ bool Lobby::StartGame(unsigned playerId)
 	std::vector<std::pair<unsigned, std::string>> lobbyPlayers;
 	for (const auto& [id, player] : m_players)
 	{
-		lobbyPlayers.push_back({ id, player->GetUsername() });
+		lobbyPlayers.push_back({ id, player.username });
 	}
 
 	m_table = std::make_unique<Table>(lobbyPlayers);
@@ -143,7 +166,7 @@ bool Lobby::HasGameStarted() const
 	return m_gameStarted.load();
 }
 
-const std::unordered_map<unsigned, std::shared_ptr<Player>>& Lobby::GetPlayers() const
+const std::unordered_map<unsigned, PlayerInfo>& Lobby::GetPlayers() const
 {
 	return m_players;
 }
@@ -243,13 +266,22 @@ std::optional<std::vector<uint8_t>> Lobby::EndTurn(unsigned playerId)
 {
 	if (!m_gameStarted || !m_table) return std::nullopt;
 	m_table->EndTurn(playerId);
+	UpdateGameResult();
 	return GetPlayerCards(playerId);
+}
+
+void Lobby::UpdateGameResult()
+{
+	if (!m_gameStarted || !m_table) return;
+
+	if (m_table->CheckWinCondition()) m_gameResult = GameResult::Won;
+	else if (m_table->CheckLoseCondition()) m_gameResult = GameResult::Lost;
 }
 
 std::optional<GameResult> Lobby::GetGameResult() const
 {
 	if (!m_gameStarted || !m_table) return std::nullopt;
-	return m_table->GetGameResult();
+	return m_gameResult;
 }
 
 std::optional<std::array<bool, 4>> Lobby::GetValidDecks(uint8_t cardId) const
@@ -271,4 +303,22 @@ std::optional<std::array<bool, 4>> Lobby::GetValidDecks(uint8_t cardId) const
 		}
 	}
 	return std::make_optional(validDecks);
+}
+
+std::optional<std::vector<PlayerState>> Lobby::GetPlayerStates() const
+{
+	if (!m_gameStarted || !m_table) return std::nullopt;
+
+	std::vector<PlayerState> playerStates;
+	playerStates.reserve(m_players.size());
+	for (const auto& [playerId, playerInfo] : m_players)
+	{
+		playerStates.emplace_back(
+			PlayerState{
+				playerInfo.username,
+				playerInfo.isConnected && m_table->HasPlayer(playerId)
+			}
+		);
+	}
+	return playerStates;
 }

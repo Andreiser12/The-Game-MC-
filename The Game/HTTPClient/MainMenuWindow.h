@@ -6,9 +6,6 @@
 #include "Utils.h"
 
 #include <iostream>
-#include <vector>
-#include <array>
-#include <optional>
 
 class MainMenuWindow : IWindow
 {
@@ -28,6 +25,7 @@ public:
 private:
 	void LoadWidgets() override;
 	void GoBackToMenu();
+	void HandleLocalPlayerLeft();
 
 private:
 	sf::RenderWindow& m_window;
@@ -74,12 +72,5 @@ private:
 	unsigned m_framerateIndex{ 1u };
 	bool m_isFullscreen{ true };
 	ApiClient& m_apiClient;
-
-	/*std::vector<sf::Texture> m_bgFrames;
-	std::optional<sf::Sprite> m_bgSprite;
-	std::size_t m_bgCurrentFrame = 0;
-	sf::Clock m_bgClock;
-	const float m_bgFrameDuration = 1.f / 24.f;*/
-
 };
 

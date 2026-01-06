@@ -1,8 +1,9 @@
 ﻿#include "GamePanel.h"
 
 GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
-	std::function<void()> onExit) :
-	m_gui{ gui }, m_apiClient{ api }, m_onExitToMenu{ std::move(onExit) }
+	std::function<void()> onExit, std::function<void()> onLocalPlayerLeft) :
+	m_gui{ gui }, m_apiClient{ api },
+	m_onExitToMenu{ std::move(onExit) }, m_onLocalPlayerLeft{ std::move(onLocalPlayerLeft) }
 {
 	m_root = tgui::Group::create({ "100%", "100%" });
 	m_gui.add(m_root);
@@ -11,14 +12,14 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	m_root->add(gamePanel);
 
 	auto gameBackground = tgui::Picture::create("assets/images/gameBackground.jpg");
-	gameBackground->setSize( "100%", "100%" );
-	gameBackground->setPosition( "0%", "0%" );
+	gameBackground->setSize("100%", "100%");
+	gameBackground->setPosition("0%", "0%");
 	gamePanel->add(gameBackground);
 	gameBackground->moveToBack();
 
 	auto canvas = tgui::CanvasSFML::create();
-	canvas->setSize( "70%", "50%" );
-	canvas->setPosition( "50%", "50%" );
+	canvas->setSize("70%", "50%");
+	canvas->setPosition("50%", "50%");
 	canvas->setOrigin(0.5f, 0.5f);
 	gamePanel->add(canvas);
 
@@ -52,19 +53,19 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	canvas->display();
 
 	auto chatGroup = tgui::Group::create({ "100%", "100%" });
-	chatGroup->setPosition( "0%", "0%" );
+	chatGroup->setPosition("0%", "0%");
 	gamePanel->add(chatGroup);
 
 	m_chat = tgui::ChatBox::create();
-	m_chat->setSize("27.5%", "25%" );
-	m_chat->setPosition( "0%", "0%" );
+	m_chat->setSize("27.5%", "25%");
+	m_chat->setPosition("0%", "0%");
 	m_chat->setTextSize(25);
 	m_chat->getRenderer()->setOpacity(0.7f);
 	chatGroup->add(m_chat);
 
 	auto chatEditBox = tgui::EditBox::create();
-	chatEditBox->setSize( "22.5%", "5%" );
-	chatEditBox->setPosition("0", "25%" );
+	chatEditBox->setSize("22.5%", "5%");
+	chatEditBox->setPosition("0", "25%");
 	chatEditBox->setTextSize(25);
 	chatEditBox->getRenderer()->setOpacity(0.5f);
 	chatEditBox->setDefaultText("Message...");
@@ -94,8 +95,8 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	chatGroup->add(chatEditBox);
 
 	auto sendButton = tgui::Button::create("Send");
-	sendButton->setSize( "5%", "5%" );
-	sendButton->setPosition( "22.5%", "25%" );
+	sendButton->setSize("5%", "5%");
+	sendButton->setPosition("22.5%", "25%");
 	sendButton->setTextSize(25);
 	sendButton->onPress([this, chatEditBox]()
 		{
@@ -115,8 +116,8 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	chatGroup->add(sendButton);
 
 	auto toggleChatButton = tgui::Button::create("^");
-	toggleChatButton->setSize( "3%", "3%" );
-	toggleChatButton->setPosition( "24.5%", "0%" );
+	toggleChatButton->setSize("3%", "3%");
+	toggleChatButton->setPosition("24.5%", "0%");
 	toggleChatButton->setTextSize(25);
 	toggleChatButton->onPress([toggleChatButton, chatGroup]()
 		{
@@ -142,7 +143,7 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	for (const auto& deck : m_decks)
 	{
 		auto deckPanel = deck->GetDeckPanel();
-		deckPanel->setSize( "2.25%", "6.5%" );
+		deckPanel->setSize("2.25%", "6.5%");
 		deckPanel->setPosition({
 			tgui::String(std::to_string(xDeckPosition) + "%"),
 			tgui::String(std::to_string(yDeckPosition) + "%")
@@ -152,7 +153,7 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	}
 	m_pileWidget = std::make_shared<PileWidget>(PileWidget());
 	auto pilePanel = m_pileWidget->GetPilePanel();
-	pilePanel->setSize( "2.25%", "6.5%" );
+	pilePanel->setSize("2.25%", "6.5%");
 	pilePanel->setPosition({
 		tgui::String(std::to_string(xDeckPosition) + "%"),
 		tgui::String(std::to_string(yDeckPosition) + "%")
@@ -160,8 +161,8 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	m_root->add(pilePanel);
 
 	m_endTurnButton = tgui::Button::create("End Turn");
-	m_endTurnButton->setSize( "14%", "9%" );
-	m_endTurnButton->setPosition( "85%", "90%" );
+	m_endTurnButton->setSize("14%", "9%");
+	m_endTurnButton->setPosition("85%", "90%");
 	m_endTurnButton->getRenderer()->setBorders(2);
 	m_endTurnButton->getRenderer()->setBorderColor(tgui::Color(100, 20, 30));
 	m_endTurnButton->onSizeChange([this](tgui::Vector2f size)
@@ -204,7 +205,13 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	m_leaveMatchButton->getRenderer()->setBackgroundColorDown(tgui::Color(60, 60, 65));
 	m_leaveMatchButton->onPress([this]()
 		{
+			auto result = m_apiClient.LeaveMatch();
+			if (!result) return;
 
+			if (result == LeaveMatchResult::Success)
+			{
+				if (m_onLocalPlayerLeft) m_onLocalPlayerLeft();
+			}
 		});
 	m_root->add(m_leaveMatchButton);
 
@@ -240,7 +247,7 @@ void GamePanel::UpdateGame()
 			OnTurnTimeout();
 		}
 
-		int seconds = static_cast<int>(m_timeLeft);
+		uint8_t seconds = static_cast<uint8_t>(m_timeLeft);
 		std::string secStr = std::to_string(seconds);
 		if (seconds < 10)
 		{
@@ -270,12 +277,13 @@ void GamePanel::UpdateGame()
 	UpdateEndTurnButton();
 	UpdateTurnState();
 	UpdateTableState();
+	UpdatePlayerStates();
 
-	auto result = m_apiClient.SnapshotGameResult();
-	if (result && *result != GameResult::Ongoing)
+	const auto gameResultOpt = m_apiClient.SnapshotGameResult();
+	if (gameResultOpt && gameResultOpt.value() != GameResult::Ongoing)
 	{
 		m_gameFinished = true;
-		HandleGameResult(*result);
+		HandleGameResult(gameResultOpt.value());
 	}
 }
 
@@ -340,6 +348,17 @@ void GamePanel::UpdateTurnState()
 	}
 }
 
+void GamePanel::UpdatePlayerStates()
+{
+	const auto& playerStates = m_apiClient.SnapshotPlayerStates();
+	if (!playerStates) return;
+
+	for (const auto& state : playerStates.value())
+	{
+		if (!state.isInMatch) MarkPlayerAsLeft(state.username);
+	}
+}
+
 void GamePanel::SetupPlayerSlots()
 {
 	auto playerUsernames = m_apiClient.SnapshotPlayers();
@@ -355,30 +374,33 @@ void GamePanel::SetupPlayerSlots()
 
 	for (size_t index = 0; index < playerUsernames.size(); index++)
 	{
-		auto userPanel = tgui::Panel::create({ "14%", "12%" });
-		userPanel->setPosition(
+		PlayerSlotWidget slotWidget;
+		slotWidget.username = playerUsernames[index];
+
+		slotWidget.panel = tgui::Panel::create({ "14%", "12%" });
+		slotWidget.panel->setPosition(
 			tgui::String(std::to_string(slots[index].xPercent) + "%"),
 			tgui::String(std::to_string(slots[index].yPercent) + "%")
 		);
-		userPanel->getRenderer()->setBackgroundColor(tgui::Color::Transparent);
-		userPanel->getRenderer()->setBorders(1);
-		userPanel->getRenderer()->setBorderColor(tgui::Color::Black);
-		userPanel->getRenderer()->setOpacity(0.95f);
+		slotWidget.panel->getRenderer()->setBackgroundColor(tgui::Color::Transparent);
+		slotWidget.panel->getRenderer()->setBorders(1);
+		slotWidget.panel->getRenderer()->setBorderColor(tgui::Color::Black);
+		slotWidget.panel->getRenderer()->setOpacity(0.95f);
 
 		auto infoPanel = tgui::Panel::create({ "70%", "100%" });
-		infoPanel->setPosition({ "30%", "0%" });
+		infoPanel->setPosition("30%", "0%");
 		infoPanel->getRenderer()->setBackgroundColor(tgui::Color(40, 40, 40));
 
-		auto userLabel = tgui::Label::create(Utils::TruncateText(
+		slotWidget.nameLabel = tgui::Label::create(Utils::TruncateText(
 			tgui::String(playerUsernames[index]), kmaxChars));
-		userLabel->setAutoSize(false);
-		userLabel->setSize({ "90%", "40%" });
-		userLabel->setPosition({ "50%", "50%" });
-		userLabel->setOrigin(0.5f, 0.5f);
-		userLabel->setTextSize(20);
-		userLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
-		userLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-		userLabel->getRenderer()->setTextColor(tgui::Color::White);
+		slotWidget.nameLabel->setAutoSize(false);
+		slotWidget.nameLabel->setSize("90%", "40%");
+		slotWidget.nameLabel->setPosition("50%", "50%");
+		slotWidget.nameLabel->setOrigin(0.5f, 0.5f);
+		slotWidget.nameLabel->getRenderer()->setTextSize(20);
+		slotWidget.nameLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+		slotWidget.nameLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+		slotWidget.nameLabel->getRenderer()->setTextColor(tgui::Color::White);
 
 		if (index == 0)
 		{
@@ -387,24 +409,25 @@ void GamePanel::SetupPlayerSlots()
 		}
 		else
 		{
-			CreatePlayerHand(index, slots[index]);
+			CreatePlayerHand(index, slots[index], slotWidget.cards);
 		}
 
-		infoPanel->add(userLabel);
+		infoPanel->add(slotWidget.nameLabel);
 
 		auto avatarPanel = tgui::Panel::create({ "32.5%", "100%" });
-		avatarPanel->setPosition({ "0%", "0%" });
+		avatarPanel->setPosition("0%", "0%");
 		avatarPanel->getRenderer()->setBackgroundColor(tgui::Color(40, 40, 40));
 
 		auto userAvatar = tgui::Picture::create("assets/images/playerDefaultAvatar.jpg");
-		userAvatar->setSize({ "100%", "100%" });
-		userAvatar->setPosition({ "0%", "0%" });
+		userAvatar->setSize("100%", "100%");
+		userAvatar->setPosition("0%", "0%");
 		userAvatar->setIgnoreMouseEvents(true);
 
 		avatarPanel->add(userAvatar);
-		userPanel->add(avatarPanel);
-		userPanel->add(infoPanel);
-		m_root->add(userPanel);
+		slotWidget.panel->add(avatarPanel);
+		slotWidget.panel->add(infoPanel);
+		m_root->add(slotWidget.panel);
+		m_playerSlots[slotWidget.username] = slotWidget;
 	}
 }
 
@@ -522,7 +545,8 @@ void GamePanel::OnTurnTimeout()
 	}
 }
 
-void GamePanel::CreatePlayerHand(size_t playerIndex, const PlayerSlot& slot)
+void GamePanel::CreatePlayerHand(size_t playerIndex, const PlayerSlot& slot,
+	std::vector<std::shared_ptr<CardWidget>>& outCards)
 {
 	const auto& playerCards = m_apiClient.GetPlayerCards();
 	if (!playerCards) return;
@@ -548,6 +572,7 @@ void GamePanel::CreatePlayerHand(size_t playerIndex, const PlayerSlot& slot)
 			tgui::String(std::to_string(startY) + "%")
 		);
 		m_root->add(card->GetWidget());
+		outCards.emplace_back(card);
 	}
 }
 
@@ -609,7 +634,7 @@ void GamePanel::HandleGameResult(GameResult result)
 	{
 		card->SetDraggable(false);
 	}
-		
+
 	m_endTurnButton->setEnabled(false);
 	ShowGameResultOverlay(result);
 }
@@ -622,7 +647,7 @@ void GamePanel::ShowGameResultOverlay(GameResult result)
 	);
 
 	auto dialog = tgui::Panel::create({ "40%", "30%" });
-	dialog->setPosition( "50%", "50%" );
+	dialog->setPosition("50%", "50%");
 	dialog->setOrigin(0.5f, 0.5f);
 	dialog->getRenderer()->setBackgroundColor(tgui::Color(40, 40, 40));
 	dialog->getRenderer()->setBorders(2);
@@ -631,23 +656,49 @@ void GamePanel::ShowGameResultOverlay(GameResult result)
 	auto gameResultLabel = tgui::Label::create(
 		result == GameResult::Won ? "YOU WON!" : "YOU LOST!"
 	);
-	gameResultLabel->setTextSize(36);
+	gameResultLabel->getRenderer()->setTextSize(36);
 	gameResultLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
-	gameResultLabel->setPosition( "50%", "30%" );
+	gameResultLabel->setPosition("50%", "30%");
 	gameResultLabel->setOrigin(0.5f, 0.5f);
 
 	auto backToMenuButton = tgui::Button::create("Back to Menu");
-	backToMenuButton->setSize( "40%", "20%" );
-	backToMenuButton->setPosition( "50%", "70%" );
+	backToMenuButton->setSize("40%", "20%");
+	backToMenuButton->setPosition("50%", "70%");
 	backToMenuButton->setOrigin(0.5f, 0.5f);
-	backToMenuButton->setTextSize(20);
+	backToMenuButton->getRenderer()->setTextSize(20);
 	backToMenuButton->onPress([this]()
-	{
-		if (m_onExitToMenu) m_onExitToMenu();
-	});
+		{
+			if (m_onExitToMenu) m_onExitToMenu();
+		});
 
 	dialog->add(gameResultLabel);
 	dialog->add(backToMenuButton);
 	overlay->add(dialog);
 	m_root->add(overlay);
+}
+
+void GamePanel::MarkPlayerAsLeft(const std::string& username)
+{
+	auto it = m_playerSlots.find(username);
+	if (it == m_playerSlots.end()) return;
+
+	auto& slot = it->second;
+	if (!slot.isActive) return;
+
+	slot.isActive = false;
+	for (auto& card : slot.cards)
+	{
+		m_root->remove(card->GetWidget());
+	}
+	slot.cards.clear();
+
+	slot.panel->getRenderer()->setBackgroundColor(tgui::Color(60, 60, 60, 100));
+	slot.panel->getRenderer()->setBorderColor(tgui::Color(80, 80, 80));
+	slot.nameLabel->setText(slot.nameLabel->getText() + " (Left)");
+	slot.nameLabel->getRenderer()->setTextColor(tgui::Color(150, 150, 150));
+
+	auto overlay = tgui::Panel::create({ "100%", "100%" });
+	overlay->getRenderer()->setBackgroundColor(tgui::Color(40, 40, 40, 120));
+	overlay->setIgnoreMouseEvents(true);
+	slot.panel->add(overlay);
 }

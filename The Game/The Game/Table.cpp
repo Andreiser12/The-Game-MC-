@@ -137,6 +137,12 @@ void Table::AdvanceTurn()
 	} while (true);
 }
 
+bool Table::HasPlayer(unsigned playerId) const
+{
+	auto it = m_playersMap.find(playerId);
+	return it != m_playersMap.end();
+}
+
 constexpr std::size_t Table::GetDeckIndex(DeckIndex index) const noexcept
 {
 	return static_cast<std::size_t>(index);
@@ -217,11 +223,6 @@ void Table::RunBotTurn(unsigned playerId)
 std::size_t Table::GetDrawPileCount() const
 {
 	return m_pile.size();
-}
-
-GameResult Table::GetGameResult() const
-{
-	return m_gameResult;
 }
 
 Deck& Table::GetDeck(uint8_t deckId) const
@@ -333,14 +334,6 @@ std::vector<uint8_t> Table::EndTurn(unsigned playerId)
 	}
 	player.ResetCardsPlaced();
 	AdvanceTurn();
-	if (CheckWinCondition())
-	{
-		m_gameResult = GameResult::Won;
-	}
-	else if (CheckLoseCondition())
-	{
-		m_gameResult = GameResult::Lost;
-	}
 	return drawnCards;
 }
 
@@ -349,9 +342,28 @@ bool Table::RemovePlayer(unsigned playerId)
 	auto it = m_playersMap.find(playerId);
 	if (it == m_playersMap.end()) return false;
 
+	auto turnIt = std::find(m_turnOrder.begin(), m_turnOrder.end(), playerId);
+	if (turnIt != m_turnOrder.end())
+	{
+		if (m_currentTurnIndex == std::distance(m_turnOrder.begin(), turnIt))
+		{
+			if (m_currentTurnIndex == m_turnOrder.size() - 1)
+			{
+				m_currentTurnIndex = 0;
+			}
+		}
+		else if (m_currentTurnIndex > std::distance(m_turnOrder.begin(), turnIt))
+		{
+			--m_currentTurnIndex;
+		}
+		m_turnOrder.erase(turnIt);
+	}
+
 	MoveCardsToPile(it->second);
 	m_playersMap.erase(playerId);
 	--m_playerCount;
+
+	if (m_currentTurnIndex >= m_turnOrder.size() && !m_turnOrder.empty()) m_currentTurnIndex = 0;
 	return true;
 }
 

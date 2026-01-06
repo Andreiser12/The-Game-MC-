@@ -17,13 +17,6 @@ import Player;
 import Deck;
 import DatabaseManager;
 
-export enum class GameResult 
-{
-	Ongoing,
-	Won,
-	Lost,
-};
-
 export class Table
 {
 public:
@@ -42,6 +35,7 @@ public:
 	bool BackwardsTrick(uint8_t deckId, const Card<uint8_t>& card) const;
 	bool PlayCard(unsigned playerId, uint8_t deckId, const Card<uint8_t>& card) const;
 	void AdvanceTurn();
+	bool HasPlayer(unsigned playerId) const;
 
 	bool CanPlayerPlayMinCards(const Player& player, uint8_t minCards) const;
 	void PlaceCardOnDeck(uint8_t deckIndex, const Card<uint8_t>& card);
@@ -59,7 +53,6 @@ public:
 	Player& GetPlayer(unsigned playerId);
 	unsigned GetCurrentPlayerId() const;
 	std::size_t GetDrawPileCount() const;
-	GameResult GetGameResult() const;
 
 	constexpr std::size_t GetDeckIndex(DeckIndex index) const noexcept;
 
@@ -77,6 +70,5 @@ private:
 	std::array<std::unique_ptr<Deck>, 4> m_decks;
 	std::vector<unsigned> m_turnOrder;
 	std::size_t m_currentTurnIndex{ 0 };
-	GameResult m_gameResult{ GameResult::Ongoing };
 };
 

@@ -13,7 +13,7 @@ LobbyManager& LobbyManager::Instance()
 			{
 				std::this_thread::sleep_for(std::chrono::seconds(5));
 				auto& manager = LobbyManager::Instance();
-				manager.CleanupInactivePlayers();
+				//manager.CleanupInactivePlayers();
 			}
 			}).detach();
 	}
@@ -57,22 +57,22 @@ bool LobbyManager::RemoveLobby(const std::string& id)
 	return false;
 }
 
-void LobbyManager::CleanupInactivePlayers()
-{
-	std::lock_guard<std::mutex> lock(m_mutex);
-
-	for (auto& [lobbyId, lobby] : m_lobbies)
-	{
-		auto inactivePlayers = lobby->GetInactivePlayers(std::chrono::seconds(15));
-		for (auto playerId : inactivePlayers)
-		{
-			auto result = lobby->RemovePlayer(playerId);
-			if (result == RemoveResult::HostRemoved)
-			{
-				m_lobbies.erase(lobbyId);
-				break;
-			}
-		}
-	}
-}
+//void LobbyManager::CleanupInactivePlayers()
+//{
+//	std::lock_guard<std::mutex> lock(m_mutex);
+//
+//	for (auto& [lobbyId, lobby] : m_lobbies)
+//	{	
+//		auto inactivePlayers = lobby->GetInactivePlayers(std::chrono::seconds(15));
+//		for (auto playerId : inactivePlayers)
+//		{
+//			auto result = lobby->RemovePlayer(playerId);
+//			if (result == RemoveResult::HostRemoved)
+//			{
+//				m_lobbies.erase(lobbyId);
+//				break;
+//			}
+//		}
+//	}
+//}
 

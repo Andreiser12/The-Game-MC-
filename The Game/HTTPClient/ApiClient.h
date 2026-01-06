@@ -29,6 +29,7 @@ enum class GameResult
 	Ongoing,
 	Won,
 	Lost,
+	NotEnoughPlayers
 };
 
 enum class LeaveMatchResult
@@ -63,7 +64,7 @@ struct LobbyState
 
 struct GameTableState
 {
-	int drawPileCount = 0;
+	int drawPileCount{ 0 };
 };
 
 struct EndTurnState
@@ -77,6 +78,12 @@ struct TurnState
 {
 	bool isMyTurn;
 	unsigned currentPlayerId;
+};
+
+struct PlayerState
+{
+	std::string username;
+	bool isInMatch;
 };
 
 class ApiClient
@@ -93,6 +100,7 @@ public:
 	bool LeaveLobby(const std::string& lobbyId, unsigned playerId);
 	std::optional<LeaveMatchResult> LeaveMatch();
 	std::optional<LobbyState> GetLobbyState(const std::string& lobbyId);
+	std::optional<std::vector<PlayerState>> GetPlayerStates();
 
 	bool StartMatch(const std::string& lobbyId, unsigned playerId);
 	bool SendChatMessage(const std::string& message);
@@ -131,6 +139,8 @@ public:
 	std::optional<GameTableState> SnapshotGameTableState() const;
 	std::optional<TurnState> SnapshotTurnState() const;
 	std::optional<GameResult> SnapshotGameResult() const;
+	std::optional<std::vector<PlayerState>> SnapshotPlayerStates() const;
+
 	std::optional<std::vector<DeckState>> GetDeckState() const;
 	std::optional<EndTurnState> GetEndTurnState() const;
 	std::vector<std::string> GetLobbyPlayers(const std::string& lobbyId) const;
@@ -168,5 +178,6 @@ private:
 	std::optional<EndTurnState> m_cachedEndTurnState;
 	std::optional<TurnState> m_cachedTurnState;
 	std::optional<GameResult> m_cachedGameResult;
+	std::optional<std::vector<PlayerState>> m_cachedPlayerStates;
 	std::unordered_map<uint8_t, std::optional<std::array<bool, 4>>> m_cachedValidDecks;
 };

@@ -6,7 +6,6 @@
 #include "CardWidget.h"
 #include "DeckWidget.h"
 #include "PileWidget.h"
-
 #include <span>
 
 struct PlayerSlot
@@ -15,19 +14,29 @@ struct PlayerSlot
 	float yPercent;
 };
 
+struct PlayerSlotWidget
+{
+	std::string username;
+	tgui::Panel::Ptr panel;
+	tgui::Label::Ptr nameLabel;
+	std::vector<std::shared_ptr<CardWidget>> cards;
+	bool isActive{ true };
+};
+
 using SlotArray = std::span<const PlayerSlot>;
 
 class GamePanel
 {
 public:
-	explicit GamePanel(tgui::Gui& gui, ApiClient& api,
-		std::function<void()> onExit);
+	explicit GamePanel(tgui::Gui& gui, ApiClient& api, std::function<void()> onExit,
+		std::function<void()> onLocalPlayerLeft);
 	void UpdateGame();
 	void UpdateDecks();
 	void UpdateEndTurnButton();
 	void UpdateChat();
 	void UpdateTableState();
 	void UpdateTurnState();
+	void UpdatePlayerStates();
 	void SetupPlayerSlots();
 	void OnGameStarted();
 	void HandleMouseEvent(const sf::Event& event);
@@ -36,6 +45,8 @@ public:
 	~GamePanel();
 
 	void OnTurnTimeout();
+
+	void MarkPlayerAsLeft(const std::string& username);
 
 private:
 	inline SlotArray GetSlotsForPlayerCount(size_t count)
@@ -49,7 +60,7 @@ private:
 			default: return {};
 		}
 	}
-	void CreatePlayerHand(size_t playerIndex, const PlayerSlot& slot);
+	void CreatePlayerHand(size_t playerIndex, const PlayerSlot& slot, std::vector<std::shared_ptr<CardWidget>>& outCards);
 	void CreateMyHand();
 	void ClearMyHand();
 	void RebuildMyHand();
@@ -60,10 +71,12 @@ private:
 	unsigned m_lastMessageId{ 0u };
 	tgui::Gui& m_gui;
 	tgui::Group::Ptr m_root;
+	std::unordered_map<std::string, PlayerSlotWidget> m_playerSlots;
 	tgui::ChatBox::Ptr m_chat;
 	sf::Clock m_chatClock;
 	ApiClient& m_apiClient;
 	std::function<void()> m_onExitToMenu;
+	std::function<void()> m_onLocalPlayerLeft;
 
 	inline static constexpr std::array<PlayerSlot, 2> k_slots2{ {
 		{45.0f, 75.0f},

@@ -21,9 +21,7 @@ inline static std::string GenerateLobbyId()
 
 LobbyRoutes::LobbyRoutes(LobbyManager& manager, DatabaseManager& db) :
 	m_manager{ manager },
-	m_db{ db }
-{
-}
+	m_db{ db } {}
 
 void LobbyRoutes::Register(crow::SimpleApp& app)
 {
@@ -131,6 +129,12 @@ void LobbyRoutes::Register(crow::SimpleApp& app)
 			{
 				return this->LeaveMatch(lobbyId, playerId);
 			});
+
+	CROW_ROUTE(app, "/lobby/<string>/players/states").methods("GET"_method)
+		([this](const std::string& lobbyId)
+			{
+				return this->GetPlayerStates(lobbyId);
+			});
 }
 
 crow::response LobbyRoutes::CreateLobby(const crow::request& request)
@@ -140,12 +144,11 @@ crow::response LobbyRoutes::CreateLobby(const crow::request& request)
 
 	const std::string lobbyId = GenerateLobbyId();
 	auto lobby = m_manager.CreateLobby(lobbyId, json["playerId"].i(), json["username"].s());
-	if (!lobby) return crow::response(500, "Failed to create lobby!");
+	if (!lobby) return crow::response(500, "Failed to create lobby");
 
 	crow::json::wvalue data;
 	data["lobbyId"] = lobbyId;
 	data["status"] = "Lobby created successfully!";
-
 	return crow::response(200, data);
 }
 
@@ -180,7 +183,7 @@ crow::response LobbyRoutes::LeaveLobby(const crow::request& request)
 	if (!body) return crow::response(400, "Invalid JSON");
 
 	const std::string lobbyId = body["lobbyId"].s();
-	const unsigned playerId = body["playerId"].i();
+	const unsigned playerId = static_cast<unsigned>(body["playerId"].i());
 
 	auto lobby = m_manager.GetLobby(lobbyId);
 	if (!lobby) return crow::response(404, "Lobby not found");
@@ -188,16 +191,15 @@ crow::response LobbyRoutes::LeaveLobby(const crow::request& request)
 	auto result = lobby->RemovePlayer(playerId);
 	if (result == RemoveResult::NotFound) return crow::response(404, "Player not found");
 
+	crow::json::wvalue data;
 	if (result == RemoveResult::HostRemoved)
 	{
 		m_manager.RemoveLobby(lobbyId);
-		crow::json::wvalue data;
 		data["status"] = "LOBBY_DELETED";
 		data["message"] = "Host left. Lobby closed.";
 		return crow::response(200, data);
 	}
 
-	crow::json::wvalue data;
 	data["status"] = "PLAYER_LEFT";
 	data["message"] = "Player left lobby.";
 	return crow::response(200, data);
@@ -304,7 +306,7 @@ crow::response LobbyRoutes::FetchLobbyPlayers(const std::string& lobbyId)
 	const auto& players = lobby->GetPlayers();
 	for (const auto& [playerId, player] : players)
 	{
-		playersList.push_back(player->GetUsername());
+		playersList.push_back(player.username);
 	}
 	data["players"] = std::move(playersList);
 
@@ -533,6 +535,11 @@ crow::response LobbyRoutes::GetGameResult(const std::string& lobbyId)
 	case GameResult::Ongoing:
 		data["result"] = "ongoing";
 		break;
+	case GameResult::NotEnoughPlayers:
+		data["result"] = "NOT_ENOUGH_PLAYERS";
+		break;
+	default:
+		return crow::response(500);
 	}
 	return crow::response(200, data);
 }
@@ -549,11 +556,32 @@ crow::response LobbyRoutes::GetValidDecks(const crow::request& request, const st
 	auto validDecksOpt{ lobby->GetValidDecks(cardId) };
 	if (!validDecksOpt) return crow::response(409, "Cannot get valid decks");
 
+	const auto& validDecks = validDecksOpt.value();
 	crow::json::wvalue data;
 	data["decks"] = crow::json::wvalue::list();
-	for (size_t i = 0; i < validDecksOpt.value().size(); i++)
+	for (size_t i = 0; i < validDecks.size(); i++)
 	{
-		data["decks"][i] = validDecksOpt.value()[i];
+		data["decks"][i] = validDecks[i];
+	}
+	return crow::response(200, data);
+}
+
+crow::response LobbyRoutes::GetPlayerStates(const std::string& lobbyId)
+{
+	auto lobby = m_manager.GetLobby(lobbyId);
+	if (!lobby) return crow::response(404, "Lobby not found");
+
+	const auto& statesOpt = lobby->GetPlayerStates();
+	if (!statesOpt) return crow::response(409);
+	const auto& states = statesOpt.value();
+
+	crow::json::wvalue data;
+	data["USERNAMES"] = crow::json::wvalue::list(states.size());
+	data["IS_IN_MATCH"] = crow::json::wvalue::list(states.size());
+	for (size_t i =0; i<states.size(); ++i)
+	{
+		data["USERNAMES"][i] = states[i].username;
+		data["IS_IN_MATCH"][i] = states[i].isInMatch;
 	}
 	return crow::response(200, data);
 }

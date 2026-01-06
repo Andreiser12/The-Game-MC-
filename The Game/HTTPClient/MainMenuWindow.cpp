@@ -1,7 +1,5 @@
 ﻿#include "MainMenuWindow.h"
 
-constexpr static uint8_t K_TEXT_SIZE{ 24u };
-
 MainMenuWindow::MainMenuWindow(sf::RenderWindow& window, ApiClient& api) :
 	m_window{ window },
 	m_mainMenu{ window },
@@ -9,88 +7,53 @@ MainMenuWindow::MainMenuWindow(sf::RenderWindow& window, ApiClient& api) :
 {
 	m_mainMenu.setFont("assets/fonts/Cinzel-Regular.ttf");
 	m_background = tgui::Picture::create("assets/images/mainMenuBackground.png");
-	m_background->setSize({ "100%", "100%" });
-	m_background->setPosition({ "0%", "0%" });
+	m_background->setSize("100%", "100%");
+	m_background->setPosition("0%", "0%");
 	m_mainMenu.add(m_background);
 
 	auto gameTitle = tgui::Picture::create("assets/images/gameTitle.png");
-	gameTitle->setSize({ "50%", "50%" });
-	gameTitle->setPosition({ "50%", "15%" });
+	gameTitle->setSize("50%", "50%");
+	gameTitle->setPosition("50%", "15%");
 	gameTitle->setOrigin(0.5f, 0.1f);
 	m_mainMenu.add(gameTitle);
 
 	auto buttonsBackground = tgui::Picture::create("assets/images/buttonsBackground.png");
-	buttonsBackground->setSize({ "90%", "90%" });
-	buttonsBackground->setPosition({ "50%", "50%" });
+	buttonsBackground->setSize("90%", "90%");
+	buttonsBackground->setPosition("50%", "50%");
 	buttonsBackground->setOrigin(0.5f, 0.5f);
 	m_mainMenu.add(buttonsBackground);
 
 	auto cardsImage = tgui::Picture::create("assets/images/cardsMainMenuImage.png");
-	cardsImage->setSize({ "67%", "67%" });
-	cardsImage->setPosition({ "80%", "60%" });
+	cardsImage->setSize("67%", "67%");
+	cardsImage->setPosition("80%", "60%");
 	cardsImage->setOrigin(0.5f, 0.5f);
 	cardsImage->getRenderer()->setOpacity(0.95f);
 
 	auto cardsShadow = tgui::Picture::create("assets/images/cardsMainMenuImage.png");
-	cardsShadow->setSize({ "67%", "67%" });
-	cardsShadow->setPosition({ "80% + 5", "60% + 5" }); 
+	cardsShadow->setSize("67%", "67%");
+	cardsShadow->setPosition("80% + 5", "60% + 5");
 	cardsShadow->setOrigin(0.5f, 0.5f);
 	cardsShadow->getRenderer()->setOpacity(0.3f);
 	m_mainMenu.add(cardsShadow);
 	m_mainMenu.add(cardsImage);
-
 	LoadWidgets();
-
-	/*const int frameCount = 60;
-	m_bgFrames.reserve(frameCount);
-
-	for (int i = 0; i < frameCount; i++)
-	{
-		sf::Texture tempTex;
-
-		std::string filename = "assets/images/TheGameLevelSequence-ezgif.com-speed" + std::to_string(i) + ".png";
-
-		if (!tempTex.loadFromFile(filename))
-		{
-			std::cerr << "Eroare la incarcarea imaginii: "  << filename << std::endl;
-			continue;
-		}
-		m_bgFrames.push_back(std::move(tempTex));
-	}
-
-	if (!m_bgFrames.empty())
-	{
-		m_bgSprite.emplace();
-		m_bgSprite->setTexture(m_bgFrames[0], true);
-		m_bgSprite->setPosition({ 0.f, 0.f });
-
-		auto texSize = m_bgFrames[0].getSize();
-		auto winSize = m_window.getSize();
-
-		sf::Vector2f scale{
-			static_cast<float>(winSize.x) / texSize.x,
-			static_cast<float>(winSize.y) / texSize.y
-		};
-
-		m_bgSprite->setScale(scale);
-	}*/
 }
 
 void MainMenuWindow::LoadWidgets()
 {
 	auto playButton = tgui::Button::create();
-	playButton->setSize({ "14%", "5%" });
-	playButton->setPosition({ "50%", "47.5%" });
+	playButton->getRenderer()->setTexture("assets/images/buttons.png");
+	playButton->setSize("14%", "5%");
+	playButton->setPosition("50%", "47.5%");
 	playButton->setOrigin(0.5f, 0.5f);
 	playButton->setText("Play");
-	playButton->getRenderer()->setTexture("assets/images/buttons.png");
 	Utils::StyleButton(playButton);
 	m_mainMenu.add(playButton);
 	playButton->onClick([this] {PlayPanelPressed(); });
 
 	auto profileButton = tgui::Button::create();
-	profileButton->setSize({ "14%", "5%" });
-	profileButton->setPosition({ "50%", "57.5%" });
+	profileButton->setSize("14%", "5%");
+	profileButton->setPosition("50%", "57.5%");
 	profileButton->setOrigin(0.5f, 0.5f);
 	profileButton->setText("Profile");
 	profileButton->getRenderer()->setTexture("assets/images/buttons.png");
@@ -99,8 +62,8 @@ void MainMenuWindow::LoadWidgets()
 	m_mainMenu.add(profileButton);
 
 	auto settingsButton = tgui::Button::create();
-	settingsButton->setSize({ "14%", "5%" });
-	settingsButton->setPosition({ "50%", "67.5%" });
+	settingsButton->setSize("14%", "5%");
+	settingsButton->setPosition("50%", "67.5%");
 	settingsButton->setOrigin(0.5f, 0.5f);
 	settingsButton->setText("Settings");
 	settingsButton->getRenderer()->setTexture("assets/images/buttons.png");
@@ -109,8 +72,8 @@ void MainMenuWindow::LoadWidgets()
 	settingsButton->onClick([this] { SettingsButtonPressed(); });
 
 	auto exitButton = tgui::Button::create();
-	exitButton->setSize({ "14%", "5%" });
-	exitButton->setPosition({ "50%", "77.5%" });
+	exitButton->setSize("14%", "5%");
+	exitButton->setPosition("50%", "77.5%");
 	exitButton->setOrigin(0.5f, 0.5f);
 	exitButton->setText("Exit");
 	exitButton->getRenderer()->setTexture("assets/images/buttons.png");
@@ -121,31 +84,45 @@ void MainMenuWindow::LoadWidgets()
 
 void MainMenuWindow::GoBackToMenu()
 {
-	const std::string lobbyId = m_apiClient.GetLobbyId();
-	const unsigned playerId = m_apiClient.GetPlayerId();
 
-	if (!lobbyId.empty() && playerId != 0) m_apiClient.LeaveLobby(lobbyId, playerId);
+	if (!m_apiClient.GetLobbyId().empty() && m_apiClient.GetPlayerId() != 0u)
+		m_apiClient.LeaveLobby(m_apiClient.GetLobbyId(), m_apiClient.GetPlayerId());
 
 	m_apiClient.StopNetworkLoop();
 	CloseHostPanel();
-	m_apiClient.SetLobbyId("");
 
 	if (m_gamePanel) m_gamePanel.reset();
-	m_apiClient.SetLobbyId("");
 	m_gameStartedLocally = false;
+}
+
+void MainMenuWindow::HandleLocalPlayerLeft()
+{
+	if (!m_gamePanel) return;
+
+	const std::string myUsername = m_apiClient.GetUsername();
+	m_gamePanel->MarkPlayerAsLeft(myUsername);
+
+	if (!m_apiClient.GetLobbyId().empty() && m_apiClient.GetPlayerId() != 0u)
+	{
+		auto result = m_apiClient.LeaveMatch();
+		if (result && result.value() == LeaveMatchResult::Success)
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(200));
+			m_apiClient.LeaveLobby(m_apiClient.GetLobbyId(), m_apiClient.GetPlayerId());
+		}
+	}
+
+
+	m_gamePanel.reset();
+	m_gameStartedLocally = false;
+	CloseHostPanel();
+	m_apiClient.SetLobbyId("");
+	m_apiClient.ClearEvent();
 }
 
 
 void MainMenuWindow::Draw()
 {
-	/*if (m_bgSprite && m_bgClock.getElapsedTime().asSeconds() >= m_bgFrameDuration)
-	{
-		m_bgClock.restart();
-		m_bgCurrentFrame = (m_bgCurrentFrame + 1) % m_bgFrames.size();
-		m_bgSprite->setTexture(m_bgFrames[m_bgCurrentFrame]);
-	}
-	if (m_bgSprite)
-		m_window.draw(*m_bgSprite);*/
 	m_mainMenu.draw();
 }
 
@@ -160,7 +137,6 @@ void MainMenuWindow::Update()
 		m_lobbyPollCheck.getElapsedTime().asMilliseconds() < 500) return;
 
 	m_lobbyPollCheck.restart();
-
 	auto event = m_apiClient.GetEvent();
 	switch (event)
 	{
@@ -186,12 +162,13 @@ void MainMenuWindow::Update()
 	}
 
 	if (m_apiClient.GetLobbyId().empty()) return;
-	auto lobbyState = m_apiClient.GetLobbyState(m_apiClient.GetLobbyId());
-	if (!lobbyState) return;
+	auto lobbyStateOpt = m_apiClient.GetLobbyState(m_apiClient.GetLobbyId());
+	if (!lobbyStateOpt) return;
 
-	if (lobbyState.value().m_status == "GAME_STARTED" && !m_gamePanel)
+	if (lobbyStateOpt.value().m_status == "GAME_STARTED" && !m_gamePanel)
 	{
-		m_gamePanel = std::make_shared<GamePanel>(m_mainMenu, m_apiClient, [this]() { GoBackToMenu(); });
+		m_gamePanel = std::make_shared<GamePanel>(m_mainMenu, m_apiClient,
+			[this]() { GoBackToMenu(); }, [this]() {HandleLocalPlayerLeft(); });
 		m_gamePanel->OnGameStarted();
 		m_gameStartedLocally = true;
 	}
@@ -259,7 +236,7 @@ void MainMenuWindow::ProfileButtonPressed()
 		[this]
 		{
 			auto panel = m_mainMenu.get<tgui::Panel>("ProfilePanel");
-			if (panel) m_mainMenu.remove(panel); 
+			if (panel) m_mainMenu.remove(panel);
 		}
 	);
 	m_mainMenu.add(panel, "ProfilePanel");
@@ -298,7 +275,6 @@ void MainMenuWindow::ShutdownLobby()
 	m_apiClient.StopLobbyWatcher();
 	m_apiClient.StopPingThread();
 	CloseHostPanel();
-
 	m_apiClient.SetLobbyId("");
 	m_apiClient.ClearEvent();
 }

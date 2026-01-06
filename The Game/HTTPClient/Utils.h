@@ -33,7 +33,5 @@ public:
 		const std::string& message, std::function<void()> onClose = nullptr);
 
 	static void StyleButton(const tgui::Button::Ptr& button);
-
-private:
 };
 

@@ -12,29 +12,25 @@ LoginResult ApiClient::Login(const std::string& username)
 	cpr::Response response = cpr::Post(
 		cpr::Url{ url },
 		cpr::Body{ jsonBody },
-		cpr::Header{ {"Content-Type", "application/json"} },
 		kTimeout
 	);
 
 	if (response.error || response.status_code != 200) return LoginResult::NetworkError;
 
 	auto json = crow::json::load(response.text);
-	if (!json)
-		return LoginResult::NetworkError;
+	if (!json) return LoginResult::NetworkError;
 
 	if (json["status"].s() != "ok")
 	{
-		std::string message = json["message"].s();
-		if (message == "You're already logged in!")
-			return LoginResult::AlreadyLoggedIn;
+		const std::string message = json["message"].s();
+		if (message == "You're already logged in!") return LoginResult::AlreadyLoggedIn;
 		return LoginResult::UserNotFound;
 	}
 
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	m_username = username;
-	m_playerId = json["id"].i();
-
+	m_playerId = static_cast<unsigned>(json["id"].i());
 	return LoginResult::Success;
 }
 
@@ -43,8 +39,7 @@ bool ApiClient::Logout()
 	unsigned playerIdCopy;
 	{
 		std::lock_guard<std::mutex> lock(m_mutex);
-		if (m_playerId == 0u)
-			return false;
+		if (m_playerId == 0u) return false;
 		playerIdCopy = m_playerId;
 	}
 
@@ -54,7 +49,6 @@ bool ApiClient::Logout()
 	cpr::Response response = cpr::Post(
 		cpr::Url{ url },
 		cpr::Body{ jsonBody },
-		cpr::Header{ {"Content-Type", "application/json"} },
 		kTimeout
 	);
 
@@ -84,22 +78,17 @@ std::optional<std::string> ApiClient::CreateLobby(const std::string& username)
 	cpr::Response response = cpr::Post(
 		cpr::Url{ url },
 		cpr::Body{ jsonBody },
-		cpr::Header{ {"Content-Type", "application/json"} },
 		kTimeout
 	);
 
 	if (response.error || response.status_code != 200) return std::nullopt;
 
 	auto json = crow::json::load(response.text);
-	if (!json) return std::nullopt;
-
-	const std::string lobbyId = json["lobbyId"].s();
-
-	return lobbyId;
+	if (!json || !json.has("lobbyId")) return std::nullopt;
+	return json["lobbyId"].s();
 }
 
-bool ApiClient::JoinLobby(const std::string& lobbyId,
-	const std::string& username)
+bool ApiClient::JoinLobby(const std::string& lobbyId, const std::string& username)
 {
 	const std::string url = m_serverURL + "/lobby/join";
 
@@ -110,7 +99,6 @@ bool ApiClient::JoinLobby(const std::string& lobbyId,
 	cpr::Response response = cpr::Post(
 		cpr::Url{ url },
 		cpr::Body{ jsonBody },
-		cpr::Header{ {"Content-Type", "application/json"} },
 		kTimeout
 	);
 
@@ -142,7 +130,6 @@ bool ApiClient::LeaveLobby(const std::string& lobbyId, unsigned playerId)
 	cpr::Response response = cpr::Post(
 		cpr::Url{ url },
 		cpr::Body{ jsonBody },
-		cpr::Header{ {"Content-Type", "application/json"} },
 		kTimeout
 	);
 
@@ -157,7 +144,6 @@ bool ApiClient::LeaveLobby(const std::string& lobbyId, unsigned playerId)
 		m_event.store(ClientEvent::HostLeftLobby);
 	else return false;
 
-	m_lobbyId.clear();
 	return true;
 }
 
@@ -169,14 +155,22 @@ std::optional<LeaveMatchResult> ApiClient::LeaveMatch()
 	cpr::Response response = cpr::Delete(
 		cpr::Url{ url },
 		cpr::Timeout(kTimeout)
-		);
+	);
 
-	if (response.error) return std::nullopt;
+	if (response.error || response.status_code != 200) return std::nullopt;
 
 	auto json = crow::json::load(response.text);
 	if (!json || !json.has("PLAYER_LEFT")) return std::nullopt;
 
-	if (json["PLAYER_LEFT"].s() == "SUCCESS") return LeaveMatchResult::Success;
+	if (json["PLAYER_LEFT"].s() == "SUCCESS")
+	{
+		auto playerStates = GetPlayerStates();
+		{
+			std::lock_guard<std::mutex> lk(m_cacheMutex);
+			m_cachedPlayerStates = playerStates;
+		}
+		return LeaveMatchResult::Success;
+	}
 	return LeaveMatchResult::NotInLobby;
 }
 
@@ -185,7 +179,6 @@ std::optional<LobbyState> ApiClient::GetLobbyState(const std::string& lobbyId)
 	const std::string url = m_serverURL + "/lobby/info/" + lobbyId;
 	cpr::Response response = cpr::Get
 	(cpr::Url{ url },
-		cpr::Header{ {"Content-Type", "application/json"} },
 		kTimeout
 	);
 
@@ -201,6 +194,38 @@ std::optional<LobbyState> ApiClient::GetLobbyState(const std::string& lobbyId)
 	return state;
 }
 
+std::optional<std::vector<PlayerState>> ApiClient::GetPlayerStates()
+{
+	const std::string url = m_serverURL + "/lobby/" + m_lobbyId
+		+ "/players/states";
+	cpr::Response response = cpr::Get(
+		cpr::Url{ url },
+		kTimeout
+	);
+	if (response.error || response.status_code != 200) return std::nullopt;
+
+	auto json = crow::json::load(response.text);
+	if (!json || !json.has("USERNAMES") || !json.has("IS_IN_MATCH")) return std::nullopt;
+
+	const auto& usernames = json["USERNAMES"];
+	const auto& isInMatch = json["IS_IN_MATCH"];
+
+	if (usernames.size() != isInMatch.size()) return std::nullopt;
+
+	std::vector<PlayerState> playerStates;
+	playerStates.reserve(usernames.size());
+	for (size_t i = 0; i < usernames.size(); ++i)
+	{
+		playerStates.emplace_back(
+			PlayerState{
+				usernames[i].s(),
+				isInMatch[i].b()
+			}
+		);
+	}
+	return playerStates;
+}
+
 bool ApiClient::StartMatch(const std::string& lobbyId, unsigned playerId)
 {
 	const std::string url = m_serverURL + "/lobby/start";
@@ -212,12 +237,14 @@ bool ApiClient::StartMatch(const std::string& lobbyId, unsigned playerId)
 	cpr::Response response = cpr::Post(
 		cpr::Url{ url },
 		cpr::Body{ jsonBody },
-		cpr::Header{ {"Content-Type", "application/json"} },
 		kTimeout
 	);
 
 	if (response.error || response.status_code != 200) return false;
+
 	auto json = crow::json::load(response.text);
+	if (!json || !json.has("status")) return false;
+
 	return json["status"].s() == "GAME_STARTED";
 }
 
@@ -235,7 +262,6 @@ bool ApiClient::SendChatMessage(const std::string& message)
 	cpr::Response response = cpr::Post(
 		cpr::Url{ url },
 		cpr::Body{ jsonBody },
-		cpr::Header{ {"Content-Type", "application/json"} },
 		kTimeout);
 
 	if (response.error || response.status_code != 200) return false;
@@ -252,7 +278,6 @@ std::optional<std::vector<ChatMessage>> ApiClient::GetNewMessages(unsigned after
 
 	cpr::Response response = cpr::Get(
 		cpr::Url{ url },
-		cpr::Header{ {"Content-Type", "application/json"} },
 		kTimeout
 	);
 
@@ -265,7 +290,7 @@ std::optional<std::vector<ChatMessage>> ApiClient::GetNewMessages(unsigned after
 	for (const auto& message : json["messages"])
 	{
 		result.emplace_back(
-			(unsigned)message["id"].i(),
+			static_cast<unsigned>(message["id"].i()),
 			message["username"].s(),
 			message["message"].s());
 	}
@@ -284,7 +309,6 @@ bool ApiClient::PlayCard(uint8_t cardId, uint8_t deckId)
 	cpr::Response response = cpr::Post(
 		cpr::Url{ url },
 		cpr::Body{ jsonBody },
-		cpr::Header{ {"Content-Type", "application/json"} },
 		kTimeout
 	);
 	if (response.error || response.status_code != 200) return false;
@@ -328,7 +352,6 @@ std::optional<EndTurnState> ApiClient::GetEndTurnState() const
 		"/players/" + std::to_string(m_playerId) + "/endturn";
 	cpr::Response response = cpr::Get(
 		cpr::Url{ url },
-		cpr::Header{ {"Content-Type", "application/json"} },
 		kTimeout
 	);
 	if (response.error || response.status_code != 200) return std::nullopt;
@@ -338,6 +361,7 @@ std::optional<EndTurnState> ApiClient::GetEndTurnState() const
 		|| !json.has("canEndTurn")
 		|| !json.has("cardsPlaced")
 		|| !json.has("minRequiredCards")) return std::nullopt;
+
 	EndTurnState state;
 	state.canEndTurn = json["canEndTurn"].b();
 	state.cardsPlaced = static_cast<uint8_t>(json["cardsPlaced"].i());
@@ -353,7 +377,6 @@ bool ApiClient::SendPing(const std::string& lobbyId, unsigned playerId)
 	cpr::Response response = cpr::Post(
 		cpr::Url{ url },
 		cpr::Body{ jsonBody },
-		cpr::Header{ {"Content-Type", "application/json"} },
 		kTimeout
 	);
 
@@ -462,15 +485,16 @@ std::optional<UserProfile> ApiClient::GetUserProfile(unsigned playerId)
 	const std::string url = m_serverURL + "/users/" + std::to_string(playerId) + "/profile";
 	cpr::Response response = cpr::Get
 	(cpr::Url{ url },
-		cpr::Header{ {"Content-Type", "application/json"} },
 		kTimeout
 	);
 
 	if (response.error || response.status_code != 200) return std::nullopt;
 
 	auto json = crow::json::load(response.text);
-	if (!json || !json.has("username") || !json.has("gamesPlayed") || !json.has("gamesWon") || !json.has("hoursPlayed"))
-		return std::nullopt;
+	if (!json || !json.has("username")
+		|| !json.has("gamesPlayed")
+		|| !json.has("gamesWon")
+		|| !json.has("hoursPlayed")) return std::nullopt;
 
 	UserProfile profile;
 	profile.username = json["username"].s();
@@ -511,7 +535,7 @@ std::optional<std::vector<uint8_t>> ApiClient::GetPlayerCards() const
 
 	for (const auto& card : json["cards"])
 	{
-		playerCards.push_back(static_cast<uint8_t>(card.i()));
+		playerCards.emplace_back(static_cast<uint8_t>(card.i()));
 	};
 	return playerCards;
 }
@@ -524,7 +548,6 @@ std::optional<std::array<bool, 4>> ApiClient::GetValidDecks(uint8_t cardId) cons
 	cpr::Response response = cpr::Get(
 		cpr::Url{ url },
 		cpr::Body{ jsonBody },
-		cpr::Header{ { "Content-Type", "application/json" } },
 		kTimeout
 	);
 
@@ -550,7 +573,6 @@ std::optional<std::vector<uint8_t>> ApiClient::EndTurn()
 		"/players/" + std::to_string(m_playerId) + "/endturn";
 	cpr::Response response = cpr::Post(
 		cpr::Url{ url },
-		cpr::Header{ {"Content-Type", "application/json" } },
 		kTimeout
 	);
 	if (response.error || response.status_code != 200) return std::nullopt;
@@ -572,7 +594,6 @@ std::optional<TurnState> ApiClient::GetTurnState() const
 		+ "/players/" + std::to_string(m_playerId) + "/turn";
 	cpr::Response response = cpr::Get(
 		cpr::Url{ url },
-		cpr::Header{ {"Content-Type", "application/json"} },
 		kTimeout
 	);
 	if (response.error || response.status_code != 200) return std::nullopt;
@@ -593,6 +614,7 @@ std::optional<GameResult> ApiClient::ParseGameResult(const std::string& result) 
 	if (result == "ongoing") return GameResult::Ongoing;
 	if (result == "won") return GameResult::Won;
 	if (result == "lost") return GameResult::Lost;
+	if (result == "NOT_ENOUGH_PLAYERS") return GameResult::NotEnoughPlayers;
 	return std::nullopt;
 }
 
@@ -601,7 +623,6 @@ std::optional<GameResult> ApiClient::GetGameResult(const std::string& lobbyId) c
 	const std::string url = m_serverURL + "/lobby/" + lobbyId + "/game/result";
 	cpr::Response response = cpr::Get
 	(cpr::Url{ url },
-		cpr::Header{ {"Content-Type", "application/json"} },
 		kTimeout
 	);
 
@@ -629,6 +650,7 @@ void ApiClient::StartNetworkLoop()
 		auto lastGameTabelState = std::chrono::steady_clock::now();
 		auto lastTurnState = std::chrono::steady_clock::now();
 		auto lastGameResult = std::chrono::steady_clock::now();
+		auto lastPlayerStates = std::chrono::steady_clock::now();
 
 		while (!st.stop_requested())
 		{
@@ -713,7 +735,7 @@ void ApiClient::StartNetworkLoop()
 						}
 						else
 						{
-							for (size_t i = 0; i < decks->size(); i++)
+							for (size_t i = 0; i < decks->size(); ++i)
 							{
 								if (m_cachedDecks.value()[i].topCardId != decks.value()[i].topCardId)
 								{
@@ -776,6 +798,15 @@ void ApiClient::StartNetworkLoop()
 				}
 				lastGameResult = now;
 			}
+			if (now - lastPlayerStates >= std::chrono::milliseconds(500))
+			{
+				auto playerStates = GetPlayerStates();
+				{
+					std::lock_guard<std::mutex> lk(m_cacheMutex);
+					m_cachedPlayerStates = playerStates;
+				}
+				lastPlayerStates = now;
+			}
 			std::this_thread::sleep_for(std::chrono::milliseconds(50));
 		}
 		});
@@ -829,7 +860,6 @@ std::optional<GameTableState> ApiClient::GetTableState(const std::string& lobbyI
 	const std::string url = m_serverURL + "/lobby/" + lobbyId + "/gamestate";
 	cpr::Response response = cpr::Get(
 		cpr::Url{ url },
-		cpr::Header{ {"Content-Type", "application/json"} },
 		kTimeout
 	);
 
@@ -865,4 +895,10 @@ std::optional<GameResult> ApiClient::SnapshotGameResult() const
 {
 	std::lock_guard<std::mutex> lk(m_cacheMutex);
 	return m_cachedGameResult;
+}
+
+std::optional<std::vector<PlayerState>> ApiClient::SnapshotPlayerStates() const
+{
+	std::lock_guard<std::mutex> lk(m_cacheMutex);
+	return m_cachedPlayerStates;
 }

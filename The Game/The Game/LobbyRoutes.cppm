@@ -38,6 +38,7 @@ private:
 	crow::response GetTurnState(const std::string& lobbyId, unsigned playerId);
 	crow::response GetGameResult(const std::string& lobbyId);
 	crow::response GetValidDecks(const crow::request& request, const std::string& lobbyId);
+	crow::response GetPlayerStates(const std::string& lobbyId);
 
 private:
 	LobbyManager& m_manager;

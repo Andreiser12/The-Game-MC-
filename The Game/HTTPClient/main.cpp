@@ -22,11 +22,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	}
 	ApiClient api{ "http://localhost:18080" };
 	cpr::Response response = cpr::Get(cpr::Url{ "http://localhost:18080/users" }, cpr::Timeout(300));
-	if (response.status_code == 404 || response.primary_port!=18080)
+	if (response.status_code == 404 || response.primary_port != 18080)
 	{
 		sf::VideoMode connectionFailedMode = sf::VideoMode::getDesktopMode();
 		connectionFailedMode.size = { LOGIN_WIDTH, LOGIN_HEIGHT };
-		sf::RenderWindow connectionFailedWindow{ connectionFailedMode, "Connection Failed", 
+		sf::RenderWindow connectionFailedWindow{ connectionFailedMode, "Connection Failed",
 			sf::Style::Titlebar | sf::Style::Close };
 		connectionFailedWindow.setIcon(
 			windowIcon.getSize(),
@@ -118,8 +118,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		MainMenuWindow _menu(menuWindow, api);
 
 		sf::Clock animationClock;
-
-		//HostPanel::PreloadImages();
 
 		while (menuWindow.isOpen())
 		{

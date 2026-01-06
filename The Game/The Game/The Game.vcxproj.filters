@@ -90,20 +90,14 @@
     <ClCompile Include="LobbyRoutes.cppm">
       <Filter>Header Files\Lobby</Filter>
     </ClCompile>
-    <ClCompile Include="DatabaseManager.cppm">
-      <Filter>Header Files\Database</Filter>
-    </ClCompile>
     <ClCompile Include="DatabaseStructures.cppm">
       <Filter>Header Files\Database</Filter>
     </ClCompile>
     <ClCompile Include="DatabaseManager.cpp">
       <Filter>Source Files\Database</Filter>
     </ClCompile>
-    <ClCompile Include="SessionManager.cppm">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SessionManager.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="DatabaseManager.cppm">
+      <Filter>Header Files\Database</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

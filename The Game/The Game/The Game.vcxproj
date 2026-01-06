@@ -157,6 +157,13 @@
       <FileType>CppCode</FileType>
     </ClCompile>
     <ClCompile Include="DatabaseManager.cpp" />
+    <ClCompile Include="DatabaseManager.cppm">
+      <FileType>Document</FileType>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Default</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Default</CompileAs>
+    </ClCompile>
     <ClCompile Include="Deck.cpp" />
     <ClCompile Include="FundamentalCard.cpp" />
     <ClCompile Include="GreedyAI.cpp" />
@@ -169,10 +176,6 @@
     <ClCompile Include="LobbyRoutes.cppm" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
-    <ClCompile Include="SessionManager.cpp" />
-    <ClCompile Include="SessionManager.cppm">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</CompileAs>
-    </ClCompile>
     <ClCompile Include="Table.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -180,11 +183,6 @@
       <FileType>Document</FileType>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCppModule</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCppModule</CompileAs>
-    </ClCompile>
-    <ClCompile Include="DatabaseManager.cppm">
-      <FileType>Document</FileType>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Default</CompileAs>
     </ClCompile>
     <ClCompile Include="DatabaseStructures.cppm">
       <FileType>Document</FileType>
@@ -205,6 +203,11 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Default</CompileAs>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TheGameCore\TheGameCore.vcxproj">
+      <Project>{e29dac7c-73db-4765-bb68-93875040a4d2}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

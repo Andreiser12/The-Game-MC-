@@ -1,5 +1,7 @@
 #include "CppUnitTest.h"
-
+#include <chrono>
+#include <thread>
+using namespace std::chrono_literals;
 import SessionManager; 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -35,6 +37,20 @@ namespace TheGameTests
 			Assert::IsFalse(sessionManager.IsLoggedIn(999));
 			Assert::IsFalse(sessionManager.Logout(999));
 		}
-
+		TEST_METHOD(IsOnline_ImmediatelyAfterLogin)
+		{
+			auto& sessionManager = SessionManager::Instance();
+			sessionManager.Login(400);
+			Assert::IsTrue(sessionManager.IsOnline(400, 5s));
+			sessionManager.Logout(400);
+		}
+		TEST_METHOD(IsOnline_AfterTimeout)
+		{
+			auto& sessionManager = SessionManager::Instance();
+			sessionManager.Login(401);
+			std::this_thread::sleep_for(50ms);
+			Assert::IsFalse(sessionManager.IsOnline(401, 1ms));
+			sessionManager.Logout(401);
+		}
 	};
 }

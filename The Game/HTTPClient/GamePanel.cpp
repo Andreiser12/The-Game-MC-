@@ -5,6 +5,13 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	m_gui{ gui }, m_apiClient{ api },
 	m_onExitToMenu{ std::move(onExit) }, m_onLocalPlayerLeft{ std::move(onLocalPlayerLeft) }
 {
+	if (m_gameMusic.openFromFile("assets/sounds/12_Silent_Piano_with_Creeping_Tension.ogg"))
+	{
+		m_gameMusic.setLooping(true);
+		m_gameMusic.setVolume(50.0f);
+		m_gameMusic.play();
+	}
+
 	m_root = tgui::Group::create({ "100%", "100%" });
 	m_gui.add(m_root);
 
@@ -531,6 +538,7 @@ void GamePanel::RemovePlacedCards()
 
 GamePanel::~GamePanel()
 {
+	m_gameMusic.stop();
 	if (m_root) m_gui.remove(m_root);
 }
 
@@ -629,6 +637,8 @@ void GamePanel::RebuildMyHand()
 void GamePanel::HandleGameResult(GameResult result)
 {
 	if (result == GameResult::Ongoing) return;
+
+	m_gameMusic.stop();
 
 	for (auto& card : m_myCards)
 	{

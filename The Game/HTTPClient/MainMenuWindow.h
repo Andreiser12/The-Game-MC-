@@ -4,6 +4,7 @@
 #include "ApiClient.h"
 #include "GamePanel.h"
 #include "Utils.h"
+#include <SFML/Audio.hpp>
 
 #include <iostream>
 
@@ -72,5 +73,7 @@ private:
 	unsigned m_framerateIndex{ 1u };
 	bool m_isFullscreen{ true };
 	ApiClient& m_apiClient;
+
+	sf::Music m_bgMusic;
 };
 

@@ -7,6 +7,7 @@
 #include "DeckWidget.h"
 #include "PileWidget.h"
 #include <span>
+#include <SFML/Audio.hpp>
 
 struct PlayerSlot
 {
@@ -114,4 +115,6 @@ private:
 	tgui::Label::Ptr m_timerLabel;
 	float m_timeLeft{60.0f};
 	sf::Clock m_deltaTimeClock;
+
+	sf::Music m_gameMusic;
 };

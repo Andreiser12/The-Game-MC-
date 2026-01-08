@@ -37,6 +37,13 @@ MainMenuWindow::MainMenuWindow(sf::RenderWindow& window, ApiClient& api) :
 	m_mainMenu.add(cardsShadow);
 	m_mainMenu.add(cardsImage);
 	LoadWidgets();
+
+	if (m_bgMusic.openFromFile("assets/sounds/13.-Dreamy-Minimal-Piano-and-Jazz-Groove-_B_.ogg"))
+	{
+		m_bgMusic.setLooping(true);      
+		m_bgMusic.setVolume(50.0f);   
+		m_bgMusic.play();             
+	}
 }
 
 void MainMenuWindow::LoadWidgets()
@@ -167,6 +174,8 @@ void MainMenuWindow::Update()
 
 	if (lobbyStateOpt.value().m_status == "GAME_STARTED" && !m_gamePanel)
 	{
+		m_bgMusic.stop();
+
 		m_gamePanel = std::make_shared<GamePanel>(m_mainMenu, m_apiClient,
 			[this]() { GoBackToMenu(); }, [this]() {HandleLocalPlayerLeft(); });
 		m_gamePanel->OnGameStarted();

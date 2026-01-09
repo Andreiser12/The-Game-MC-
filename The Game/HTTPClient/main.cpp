@@ -3,8 +3,6 @@
 #include "MainMenuWindow.h"
 #include "ConnectionFailedWindow.h"
 
-#include <cpr/cpr.h>
-#include <crow.h>
 #include <thread>
 
 static inline constexpr uint16_t LOGIN_WIDTH{ 640u };

@@ -40,7 +40,6 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	std::function<bool(ApiClient&)> onStart)
 {
 	PreloadImages();
-
 	if (!s_frames.empty())
 	{
 		s_backgroundPicture = tgui::Picture::create(s_frames[0]);
@@ -60,18 +59,20 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 
 	auto lobbyIdLabel = tgui::Label::create("Lobby ID: " + lobbyId);
 	lobbyIdLabel->setSize("30%", "10%");
-	lobbyIdLabel->setPosition("62.5%", "7.5%");
+	lobbyIdLabel->setPosition("70%", "0%");
 	lobbyIdLabel->getRenderer()->setFont("assets/fonts/Sanchez-Regular.ttf");
 	lobbyIdLabel->getRenderer()->setBorders(1);
 	lobbyIdLabel->getRenderer()->setBorderColor(tgui::Color::Black);
 	lobbyIdLabel->getRenderer()->setBackgroundColor(tgui::Color(128, 128, 128));
 	lobbyIdLabel->getRenderer()->setOpacity(0.7f);
-	lobbyIdLabel->getRenderer()->setTextSize(22);
+	lobbyIdLabel->getRenderer()->setTextSize(20);
 
 	playersListBox = tgui::ListBox::create();
-	playersListBox->setSize("20%", "30%");
-	playersListBox->setPosition("0%", "5%");
 	playersListBox->getRenderer()->setFont("assets/fonts/Sanchez-Regular.ttf");
+	playersListBox->setSize("20%", "30%");
+	playersListBox->setPosition("0%", "0%");
+	playersListBox->getRenderer()->setOpacity(0.7f);
+	playersListBox->getRenderer()->setTextSize(20);
 	playersListBox->getRenderer()->setBackgroundColor(tgui::Color(128, 128, 128));
 	for (const auto& username : apiClient.SnapshotPlayers())
 	{
@@ -84,21 +85,19 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 		s_playerId = apiClient.GetPlayerId();
 	}
 
-	auto usernameLabel = tgui::Label::create(apiClient.GetUsername());
-	usernameLabel->setSize("25%", "8%");
-	usernameLabel->setPosition("25%", "7.5%");
-	usernameLabel->getRenderer()->setBorders(1);
-	usernameLabel->getRenderer()->setBorderColor(tgui::Color::Black);
-	usernameLabel->getRenderer()->setBackgroundColor(tgui::Color(128, 128, 128));
-	usernameLabel->getRenderer()->setOpacity(0.7f);
-	usernameLabel->getRenderer()->setTextSize(24);
-
 	apiClient.StartNetworkLoop();
 	auto leaveButton = tgui::Button::create("Leave Lobby");
 	leaveButton->setSize("22.5%", "12.5%");
-	leaveButton->setPosition("27.5%", "80%");
-	leaveButton->getRenderer()->setTexture("assets/images/buttons.png");
-	leaveButton->getRenderer()->setTextSize(18);
+	leaveButton->setPosition("3.5%", "82%");
+	leaveButton->getRenderer()->setFont("assets/fonts/Sanchez-Regular.ttf");
+	leaveButton->getRenderer()->setTextSize(20);
+	leaveButton->getRenderer()->setTextColor(tgui::Color::White);
+	leaveButton->getRenderer()->setBackgroundColor(tgui::Color(90, 90, 90));
+	leaveButton->getRenderer()->setBackgroundColorHover(tgui::Color(120, 120, 120));
+	leaveButton->getRenderer()->setBackgroundColorDown(tgui::Color(70, 70, 70));
+	leaveButton->getRenderer()->setBorderColor(tgui::Color(40, 40, 40));
+	leaveButton->getRenderer()->setBorders(1);
+	leaveButton->getRenderer()->setOpacity(0.85f);
 	leaveButton->onPress([&apiClient, &btnSound, onLeave, panel]()
 		{
 			btnSound.play();
@@ -110,22 +109,29 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 
 	auto startButtonLocal = tgui::Button::create("Start Match");
 	startButtonLocal->setSize("22.5%", "12.5%");
-	startButtonLocal->setPosition("65%", "80%");
-	startButtonLocal->getRenderer()->setTexture("assets/images/buttons.png");
-	startButtonLocal->getRenderer()->setTextSize(18);
+	startButtonLocal->setPosition("74%", "82%");
+	startButtonLocal->getRenderer()->setFont("assets/fonts/Sanchez-Regular.ttf");
+	startButtonLocal->getRenderer()->setTextSize(20);
+	startButtonLocal->getRenderer()->setTextColor(tgui::Color::White);
+	startButtonLocal->getRenderer()->setBackgroundColor(tgui::Color(60, 120, 90));
+	startButtonLocal->getRenderer()->setBackgroundColorHover(tgui::Color(80, 150, 115));
+	startButtonLocal->getRenderer()->setBackgroundColorDown(tgui::Color(45, 95, 70));
+	startButtonLocal->getRenderer()->setBorderColor(tgui::Color(30, 60, 50));
+	startButtonLocal->getRenderer()->setBackgroundColorDisabled(tgui::Color(60, 80, 75));
+	startButtonLocal->getRenderer()->setTextColorDisabled(tgui::Color(170, 170, 170));
+	startButtonLocal->getRenderer()->setBorderColorDisabled(tgui::Color(50, 70, 65));
+	startButtonLocal->getRenderer()->setBorders(1);
+	startButtonLocal->getRenderer()->setOpacity(0.85f);
 	startButton = startButtonLocal;
 
 	bool isHost{ (s_playerId != -1 && s_hostId != -1 && s_playerId == s_hostId) };
-	bool enoughPlayers{ playersListBox->getItemCount() >= kMinPlayers };
+	bool enoughPlayers{ playersListBox->getItemCount() - 1 >= kMinPlayers };
 	startButton->setVisible(isHost);
 	startButton->setEnabled(isHost && enoughPlayers);
 	startButton->onPress([onStart, &apiClient, &btnSound]()
 		{
 			btnSound.play();
-			if (onStart)
-			{
-				onStart(apiClient);
-			}
+			if (onStart) onStart(apiClient);
 		});
 
 	panel->add(leaveButton);
@@ -148,6 +154,7 @@ void HostPanel::RefreshPlayersList(ApiClient& apiClient)
 	if (playersListBox)
 	{
 		playersListBox->removeAllItems();
+		playersListBox->addItem("Players:");
 		for (const auto& username : playersCopy)
 		{
 			playersListBox->addItem(username);
@@ -160,7 +167,7 @@ void HostPanel::UpdateStartButton()
 	if (!startButton || !playersListBox) return;
 
 	bool isHost{ (s_hostId == s_playerId) };
-	bool enoughPlayers{ (playersListBox->getItemCount() >= kMinPlayers) };
+	bool enoughPlayers{ (playersListBox->getItemCount() - 1 >= kMinPlayers) };
 	startButton->setVisible(isHost);
 	startButton->setEnabled(isHost && enoughPlayers);
 }
@@ -176,6 +183,5 @@ void HostPanel::UpdateBackground(float deltaTime)
 		s_animationTime -= kFrameDuration;
 		s_currentFrame = (s_currentFrame + 1) % s_frames.size();
 	}
-
 	s_backgroundPicture->getRenderer()->setTexture(s_frames[s_currentFrame]);
 }

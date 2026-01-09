@@ -1,19 +1,13 @@
 export module Lobby;
 
+import Table;
+
 import <stdint.h>;
-import <vector>;
-import <array>;
 import <unordered_map>;
 import <deque>;
 import <atomic>;
 import <mutex>;
 import <chrono>;
-import <algorithm>;
-
-import Player;
-import Table;
-import Card;
-import Deck;
 
 export enum class RemoveResult
 {

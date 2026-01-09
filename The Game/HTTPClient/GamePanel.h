@@ -7,7 +7,6 @@
 #include "DeckWidget.h"
 #include "PileWidget.h"
 #include <span>
-#include <SFML/Audio.hpp>
 
 struct PlayerSlot
 {

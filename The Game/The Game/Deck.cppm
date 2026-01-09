@@ -1,6 +1,5 @@
 export module Deck;
 import Card;
-import FundamentalCard;
 
 import <stack>;
 
@@ -27,10 +26,10 @@ public:
 	Deck(DeckType deckType, DeckNumber deckNumber, uint8_t deckIndex);
 
 	const Pile& GetDeck() const;
-	DeckType GetDeckType() const;
-	DeckNumber GetDeckNumber() const;
+	DeckType GetDeckType() const noexcept;
+	DeckNumber GetDeckNumber() const noexcept;
 	const Card<uint8_t>& GetTopCard() const;
-	uint8_t GetDeckIndex() const;
+	uint8_t GetDeckIndex() const noexcept;
 
 	void PushCard(const Card<uint8_t>& card);
 

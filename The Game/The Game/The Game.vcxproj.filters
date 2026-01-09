@@ -39,16 +39,10 @@
     <ClCompile Include="Card.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FundamentalCard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Deck.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Card.cppm">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FundamentalCard.cppm">
       <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="Deck.cppm">

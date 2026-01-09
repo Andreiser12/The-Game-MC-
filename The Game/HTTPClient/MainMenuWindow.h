@@ -1,10 +1,7 @@
 #pragma once
 #include "PlayPanel.h"
 #include "IWindow.h"
-#include "ApiClient.h"
 #include "GamePanel.h"
-#include "Utils.h"
-#include <SFML/Audio.hpp>
 
 #include <iostream>
 

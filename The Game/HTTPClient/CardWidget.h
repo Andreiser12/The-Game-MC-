@@ -1,7 +1,5 @@
 #pragma once
-#include "TGUI/TGUI.hpp"
 #include "DeckWidget.h"
-#include <string>
 #include <optional>
 #include <functional>
 

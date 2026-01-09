@@ -1,11 +1,4 @@
 #pragma once
-#include "SFML/Graphics.hpp"
-#include "TGUI/TGUI.hpp"
-#include "TGUI/Core.hpp"
-#include "TGUI/Widgets/Button.hpp"
-#include "TGUI/Backend/SFML-Graphics.hpp"
-#include <SFML/Audio.hpp>
-
 #include "ApiClient.h"
 #include "HostPanel.h"
 #include "Utils.h"

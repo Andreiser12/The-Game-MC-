@@ -32,7 +32,7 @@ tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 	joinButton->setSize("35%", "20%");
 	joinButton->setPosition("5%", "70%");
 	Utils::StyleButton(joinButton);
-	joinButton->setTextSize(22);
+	joinButton->getRenderer()->setTextSize(22);
 	joinButton->onPress([&gui, onJoin, &apiClient, &btnSound, panel]() {
 		btnSound.play();
 		panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(150));
@@ -97,7 +97,7 @@ tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 	closeButton->getRenderer()->setTexture("assets/images/buttons.png");
 	closeButton->getRenderer()->setBorders(1);
 	Utils::StyleButton(closeButton);
-	closeButton->getRenderer()->setTextSize(22);
+	closeButton->getRenderer()->setTextSize(16);
 	closeButton->onPress([panel, onClose, &btnSound]()
 		{
 			btnSound.play();

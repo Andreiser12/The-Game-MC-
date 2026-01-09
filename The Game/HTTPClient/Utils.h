@@ -44,7 +44,6 @@ public:
 		std::function<void()> onClose = nullptr);
 
 	static void StyleButton(const tgui::Button::Ptr& button);
-
 	static void StyleSlider(const tgui::Slider::Ptr& slider);
 };
 

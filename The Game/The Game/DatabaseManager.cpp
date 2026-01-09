@@ -1,7 +1,5 @@
 module DatabaseManager;
 
-import Player;
-
 DatabaseManager::DatabaseManager(const std::string& databasePath)
     : m_storage{ CreateStorage(databasePath) }
 {

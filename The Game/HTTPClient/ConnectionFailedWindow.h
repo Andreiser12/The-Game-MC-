@@ -2,10 +2,9 @@
 #include "IWindow.h"
 #include "TGUI/TGUI.hpp"
 #include "TGUI/Core.hpp"
-#include "TGUI/Widgets/Button.hpp"
 #include "TGUI/Backend/SFML-Graphics.hpp"
 
-class ConnectionFailedWindow : IWindow
+class ConnectionFailedWindow : public IWindow
 {
 public:
 	ConnectionFailedWindow(sf::RenderWindow& window);

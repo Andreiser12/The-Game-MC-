@@ -3,10 +3,7 @@
 #include "ApiClient.h"
 #include "Utils.h"
 
-#include <cpr/cpr.h>
-#include <crow.h>
-
-class LoginWindow : IWindow
+class LoginWindow : public IWindow
 {
 public:
 	LoginWindow(sf::RenderWindow& window, ApiClient& api);

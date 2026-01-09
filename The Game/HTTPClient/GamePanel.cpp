@@ -37,8 +37,8 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 		static_cast<float>(canvas->getSize().y)
 	};
 
-	const float baseSize = std::min(canvasSize.x, canvasSize.y);
-	const float tableRadius = baseSize * 0.35f;
+	const float baseSize{ std::min(canvasSize.x, canvasSize.y) };
+	const float tableRadius{ baseSize * 0.35f };
 
 	sf::CircleShape tableShape;
 	tableShape.setRadius(tableRadius);
@@ -60,20 +60,21 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	canvas->display();
 
 	auto chatGroup = tgui::Group::create({ "100%", "100%" });
+	chatGroup->getRenderer()->setFont("assets/fonts/Sanchez-Regular.ttf");
 	chatGroup->setPosition("0%", "0%");
 	gamePanel->add(chatGroup);
 
 	m_chat = tgui::ChatBox::create();
 	m_chat->setSize("27.5%", "25%");
 	m_chat->setPosition("0%", "0%");
-	m_chat->setTextSize(25);
+	m_chat->getRenderer()->setTextSize(25);
 	m_chat->getRenderer()->setOpacity(0.7f);
 	chatGroup->add(m_chat);
 
 	auto chatEditBox = tgui::EditBox::create();
 	chatEditBox->setSize("22.5%", "5%");
 	chatEditBox->setPosition("0", "25%");
-	chatEditBox->setTextSize(25);
+	chatEditBox->getRenderer()->setTextSize(25);
 	chatEditBox->getRenderer()->setOpacity(0.5f);
 	chatEditBox->setDefaultText("Message...");
 	chatEditBox->onFocus([chatEditBox]()
@@ -98,7 +99,6 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 				}).detach();
 			chatEditBox->setText("");
 		});
-
 	chatGroup->add(chatEditBox);
 
 	auto sendButton = tgui::Button::create("Send");
@@ -393,6 +393,7 @@ void GamePanel::SetupPlayerSlots()
 		slotWidget.panel->getRenderer()->setBorders(1);
 		slotWidget.panel->getRenderer()->setBorderColor(tgui::Color::Black);
 		slotWidget.panel->getRenderer()->setOpacity(0.95f);
+		slotWidget.panel->getRenderer()->setFont("assets/fonts/Sanchez-Regular.ttf");
 
 		auto infoPanel = tgui::Panel::create({ "70%", "100%" });
 		infoPanel->setPosition("30%", "0%");

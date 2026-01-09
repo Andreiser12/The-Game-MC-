@@ -18,9 +18,10 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 	panel->getRenderer()->setBorderColor(tgui::Color::Black);
 
 	auto lobbyEditBox = tgui::EditBox::create();
-	lobbyEditBox->setSize("45%", "25%");
-	lobbyEditBox->setPosition("50%", "40%");
-	lobbyEditBox->getRenderer()->setTexture("assets/images/textBoxbackground2.png");
+	lobbyEditBox->setSize("45%", "20%");
+	lobbyEditBox->setPosition("50%", "42%");
+	lobbyEditBox->getRenderer()->setTexture("assets/images/textBoxbackground.png");
+	lobbyEditBox->getRenderer()->setFont("assets/fonts/Sanchez-Regular.ttf");
 	lobbyEditBox->setDefaultText("Enter lobby ID");
 	lobbyEditBox->setOrigin(0.5f, 0.5f);
 	lobbyEditBox->getRenderer()->setTextSize(26);
@@ -33,9 +34,9 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 		});
 
 	auto joinLobbyButton = tgui::Button::create("Join");
+	joinLobbyButton->getRenderer()->setTexture("assets/images/buttons.png");
 	joinLobbyButton->setSize("35%", "20%");
 	joinLobbyButton->setPosition("60%", "70%");
-	joinLobbyButton->getRenderer()->setTexture("assets/images/buttons.png");
 	Utils::StyleButton(joinLobbyButton);
 	joinLobbyButton->getRenderer()->setTextSize(22);
 	joinLobbyButton->onPress([&gui, onJoinLobby, &apiClient, &btnSound, lobbyEditBox, panel]()

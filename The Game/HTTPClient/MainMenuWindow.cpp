@@ -138,7 +138,6 @@ void MainMenuWindow::HandleLocalPlayerLeft()
 		}
 	}
 
-
 	m_gamePanel.reset();
 	m_gameStartedLocally = false;
 	CloseHostPanel();

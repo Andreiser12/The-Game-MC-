@@ -5,23 +5,20 @@ LoginWindow::LoginWindow(sf::RenderWindow& window, ApiClient& api)
 {
 	m_login.setFont("assets/fonts/Cinzel-Regular.ttf");
 	m_background = tgui::Picture::create("assets/images/mainMenuBackground.png");
-	m_background->setSize({ "100%", "100%" });
-	m_background->setPosition({ "0%", "0%" });
+	m_background->setSize("100%", "100%");
+	m_background->setPosition("0%", "0%");
 	m_login.add(m_background);
-
 	LoadWidgets();
-} 
+}
 
-void LoginWindow::CheckLogin(tgui::EditBox::Ptr username)
+void LoginWindow::CheckLogin(const std::string& usernameEntered)
 {
-	std::string usernameEntered = username->getText().toStdString();
-	LoginResult result = m_apiClient.Login(usernameEntered);
-	if (result != LoginResult::Success)
+	if (LoginResult result = m_apiClient.Login(usernameEntered);  result != LoginResult::Success)
 	{
 		m_login.remove(m_login.get("errorPanel"));
 
-		auto errorPanel = tgui::Panel::create({"55%", "8%"});
-		errorPanel->setPosition({ "50%", "62.5%" });
+		auto errorPanel = tgui::Panel::create({ "55%", "8%" });
+		errorPanel->setPosition("50%", "62.5%");
 		errorPanel->setOrigin(0.5f, 0.5f);
 		errorPanel->getRenderer()->setBackgroundColor(tgui::Color(30, 30, 30, 120));
 		errorPanel->getRenderer()->setBorders(2);
@@ -31,20 +28,20 @@ void LoginWindow::CheckLogin(tgui::EditBox::Ptr username)
 		auto errorLabel = tgui::Label::create();
 		switch (result)
 		{
-			case LoginResult::UserNotFound:
-				errorLabel->setText("No account with this username has been found!");
-				break;
-			case LoginResult::AlreadyLoggedIn:
-				errorLabel->setText("You're already logged in!");
-				break;
-			case LoginResult::NetworkError:
-				errorLabel->setText("Server error. Please try again!");
-				break;
-			default:
-				break;
+		case LoginResult::UserNotFound:
+			errorLabel->setText("No account with this username has been found!");
+			break;
+		case LoginResult::AlreadyLoggedIn:
+			errorLabel->setText("You're already logged in!");
+			break;
+		case LoginResult::NetworkError:
+			errorLabel->setText("Server error. Please try again!");
+			break;
+		default:
+			break;
 		}
 		errorLabel->getRenderer()->setTextColor(tgui::Color(255, 100, 100));
-		errorLabel->setPosition({ "50%", "50%" });
+		errorLabel->setPosition("50%", "50%");
 		errorLabel->setOrigin(0.5f, 0.5f);
 		errorLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
 		errorLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
@@ -60,14 +57,8 @@ void LoginWindow::CheckLogin(tgui::EditBox::Ptr username)
 	m_isLoggedIn = true;
 }
 
-void LoginWindow::UpdateTextSize()
-{ 
-	const float windowHeight = m_login.getView().getRect().height;
-	m_login.setTextSize(static_cast<unsigned int>(0.07f * windowHeight));
-}
-
 void LoginWindow::Draw()
-{ 
+{
 	m_login.draw();
 }
 
@@ -78,14 +69,14 @@ void LoginWindow::HandleEvent(sf::Event event)
 
 void LoginWindow::LoadWidgets()
 
-{ 
-	UpdateTextSize();
-	m_login.onViewChange([this] {UpdateTextSize(); });
+{
 	auto editBoxUsername = tgui::EditBox::create();
-	editBoxUsername->setSize({ "65%", "12.5%" });
-	editBoxUsername->setPosition({ "50%", "50%" });
-	editBoxUsername->getRenderer()->setTexture("assets/images/textBoxbackground2.png");
+	editBoxUsername->getRenderer()->setFont("assets/fonts/Sanchez-Regular.ttf");
+	editBoxUsername->setSize("65%", "12.5%");
+	editBoxUsername->setPosition("50%", "50%");
+	editBoxUsername->getRenderer()->setTexture("assets/images/textBoxbackground.png");
 	editBoxUsername->setOrigin(0.5f, 0.5f);
+	editBoxUsername->setTextSize(36);
 	editBoxUsername->setDefaultText("Username");
 	m_login.add(editBoxUsername);
 	editBoxUsername->onFocus([this, editBoxUsername] {
@@ -94,25 +85,23 @@ void LoginWindow::LoadWidgets()
 	editBoxUsername->onUnfocus([this, editBoxUsername] {
 		editBoxUsername->setDefaultText("Username");
 		});
+	editBoxUsername->onReturnKeyPress([this, editBoxUsername]
+		{ CheckLogin(editBoxUsername->getText().toStdString()); });
 
 	auto loginButton = tgui::Button::create("Login");
-	loginButton->setSize({ "20%", "15%" }); 
 	loginButton->getRenderer()->setTexture("assets/images/buttons.png");
-	auto coordX = editBoxUsername->getSize().x - editBoxUsername->getPosition().x;
-	auto coordY = editBoxUsername->getSize().y*1.5f + editBoxUsername->getPosition().y;
-	loginButton->setPosition({ coordX, coordY });
+	loginButton->setSize("20%", "15%");
+	loginButton->setPosition("18%", "71%");
 	Utils::StyleButton(loginButton);
 	m_login.add(loginButton);
-	loginButton->onClick([this, editBoxUsername] { CheckLogin(editBoxUsername); });
+	loginButton->onClick([this, editBoxUsername] { CheckLogin(editBoxUsername->getText().toStdString()); });
 
 	auto registerButton = tgui::Button::create("Register");
-	registerButton->setSize({ "20%", "15%" });
 	registerButton->getRenderer()->setTexture("assets/images/buttons.png");
-	coordX = editBoxUsername->getPosition().x + loginButton->getSize().x*0.7f;
-	coordY = editBoxUsername->getSize().y * 1.5f + editBoxUsername->getPosition().y;
-	registerButton->setPosition({ coordX, coordY });
+	registerButton->setSize("20%", "15%");
+	registerButton->setPosition("62.5%", "71%");
 	Utils::StyleButton(registerButton);
-	m_login.add(registerButton); 
+	m_login.add(registerButton);
 	registerButton->onClick([this] {
 		m_isRegisteredPressed = true;
 		m_onLoginWindow = false;

@@ -1,20 +1,14 @@
 #include "RegisterWindow.h"
 
 RegisterWindow::RegisterWindow(sf::RenderWindow& window, ApiClient& api)
-	: m_register{window}, m_apiClient{api}
+	: m_register{ window }, m_apiClient{ api }
 {
 	m_register.setFont("assets/fonts/Cinzel-Regular.ttf");
 	m_background = tgui::Picture::create("assets/images/mainMenuBackground.png");
-	m_background->setSize({ "100%", "100%" });
-	m_background->setPosition({ "0%", "0%" });
+	m_background->setSize("100%", "100%");
+	m_background->setPosition("0%", "0%");
 	m_register.add(m_background);
 	LoadWidgets();
-}
-
-void RegisterWindow::UpdateTextSize()
-{
-	const float windowHeight{ m_register.getView().getRect().height };
-	m_register.setTextSize(static_cast<unsigned>(0.07f * windowHeight));
 }
 
 void RegisterWindow::GoToLogin()
@@ -27,16 +21,14 @@ void RegisterWindow::Draw()
 	m_register.draw();
 }
 
-void RegisterWindow::CheckRegister(tgui::EditBox::Ptr username)
+void RegisterWindow::CheckRegister(const std::string& usernameEntered)
 {
-	std::string usernameEntered = username->getText().toStdString();
-	cpr::Response r = cpr::Post(
+	cpr::Response response = cpr::Post(
 		cpr::Url{ "http://localhost:18080/register" },
-		cpr::Body{ "{\"username\": \"" + usernameEntered + "\"}" },
-		cpr::Header{ {"Content-Type", "application/json"} }
+		cpr::Body{ "{\"username\": \"" + usernameEntered + "\"}" }
 	);
-	auto json = crow::json::load(r.text);
-	if (!json || json["status"].s() == "fail")
+	auto json = crow::json::load(response.text);
+	if (!json || !json.has("status") || json["status"].s() == "fail")
 	{
 		m_register.remove(m_register.get("errorPanel"));
 		auto errorPanel = tgui::Panel::create({ "55%", "8%" });
@@ -63,7 +55,7 @@ void RegisterWindow::CheckRegister(tgui::EditBox::Ptr username)
 		return;
 	}
 	m_apiClient.SetUsername(usernameEntered);
-	m_apiClient.SetPlayerId(json["id"].i());
+	m_apiClient.SetPlayerId(static_cast<unsigned>(json["id"].i()));
 	m_isRegistered = true;
 }
 
@@ -74,14 +66,14 @@ void RegisterWindow::HandleEvent(sf::Event event)
 
 void RegisterWindow::LoadWidgets()
 {
-	UpdateTextSize();
-	m_register.onViewChange([this] {UpdateTextSize(); });
 	auto editBoxUsername = tgui::EditBox::create();
-	editBoxUsername->setSize({ "65%", "12.5%" });
-	editBoxUsername->setPosition({ "50%", "50%" });
+	editBoxUsername->getRenderer()->setFont("assets/fonts/Sanchez-Regular.ttf");
+	editBoxUsername->setSize("65%", "12.5%");
+	editBoxUsername->setPosition("50%", "50%");
 	editBoxUsername->setOrigin(0.5f, 0.5f);
 	editBoxUsername->setDefaultText("Username");
-	editBoxUsername->getRenderer()->setTexture("assets/images/textBoxbackground2.png");
+	editBoxUsername->getRenderer()->setTexture("assets/images/textBoxbackground.png");
+	editBoxUsername->getRenderer()->setTextSize(36);
 	m_register.add(editBoxUsername);
 	editBoxUsername->onFocus([this, editBoxUsername] {
 		editBoxUsername->setDefaultText("");
@@ -89,21 +81,25 @@ void RegisterWindow::LoadWidgets()
 	editBoxUsername->onUnfocus([this, editBoxUsername] {
 		editBoxUsername->setDefaultText("Username");
 		});
+	editBoxUsername->onReturnKeyPress([this, editBoxUsername] 
+		{CheckRegister(editBoxUsername->getText().toStdString()); });
 
 	auto registerButton = tgui::Button::create("Register");
 	registerButton->getRenderer()->setTexture("assets/images/buttons.png");
-	registerButton->setSize({ "20%", "15%" });
-	registerButton->setPosition({"50%", "80%"});
+	registerButton->setSize("20%", "15%");
+	registerButton->setPosition("50%", "80%");
 	registerButton->setOrigin(0.5f, 0.5f);
 	Utils::StyleButton(registerButton);
 	m_register.add(registerButton);
-	registerButton->onClick([this, editBoxUsername] {CheckRegister(editBoxUsername); });
+	registerButton->onClick([this, editBoxUsername] 
+		{CheckRegister(editBoxUsername->getText().toStdString()); });
 
 	auto backButton = tgui::Button::create("Back");
-	backButton->setSize({ "10%", "12.5%" });
-	backButton->setPosition({ "3.5%", "5%" });
+	backButton->setSize("15%", "12.5%");
+	backButton->setPosition("3.5%", "5%");
 	backButton->getRenderer()->setTexture("assets/images/buttons.png");
 	Utils::StyleButton(backButton);
+	backButton->getRenderer()->setTextSize(18);
 	m_register.add(backButton);
 	backButton->onClick([this] { GoToLogin(); });
 }

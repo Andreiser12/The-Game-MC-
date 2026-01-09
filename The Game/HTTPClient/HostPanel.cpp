@@ -11,9 +11,9 @@ void HostPanel::PreloadImages()
 {
 	if (!s_frames.empty()) return;
 
-	const int totalFrames{ 300 };
+	constexpr uint16_t totalFrames{ 300 };
 
-	for (int i = 0; i < totalFrames; ++i)
+	for (uint16_t i = 0; i < totalFrames; ++i)
 	{
 		std::stringstream ss;
 
@@ -61,6 +61,7 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	auto lobbyIdLabel = tgui::Label::create("Lobby ID: " + lobbyId);
 	lobbyIdLabel->setSize("30%", "10%");
 	lobbyIdLabel->setPosition("62.5%", "7.5%");
+	lobbyIdLabel->getRenderer()->setFont("assets/fonts/Sanchez-Regular.ttf");
 	lobbyIdLabel->getRenderer()->setBorders(1);
 	lobbyIdLabel->getRenderer()->setBorderColor(tgui::Color::Black);
 	lobbyIdLabel->getRenderer()->setBackgroundColor(tgui::Color(128, 128, 128));
@@ -70,6 +71,7 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	playersListBox = tgui::ListBox::create();
 	playersListBox->setSize("20%", "30%");
 	playersListBox->setPosition("0%", "5%");
+	playersListBox->getRenderer()->setFont("assets/fonts/Sanchez-Regular.ttf");
 	playersListBox->getRenderer()->setBackgroundColor(tgui::Color(128, 128, 128));
 	for (const auto& username : apiClient.SnapshotPlayers())
 	{
@@ -103,10 +105,7 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 			apiClient.StopNetworkLoop();
 			playersListBox = nullptr;
 			startButton = nullptr;
-			if (onLeave && onLeave(apiClient))
-			{
-				panel->setVisible(false);
-			}
+			if (onLeave && onLeave(apiClient)) panel->setVisible(false);
 		});
 
 	auto startButtonLocal = tgui::Button::create("Start Match");
@@ -116,8 +115,8 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	startButtonLocal->getRenderer()->setTextSize(18);
 	startButton = startButtonLocal;
 
-	bool isHost = (s_playerId == s_hostId && s_playerId != -1 && s_hostId != -1);
-	bool enoughPlayers = playersListBox->getItemCount() >= kMinPlayers;
+	bool isHost{ (s_playerId != -1 && s_hostId != -1 && s_playerId == s_hostId) };
+	bool enoughPlayers{ playersListBox->getItemCount() >= kMinPlayers };
 	startButton->setVisible(isHost);
 	startButton->setEnabled(isHost && enoughPlayers);
 	startButton->onPress([onStart, &apiClient, &btnSound]()
@@ -160,8 +159,8 @@ void HostPanel::UpdateStartButton()
 {
 	if (!startButton || !playersListBox) return;
 
-	bool isHost = (s_hostId == s_playerId);
-	bool enoughPlayers = (playersListBox->getItemCount() >= kMinPlayers);
+	bool isHost{ (s_hostId == s_playerId) };
+	bool enoughPlayers{ (playersListBox->getItemCount() >= kMinPlayers) };
 	startButton->setVisible(isHost);
 	startButton->setEnabled(isHost && enoughPlayers);
 }
@@ -180,4 +179,3 @@ void HostPanel::UpdateBackground(float deltaTime)
 
 	s_backgroundPicture->getRenderer()->setTexture(s_frames[s_currentFrame]);
 }
-

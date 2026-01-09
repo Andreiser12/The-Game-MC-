@@ -18,7 +18,7 @@ LoginResult ApiClient::Login(const std::string& username)
 	if (response.error || response.status_code != 200) return LoginResult::NetworkError;
 
 	auto json = crow::json::load(response.text);
-	if (!json) return LoginResult::NetworkError;
+	if (!json || !json.has("status")) return LoginResult::NetworkError;
 
 	if (json["status"].s() != "ok")
 	{
@@ -28,7 +28,6 @@ LoginResult ApiClient::Login(const std::string& username)
 	}
 
 	std::lock_guard<std::mutex> lock(m_mutex);
-
 	m_username = username;
 	m_playerId = static_cast<unsigned>(json["id"].i());
 	return LoginResult::Success;
@@ -53,7 +52,6 @@ bool ApiClient::Logout()
 	);
 
 	if (response.error || response.status_code != 200) return false;
-
 	{
 		std::lock_guard<std::mutex> lock(m_mutex);
 		m_playerId = 0;

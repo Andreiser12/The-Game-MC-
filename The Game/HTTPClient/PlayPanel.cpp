@@ -2,6 +2,7 @@
 
 tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 	ApiClient& apiClient,
+	sf::Sound& btnSound,
 	std::function<void()> onClose,
 	std::function<void()> onJoin,
 	std::function<std::string(ApiClient&, const std::string&)> onHost)
@@ -32,15 +33,17 @@ tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 	joinButton->setPosition("5%", "70%");
 	Utils::StyleButton(joinButton);
 	joinButton->setTextSize(22);
-	joinButton->onPress([&gui, onJoin, &apiClient, panel]() {
+	joinButton->onPress([&gui, onJoin, &apiClient, &btnSound, panel]() {
+		btnSound.play();
 		panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(150));
 		auto joinPanel = JoinPanel::Create(
 			gui,
 			apiClient,
+			btnSound,
 			[panel]() {
 				panel->setVisible(true);
 			},
-			[&gui, &apiClient, panel](ApiClient& api, std::string lobbyIdEntered)
+			[&gui, &apiClient, &btnSound, panel](ApiClient& api, std::string lobbyIdEntered)
 			{
 				if (api.JoinLobby(lobbyIdEntered, api.GetUsername()))
 				{
@@ -49,6 +52,7 @@ tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 					auto host = HostPanel::Create(
 						gui,
 						apiClient,
+						btnSound,
 						lobbyId,
 						[lobbyId](ApiClient& api) { return api.LeaveLobby(lobbyId, api.GetPlayerId()); },
 						[lobbyId](ApiClient& api) { return api.StartMatch(lobbyId, api.GetPlayerId()); }
@@ -69,7 +73,8 @@ tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 	hostButton->getRenderer()->setTexture("assets/images/buttons.png");
 	Utils::StyleButton(hostButton);
 	hostButton->getRenderer()->setTextSize(22);
-	hostButton->onPress([&gui, &apiClient, onHost, panel]() {
+	hostButton->onPress([&gui, &apiClient, &btnSound, onHost, panel]() {
+		btnSound.play();
 		if (onHost)
 		{
 			std::string lobbyId = onHost(apiClient, apiClient.GetUsername());
@@ -77,6 +82,7 @@ tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 			panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(150));
 			auto hostPanel = HostPanel::Create(gui,
 				apiClient,
+				btnSound,
 				lobbyId,
 				[lobbyId](ApiClient& api) { return api.LeaveLobby(lobbyId, api.GetPlayerId()); },
 				[lobbyId](ApiClient& api) { return api.StartMatch(lobbyId, api.GetPlayerId()); }
@@ -92,8 +98,9 @@ tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 	closeButton->getRenderer()->setBorders(1);
 	Utils::StyleButton(closeButton);
 	closeButton->getRenderer()->setTextSize(22);
-	closeButton->onPress([panel, onClose]()
+	closeButton->onPress([panel, onClose, &btnSound]()
 		{
+			btnSound.play();
 			panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(150));
 			if (onClose) onClose();
 		});

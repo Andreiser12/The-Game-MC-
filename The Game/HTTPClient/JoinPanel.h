@@ -4,6 +4,7 @@
 #include "TGUI/Core.hpp"
 #include "TGUI/Widgets/Button.hpp"
 #include "TGUI/Backend/SFML-Graphics.hpp"
+#include <SFML/Audio.hpp>
 
 #include "ApiClient.h"
 #include "HostPanel.h"
@@ -14,6 +15,7 @@ class JoinPanel
 public:
 	static tgui::Panel::Ptr Create(tgui::Gui& gui,
 		ApiClient& apiClient,
+		sf::Sound& btnSound,
 		std::function<void()> onBack,
 		std::function<bool(ApiClient&, std::string)> onJoinLobby);
 

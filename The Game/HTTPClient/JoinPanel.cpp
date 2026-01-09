@@ -4,6 +4,7 @@ std::atomic<bool> JoinPanel::s_running{ false };
 
 tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 	ApiClient& apiClient,
+	sf::Sound& btnSound,
 	std::function<void()> onBack,
 	std::function<bool(ApiClient&, std::string)> onJoinLobby)
 {
@@ -37,8 +38,9 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 	joinLobbyButton->getRenderer()->setTexture("assets/images/buttons.png");
 	Utils::StyleButton(joinLobbyButton);
 	joinLobbyButton->getRenderer()->setTextSize(22);
-	joinLobbyButton->onPress([&gui, onJoinLobby, &apiClient, lobbyEditBox, panel]()
+	joinLobbyButton->onPress([&gui, onJoinLobby, &apiClient, &btnSound, lobbyEditBox, panel]()
 		{
+			btnSound.play();
 			std::string lobbyId = lobbyEditBox->getText().toStdString();
 			std::string errorMessage;
 
@@ -47,7 +49,7 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 
 			if (!errorMessage.empty())
 			{
-				auto errorPopupPanel = Utils::CreateErrorPopupPanel(gui, errorMessage);
+				auto errorPopupPanel = Utils::CreateErrorPopupPanel(gui, errorMessage, btnSound);
 				gui.add(errorPopupPanel);
 				return;
 			}
@@ -61,7 +63,7 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 				}
 				else
 				{
-					auto errorPopupPanel = Utils::CreateErrorPopupPanel(gui, "Invalid Lobby ID");
+					auto errorPopupPanel = Utils::CreateErrorPopupPanel(gui, "Invalid Lobby ID", btnSound);
 					gui.add(errorPopupPanel);
 				}
 			}
@@ -73,8 +75,9 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 	backButton->getRenderer()->setTexture("assets/images/buttons.png");
 	Utils::StyleButton(backButton);
 	backButton->getRenderer()->setTextSize(22);
-	backButton->onPress([&apiClient, panel, onBack]()
+	backButton->onPress([&apiClient, &btnSound, panel, onBack]()
 		{
+			btnSound.play();
 			apiClient.StopPingThread();
 			panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(150));
 			if (onBack)

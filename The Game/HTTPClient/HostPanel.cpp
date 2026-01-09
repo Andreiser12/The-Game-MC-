@@ -34,6 +34,7 @@ void HostPanel::PreloadImages()
 
 tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	ApiClient& apiClient,
+	sf::Sound& btnSound,
 	const std::string& lobbyId,
 	std::function<bool(ApiClient&)> onLeave,
 	std::function<bool(ApiClient&)> onStart)
@@ -96,8 +97,9 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	leaveButton->setPosition("27.5%", "80%");
 	leaveButton->getRenderer()->setTexture("assets/images/buttons.png");
 	leaveButton->getRenderer()->setTextSize(18);
-	leaveButton->onPress([&apiClient, onLeave, panel]()
+	leaveButton->onPress([&apiClient, &btnSound, onLeave, panel]()
 		{
+			btnSound.play();
 			apiClient.StopNetworkLoop();
 			playersListBox = nullptr;
 			startButton = nullptr;
@@ -118,8 +120,9 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	bool enoughPlayers = playersListBox->getItemCount() >= kMinPlayers;
 	startButton->setVisible(isHost);
 	startButton->setEnabled(isHost && enoughPlayers);
-	startButton->onPress([onStart, &apiClient]()
+	startButton->onPress([onStart, &apiClient, &btnSound]()
 		{
+			btnSound.play();
 			if (onStart)
 			{
 				onStart(apiClient);

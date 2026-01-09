@@ -11,8 +11,13 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 	unsigned resolutionIndex,
 	bool isFullscreen,
 	unsigned framerateIndex,
+	float masterVolume,
+	float buttonsVolume,
+	float backgroundVolume,
+	sf::Sound& btnSound,
 	std::function<void()> onClose,
-	std::function<void(unsigned res, bool fullscreen, unsigned framerate)> onApply)
+	std::function<void(unsigned res, bool fullscreen, unsigned framerate,
+		float masterVol, float btnVol, float bgVol)> onApply)
 {
 	auto resolutionsIndexPtr = std::make_shared<unsigned>(resolutionIndex);
 	auto resolutions = std::make_shared<std::vector<sf::Vector2u>>
@@ -40,6 +45,10 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 		144u,
 		180u
 	});
+
+	auto masterVolPtr = std::make_shared<float>(masterVolume);
+	auto buttonsVolPtr = std::make_shared<float>(buttonsVolume);
+	auto bgVolPtr = std::make_shared<float>(backgroundVolume);
 
 	auto panel = tgui::Panel::create({ "60%", "60%" });
 	panel->setPosition({ "50%", "50%" });
@@ -75,8 +84,8 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 	content->add(gameplayPanel);
 
 	videoPanel->setPosition({ "0%", "0%" });
-	videoPanel->getRenderer()->setBackgroundColor(tgui::Color(128, 128, 128));
-	videoPanel->add(background);
+	audioPanel->getRenderer()->setBackgroundColor(tgui::Color(0, 0, 0, 0));
+	//videoPanel->add(background);
 
 	audioPanel->setPosition({ "0%", "0%" });
 	audioPanel->getRenderer()->setBackgroundColor(tgui::Color(128, 128, 128));
@@ -107,19 +116,22 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 	StyleButton(gameplayButton);
 	sidebar->add(gameplayButton);
 
-	videoButton->onClick([=] {
+	videoButton->onClick([=, &btnSound] {
+		btnSound.play();
 		videoPanel->setVisible(true);
 		audioPanel->setVisible(false);
 		gameplayPanel->setVisible(false);
 		});
 
-	audioButton->onClick([=] {
+	audioButton->onClick([=, &btnSound] {
+		btnSound.play();
 		videoPanel->setVisible(false);
 		audioPanel->setVisible(true);
 		gameplayPanel->setVisible(false);
 		});
 
-	gameplayButton->onClick([=] {
+	gameplayButton->onClick([=, &btnSound] {
+		btnSound.play();
 		videoPanel->setVisible(false);
 		audioPanel->setVisible(false);
 		gameplayPanel->setVisible(true);
@@ -170,15 +182,18 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 	Utils::StyleButton(rightResolutionArrow);
 	rightResolutionArrow->setTextSize(24);
 
-	leftResolutionArrow->onClick([resolutions, resolutionsIndexPtr, resolutionValue]
+	leftResolutionArrow->onClick([resolutions, resolutionsIndexPtr, resolutionValue, &btnSound]
 		{
+			btnSound.play();
 			if (*resolutionsIndexPtr == 0) *resolutionsIndexPtr = resolutions->size() - 1;
 			else --(*resolutionsIndexPtr);
 			resolutionValue->setText(std::to_string((*resolutions)[*resolutionsIndexPtr].x) + "x"
 				+ std::to_string((*resolutions)[*resolutionsIndexPtr].y));
 		});
-	rightResolutionArrow->onClick([resolutions, resolutionsIndexPtr, resolutionValue]
+	rightResolutionArrow->onClick([resolutions, resolutionsIndexPtr, resolutionValue, &btnSound]
 		{
+
+			btnSound.play();
 			if (*resolutionsIndexPtr == resolutions->size() - 1) *resolutionsIndexPtr = 0;
 			else ++(*resolutionsIndexPtr);
 			resolutionValue->setText(std::to_string((*resolutions)[*resolutionsIndexPtr].x) + "x"
@@ -205,10 +220,12 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 	fullscreenCheckbox->setSize({ "5%", "6%" });
 	fullscreenCheckbox->setPosition({ "73%", "37.5%" });
 	fullscreenCheckbox->setChecked(true);
-	fullscreenCheckbox->onCheck([fullscreenPtr] {
+	fullscreenCheckbox->onCheck([fullscreenPtr, &btnSound] {
+		btnSound.play();
 		*fullscreenPtr = true;
 		});
-	fullscreenCheckbox->onUncheck([fullscreenPtr] {
+	fullscreenCheckbox->onUncheck([fullscreenPtr, &btnSound] {
+		btnSound.play();
 		*fullscreenPtr = false;
 		});
 
@@ -225,10 +242,20 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 	applyButton->getRenderer()->setRoundedBorderRadius(10);
 	applyButton->getRenderer()->setTexture("assets/images/buttons.png");
 	Utils::StyleButton(applyButton);
-	applyButton->onClick([resolutionsIndexPtr, fullscreenPtr,
-		framerateIndexPtr, onApply]
+	applyButton->onClick([resolutionsIndexPtr, fullscreenPtr, framerateIndexPtr,
+		masterVolPtr, buttonsVolPtr, bgVolPtr, onApply, &btnSound]
 		{
-			if (onApply) onApply(*resolutionsIndexPtr, *fullscreenPtr, *framerateIndexPtr);
+			btnSound.play();
+			if (onApply) {
+				onApply(
+					*resolutionsIndexPtr,
+					*fullscreenPtr,
+					*framerateIndexPtr,
+					*masterVolPtr,
+					*buttonsVolPtr,
+					*bgVolPtr
+				);
+			}
 		});
 	content->add(applyButton);
 
@@ -274,7 +301,8 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 	leftFramerateArrow->setPosition({ "0%", "0%" });
 	leftFramerateArrow->getRenderer()->setTexture("assets/images/buttons.png");
 	Utils::StyleButton(leftFramerateArrow);
-	leftFramerateArrow->onClick([framerateIndexPtr, framerates, framerateValue] {
+	leftFramerateArrow->onClick([framerateIndexPtr, framerates, framerateValue, &btnSound] {
+		btnSound.play();
 		if (*framerateIndexPtr == 0) *framerateIndexPtr = (*framerates).size() - 1;
 		else --(*framerateIndexPtr);
 		framerateValue->setText(std::to_string((*framerates)[*framerateIndexPtr]));
@@ -285,7 +313,8 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 	rightFramerateArrow->setPosition({ "85%", "0%" });
 	rightFramerateArrow->getRenderer()->setTexture("assets/images/buttons.png");
 	Utils::StyleButton(rightFramerateArrow);
-	rightFramerateArrow->onClick([framerateIndexPtr, framerates, framerateValue] {
+	rightFramerateArrow->onClick([framerateIndexPtr, framerates, framerateValue, &btnSound] {
+		btnSound.play();
 		if (*framerateIndexPtr == (*framerates).size() - 1) *framerateIndexPtr = 0;
 		else ++(*framerateIndexPtr);
 		framerateValue->setText(std::to_string((*framerates)[*framerateIndexPtr]));
@@ -299,11 +328,73 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 	videoPanel->add(fullscreenCheckbox);
 	videoPanel->add(framerateContainer);
 
+	auto createAudioLabel = [](const tgui::String& text) {
+		auto label = tgui::Label::create(text);
+		label->setSize({ "25%", "12.5%" });
+		label->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+		label->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+		label->getRenderer()->setBorders(2);
+		label->getRenderer()->setTextColor(tgui::Color(245, 240, 230));
+		label->getRenderer()->setTextOutlineColor(tgui::Color(40, 25, 15));
+		label->getRenderer()->setTextOutlineThickness(1.5f);
+		label->setTextSize(22);
+		return label;
+		};
+
+	auto masterLabel = createAudioLabel("Master Volume");
+	masterLabel->setPosition({ "5%", "10%" });
+	audioPanel->add(masterLabel);
+
+	auto masterSlider = tgui::Slider::create();
+	masterSlider->setPosition({ "35%", "12.5%" });
+	masterSlider->setSize({ "55%", "8%" });
+	masterSlider->setMinimum(0);
+	masterSlider->setMaximum(100);
+	masterSlider->setValue(*masterVolPtr);
+	StyleSlider(masterSlider);
+	masterSlider->onValueChange([masterVolPtr](float value) {
+		*masterVolPtr = value;
+		});
+	audioPanel->add(masterSlider);
+
+	auto buttonsLabel = createAudioLabel("Buttons Volume");
+	buttonsLabel->setPosition({ "5%", "35%" });
+	audioPanel->add(buttonsLabel);
+
+	auto buttonsSlider = tgui::Slider::create();
+	buttonsSlider->setPosition({ "35%", "37.5%" });
+	buttonsSlider->setSize({ "55%", "8%" });
+	buttonsSlider->setMinimum(0);
+	buttonsSlider->setMaximum(100);
+	buttonsSlider->setValue(*buttonsVolPtr);
+	StyleSlider(buttonsSlider);
+	buttonsSlider->onValueChange([buttonsVolPtr](float value) {
+		*buttonsVolPtr = value;
+		});
+	audioPanel->add(buttonsSlider);
+
+	auto bgLabel = createAudioLabel("Background Vol.");
+	bgLabel->setPosition({ "5%", "60%" });
+	audioPanel->add(bgLabel);
+
+	auto bgSlider = tgui::Slider::create();
+	bgSlider->setPosition({ "35%", "62.5%" });
+	bgSlider->setSize({ "55%", "8%" });
+	bgSlider->setMinimum(0);
+	bgSlider->setMaximum(100);
+	bgSlider->setValue(*bgVolPtr);
+	StyleSlider(bgSlider);
+	bgSlider->onValueChange([bgVolPtr](float value) {
+		*bgVolPtr = value;
+		});
+	audioPanel->add(bgSlider);
+
 	return panel;
 }
 
 tgui::Panel::Ptr Utils::CreateProfilePanel(
 	const UserProfile& profile,
+	sf::Sound& btnSound,
 	std::function<void()> onClose)
 {
 	auto panel = tgui::Panel::create({ "60%", "60%" });
@@ -350,8 +441,9 @@ tgui::Panel::Ptr Utils::CreateProfilePanel(
 	closeButton->setOrigin(1.f, 0.f);
 	closeButton->setPosition({ "98%", "2%" });
 	closeButton->onPress(
-		[panel, onClose]
+		[panel, onClose, &btnSound]
 		{
+			btnSound.play();
 			panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(150));
 			if (onClose) onClose();
 		});
@@ -367,6 +459,7 @@ tgui::Panel::Ptr Utils::CreateProfilePanel(
 }
 
 tgui::Panel::Ptr Utils::CreateExitPanel(tgui::Gui& gui,
+	sf::Sound& btnSound,
 	std::function<void()> onYes,
 	std::function<void()> onNo)
 {
@@ -396,7 +489,8 @@ tgui::Panel::Ptr Utils::CreateExitPanel(tgui::Gui& gui,
 	noButton->getRenderer()->setTexture("assets/images/buttons.png");
 	StyleButton(noButton);
 	noButton->setTextSize(20);
-	noButton->onPress([panel, onNo]() {
+	noButton->onPress([panel, onNo, &btnSound]() {
+		btnSound.play();
 		panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(100));
 		if (onNo) onNo();
 		});
@@ -407,7 +501,8 @@ tgui::Panel::Ptr Utils::CreateExitPanel(tgui::Gui& gui,
 	yesButton->getRenderer()->setTexture("assets/images/buttons.png");
 	StyleButton(yesButton);
 	yesButton->setTextSize(20);
-	yesButton->onPress([panel, onYes]() {
+	yesButton->onPress([panel, onYes, &btnSound]() {
+		btnSound.play();
 		if (onYes) onYes();
 		});
 
@@ -417,7 +512,8 @@ tgui::Panel::Ptr Utils::CreateExitPanel(tgui::Gui& gui,
 	return panel;
 }
 
-tgui::Panel::Ptr Utils::CreateErrorPopupPanel(tgui::Gui& gui, const std::string& message, std::function<void()> onClose)
+tgui::Panel::Ptr Utils::CreateErrorPopupPanel(tgui::Gui& gui,
+	const std::string& message, sf::Sound& btnSound, std::function<void()> onClose)
 {
 	auto errorPopupPanel = tgui::Panel::create({ "25%", "25%" });
 	errorPopupPanel->setPosition({ "50%", "50%" });
@@ -435,8 +531,9 @@ tgui::Panel::Ptr Utils::CreateErrorPopupPanel(tgui::Gui& gui, const std::string&
 	okButton->setOrigin(0.5f, 0.5f);
 	okButton->getRenderer()->setTexture("assets/images/buttons.png");
 	StyleButton(okButton);
-	okButton->onPress([errorPopupPanel, onClose]()
+	okButton->onPress([errorPopupPanel, onClose, &btnSound]()
 		{
+			btnSound.play();
 			errorPopupPanel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(150));
 			if (onClose) onClose();
 		});
@@ -462,4 +559,23 @@ void Utils::StyleButton(const tgui::Button::Ptr& button)
 	button->getRenderer()->setTextOutlineThickness(1.5f);
 	button->getRenderer()->setOpacity(0.7f);
 	button->getRenderer()->setTextSize(24);
+}
+
+void Utils::StyleSlider(const tgui::Slider::Ptr& slider)
+{
+	tgui::Color darkBrown(40, 25, 15);
+	tgui::Color mediumBrown(80, 50, 30);
+	tgui::Color cream(245, 240, 230);
+
+	tgui::Color mediumBrownHover(100, 70, 50);
+
+	auto renderer = slider->getRenderer();
+
+	slider->getRenderer()->setTrackColor(mediumBrown);
+	slider->getRenderer()->setTrackColorHover(mediumBrownHover);
+	slider->getRenderer()->setBorders(2);
+	slider->getRenderer()->setBorderColor(darkBrown);
+
+	renderer->setThumbColor(cream);
+	renderer->setThumbColorHover(tgui::Color::White);
 }

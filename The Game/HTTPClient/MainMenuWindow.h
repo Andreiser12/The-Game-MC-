@@ -75,5 +75,10 @@ private:
 	ApiClient& m_apiClient;
 
 	sf::Music m_bgMusic;
+	sf::SoundBuffer m_clickBuffer;
+	sf::Sound m_clickSound;
+	float m_masterVolume{ 100.0f };
+	float m_buttonsVolume{ 100.0f };
+	float m_backgroundVolume{ 100.0f };
 };
 

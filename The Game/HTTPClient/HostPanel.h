@@ -4,6 +4,7 @@
 #include "TGUI/Core.hpp"
 #include "TGUI/Widgets/Button.hpp"
 #include "TGUI/Backend/SFML-Graphics.hpp"
+#include <SFML/Audio.hpp>
 
 #include "ApiClient.h"
 
@@ -12,6 +13,7 @@ class HostPanel
 public:
 	static tgui::Panel::Ptr Create(tgui::Gui& gui,
 		ApiClient& apiClient,
+		sf::Sound& btnSound,
 		const std::string& lobbyId,
 		std::function<bool(ApiClient&)> onLeave,
 		std::function<bool(ApiClient&)> onStart);

@@ -3,7 +3,8 @@
 MainMenuWindow::MainMenuWindow(sf::RenderWindow& window, ApiClient& api) :
 	m_window{ window },
 	m_mainMenu{ window },
-	m_apiClient{ api }
+	m_apiClient{ api },
+	m_clickSound{m_clickBuffer}
 {
 	m_mainMenu.setFont("assets/fonts/Cinzel-Regular.ttf");
 	m_background = tgui::Picture::create("assets/images/mainMenuBackground.png");
@@ -44,6 +45,11 @@ MainMenuWindow::MainMenuWindow(sf::RenderWindow& window, ApiClient& api) :
 		m_bgMusic.setVolume(50.0f);   
 		m_bgMusic.play();             
 	}
+
+	if (m_clickBuffer.loadFromFile("assets/sounds/FEETHmn_InsJ_Footsteps_Wood_Jogging_Trainers_02-01_Single_02.wav"))
+	{
+		m_clickSound.setVolume(50.0f);
+	}
 }
 
 void MainMenuWindow::LoadWidgets()
@@ -56,7 +62,9 @@ void MainMenuWindow::LoadWidgets()
 	playButton->setText("Play");
 	Utils::StyleButton(playButton);
 	m_mainMenu.add(playButton);
-	playButton->onClick([this] {PlayPanelPressed(); });
+	playButton->onClick([this] {
+		m_clickSound.play();
+		PlayPanelPressed(); });
 
 	auto profileButton = tgui::Button::create();
 	profileButton->setSize("14%", "5%");
@@ -65,7 +73,9 @@ void MainMenuWindow::LoadWidgets()
 	profileButton->setText("Profile");
 	profileButton->getRenderer()->setTexture("assets/images/buttons.png");
 	Utils::StyleButton(profileButton);
-	profileButton->onClick([this] { ProfileButtonPressed(); });
+	profileButton->onClick([this] {
+		m_clickSound.play();
+		ProfileButtonPressed(); });
 	m_mainMenu.add(profileButton);
 
 	auto settingsButton = tgui::Button::create();
@@ -76,7 +86,9 @@ void MainMenuWindow::LoadWidgets()
 	settingsButton->getRenderer()->setTexture("assets/images/buttons.png");
 	Utils::StyleButton(settingsButton);
 	m_mainMenu.add(settingsButton);
-	settingsButton->onClick([this] { SettingsButtonPressed(); });
+	settingsButton->onClick([this] {
+		m_clickSound.play();
+		SettingsButtonPressed(); });
 
 	auto exitButton = tgui::Button::create();
 	exitButton->setSize("14%", "5%");
@@ -86,7 +98,9 @@ void MainMenuWindow::LoadWidgets()
 	exitButton->getRenderer()->setTexture("assets/images/buttons.png");
 	Utils::StyleButton(exitButton);
 	m_mainMenu.add(exitButton);
-	exitButton->onClick([this] {ExitButtonPressed(); });
+	exitButton->onClick([this] {
+		m_clickSound.play();
+		ExitButtonPressed(); });
 }
 
 void MainMenuWindow::GoBackToMenu()
@@ -100,6 +114,11 @@ void MainMenuWindow::GoBackToMenu()
 
 	if (m_gamePanel) m_gamePanel.reset();
 	m_gameStartedLocally = false;
+
+	if (m_bgMusic.getStatus() != sf::SoundSource::Status::Playing)
+	{
+		m_bgMusic.play();
+	}
 }
 
 void MainMenuWindow::HandleLocalPlayerLeft()
@@ -125,6 +144,11 @@ void MainMenuWindow::HandleLocalPlayerLeft()
 	CloseHostPanel();
 	m_apiClient.SetLobbyId("");
 	m_apiClient.ClearEvent();
+
+	if (m_bgMusic.getStatus() != sf::SoundSource::Status::Playing)
+	{
+		m_bgMusic.play();
+	}
 }
 
 
@@ -156,7 +180,7 @@ void MainMenuWindow::Update()
 	case ClientEvent::LobbyClosed:
 	{
 		ShutdownLobby();
-		m_mainMenu.add(Utils::CreateErrorPopupPanel(m_mainMenu, "Lobby was closed by host.", []() {}));
+		m_mainMenu.add(Utils::CreateErrorPopupPanel(m_mainMenu, "Lobby was closed by host.", m_clickSound, []() {}));
 		return;
 	}
 
@@ -177,7 +201,9 @@ void MainMenuWindow::Update()
 		m_bgMusic.stop();
 
 		m_gamePanel = std::make_shared<GamePanel>(m_mainMenu, m_apiClient,
-			[this]() { GoBackToMenu(); }, [this]() {HandleLocalPlayerLeft(); });
+			[this]() { GoBackToMenu(); }, [this]() {
+				m_clickSound.play();
+				HandleLocalPlayerLeft(); });
 		m_gamePanel->OnGameStarted();
 		m_gameStartedLocally = true;
 	}
@@ -187,11 +213,15 @@ void MainMenuWindow::ExitButtonPressed()
 {
 	auto exitPanel = Utils::CreateExitPanel(
 		m_mainMenu,
+		m_clickSound,
 		[this]() {
+			m_clickSound.play();
+			m_clickSound.play();
 			m_apiClient.Logout();
 			m_window.close();
 		},
 		[this]() {
+			m_clickSound.play();
 			auto panel = m_mainMenu.get<tgui::Panel>("ExitPanel");
 			if (panel) m_mainMenu.remove(panel);
 		}
@@ -206,12 +236,32 @@ void MainMenuWindow::SettingsButtonPressed()
 		m_resolutionIndex,
 		m_isFullscreen,
 		m_framerateIndex,
-		[this]() {},
-		[this](unsigned newResolutionIndex, bool fullscreen, unsigned newFramerateIndex)
+		m_masterVolume,
+		m_buttonsVolume,
+		m_backgroundVolume,
+		m_clickSound,
+		[this]() {m_clickSound.play(); },
+		[this](unsigned newResolutionIndex, bool fullscreen, unsigned newFramerateIndex,
+			float newMasterVol, float newBtnVol, float newBgVol)
 		{
+			m_clickSound.play();
 			m_resolutionIndex = newResolutionIndex;
 			m_isFullscreen = fullscreen;
 			m_framerateIndex = newFramerateIndex;
+
+			m_masterVolume = newMasterVol;
+			m_buttonsVolume = newBtnVol;
+			m_backgroundVolume = newBgVol;
+
+			float masterMult = m_masterVolume / 100.0f;
+
+			if (m_bgMusic.getStatus() != sf::SoundSource::Status::Stopped)
+			{
+				m_bgMusic.setVolume(m_backgroundVolume * masterMult);
+			}
+
+			m_clickSound.setVolume(m_buttonsVolume * masterMult);
+
 			if (m_isFullscreen)
 			{
 				m_window.create(sf::VideoMode(m_resolutions[m_resolutionIndex]),
@@ -237,13 +287,15 @@ void MainMenuWindow::ProfileButtonPressed()
 	auto userProfileExists = m_apiClient.GetUserProfile(m_apiClient.GetPlayerId());
 	if (!userProfileExists)
 	{
-		Utils::CreateErrorPopupPanel(m_mainMenu, "Could not load profile");
+		Utils::CreateErrorPopupPanel(m_mainMenu, "Could not load profile", m_clickSound);
 		return;
 	}
 	auto panel = Utils::CreateProfilePanel(
 		userProfileExists.value(),
+		m_clickSound,
 		[this]
 		{
+			m_clickSound.play();
 			auto panel = m_mainMenu.get<tgui::Panel>("ProfilePanel");
 			if (panel) m_mainMenu.remove(panel);
 		}
@@ -256,10 +308,12 @@ void MainMenuWindow::PlayPanelPressed()
 	auto playPanel = PlayPanel::Create(
 		m_mainMenu,
 		m_apiClient,
-		[this]() {},
-		[this]() {},
+		m_clickSound,
+		[this]() {m_clickSound.play(); },
+		[this]() {m_clickSound.play(); },
 		[this](ApiClient& api, const std::string& user)
 		{
+			m_clickSound.play();
 			auto lobbyId = api.CreateLobby(user);
 			if (!lobbyId) return std::string{ "ERROR" };
 			return lobbyId.value();

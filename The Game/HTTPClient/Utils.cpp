@@ -85,7 +85,6 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 
 	videoPanel->setPosition({ "0%", "0%" });
 	audioPanel->getRenderer()->setBackgroundColor(tgui::Color(0, 0, 0, 0));
-	//videoPanel->add(background);
 
 	audioPanel->setPosition({ "0%", "0%" });
 	audioPanel->getRenderer()->setBackgroundColor(tgui::Color(128, 128, 128));
@@ -346,8 +345,8 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 	audioPanel->add(masterLabel);
 
 	auto masterSlider = tgui::Slider::create();
-	masterSlider->setPosition({ "35%", "12.5%" });
-	masterSlider->setSize({ "55%", "8%" });
+	masterSlider->setPosition({ "35%", "13.5%" });
+	masterSlider->setSize({ "55%", "2%" });
 	masterSlider->setMinimum(0);
 	masterSlider->setMaximum(100);
 	masterSlider->setValue(*masterVolPtr);
@@ -362,8 +361,8 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 	audioPanel->add(buttonsLabel);
 
 	auto buttonsSlider = tgui::Slider::create();
-	buttonsSlider->setPosition({ "35%", "37.5%" });
-	buttonsSlider->setSize({ "55%", "8%" });
+	buttonsSlider->setPosition({ "35%", "38.5%" });
+	buttonsSlider->setSize({ "55%", "2%" });
 	buttonsSlider->setMinimum(0);
 	buttonsSlider->setMaximum(100);
 	buttonsSlider->setValue(*buttonsVolPtr);
@@ -378,8 +377,8 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 	audioPanel->add(bgLabel);
 
 	auto bgSlider = tgui::Slider::create();
-	bgSlider->setPosition({ "35%", "62.5%" });
-	bgSlider->setSize({ "55%", "8%" });
+	bgSlider->setPosition({ "35%", "63.5%" });
+	bgSlider->setSize({ "55%", "2%" });
 	bgSlider->setMinimum(0);
 	bgSlider->setMaximum(100);
 	bgSlider->setValue(*bgVolPtr);
@@ -563,19 +562,12 @@ void Utils::StyleButton(const tgui::Button::Ptr& button)
 
 void Utils::StyleSlider(const tgui::Slider::Ptr& slider)
 {
-	tgui::Color darkBrown(40, 25, 15);
-	tgui::Color mediumBrown(80, 50, 30);
-	tgui::Color cream(245, 240, 230);
-
-	tgui::Color mediumBrownHover(100, 70, 50);
-
 	auto renderer = slider->getRenderer();
 
-	slider->getRenderer()->setTrackColor(mediumBrown);
-	slider->getRenderer()->setTrackColorHover(mediumBrownHover);
-	slider->getRenderer()->setBorders(2);
-	slider->getRenderer()->setBorderColor(darkBrown);
-
-	renderer->setThumbColor(cream);
+	renderer->setTrackColor(tgui::Color::Black);
+	renderer->setTrackColorHover(tgui::Color::Black);
+	renderer->setBorders(0);
+	renderer->setThumbColor(tgui::Color(245, 240, 230));
 	renderer->setThumbColorHover(tgui::Color::White);
+
 }

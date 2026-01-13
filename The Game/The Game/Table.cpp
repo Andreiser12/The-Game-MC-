@@ -22,10 +22,10 @@ AssistantAI::DeckType ConvertDeckType(Deck::DeckType type)
 Table::Table(const std::vector<std::pair<unsigned, std::string>>& lobbyPlayers) :
 	m_playerCount{ static_cast<uint8_t>(lobbyPlayers.size())}
 {
-	m_decks[0] = std::make_unique<Deck>(Deck::DeckType::Ascending, Deck::DeckNumber::First, 0u);
-	m_decks[1] = std::make_unique<Deck>(Deck::DeckType::Ascending, Deck::DeckNumber::Second, 1u);
-	m_decks[2] = std::make_unique<Deck>(Deck::DeckType::Descending, Deck::DeckNumber::First, 2u);
-	m_decks[3] = std::make_unique<Deck>(Deck::DeckType::Descending, Deck::DeckNumber::Second, 3u);
+	m_decks[0] = std::make_unique<Deck>(Deck::DeckType::Ascending, 0u);
+	m_decks[1] = std::make_unique<Deck>(Deck::DeckType::Ascending, 1u);
+	m_decks[2] = std::make_unique<Deck>(Deck::DeckType::Descending, 2u);
+	m_decks[3] = std::make_unique<Deck>(Deck::DeckType::Descending, 3u);
 	Shuffle();
 
 	size_t cardsPerPlayer;
@@ -316,15 +316,15 @@ std::vector<uint8_t> Table::EndTurn(unsigned playerId)
 {
 	if (playerId != GetCurrentPlayerId()) return {};
 
-	Player& player = GetPlayer(playerId);	
-	const uint8_t cardsPlaced = player.GetCardsPlacedRound();
-	uint8_t drawCount = static_cast<uint8_t>(std::min<std::size_t>(cardsPlaced, m_pile.size()));
+	Player& player{ GetPlayer(playerId) };
+	const uint8_t cardsPlaced{ player.GetCardsPlacedRound() };
+	uint8_t drawCount{ static_cast<uint8_t>(std::min<std::size_t>(cardsPlaced, m_pile.size())) };
 	std::vector<uint8_t> drawnCards;
 	for (uint8_t i = 0; i < drawCount; i++)
 	{
 		Card<uint8_t> card = m_pile.top();
 		m_pile.pop();
-		player.AddCard(card);
+		player.AddCard(std::move(card));
 		drawnCards.emplace_back(card.GetId());
 	}
 	player.ResetCardsPlaced();

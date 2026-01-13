@@ -24,8 +24,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	{
 		sf::VideoMode connectionFailedMode = sf::VideoMode::getDesktopMode();
 		connectionFailedMode.size = { LOGIN_WIDTH, LOGIN_HEIGHT };
-		sf::RenderWindow connectionFailedWindow{ connectionFailedMode, "Connection Failed",
-			sf::Style::Titlebar | sf::Style::Close };
+		sf::RenderWindow connectionFailedWindow{ connectionFailedMode, 
+			"The Game - Failed Connection", sf::Style::Titlebar | sf::Style::Close };
 		connectionFailedWindow.setIcon(
 			windowIcon.getSize(),
 			windowIcon.getPixelsPtr()

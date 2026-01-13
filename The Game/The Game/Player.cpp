@@ -1,59 +1,55 @@
 module Player;
 
-Player::Player(unsigned playerID, const std::string& username) :
-	m_playerId{playerID}, m_username{username} {}
+Player::Player(unsigned playerID, std::string_view username) :
+	m_playerId{ playerID }, m_username{ username } {
+}
 
-Player::~Player() {}
-
-void Player::AddCard(const Card<uint8_t>& card)
+void Player::AddCard(Card<uint8_t>&& card)
 {
-	m_cards.emplace(card);
+	m_cards.emplace(std::move(card));
 }
 
 void Player::DrawCards(Pile& deck)
 {
 	while (!deck.empty() && m_cardsPlacedRound)
 	{
-		Card<uint8_t> card = deck.top();
+		m_cards.emplace(std::move(deck.top()));
 		deck.pop();
-		m_cards.emplace(card);
 		--m_cardsPlacedRound;
 	}
 }
 
-bool Player::FindCard(uint8_t cardId) const
+bool Player::FindCard(uint8_t cardId) const noexcept
 {
-	Card<uint8_t> cardToFind = Card(cardId);
-	return m_cards.find(cardToFind) != m_cards.end();
+	return m_cards.contains(Card<uint8_t>{cardId});
 }
 
-void Player::RemoveCard(uint8_t cardId)
+void Player::RemoveCard(uint8_t cardId) noexcept
 {
-	auto it = std::find_if(m_cards.begin(), m_cards.end(),
+	auto it{ std::find_if(m_cards.begin(), m_cards.end(),
 		[cardId](const Card<uint8_t>& card)
 		{
 			return card.GetId() == cardId;
-		});
+		}) };
 	if (it != m_cards.end()) m_cards.erase(it);
 }
 
 void Player::SetupCards(Pile& deck, uint8_t cardsCount)
 {
-	Card<uint8_t> cardToPlace;
+	m_cards.reserve(cardsCount);
 	for (uint8_t i = 0; i < cardsCount; ++i)
 	{
-		cardToPlace = deck.top();
+		m_cards.emplace(std::move(deck.top()));
 		deck.pop();
-		AddCard(cardToPlace);
 	}
 }
 
-void Player::IncrementCardsPlaced()
+void Player::IncrementCardsPlaced() noexcept
 {
 	++m_cardsPlacedRound;
 }
 
-void Player::ResetCardsPlaced()
+void Player::ResetCardsPlaced() noexcept
 {
 	m_cardsPlacedRound = 0u;
 }
@@ -63,12 +59,12 @@ unsigned Player::GetPlayerId() const noexcept
 	return m_playerId;
 }
 
-const std::string& Player::GetUsername() const
+const std::string& Player::GetUsername() const noexcept
 {
 	return m_username;
 }
 
-const PlayerHand& Player::GetCards() const
+const PlayerHand& Player::GetCards() const noexcept
 {
 	return m_cards;
 }
@@ -78,14 +74,9 @@ size_t Player::GetCardsCount() const noexcept
 	return m_cards.size();
 }
 
-uint8_t Player::GetCardsPlacedRound() const
+uint8_t Player::GetCardsPlacedRound() const noexcept
 {
 	return m_cardsPlacedRound;
-}
-
-bool Player::operator<(Player& other) const
-{
-	return this->m_playerId < other.GetPlayerId();
 }
 
 void Player::SetTimeOut(bool value)
@@ -97,12 +88,12 @@ void Player::SetIncative(bool value)
 	m_isInactive = value;
 }
 
-bool Player::HasTimeOut() const
+bool Player::HasTimeOut() const noexcept
 {
 	return m_hasTimeOut;
 }
 
-bool Player::IsInactive() const
+bool Player::IsInactive() const noexcept
 {
 	return m_isInactive;
 }

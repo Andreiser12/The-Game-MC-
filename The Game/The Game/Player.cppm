@@ -1,45 +1,46 @@
 export module Player;
 
-import <stack>;
+import Card;
+import Deck;
+
 import <unordered_set>;
 import <cstddef>;
 import <string>;
 import <functional>;
 
-import Card;
-import Deck;
-
-export using PlayerHand = std::unordered_set<Card<uint8_t>,
-	CardsSetHashFunction<uint8_t>, CardsEqual<uint8_t>>;
+export using PlayerHand = std::unordered_set<Card<std::uint8_t>>;
 
 export class Player
 {
 public:
-	Player(unsigned playerID, const std::string& username);
-	~Player();
+	Player(unsigned playerID, std::string_view username);
+	~Player() = default;
 
-	void AddCard(const Card<uint8_t>& card);
+	void AddCard(Card<uint8_t>&& card);
 	void DrawCards(Pile& deck);
-	bool FindCard(uint8_t cardId) const;
-	void RemoveCard(uint8_t cardId);
+	[[nodiscard]] bool FindCard(uint8_t cardId) const noexcept;
+	void RemoveCard(uint8_t cardId) noexcept;
 
 	void SetupCards(Pile& deck, uint8_t cardsCount);
-	void IncrementCardsPlaced();
-	void ResetCardsPlaced();
+	void IncrementCardsPlaced() noexcept;
+	void ResetCardsPlaced() noexcept;
 
 	void SetTimeOut(bool value);
 	void SetIncative(bool value);
 
 	unsigned GetPlayerId() const noexcept;
-	const std::string& GetUsername() const;
-	const PlayerHand& GetCards() const;
+	const std::string& GetUsername() const noexcept;
+	const PlayerHand& GetCards() const noexcept;
 	size_t GetCardsCount() const noexcept;
-	uint8_t GetCardsPlacedRound() const;
+	uint8_t GetCardsPlacedRound() const noexcept;
 
-	bool operator<(Player& other) const;
+	[[nodiscard]] bool operator<(const Player& other) const noexcept
+	{
+		return m_playerId < other.GetPlayerId();
+	}
 
-	bool HasTimeOut() const;
-	bool IsInactive() const;
+	bool HasTimeOut() const noexcept;
+	bool IsInactive() const noexcept;
 
 private:
 	Player() = delete;

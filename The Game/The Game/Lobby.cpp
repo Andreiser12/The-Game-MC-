@@ -203,7 +203,7 @@ bool Lobby::PlayCard(unsigned playerId, uint8_t cardId, uint8_t deckId)
 	if (!m_gameStarted || !m_table) return false;
 
 	auto& player = m_table->GetPlayer(playerId);
-	Card<uint8_t> card(cardId);
+	Card<uint8_t> card{ cardId };
 	if (!m_table->PlayCard(playerId, deckId, card)) return false;
 
 	m_table->PlaceCardOnDeck(deckId, card);

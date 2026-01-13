@@ -2,6 +2,7 @@ export module Deck;
 import Card;
 
 import <stack>;
+import <utility>;
 
 using std::uint8_t;
 export using Pile = std::stack<Card<uint8_t>>;
@@ -16,22 +17,18 @@ public:
 		Descending
 	};
 
-	enum class DeckNumber : uint8_t
-	{
-		First,
-		Second
-	};
-
 public:
-	Deck(DeckType deckType, DeckNumber deckNumber, uint8_t deckIndex);
+	Deck(DeckType deckType, uint8_t deckIndex);
 
-	const Pile& GetDeck() const;
 	DeckType GetDeckType() const noexcept;
-	DeckNumber GetDeckNumber() const noexcept;
 	const Card<uint8_t>& GetTopCard() const;
 	uint8_t GetDeckIndex() const noexcept;
 
-	void PushCard(const Card<uint8_t>& card);
+	template<typename CardType>
+	void PushCard(CardType&& card)
+	{
+		m_pile.emplace(std::forward<CardType>(card));
+	};
 
 public:
 	constexpr static uint8_t ASCENDING_START_CARD{ 1u };
@@ -43,9 +40,5 @@ private:
 private:
 	Pile m_pile;
 	DeckType m_deckType : 1;
-	DeckNumber m_deckNumber : 1;
 	uint8_t m_deckIndex;
 };
-
-
-

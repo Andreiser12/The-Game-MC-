@@ -8,34 +8,29 @@ export template<std::integral Integer>
 class Card
 {
 public:
-	Card() = default;
-	Card(Integer id);
+	explicit constexpr Card(Integer id) noexcept;
 
-	Integer GetId() const noexcept;
+	constexpr Integer GetId() const noexcept;
 
-	bool operator == (const Card<Integer>& other) const;
+	constexpr bool operator == (const Card&) const noexcept = default;
 
-protected:
+private:
+	Card() = delete;
+
+private:
 	Integer m_id{};
 
 };
 
-export template<std::integral Integer>
-struct CardsSetHashFunction
+namespace std
 {
-	std::size_t operator()(const Card<Integer>& card) const noexcept
+	template<std::integral Integer>
+	struct hash<Card<Integer>> 
 	{
-		std::size_t hash = std::hash<Integer>()(card.GetId());
-		return hash;
-	}
-};
-
-export template<std::integral Integer>
-struct CardsEqual
-{
-	bool operator()(const Card<Integer>& c1, const Card<Integer>& c2) const noexcept
-	{
-		return c1.GetId() == c2.GetId();
-	}
-};
+		constexpr size_t operator()(const Card<Integer>& card) const noexcept
+		{
+			return hash<std::uint8_t>{}(card.GetId());
+		}
+	};
+}
 

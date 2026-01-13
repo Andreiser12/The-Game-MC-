@@ -4,6 +4,7 @@ import <optional>;
 import <vector>;
 import <ranges>;
 import <cmath>;
+import <unordered_map>;
 import <set>;
 
 import Card;
@@ -20,10 +21,11 @@ export struct AIMove
 
 export struct HeuristicTree
 {
-	static int Evaluate(const AIMove& move, const Table& table, std::span<const Player> players);
+	static int Evaluate(const AIMove& move, const Table& table, const std::unordered_map<unsigned, Player>& players);
 	static int LocalScore(const AIMove& move);
 	static int BackwardsBonus(const AIMove& move);
-	static int GlobalPenalty(const AIMove& move, const Table& table, std::span<const Player> players);
+	static int GlobalPenalty(const AIMove& move, const Table& table,
+		const std::unordered_map<unsigned, Player>& players);
 	static int RiskPenalty(const AIMove& move, const Table& table);
 };
 

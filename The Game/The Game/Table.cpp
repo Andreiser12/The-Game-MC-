@@ -246,12 +246,7 @@ const Pile& Table::GetPile() const
 	return m_pile;
 }
 
-std::span<const Player> Table::GetPlayers() const
-{
-	return {m_Players.data(), m_Players.size()};
-}
-
-const std::unordered_map<unsigned, Player>& Table::GetPlayersMap() const
+const std::unordered_map<unsigned, Player>& Table::GetPlayers() const
 {
 	return m_playersMap;
 }

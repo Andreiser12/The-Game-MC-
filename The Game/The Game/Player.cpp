@@ -1,7 +1,5 @@
 module Player;
 
-constexpr static uint8_t MINIMUM_CARDS{ 2u };
-
 Player::Player(unsigned playerID, const std::string& username) :
 	m_playerId{playerID}, m_username{username} {}
 
@@ -42,11 +40,11 @@ void Player::RemoveCard(uint8_t cardId)
 void Player::SetupCards(Pile& deck, uint8_t cardsCount)
 {
 	Card<uint8_t> cardToPlace;
-	for (uint8_t i = 0; i < cardsCount; i++)
+	for (uint8_t i = 0; i < cardsCount; ++i)
 	{
 		cardToPlace = deck.top();
 		deck.pop();
-		m_cards.emplace(cardToPlace);
+		AddCard(cardToPlace);
 	}
 }
 
@@ -60,7 +58,7 @@ void Player::ResetCardsPlaced()
 	m_cardsPlacedRound = 0u;
 }
 
-unsigned Player::GetPlayerId() const
+unsigned Player::GetPlayerId() const noexcept
 {
 	return m_playerId;
 }
@@ -75,7 +73,7 @@ const PlayerHand& Player::GetCards() const
 	return m_cards;
 }
 
-size_t Player::GetCardsCount() const
+size_t Player::GetCardsCount() const noexcept
 {
 	return m_cards.size();
 }

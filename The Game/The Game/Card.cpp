@@ -4,7 +4,7 @@ template<std::integral Integer>
 Card<Integer>::Card(Integer id) : m_id{ id } {}
 
 template<std::integral Integer>
-Integer Card<Integer>::GetId() const
+Integer Card<Integer>::GetId() const noexcept
 {
 	return m_id;
 }

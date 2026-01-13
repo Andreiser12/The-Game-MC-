@@ -12,22 +12,19 @@ std::optional<AIMove>GreedyAI::FindBestMove(const Player& currentPlayer, Table& 
 	{
 		for (const auto& deckReference : table.GetAllDecks())
 		{
-			auto& deck = deckReference.get();
+			auto& deck{ deckReference.get() };
 			if (table.PlayCard(currentPlayer.GetPlayerId(), deck.GetDeckIndex(), card))
 			{
-				AIMove move{deck, card, 0};
+				AIMove move{ deck, card, 0 };
 				move.score = HeuristicTree::Evaluate(move, table, table.GetPlayers());
 				moves.push_back(move);
 			}
 		}
 	}
 
-	if (moves.empty())
-	{
-		return std::nullopt;
-	}
-	
-	auto bestMove = std::ranges::min_element(moves, {}, &AIMove::score);
+	if (moves.empty()) return std::nullopt;
+
+	auto bestMove{ std::ranges::min_element(moves, {}, &AIMove::score) };
 	return *bestMove;
 }
 
@@ -35,17 +32,14 @@ void GreedyAI::PlayTurn(Player& currentPlayer, Table& table, uint8_t minCards)
 {
 	for (size_t i = 0; i < minCards; i++)
 	{
-		auto bestMove = FindBestMove(currentPlayer, table);
-		if (!bestMove)
-		{
-			break;
-		}
+		auto bestMove{ FindBestMove(currentPlayer, table) };
+		if (!bestMove) break;
 		table.PlaceCardOnDeck(bestMove.value().deck.get().GetDeckIndex(), bestMove.value().card);
 		currentPlayer.RemoveCard(bestMove.value().card.GetId());
 	}
 }
 
-int HeuristicTree::Evaluate(const AIMove& move, const Table& table, std::span<const Player> players)
+int HeuristicTree::Evaluate(const AIMove& move, const Table& table, const std::unordered_map<unsigned, Player>& players)
 {
 	int score{ 0 };
 	score += LOCAL_WEIGHT * LocalScore(move)
@@ -57,16 +51,15 @@ int HeuristicTree::Evaluate(const AIMove& move, const Table& table, std::span<co
 
 int HeuristicTree::LocalScore(const AIMove& move)
 {
-	auto topCard = static_cast<int>(move.deck.get().GetTopCard().GetId());
-	auto cardId = static_cast<int>(move.card.GetId());
+	auto topCard{ static_cast<int>(move.deck.get().GetTopCard().GetId()) };
+	auto cardId{ static_cast<int>(move.card.GetId()) };
 	return (std::abs(cardId - topCard));
-
 }
 
 int HeuristicTree::BackwardsBonus(const AIMove& move)
 {
-	auto topCard = static_cast<int>(move.deck.get().GetTopCard().GetId());
-	auto cardId = static_cast<int>(move.card.GetId());
+	auto topCard{ static_cast<int>(move.deck.get().GetTopCard().GetId()) };
+	auto cardId{ static_cast<int>(move.card.GetId()) };
 
 	if (std::abs(cardId - topCard) == 10)
 	{
@@ -75,11 +68,12 @@ int HeuristicTree::BackwardsBonus(const AIMove& move)
 	return 0;
 }
 
-int HeuristicTree::GlobalPenalty(const AIMove& move, const Table& table, std::span<const Player> players)
+int HeuristicTree::GlobalPenalty(const AIMove& move, const Table& table,
+	const std::unordered_map<unsigned, Player>& players)
 {
 	int penalty{ 0 };
 
-	for (const auto& player : players)
+	for (const auto& [id, player] : players)
 	{
 		int validMoves{ 0 };
 
@@ -109,9 +103,9 @@ int HeuristicTree::GlobalPenalty(const AIMove& move, const Table& table, std::sp
 
 int HeuristicTree::RiskPenalty(const AIMove& move, const Table& table)
 {
-	int topCard = static_cast<int>(move.deck.get().GetTopCard().GetId());
-	int cardId = static_cast<int>(move.card.GetId());
-	int gap = std::abs(cardId - topCard);
+	int topCard{ static_cast<int>(move.deck.get().GetTopCard().GetId()) };
+	int cardId{ static_cast<int>(move.card.GetId()) };
+	int gap{ std::abs(cardId - topCard) };
 
 	if (gap >= 30)
 	{

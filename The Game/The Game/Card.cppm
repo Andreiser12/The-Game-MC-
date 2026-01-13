@@ -11,7 +11,7 @@ public:
 	Card() = default;
 	Card(Integer id);
 
-	Integer GetId() const;
+	Integer GetId() const noexcept;
 
 	bool operator == (const Card<Integer>& other) const;
 
@@ -33,7 +33,7 @@ struct CardsSetHashFunction
 export template<std::integral Integer>
 struct CardsEqual
 {
-	bool operator()(const Card<Integer>& c1, const Card<Integer>& c2) const
+	bool operator()(const Card<Integer>& c1, const Card<Integer>& c2) const noexcept
 	{
 		return c1.GetId() == c2.GetId();
 	}

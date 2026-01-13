@@ -30,10 +30,10 @@ public:
 	void SetTimeOut(bool value);
 	void SetIncative(bool value);
 
-	unsigned GetPlayerId() const;
+	unsigned GetPlayerId() const noexcept;
 	const std::string& GetUsername() const;
 	const PlayerHand& GetCards() const;
-	size_t GetCardsCount() const;
+	size_t GetCardsCount() const noexcept;
 	uint8_t GetCardsPlacedRound() const;
 
 	bool operator<(Player& other) const;

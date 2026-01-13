@@ -1,6 +1,5 @@
 export module Table;
 
-import <vector>;
 import <stack>;
 import <unordered_set>;
 import <unordered_map>;
@@ -47,8 +46,7 @@ public:
 	Deck& GetDeck(uint8_t deckId) const;
 	const Pile& GetPile() const;
 	std::span<std::reference_wrapper<Deck>> GetAllDecks() const;
-	std::span<const Player> GetPlayers() const;
-	const std::unordered_map<unsigned, Player>& GetPlayersMap() const;
+	const std::unordered_map<unsigned, Player>& GetPlayers() const;
 	const Player& GetPlayer(unsigned playerId) const;
 	Player& GetPlayer(unsigned playerId);
 	unsigned GetCurrentPlayerId() const;
@@ -64,7 +62,6 @@ private:
 
 private:
 	uint8_t m_playerCount;
-	std::vector<Player> m_Players;
 	std::unordered_map<unsigned, Player> m_playersMap;
 	Pile m_pile;
 	std::array<std::unique_ptr<Deck>, 4> m_decks;

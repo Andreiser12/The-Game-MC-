@@ -3,14 +3,32 @@
 GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	std::function<void()> onExit, std::function<void()> onLocalPlayerLeft) :
 	m_gui{ gui }, m_apiClient{ api },
-	m_onExitToMenu{ std::move(onExit) }, m_onLocalPlayerLeft{ std::move(onLocalPlayerLeft) }
+	m_onExitToMenu{ std::move(onExit) }, m_onLocalPlayerLeft{ std::move(onLocalPlayerLeft) },
+	m_ExitButtonSound{ m_ExitButtonBuffer },
+	m_uiSound(m_clickBuffer),
+	m_cardSound(m_cardFlipBuffer),
+	m_timerSound(m_timerTickBuffer),
+	m_feedbackSound(m_validMoveBuffer)
 {
-	if (m_gameMusic.openFromFile("assets/sounds/12_Silent_Piano_with_Creeping_Tension.ogg"))
+	if (m_gameMusic.openFromFile("assets/sounds/game_panel_sound.ogg"))
 	{
 		m_gameMusic.setLooping(true);
-		m_gameMusic.setVolume(50.0f);
+		m_gameMusic.setVolume(m_normalMusicVolume);
 		m_gameMusic.play();
 	}
+
+	m_ExitButtonBuffer.loadFromFile("assets/sounds/press_button_sound.wav");
+	m_clickBuffer.loadFromFile("assets/sounds/end_turn.wav");
+	m_leaveBuffer.loadFromFile("assets/sounds/leave_match.wav");
+	m_cardFlipBuffer.loadFromFile("assets/sounds/pickup_card.wav");
+	m_validMoveBuffer.loadFromFile("assets/sounds/valid_card.wav");
+	m_specialMoveBuffer.loadFromFile("assets/sounds/backwards_trick.wav");
+	m_errorMoveBuffer.loadFromFile("assets/sounds/invalid_card.wav");
+	m_timerTickBuffer.loadFromFile("assets/sounds/timer_sound.wav");
+
+	m_uiSound.setBuffer(m_clickBuffer);
+	m_cardSound.setBuffer(m_cardFlipBuffer);
+	m_timerSound.setBuffer(m_timerTickBuffer);
 
 	m_root = tgui::Group::create({ "100%", "100%" });
 	m_gui.add(m_root);
@@ -185,6 +203,9 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	m_endTurnButton->getRenderer()->setBackgroundColorDisabled(tgui::Color(90, 70, 75));
 	m_endTurnButton->onPress([this]()
 		{
+			m_uiSound.setBuffer(m_clickBuffer);
+			m_uiSound.play();
+
 			auto drawnCards = m_apiClient.EndTurn();
 			if (!drawnCards) return;
 
@@ -212,6 +233,8 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	m_leaveMatchButton->getRenderer()->setBackgroundColorDown(tgui::Color(60, 60, 65));
 	m_leaveMatchButton->onPress([this]()
 		{
+			m_uiSound.setBuffer(m_leaveBuffer);
+			m_uiSound.play();
 			auto result = m_apiClient.LeaveMatch();
 			if (!result) return;
 
@@ -256,26 +279,49 @@ void GamePanel::UpdateGame()
 
 		uint8_t seconds = static_cast<uint8_t>(m_timeLeft);
 		std::string secStr = std::to_string(seconds);
-		if (seconds < 10)
-		{
-			secStr = "0" + secStr;
-		}
-
+		if (seconds < 10) secStr = "0" + secStr;
 		m_timerLabel->setText("00:" + secStr);
 
-		if (seconds <= 10)
+		if (seconds <= 10) m_timerLabel->getRenderer()->setTextColor(tgui::Color::Red);
+		else m_timerLabel->getRenderer()->setTextColor(tgui::Color::White);
+
+		int currentSeconds = static_cast<int>(m_timeLeft);
+
+		if (currentSeconds <= 10 && currentSeconds >= 0)
 		{
-			m_timerLabel->getRenderer()->setTextColor(tgui::Color::Red);
+			if (!m_isMusicDimmed)
+			{
+				m_gameMusic.setVolume(m_normalMusicVolume / 5.0f);
+				m_isMusicDimmed = true;
+			}
+
+			if (currentSeconds != m_lastTimerSecond)
+			{
+				m_timerSound.setPitch(1.0f + (10 - currentSeconds) * 0.05f);
+				m_timerSound.play();
+				m_lastTimerSecond = currentSeconds;
+			}
 		}
 		else
 		{
-			m_timerLabel->getRenderer()->setTextColor(tgui::Color::White);
+			m_lastTimerSecond = -1;
+			if (m_isMusicDimmed)
+			{
+				m_gameMusic.setVolume(m_normalMusicVolume);
+				m_isMusicDimmed = false;
+			}
 		}
 	}
 	else
 	{
 		m_timerLabel->setText("WAIT");
 		m_timerLabel->getRenderer()->setTextColor(tgui::Color(200, 200, 200));
+
+		if (m_isMusicDimmed)
+		{
+			m_gameMusic.setVolume(m_normalMusicVolume);
+			m_isMusicDimmed = false;
+		}
 	}
 
 	RemovePlacedCards();
@@ -479,6 +525,8 @@ void GamePanel::HandleMouseEvent(const sf::Event& event)
 		auto validDecks = m_apiClient.SnapshotValidDecks(movingCardId);
 		if (!validDecks) return;
 
+		bool hoverFound = false;
+
 		for (auto& deck : m_decks)
 		{
 			bool isValid = validDecks.value()[deck->GetDeckId()];
@@ -501,11 +549,27 @@ void GamePanel::HandleMouseEvent(const sf::Event& event)
 				isValid = true;
 			}
 
+			if (deck->GetDeckPanel()->isMouseOnWidget(mousePos))
+			{
+				hoverFound = true;
+
+				if (m_lastHighlightDeckId != deck->GetDeckId())
+				{
+					m_lastHighlightDeckId = deck->GetDeckId();
+				}
+			}
+
 			deck->SetHighlight(isValid, isBackwards);
+		}
+
+		if (!hoverFound)
+		{
+			m_lastHighlightDeckId = -1;
 		}
 	}
 	else
 	{
+		m_lastHighlightDeckId = -1;
 		for (const auto& deck : m_decks)
 		{
 			deck->ClearHighlight();
@@ -610,9 +674,56 @@ void GamePanel::CreateMyHand()
 			tgui::String(std::to_string(cardX) + "%"),
 			tgui::String(std::to_string(startY) + "%")
 		);
+
+		card->onPickup = [this]()
+			{
+				if (m_cardSound.getStatus() != sf::SoundSource::Status::Playing)
+				{
+					m_cardSound.setBuffer(m_cardFlipBuffer);
+					m_cardSound.setPitch(1.0f + (rand() % 10) / 100.f);
+					m_cardSound.play();
+				}
+			};
+
 		card->onCardPlaced = [this](uint8_t cardId, std::shared_ptr<DeckWidget> deck)
 			{
-				return m_apiClient.PlayCard(cardId, deck->GetDeckId());
+				bool success = m_apiClient.PlayCard(cardId, deck->GetDeckId());
+
+				if (success)
+				{
+					uint8_t cardVal = cardId;
+					uint8_t deckVal = static_cast<uint8_t>(deck->GetLastId());
+					bool isSpecial = false;
+
+					if (deck->GetDeckType() == DeckWidget::DeckType::Ascending)
+					{
+						if (cardVal == deckVal - 10) isSpecial = true;
+					}
+					else
+					{
+						if (cardVal == deckVal + 10) isSpecial = true;
+					}
+
+					m_feedbackSound.stop();
+
+					if (isSpecial)
+					{
+						m_feedbackSound.setBuffer(m_specialMoveBuffer);
+					}
+					else
+					{
+						m_feedbackSound.setBuffer(m_validMoveBuffer);
+					}
+
+					m_feedbackSound.play();
+				}
+				else
+				{
+					m_feedbackSound.setBuffer(m_errorMoveBuffer);
+					m_feedbackSound.play();
+				}
+
+				return success;
 			};
 		card->SetDraggable(true);
 		m_root->add(card->GetWidget());
@@ -679,6 +790,7 @@ void GamePanel::ShowGameResultOverlay(GameResult result)
 	backToMenuButton->getRenderer()->setTextSize(20);
 	backToMenuButton->onPress([this]()
 		{
+			m_ExitButtonSound.play();
 			if (m_onExitToMenu) m_onExitToMenu();
 		});
 

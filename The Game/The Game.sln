@@ -9,9 +9,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HTTPClient", "HTTPClient\HT
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AssistantAI", "AssistantAI\AssistantAI.vcxproj", "{B3918795-EA54-4D15-AF39-DABD46A23B9E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TheGameTests", "TheGameTests\TheGameTests.vcxproj", "{66CCC3C9-1795-6B2A-D287-5F68A51FF03A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tests", "TheGameTests\TheGameTests.vcxproj", "{66CCC3C9-1795-6B2A-D287-5F68A51FF03A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TheGameCore", "TheGameCore\TheGameCore.vcxproj", "{E29DAC7C-73DB-4765-BB68-93875040A4D2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Core", "TheGameCore\TheGameCore.vcxproj", "{E29DAC7C-73DB-4765-BB68-93875040A4D2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

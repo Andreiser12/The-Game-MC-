@@ -1,8 +1,12 @@
 #include "RegisterWindow.h"
 
 RegisterWindow::RegisterWindow(sf::RenderWindow& window, ApiClient& api)
-	: m_register{ window }, m_apiClient{ api }
+	: m_register{ window }, m_apiClient{ api }, m_clickSound{ m_clickBuffer }
 {
+	if (m_clickBuffer.loadFromFile("assets/sounds/press_button_sound.wav"))
+	{
+		m_clickSound.setBuffer(m_clickBuffer);
+	}
 	m_register.setFont("assets/fonts/Cinzel-Regular.ttf");
 	m_background = tgui::Picture::create("assets/images/mainMenuBackground.png");
 	m_background->setSize("100%", "100%");
@@ -91,8 +95,9 @@ void RegisterWindow::LoadWidgets()
 	registerButton->setOrigin(0.5f, 0.5f);
 	Utils::StyleButton(registerButton);
 	m_register.add(registerButton);
-	registerButton->onClick([this, editBoxUsername] 
-		{CheckRegister(editBoxUsername->getText().toStdString()); });
+	registerButton->onClick([this, editBoxUsername] {
+		m_clickSound.play();
+		CheckRegister(editBoxUsername->getText().toStdString()); });
 
 	auto backButton = tgui::Button::create("Back");
 	backButton->setSize("15%", "12.5%");
@@ -101,7 +106,9 @@ void RegisterWindow::LoadWidgets()
 	Utils::StyleButton(backButton);
 	backButton->getRenderer()->setTextSize(18);
 	m_register.add(backButton);
-	backButton->onClick([this] { GoToLogin(); });
+	backButton->onClick([this] {
+		m_clickSound.play();
+		GoToLogin(); });
 }
 
 bool RegisterWindow::GetRegisteredState() const

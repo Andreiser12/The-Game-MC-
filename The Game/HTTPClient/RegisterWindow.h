@@ -24,5 +24,8 @@ private:
 	tgui::Picture::Ptr m_gameTitle;
 	bool m_isRegistered{ false };
 	ApiClient& m_apiClient;
+
+	sf::SoundBuffer m_clickBuffer;
+	sf::Sound m_clickSound;
 };
 

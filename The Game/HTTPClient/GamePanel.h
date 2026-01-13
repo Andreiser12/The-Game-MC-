@@ -116,4 +116,26 @@ private:
 	sf::Clock m_deltaTimeClock;
 
 	sf::Music m_gameMusic;
+
+	sf::SoundBuffer m_ExitButtonBuffer;
+	sf::SoundBuffer m_clickBuffer;
+	sf::SoundBuffer m_leaveBuffer;
+	sf::SoundBuffer m_cardFlipBuffer;
+	sf::SoundBuffer m_validMoveBuffer;
+	sf::SoundBuffer m_specialMoveBuffer;
+	sf::SoundBuffer m_errorMoveBuffer;
+	sf::SoundBuffer m_timerTickBuffer;
+
+	sf::Sound m_uiSound;
+	sf::Sound m_cardSound;
+	sf::Sound m_feedbackSound;
+	sf::Sound m_timerSound;
+	sf::Sound m_ExitButtonSound;
+
+	int m_lastTimerSecond{ -1 };
+	int m_lastHighlightDeckId{ -1 };
+	bool m_wasHighlighting{ false };
+
+	float m_normalMusicVolume{ 50.0f };
+	bool m_isMusicDimmed{ false };
 };

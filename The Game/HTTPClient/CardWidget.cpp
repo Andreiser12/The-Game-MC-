@@ -93,6 +93,11 @@ void CardWidget::MarkAsPlaced()
 	m_isPlacedOnDeck = true;
 }
 
+bool CardWidget::IsDragging() const
+{
+	return m_isDragging;
+}
+
 void CardWidget::CreateCardWidget()
 {
 	m_cardPanel = tgui::Panel::create({ "100%", "100%" });
@@ -123,6 +128,7 @@ void CardWidget::CreateCardWidget()
 	{
 		m_cardPanel->onMousePress([this](tgui::Vector2f mousePos) {
 
+			if (onPickup) onPickup();
 			m_isDragging = true;
 			m_dragOffset = mousePos;
 			m_originalPosition = m_cardPanel->getPosition();

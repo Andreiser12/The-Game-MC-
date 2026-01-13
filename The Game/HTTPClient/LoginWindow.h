@@ -26,5 +26,8 @@ private:
 	bool m_isLoggedIn{ false };
 	bool m_isRegisteredPressed{ false };
 	ApiClient& m_apiClient;
+
+	sf::SoundBuffer m_clickBuffer;
+	sf::Sound m_clickSound;
 };
 

@@ -39,14 +39,14 @@ MainMenuWindow::MainMenuWindow(sf::RenderWindow& window, ApiClient& api) :
 	m_mainMenu.add(cardsImage);
 	LoadWidgets();
 
-	if (m_bgMusic.openFromFile("assets/sounds/13.-Dreamy-Minimal-Piano-and-Jazz-Groove-_B_.ogg"))
+	if (m_bgMusic.openFromFile("assets/sounds/main_menu_sound.ogg"))
 	{
 		m_bgMusic.setLooping(true);      
 		m_bgMusic.setVolume(50.0f);   
 		m_bgMusic.play();             
 	}
 
-	if (m_clickBuffer.loadFromFile("assets/sounds/FEETHmn_InsJ_Footsteps_Wood_Jogging_Trainers_02-01_Single_02.wav"))
+	if (m_clickBuffer.loadFromFile("assets/sounds/press_button_sound.wav"))
 	{
 		m_clickSound.setVolume(50.0f);
 	}

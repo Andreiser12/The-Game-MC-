@@ -37,6 +37,7 @@ private:
 	crow::response EndTurn(const std::string& lobbyId, unsigned playerId);
 	crow::response GetTurnState(const std::string& lobbyId, unsigned playerId);
 	crow::response GetGameResult(const std::string& lobbyId);
+	crow::response ReportGameLoss(const crow::request& request);
 	crow::response GetValidDecks(const crow::request& request, const std::string& lobbyId);
 	crow::response GetPlayerStates(const std::string& lobbyId);
 

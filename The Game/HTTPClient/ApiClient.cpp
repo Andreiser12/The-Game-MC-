@@ -460,6 +460,40 @@ void ApiClient::SetLobbyId(const std::string& lobbyId)
 	m_lobbyId = lobbyId;
 }
 
+bool ApiClient::ReportGameLoss()
+{
+	std::string lobbyId;
+	unsigned playerId;
+	{
+		std::lock_guard<std::mutex> lock(m_mutex);
+		lobbyId = m_lobbyId;
+		playerId = m_playerId;
+	}
+
+	if (lobbyId.empty() || playerId == 0u) return false;
+
+	const std::string url = m_serverURL + "/lobby/lost";
+
+	const std::string jsonBody =
+		"{"
+		"\"lobbyId\":\"" + lobbyId + "\","
+		"\"playerId\":" + std::to_string(playerId) +
+		"}";
+
+	cpr::Response response = cpr::Post(
+		cpr::Url{ url },
+		cpr::Body{ jsonBody },
+		kTimeout
+	);
+
+	if (response.error || response.status_code != 200) return false;
+
+	auto json = crow::json::load(response.text);
+	if (!json || !json.has("status")) return false;
+
+	return json["status"].s() == "OK";
+}
+
 std::string ApiClient::GetUsername() const
 {
 	std::lock_guard<std::mutex> lock(m_mutex);

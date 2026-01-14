@@ -151,6 +151,8 @@ public:
 	void SetPlayerId(unsigned playerId);
 	void SetLobbyId(const std::string& lobbyId);
 
+	bool ReportGameLoss();
+
 private:
 	ApiClient() = delete;
 

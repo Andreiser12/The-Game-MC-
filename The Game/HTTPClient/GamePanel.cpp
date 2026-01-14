@@ -311,6 +311,24 @@ void GamePanel::UpdateGame()
 				m_isMusicDimmed = false;
 			}
 		}
+		bool hasMoves = CanMakeAnyMove();
+
+		bool canEndTurn = m_endTurnButton->isEnabled();
+
+		if (!canEndTurn && !hasMoves)
+		{
+			std::thread([this]() {
+				m_apiClient.ReportGameLoss();
+				}).detach();
+
+			m_gameFinished = true;
+
+			m_feedbackSound.setBuffer(m_errorMoveBuffer);
+			m_feedbackSound.play();
+
+			HandleGameResult(GameResult::Lost);
+			return;
+		}
 	}
 	else
 	{
@@ -798,6 +816,33 @@ void GamePanel::ShowGameResultOverlay(GameResult result)
 	dialog->add(backToMenuButton);
 	overlay->add(dialog);
 	m_root->add(overlay);
+}
+
+bool GamePanel::CanMakeAnyMove() const
+{
+	if (m_myCards.empty()) return false;
+
+	for (const auto& card : m_myCards)
+	{
+		uint8_t cardVal = card->GetId();
+
+		for (const auto& deck : m_decks)
+		{
+			uint8_t deckVal = static_cast<uint8_t>(deck->GetLastId());
+			bool isValid = false;
+
+			if (deck->GetDeckType() == DeckWidget::DeckType::Ascending)
+			{
+				if (cardVal > deckVal || (cardVal == deckVal - 10)) isValid = true;
+			}
+			else
+			{
+				if (cardVal < deckVal || (cardVal == deckVal + 10)) isValid = true;
+			}
+			if (isValid) return true;
+		}
+	}
+	return false;
 }
 
 void GamePanel::MarkPlayerAsLeft(const std::string& username)

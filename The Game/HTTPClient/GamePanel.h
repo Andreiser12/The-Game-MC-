@@ -48,6 +48,7 @@ public:
 
 	void MarkPlayerAsLeft(const std::string& username);
 
+
 private:
 	inline SlotArray GetSlotsForPlayerCount(size_t count)
 	{
@@ -66,6 +67,7 @@ private:
 	void RebuildMyHand();
 	void HandleGameResult(GameResult result);
 	void ShowGameResultOverlay(GameResult result);
+	bool CanMakeAnyMove() const;
 
 private:
 	unsigned m_lastMessageId{ 0u };

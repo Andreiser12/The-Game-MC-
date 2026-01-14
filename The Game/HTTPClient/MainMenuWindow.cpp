@@ -12,12 +12,6 @@ MainMenuWindow::MainMenuWindow(sf::RenderWindow& window, ApiClient& api) :
 	m_background->setPosition("0%", "0%");
 	m_mainMenu.add(m_background);
 
-	auto gameTitle = tgui::Picture::create("assets/images/gameTitle.png");
-	gameTitle->setSize("50%", "50%");
-	gameTitle->setPosition("50%", "15%");
-	gameTitle->setOrigin(0.5f, 0.1f);
-	m_mainMenu.add(gameTitle);
-
 	auto buttonsBackground = tgui::Picture::create("assets/images/buttonsBackground.png");
 	buttonsBackground->setSize("90%", "90%");
 	buttonsBackground->setPosition("50%", "50%");
@@ -37,6 +31,13 @@ MainMenuWindow::MainMenuWindow(sf::RenderWindow& window, ApiClient& api) :
 	cardsShadow->getRenderer()->setOpacity(0.3f);
 	m_mainMenu.add(cardsShadow);
 	m_mainMenu.add(cardsImage);
+
+	auto gameTitle = tgui::Picture::create("assets/images/gameTitle.png");
+	gameTitle->setSize("50%", "50%");
+	gameTitle->setPosition("50%", "15%");
+	gameTitle->setOrigin(0.5f, 0.1f);
+	m_mainMenu.add(gameTitle);
+
 	LoadWidgets();
 
 	if (m_bgMusic.openFromFile("assets/sounds/main_menu_sound.ogg"))
@@ -105,15 +106,16 @@ void MainMenuWindow::LoadWidgets()
 
 void MainMenuWindow::GoBackToMenu()
 {
+	m_apiClient.StopNetworkLoop();
 
 	if (!m_apiClient.GetLobbyId().empty() && m_apiClient.GetPlayerId() != 0u)
 		m_apiClient.LeaveLobby(m_apiClient.GetLobbyId(), m_apiClient.GetPlayerId());
 
-	m_apiClient.StopNetworkLoop();
 	CloseHostPanel();
 
 	if (m_gamePanel) m_gamePanel.reset();
 	m_gameStartedLocally = false;
+	m_apiClient.ClearEvent();
 
 	if (m_bgMusic.getStatus() != sf::SoundSource::Status::Playing)
 	{

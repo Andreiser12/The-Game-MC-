@@ -113,6 +113,8 @@ public:
 	[[nodiscard]] bool IsPlayerHost(unsigned playerId) const;
 	unsigned GetHostId() const;
 
+	void SetGameLost();
+
 private:
 	Lobby() = delete;
 	void TrimChatBuffer() noexcept;

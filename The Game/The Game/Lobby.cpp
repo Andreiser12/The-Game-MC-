@@ -175,6 +175,11 @@ unsigned Lobby::GetHostId() const
 	return m_hostId;
 }
 
+void Lobby::SetGameLost()
+{
+	m_gameResult = GameResult::Lost;
+}
+
 void Lobby::TrimChatBuffer() noexcept
 {
 	if (m_chatBuffer.size() > kMaxChatMessages) m_chatBuffer.pop_front();
@@ -284,6 +289,8 @@ std::optional<std::vector<uint8_t>> Lobby::EndTurn(unsigned playerId)
 void Lobby::UpdateGameResult() noexcept
 {
 	if (!IsGameActive()) return;
+
+	if (m_gameResult == GameResult::Lost) return;
 
 	if (m_table->CheckWinCondition()) m_gameResult = GameResult::Won;
 	else if (m_table->CheckLoseCondition()) m_gameResult = GameResult::Lost;

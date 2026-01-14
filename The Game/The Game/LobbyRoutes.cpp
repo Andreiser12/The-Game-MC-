@@ -1,4 +1,4 @@
-import LobbyRoutes;
+﻿import LobbyRoutes;
 import SessionManager;
 #include "crow.h"
 
@@ -11,8 +11,12 @@ inline static std::string GenerateLobbyId()
 	static std::uniform_int_distribution<> dist(0, 35);
 	const std::string charset{ "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" };
 	std::string lobbyId;
-	lobbyId.reserve(K_LOBBY_ID_LENGTH);
-	for (auto& c : lobbyId) c = charset[dist(gen)];
+	lobbyId.resize(K_LOBBY_ID_LENGTH);
+
+	for (uint8_t i = 0u; i < K_LOBBY_ID_LENGTH; ++i)
+	{
+		lobbyId[i] = charset[dist(gen)];
+	}
 	return lobbyId;
 }
 
@@ -140,6 +144,11 @@ void LobbyRoutes::Register(crow::SimpleApp& app)
 		([this](const std::string& lobbyId)
 			{
 				return this->GetPlayerStates(lobbyId);
+			});
+
+	CROW_ROUTE(app, "/lobby/lost").methods("POST"_method)
+		([this](const crow::request& req) {
+		return this->ReportGameLoss(req);
 			});
 }
 
@@ -549,6 +558,23 @@ crow::response LobbyRoutes::GetGameResult(const std::string& lobbyId)
 	default:
 		return crow::response(500);
 	}
+	return crow::response(200, data);
+}
+
+crow::response LobbyRoutes::ReportGameLoss(const crow::request& request)
+{
+	auto body = crow::json::load(request.body);
+	if (!body) return crow::response(400, "Invalid JSON");
+
+	const std::string lobbyId{ body["lobbyId"].s() };
+
+	auto lobby = m_manager.GetLobby(lobbyId);
+	if (!lobby) return crow::response(404, "Lobby not found");
+
+	lobby->SetGameLost();
+
+	crow::json::wvalue data;
+	data["status"] = "OK";
 	return crow::response(200, data);
 }
 

@@ -27,7 +27,7 @@ void HostPanel::PreloadImages()
 			s_frames.emplace_back(path);
 		}
 		catch (...) {
-			std::cout << "Nu am putut incarca: " << path << std::endl;
+			throw std::runtime_error("One of the GIF file is missing");
 		}
 	}
 }

@@ -5,10 +5,10 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	m_gui{ gui }, m_apiClient{ api },
 	m_onExitToMenu{ std::move(onExit) }, m_onLocalPlayerLeft{ std::move(onLocalPlayerLeft) },
 	m_ExitButtonSound{ m_ExitButtonBuffer },
-	m_uiSound(m_clickBuffer),
-	m_cardSound(m_cardFlipBuffer),
-	m_timerSound(m_timerTickBuffer),
-	m_feedbackSound(m_validMoveBuffer)
+	m_uiSound{ m_clickBuffer },
+	m_cardSound{ m_cardFlipBuffer },
+	m_timerSound{ m_timerTickBuffer },
+	m_feedbackSound{ m_validMoveBuffer }
 {
 	if (m_gameMusic.openFromFile("assets/sounds/game_panel_sound.ogg"))
 	{

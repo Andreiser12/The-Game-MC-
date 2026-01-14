@@ -1,18 +1,19 @@
 module Lobby;
 
-Lobby::Lobby(const std::string& lobbyId, unsigned hostId, const std::string& username) : 
-	m_lobbyId{lobbyId},
-	m_hostId{hostId}
+Lobby::Lobby(std::string_view lobbyId, unsigned hostId, const std::string& username) :
+	m_lobbyId{ lobbyId },
+	m_hostId{ hostId }
 {
 	m_players.try_emplace(hostId, hostId, username);
+	m_lastPingPlayer[hostId] = std::chrono::steady_clock::now();
 }
 
 bool Lobby::AddPlayer(unsigned playerId, const std::string& username)
 {
-	std::lock_guard<std::mutex> lock(m_mutex);
+	std::lock_guard lock(m_mutex);
 	if (IsFull()) return false;
 
-	if (m_players.find(playerId) != m_players.end()) return false;
+	if (m_players.contains(playerId)) return false;
 
 	m_players.try_emplace(playerId, playerId, username);
 	m_lastPingPlayer[playerId] = std::chrono::steady_clock::now();
@@ -21,42 +22,38 @@ bool Lobby::AddPlayer(unsigned playerId, const std::string& username)
 	return true;
 }
 
-void Lobby::AddChatMessage(const std::string& username, const std::string& message)
+void Lobby::AddChatMessage(std::string_view username, std::string_view message)
 {
-	std::lock_guard<std::mutex> lock(m_mutex);
-	m_chatBuffer.push_back({
-		++m_lastMessageId,
-		username,
-		message
+	std::lock_guard lock(m_mutex);
+	m_chatBuffer.emplace_back(ChatMessage{
+		.id = ++m_lastMessageId,
+		.username = std::string(username),
+		.message = std::string(message)
 		});
 
-	if (m_chatBuffer.size() > kMaxChatMessages)
-	{
-		m_chatBuffer.pop_front();
-	}
+	TrimChatBuffer();
 }
 
 std::optional<std::vector<ChatMessage>> Lobby::GetMessagesAfter(unsigned afterId) const
 {
-	std::lock_guard<std::mutex> lock(m_mutex);
-	std::vector<ChatMessage> out;
-	out.reserve(kMaxChatMessages);
-	for (const auto& message : m_chatBuffer)
-	{
-		if (message.id > afterId) out.push_back(message);
-	}
-	if (out.empty()) return std::nullopt;
-	return std::make_optional(out);
+	std::lock_guard lock(m_mutex);
+	std::vector<ChatMessage> result;
+	result.reserve(kMaxChatMessages);
+
+	std::ranges::copy_if(m_chatBuffer, std::back_inserter(result),
+		[afterId](const auto& msg) { return msg.id > afterId; });
+
+	return std::make_optional(result);
 }
 
 RemoveResult Lobby::RemovePlayer(unsigned playerId)
 {
-	std::lock_guard<std::mutex> lock(m_mutex);
+	std::lock_guard lock(m_mutex);
 
 	auto it = m_players.find(playerId);
 	if (it == m_players.end()) return RemoveResult::NotFound;
 
-	bool isHost = (m_hostId == playerId);
+	const bool isHost{ (m_hostId == playerId) };
 
 	m_players.erase(it);
 	m_lastPingPlayer.erase(playerId);
@@ -68,13 +65,15 @@ RemoveResult Lobby::RemovePlayer(unsigned playerId)
 	}
 	if (m_players.size() < kMinPlayers)
 	{
-		m_gameStarted.store(false);
+		m_gameStarted.store(false, std::memory_order_release);
 	}
 	return RemoveResult::Removed;
 }
 
-void Lobby::MarkPlayerAsDisconnected(unsigned playerId)
+void Lobby::MarkPlayerAsDisconnected(unsigned playerId) noexcept
 {
+	std::lock_guard lock(m_mutex);
+
 	auto it = m_players.find(playerId);
 	if (it == m_players.end()) return;
 
@@ -86,17 +85,15 @@ void Lobby::MarkPlayerAsDisconnected(unsigned playerId)
 
 RemoveResult Lobby::RemoveMatchPlayer(unsigned playerId)
 {
-	std::lock_guard<std::mutex> lock(m_mutex);
-	if (!m_gameStarted || !m_table) return RemoveResult::NotFound;
+	std::lock_guard lock(m_mutex);
+	if (!IsGameActive()) return RemoveResult::NotFound;
 
-	auto playerIt = m_players.find(playerId);
-	if (playerIt != m_players.end())
+	if (auto playerIt = m_players.find(playerId); playerIt != m_players.end())
 	{
 		playerIt->second.isConnected = false;
 	}
 
-	bool result = m_table->RemovePlayer(playerId);
-	if (!result) return RemoveResult::NotFound;
+	if (!m_table->RemovePlayer(playerId)) return RemoveResult::NotFound;
 
 	m_lastPingPlayer.erase(playerId);
 
@@ -112,23 +109,24 @@ RemoveResult Lobby::RemoveMatchPlayer(unsigned playerId)
 	return RemoveResult::Removed;
 }
 
-void Lobby::UpdatePlayerPing(unsigned playerId)
+void Lobby::UpdatePlayerPing(unsigned playerId) noexcept
 {
-	std::lock_guard<std::mutex> lock(m_mutex);
-	auto iterator = m_lastPingPlayer.find(playerId);
-	if (iterator != m_lastPingPlayer.end())
+	std::lock_guard lock(m_mutex);
+
+	if (auto it = m_lastPingPlayer.find(playerId); it != m_lastPingPlayer.end())
 	{
-		iterator->second = std::chrono::steady_clock::now();
+		it->second = std::chrono::steady_clock::now();
 	}
 }
 
-std::vector<unsigned> Lobby::GetInactivePlayers(std::chrono::seconds timeout)
+std::vector<unsigned> Lobby::GetInactivePlayers(std::chrono::seconds timeout) const
 {
-	std::vector<unsigned> inactive;
 	auto now = std::chrono::steady_clock::now();
+	std::vector<unsigned> inactive;
+	inactive.reserve(m_lastPingPlayer.size());
 
-	std::lock_guard<std::mutex> lock(m_mutex);
-	for (auto& [playerId, lastPing] : m_lastPingPlayer)
+	std::lock_guard lock(m_mutex);
+	for (const auto& [playerId, lastPing] : m_lastPingPlayer)
 	{
 		if (now - lastPing > timeout)
 			inactive.emplace_back(playerId);
@@ -136,34 +134,30 @@ std::vector<unsigned> Lobby::GetInactivePlayers(std::chrono::seconds timeout)
 	return inactive;
 }
 
-bool Lobby::IsFull() const
+bool Lobby::IsFull() const noexcept
 {
 	return m_players.size() == kMaxPlayers;
 }
 
 bool Lobby::StartGame(unsigned playerId)
 {
-	std::lock_guard<std::mutex> lock(m_mutex);
-	if (m_gameStarted.load()) return false;
+	std::lock_guard lock(m_mutex);
 
+	if (m_gameStarted.load(std::memory_order_acquire)) return false;
 	if (playerId != m_hostId) return false;
-
 	if (m_players.size() < kMinPlayers) return false;
 
-	std::vector<std::pair<unsigned, std::string>> lobbyPlayers;
+	std::vector<std::pair<unsigned, std::string_view>> lobbyPlayers;
+	lobbyPlayers.reserve(m_players.size());
 	for (const auto& [id, player] : m_players)
 	{
-		lobbyPlayers.push_back({ id, player.username });
+		lobbyPlayers.emplace_back(id, player.username);
 	}
 
-	m_table = std::make_unique<Table>(lobbyPlayers);
-	m_gameStarted.store(true);
+	m_table = std::make_unique<Table>
+		(std::span<std::pair<unsigned, std::string_view>>{lobbyPlayers});
+	m_gameStarted.store(true, std::memory_order_release);
 	return true;
-}
-
-bool Lobby::HasGameStarted() const
-{
-	return m_gameStarted.load();
 }
 
 const std::unordered_map<unsigned, PlayerInfo>& Lobby::GetPlayers() const
@@ -181,32 +175,43 @@ unsigned Lobby::GetHostId() const
 	return m_hostId;
 }
 
+void Lobby::TrimChatBuffer() noexcept
+{
+	if (m_chatBuffer.size() > kMaxChatMessages) m_chatBuffer.pop_front();
+}
+
+bool Lobby::IsGameActive() const noexcept
+{
+	return m_gameStarted.load(std::memory_order_acquire) && m_table != nullptr;
+}
+
 std::optional<std::vector<uint8_t>> Lobby::GetPlayerCards(unsigned playerId) const
 {
 	std::lock_guard lock(m_mutex);
 
-	if (!m_gameStarted || !m_table) return std::nullopt;
+	if (!IsGameActive()) return std::nullopt;
 
 	const auto& player = m_table->GetPlayer(playerId);
-	std::vector<uint8_t> playerCards;
-	for (const auto& card : player.GetCards())
-	{
-		playerCards.emplace_back(card.GetId());
-	}
-	std::sort(playerCards.begin(), playerCards.end());
-	return playerCards;
+	std::vector<uint8_t> cards;
+	cards.reserve(player.GetCardsCount());
+
+	std::ranges::transform(player.GetCards(), std::back_inserter(cards),
+		[](const auto& card) { return card.GetId();  });
+
+	std::ranges::sort(cards);
+	return cards;
 }
 
 bool Lobby::PlayCard(unsigned playerId, uint8_t cardId, uint8_t deckId)
 {
 	std::lock_guard lock(m_mutex);
-	if (!m_gameStarted || !m_table) return false;
+	if (!IsGameActive()) return false;
 
 	auto& player = m_table->GetPlayer(playerId);
-	Card<uint8_t> card{ cardId };
+	const Card<uint8_t> card{ cardId };
 	if (!m_table->PlayCard(playerId, deckId, card)) return false;
 
-	m_table->PlaceCardOnDeck(deckId, card);
+	m_table->PlaceCardOnDeck(deckId, std::move(card));
 	player.RemoveCard(cardId);
 	player.IncrementCardsPlaced();
 	return true;
@@ -216,23 +221,24 @@ std::optional<std::vector<DeckState>> Lobby::GetDecksState() const
 {
 	std::lock_guard lock(m_mutex);
 
-	if (!m_gameStarted || !m_table) return std::nullopt;
+	if (!IsGameActive()) return std::nullopt;
 
 	std::vector<DeckState> decksState;
-	for (size_t i = 0; i < 4; i++)
+	for (uint8_t i = 0; i < kDeckCount; ++i)
 	{
-		DeckState deck;
-		deck.deckId = static_cast<uint8_t>(i);
-		deck.topCardId = m_table->GetDeck(static_cast<uint8_t>(i)).GetTopCard().GetId();
-		decksState.emplace_back(deck);
+		decksState.emplace_back(DeckState{
+			.deckId = i,
+			.topCardId = m_table->GetDeck(i).GetTopCard().GetId()
+			});
 	}
 	return decksState;
 }
 
 std::optional<size_t> Lobby::GetDrawPileCount() const
 {
-	std::lock_guard<std::mutex> lock(m_mutex);
-	if (!m_gameStarted || !m_table) return std::nullopt;
+	std::lock_guard lock(m_mutex);
+
+	if (!IsGameActive()) return std::nullopt;
 
 	return m_table->GetDrawPileCount();
 }
@@ -240,39 +246,44 @@ std::optional<size_t> Lobby::GetDrawPileCount() const
 std::optional<EndTurnState> Lobby::GetEndTurnState(unsigned playerId) const
 {
 	std::lock_guard lock(m_mutex);
-	if (!m_gameStarted || !m_table) return std::nullopt;
 
-	auto& player = m_table->GetPlayer(playerId);
-	EndTurnState state;
-	state.cardsPlaced = player.GetCardsPlacedRound();
-	const bool pileEmpty = m_table->GetDrawPileCount() == 0;
-	state.minRequiredCards = (pileEmpty == true) ? 1u : 2u;
-	state.canEndTurn = state.cardsPlaced >= state.minRequiredCards;
-	return state;
+	if (!IsGameActive()) return std::nullopt;
+
+	const auto& player = m_table->GetPlayer(playerId);
+	const uint8_t cardsPlaced{ player.GetCardsPlacedRound() };
+	const bool pileEmpty{ m_table->GetDrawPileCount() == 0 };
+	const uint8_t minRequired = pileEmpty ? 1u : 2u;
+	return EndTurnState{
+		.cardsPlaced = cardsPlaced,
+		.minRequiredCards = minRequired,
+		.canEndTurn = cardsPlaced >= minRequired
+	};
 }
 
 std::optional<TurnState> Lobby::GetTurnState(unsigned playerId) const
 {
 	std::lock_guard lock(m_mutex);
-	if (!m_gameStarted || !m_table) return std::nullopt;
+	if (!IsGameActive()) return std::nullopt;
 
-	TurnState state;
-	state.currentPlayerId = m_table->GetCurrentPlayerId();
-	state.isMyTurn = (state.currentPlayerId == playerId);
-	return state;
+	const unsigned currentPlayerId{ m_table->GetCurrentPlayerId() };
+	return TurnState{
+		.currentPlayerId = currentPlayerId,
+		.isMyTurn = currentPlayerId == playerId
+	};
 }
 
 std::optional<std::vector<uint8_t>> Lobby::EndTurn(unsigned playerId)
 {
-	if (!m_gameStarted || !m_table) return std::nullopt;
+	if (!IsGameActive()) return std::nullopt;
+
 	m_table->EndTurn(playerId);
 	UpdateGameResult();
 	return GetPlayerCards(playerId);
 }
 
-void Lobby::UpdateGameResult()
+void Lobby::UpdateGameResult() noexcept
 {
-	if (!m_gameStarted || !m_table) return;
+	if (!IsGameActive()) return;
 
 	if (m_table->CheckWinCondition()) m_gameResult = GameResult::Won;
 	else if (m_table->CheckLoseCondition()) m_gameResult = GameResult::Lost;
@@ -280,45 +291,44 @@ void Lobby::UpdateGameResult()
 
 std::optional<GameResult> Lobby::GetGameResult() const
 {
-	if (!m_gameStarted || !m_table) return std::nullopt;
+	if (!IsGameActive()) return std::nullopt;
 	return m_gameResult;
 }
 
 std::optional<std::array<bool, 4>> Lobby::GetValidDecks(uint8_t cardId) const
 {
-	if (!m_gameStarted || !m_table) return std::nullopt;
-	
+	std::lock_guard lock(m_mutex);
+
+	if (!IsGameActive()) return std::nullopt;
+
 	std::array<bool, 4> validDecks;
-	for (uint8_t deckId = 0u; deckId < 4u; deckId++)
+	for (uint8_t deckId = 0u; deckId < kDeckCount; ++deckId)
 	{
-		auto deck = m_table->GetDeck(deckId);
-		switch (deck.GetDeckType())
-		{
-		case Deck::DeckType::Ascending:
-			validDecks[deckId] = cardId > deck.GetTopCard().GetId();
-			break;
-		case Deck::DeckType::Descending:
-			validDecks[deckId] = cardId < deck.GetTopCard().GetId();
-			break;
-		}
+		const auto& deck = m_table->GetDeck(deckId);
+		const uint8_t topCard{ deck.GetTopCard().GetId() };
+
+		validDecks[deckId] = (deck.GetDeckType() == Deck::DeckType::Ascending)
+			? (cardId > topCard)
+			: (cardId < topCard);
 	}
 	return std::make_optional(validDecks);
 }
 
 std::optional<std::vector<PlayerState>> Lobby::GetPlayerStates() const
 {
-	if (!m_gameStarted || !m_table) return std::nullopt;
+	std::lock_guard lock(m_mutex);
 
-	std::vector<PlayerState> playerStates;
-	playerStates.reserve(m_players.size());
+	if (!IsGameActive()) return std::nullopt;
+
+	std::vector<PlayerState> states;
+	states.reserve(m_players.size());
 	for (const auto& [playerId, playerInfo] : m_players)
 	{
-		playerStates.emplace_back(
+		states.emplace_back(
 			PlayerState{
-				playerInfo.username,
-				playerInfo.isConnected && m_table->HasPlayer(playerId)
-			}
-		);
+				.username = playerInfo.username,
+				.isInMatch = playerInfo.isConnected && m_table->HasPlayer(playerId)
+			});
 	}
-	return playerStates;
+	return states;
 }

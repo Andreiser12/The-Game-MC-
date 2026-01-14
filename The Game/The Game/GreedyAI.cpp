@@ -12,10 +12,10 @@ std::optional<AIMove>GreedyAI::FindBestMove(const Player& currentPlayer, Table& 
 	{
 		for (const auto& deckReference : table.GetAllDecks())
 		{
-			auto& deck{ deckReference.get() };
-			if (table.PlayCard(currentPlayer.GetPlayerId(), deck.GetDeckIndex(), card))
+			auto& deck{ deckReference };
+			if (table.PlayCard(currentPlayer.GetPlayerId(), deck->GetDeckIndex(), card))
 			{
-				AIMove move{ deck, card, 0 };
+				AIMove move{ *deck, card, 0 };
 				move.score = HeuristicTree::Evaluate(move, table, table.GetPlayers());
 				moves.push_back(move);
 			}

@@ -1,6 +1,7 @@
 import AuthenticationRoutes;
 import SessionManager;
-#include <crow.h>
+
+#include "crow.h"
 
 AuthenticationRoutes::AuthenticationRoutes(DatabaseManager& database)
 	: m_database{ database } { }
@@ -51,8 +52,8 @@ void AuthenticationRoutes::Profile(crow::SimpleApp& app)
 crow::response AuthenticationRoutes::HandleRegister(const crow::request& req)
 {
 	auto body = crow::json::load(req.body);
-	if (!body)
-		return crow::response(400, "Invalid JSON");
+	if (!body) return crow::response(400, "Invalid JSON");
+
 	std::string username = body["username"].s();
 
 	auto user = m_database.GetUserByName(username);
@@ -75,12 +76,12 @@ crow::response AuthenticationRoutes::HandleRegister(const crow::request& req)
 crow::response AuthenticationRoutes::HandleLogin(const crow::request& req)
 {
 	auto body = crow::json::load(req.body);
-	if (!body)
-		return crow::response(400, "Invalid JSON");
+	if (!body) return crow::response(400, "Invalid JSON");
+
 	std::string username = body["username"].s();
 
-	auto userOptional = m_database.GetUserByName(username);
-	if (!userOptional) 
+	auto userOpt = m_database.GetUserByName(username);
+	if (!userOpt) 
 	{
 		crow::json::wvalue result;
 		result["status"] = "fail";
@@ -88,7 +89,7 @@ crow::response AuthenticationRoutes::HandleLogin(const crow::request& req)
 		return crow::response{ result };
 	}
 	
-	unsigned playerId = userOptional->GetID();
+	unsigned playerId{ userOpt->GetID() };
 	auto& sessionManager = SessionManager::Instance();
 
 	if (sessionManager.IsLoggedIn(playerId))
@@ -103,18 +104,17 @@ crow::response AuthenticationRoutes::HandleLogin(const crow::request& req)
 
 	crow::json::wvalue result;
 	result["status"] = "ok";
-	result["id"] = userOptional->GetID();
-	result["username"] = userOptional->GetUsername();
+	result["id"] = userOpt->GetID();
+	result["username"] = userOpt->GetUsername();
 	return crow::response{ result };
 }
 
 crow::response AuthenticationRoutes::HandleLogout(const crow::request& req)
 {
 	auto body = crow::json::load(req.body);
-	if (!body)
-		return crow::response(400, "Invalid JSON");
+	if (!body) return crow::response(400, "Invalid JSON");
 	 
-	unsigned playerId = body["playerId"].i();
+	unsigned playerId = static_cast<unsigned>(body["playerId"].i());
 	auto& sessionManager = SessionManager::Instance();
 
 	sessionManager.Logout(playerId);
@@ -140,16 +140,15 @@ crow::response AuthenticationRoutes::HandleUsers()
 
 crow::response AuthenticationRoutes::HandleUserProfile(unsigned playerId)
 {
-	auto userExists = m_database.GetUserByID(playerId);
-	if (!userExists)
-		return crow::response(404, "User not found");
+	auto userOpt = m_database.GetUserByID(playerId);
+	if (!userOpt) return crow::response(404, "User not found");
 
-	const auto& user = userExists.value();
+	const auto& user = userOpt.value();
 
 	crow::json::wvalue data;
 	data["username"] = user.GetUsername();
 	data["gamesPlayed"] = user.GetGamesPlayed();
 	data["gamesWon"] = user.GetGamesWon();
 	data["hoursPlayed"] = user.GetHoursPlayed();
-	return crow::response(200,data);
+	return crow::response(200, data);
 }

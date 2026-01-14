@@ -10,14 +10,14 @@ import <sqlite_orm/sqlite_orm.h>;
 
 export inline auto CreateStorage(const std::string& filename)
 {
-    return sqlite_orm::make_storage(filename,
-        sqlite_orm::make_table("User",
-            sqlite_orm::make_column("ID", &DB::User::GetID, &DB::User::SetID, sqlite_orm::primary_key().autoincrement()),
-            sqlite_orm::make_column("username", &DB::User::GetUsername, &DB::User::SetUsername),
-            sqlite_orm::make_column("gamesPlayed", &DB::User::GetGamesPlayed, &DB::User::SetGamesPlayed),
-            sqlite_orm::make_column("gamesWon", &DB::User::GetGamesWon, &DB::User::SetGamesWon),
-            sqlite_orm::make_column("hoursPlayed", &DB::User::GetHoursPlayed, &DB::User::SetHoursPlayed),
-            sqlite_orm::make_column("finalCards", &DB::User::GetFinalCards, &DB::User::SetFinalCards)));
+	return sqlite_orm::make_storage(filename,
+		sqlite_orm::make_table("User",
+			sqlite_orm::make_column("ID", &DB::User::GetID, &DB::User::SetID, sqlite_orm::primary_key().autoincrement()),
+			sqlite_orm::make_column("username", &DB::User::GetUsername, &DB::User::SetUsername),
+			sqlite_orm::make_column("gamesPlayed", &DB::User::GetGamesPlayed, &DB::User::SetGamesPlayed),
+			sqlite_orm::make_column("gamesWon", &DB::User::GetGamesWon, &DB::User::SetGamesWon),
+			sqlite_orm::make_column("hoursPlayed", &DB::User::GetHoursPlayed, &DB::User::SetHoursPlayed),
+			sqlite_orm::make_column("finalCards", &DB::User::GetFinalCards, &DB::User::SetFinalCards)));
 }
 export using Storage = decltype(CreateStorage(" "));
 
@@ -27,12 +27,11 @@ public:
 	explicit DatabaseManager(const std::string& databasePath);
 
 	bool AddUser(const DB::User& user);
-    std::optional<DB::User> GetUserByID(unsigned userID);
-    std::optional<DB::User> GetUserByName(const std::string& username);
-
-    std::vector<DB::User> GetUsers();
+	std::optional<DB::User> GetUserByID(unsigned userID);
+	std::optional<DB::User> GetUserByName(const std::string& username);
+	[[nodiscard]] std::vector<DB::User> GetUsers();
 
 private:
-    decltype(CreateStorage("")) m_storage;
+	decltype(CreateStorage("")) m_storage;
 };
 

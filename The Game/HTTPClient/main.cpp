@@ -38,13 +38,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			while ((eventOpt = connectionFailedWindow.pollEvent()))
 			{
 				sf::Event& event = *eventOpt;
-
 				if (event.is<sf::Event::Closed>())
 				{
 					connectionFailedWindow.close();
 				}
 			}
-
 			connectionFailedWindow.clear(tgui::Color::Black);
 			_connection.Draw();
 			connectionFailedWindow.display();

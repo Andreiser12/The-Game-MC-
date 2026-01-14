@@ -8,8 +8,10 @@ import <deque>;
 import <atomic>;
 import <mutex>;
 import <chrono>;
+import <ranges>;
+import <algorithm>;
 
-export enum class RemoveResult
+export enum class RemoveResult : uint8_t
 {
 	NotFound,
 	Removed,
@@ -31,18 +33,18 @@ export struct DeckState
 
 export struct EndTurnState
 {
-	bool canEndTurn;
 	uint8_t cardsPlaced;
 	uint8_t minRequiredCards;
+	bool canEndTurn;
 };
 
 export struct TurnState
 {
-	bool isMyTurn;
 	unsigned currentPlayerId;
+	bool isMyTurn;
 };
 
-export enum class GameResult
+export enum class GameResult : uint8_t
 {
 	Ongoing,
 	Won,
@@ -62,49 +64,66 @@ export struct PlayerInfo
 	std::string username;
 	bool isConnected{ true };
 
-	PlayerInfo (unsigned p, std::string u) : playerId{p}, username{std::move(u)} {}
+	PlayerInfo(unsigned id, std::string_view name) : playerId{ id }, username{ name } {}
 };
 
 export class Lobby
 {
 public:
-	explicit Lobby(const std::string& lobbyId, unsigned hostId, const std::string& username);
-	bool AddPlayer(unsigned playerId, const std::string& playerUsername);
-	void AddChatMessage(const std::string& username, const std::string& message);
-	std::optional<std::vector<ChatMessage>> GetMessagesAfter(unsigned afterId) const;
-	std::optional<std::vector<DeckState>> GetDecksState() const;
-	std::optional<size_t> GetDrawPileCount() const;
-	std::optional<EndTurnState> GetEndTurnState(unsigned playerId) const;
-	std::optional<TurnState> GetTurnState(unsigned playerId) const;
-	std::optional<GameResult> GetGameResult() const;
-	std::optional<std::vector<uint8_t>> GetPlayerCards(unsigned playerId) const;
-	std::optional<std::array<bool, 4>> GetValidDecks(uint8_t cardId) const;
-	std::optional<std::vector<PlayerState>> GetPlayerStates() const;
+	explicit Lobby(std::string_view lobbyId, unsigned hostId, const std::string& username);
 
-	RemoveResult RemovePlayer(unsigned playerId);
-	void MarkPlayerAsDisconnected(unsigned playerId);
-	RemoveResult RemoveMatchPlayer(unsigned playerId);
-	void UpdatePlayerPing(unsigned playerId);
-	std::vector<unsigned> GetInactivePlayers(std::chrono::seconds timeout);
+	~Lobby() = default;
+	Lobby(const Lobby&) = delete;
+	Lobby& operator =(const Lobby&) = delete;
+	Lobby(Lobby&&) = delete;
+	Lobby& operator =(Lobby&&) = delete;
 
-	bool IsFull() const;
-	bool StartGame(unsigned playerId);
-	bool HasGameStarted() const;
-	const std::unordered_map<unsigned, PlayerInfo>& GetPlayers() const;
-	bool IsPlayerHost(unsigned playerId) const;
+	[[nodiscard]] bool AddPlayer(unsigned playerId, const std::string& playerUsername);
+	[[nodiscard]] RemoveResult RemovePlayer(unsigned playerId);
+	void MarkPlayerAsDisconnected(unsigned playerId) noexcept;
+	[[nodiscard]] RemoveResult RemoveMatchPlayer(unsigned playerId);
+
+	void AddChatMessage(std::string_view username, std::string_view message);
+	[[nodiscard]] std::optional<std::vector<ChatMessage>> GetMessagesAfter(unsigned afterId) const;
+
+	[[nodiscard]] bool StartGame(unsigned playerId);
+	[[nodiscard]] bool HasGameStarted() const noexcept
+	{
+		return m_gameStarted.load(std::memory_order_acquire);
+	}
+	[[nodiscard]] bool PlayCard(unsigned playerId, uint8_t cardId, uint8_t deckId);
+	[[nodiscard]] std::optional<std::vector<uint8_t>> EndTurn(unsigned playerId);
+	void UpdateGameResult() noexcept;
+
+	[[nodiscard]] std::optional<std::vector<DeckState>> GetDecksState() const;
+	[[nodiscard]] std::optional<size_t> GetDrawPileCount() const;
+	[[nodiscard]] std::optional<EndTurnState> GetEndTurnState(unsigned playerId) const;
+	[[nodiscard]] std::optional<TurnState> GetTurnState(unsigned playerId) const;
+	[[nodiscard]] std::optional<GameResult> GetGameResult() const;
+	[[nodiscard]] std::optional<std::vector<uint8_t>> GetPlayerCards(unsigned playerId) const;
+	[[nodiscard]] std::optional<std::array<bool, 4>> GetValidDecks(uint8_t cardId) const;
+	[[nodiscard]] std::optional<std::vector<PlayerState>> GetPlayerStates() const;
+
+	void UpdatePlayerPing(unsigned playerId) noexcept;
+	std::vector<unsigned> GetInactivePlayers(std::chrono::seconds timeout) const;
+
+	[[nodiscard]] bool IsFull() const noexcept;
+
+	[[nodiscard]] const std::unordered_map<unsigned, PlayerInfo>& GetPlayers() const;
+	[[nodiscard]] bool IsPlayerHost(unsigned playerId) const;
 	unsigned GetHostId() const;
 
-	bool PlayCard(unsigned playerId, uint8_t cardId, uint8_t deckId);
-	std::optional<std::vector<uint8_t>> EndTurn(unsigned playerId);
-	void UpdateGameResult();
- 
 private:
 	Lobby() = delete;
+	void TrimChatBuffer() noexcept;
+
+	bool IsGameActive() const noexcept;
 
 public:
 	inline static constexpr size_t kMaxChatMessages{ 100 };
 	inline static constexpr uint8_t kMinPlayers{ 2u };
 	inline static constexpr uint8_t kMaxPlayers{ 5u };
+	inline static constexpr uint8_t kDeckCount{ 4u };
 
 private:
 	std::string m_lobbyId;
@@ -117,6 +136,5 @@ private:
 	std::atomic<bool> m_gameStarted{ false };
 	GameResult m_gameResult{ GameResult::Ongoing };
 	mutable std::mutex m_mutex;
-
 	std::unique_ptr<Table> m_table;
 };

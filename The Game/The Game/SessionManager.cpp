@@ -9,7 +9,8 @@ SessionManager& SessionManager::Instance()
 bool SessionManager::Login(unsigned playerId)
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
-	auto [iterator, inserted] = m_lastPlayerActivity.emplace(playerId, std::chrono::steady_clock::now());
+	auto [iterator, inserted] = m_lastPlayerActivity.emplace
+	(playerId, std::chrono::steady_clock::now());
 	return inserted;
 }
 
@@ -42,7 +43,8 @@ bool SessionManager::IsOnline(unsigned playerId, std::chrono::steady_clock::dura
 	return std::chrono::steady_clock::now() - iteratorActivity->second < timeout;
 }
 
-std::vector<unsigned> SessionManager::GetInactivePlayers(std::chrono::steady_clock::duration timeout) const
+std::vector<unsigned> SessionManager::GetInactivePlayers
+(std::chrono::steady_clock::duration timeout) const
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
 	auto now = std::chrono::steady_clock::now();
@@ -52,6 +54,3 @@ std::vector<unsigned> SessionManager::GetInactivePlayers(std::chrono::steady_clo
 			inactivePlayers.emplace_back(playerId);
 	return inactivePlayers;
 }
-
-
-

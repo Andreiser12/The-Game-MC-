@@ -1,58 +1,46 @@
 export module Table;
 
-import <stack>;
-import <unordered_set>;
-import <unordered_map>;
-import <algorithm>;
-import <random>;
-import <span>;
-import <memory>;
-import <array>;  
-
-#include "AssistantAI.h"
-
 import Card;
 import Player;
 import Deck;
 import DatabaseManager;
 
+import <unordered_map>;
+import <algorithm>;
+import <random>;
+import <span>;
+import <memory>;
+import <array>; 
+import <ranges>;
+
+#include "AssistantAI.h"
+
 export class Table
 {
 public:
-	enum class DeckIndex : std::size_t 
-	{
-		FirstAscending = 0,
-		SecondAscending = 1,
-		FirstDescending = 2,
-		SecondDescending = 3
-	};
+	explicit Table(std::span<const std::pair<unsigned, std::string_view>> lobbyPlayers);
 
-public:
-	Table(const std::vector<std::pair<unsigned, std::string>>& lobbyPlayers);
-
-	bool IsPileEmpty() const;
+	bool IsPileEmpty() const noexcept;
 	bool BackwardsTrick(uint8_t deckId, const Card<uint8_t>& card) const;
 	bool PlayCard(unsigned playerId, uint8_t deckId, const Card<uint8_t>& card) const;
-	void AdvanceTurn();
+	void AdvanceTurn() noexcept;
 	bool HasPlayer(unsigned playerId) const;
 
 	bool CanPlayerPlayMinCards(const Player& player, uint8_t minCards) const;
 	void PlaceCardOnDeck(uint8_t deckIndex, const Card<uint8_t>& card);
-	bool CheckWinCondition() const;
+	bool CheckWinCondition() const noexcept;
 	bool CheckLoseCondition() const;
 	std::vector<uint8_t> EndTurn(unsigned playerId);
-	bool RemovePlayer(unsigned playerId);
+	bool RemovePlayer(unsigned playerId) noexcept;
 
 	Deck& GetDeck(uint8_t deckId) const;
-	const Pile& GetPile() const;
-	std::span<std::reference_wrapper<Deck>> GetAllDecks() const;
+	[[nodiscard]] const Pile& GetPile() const noexcept { return m_pile; };
+	[[nodiscard]] std::size_t GetDrawPileCount() const noexcept { return m_pile.size(); };
+	std::span<const std::unique_ptr<Deck>> GetAllDecks() const noexcept;
 	const std::unordered_map<unsigned, Player>& GetPlayers() const;
 	const Player& GetPlayer(unsigned playerId) const;
 	Player& GetPlayer(unsigned playerId);
 	unsigned GetCurrentPlayerId() const;
-	std::size_t GetDrawPileCount() const;
-
-	constexpr std::size_t GetDeckIndex(DeckIndex index) const noexcept;
 
 	void RunBotTurn(unsigned playerId);
 
@@ -62,7 +50,7 @@ private:
 
 private:
 	uint8_t m_playerCount;
-	std::unordered_map<unsigned, Player> m_playersMap;
+	std::unordered_map<unsigned, Player> m_players;
 	Pile m_pile;
 	std::array<std::unique_ptr<Deck>, 4> m_decks;
 	std::vector<unsigned> m_turnOrder;

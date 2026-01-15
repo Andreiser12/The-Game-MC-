@@ -1,19 +1,16 @@
-#include "PileWidget.h"
+﻿#include "PileWidget.h"
 
 
 PileWidget::PileWidget()
 {
-	m_pilePanel = tgui::Panel::create({ "100%", "100%" });
-	m_pilePanel->getRenderer()->setBorderColor(tgui::Color::Black);
-	m_pilePanel->getRenderer()->setBorders(2);
-	m_pilePanel->getRenderer()->setRoundedBorderRadius(5);
+	m_lastCardCount = -1;
 
-	m_backsidePicture = tgui::Picture::create("assets/images/cardBackside.png");
-	m_backsidePicture->setSize("100%", "100%");
-	m_backsidePicture->setPosition("0%", "0%");
-	m_backsidePicture->setIgnoreMouseEvents(true);
-	m_pilePanel->add(m_backsidePicture);
-	m_backsidePicture->moveToBack();
+	m_pilePanel = tgui::Panel::create({ "100%", "100%" });
+
+	m_pilePanel->getRenderer()->setBorders(0);
+	m_pilePanel->getRenderer()->setBackgroundColor(tgui::Color::Transparent);
+
+	UpdatePile(50);
 }
 
 tgui::Panel::Ptr PileWidget::GetPilePanel() const
@@ -28,29 +25,47 @@ void PileWidget::UpdatePile(int cardCount)
 
 	m_pilePanel->removeAllWidgets();
 
-	if (cardCount <= 0) return;
+	if (cardCount <= 0)
+	{
+		m_pilePanel->setVisible(false);
+		return;
+	}
 
-	int visualLayers = (cardCount > 1) ? 3 : 1;
+	m_pilePanel->setVisible(true);
 
-	constexpr float offset{ 5.0f };
+	int visualLayers = 0;
+	if (cardCount == 1) visualLayers = 1;
+	else if (cardCount <= 10) visualLayers = 2;
+	else if (cardCount <= 30) visualLayers = 3;
+	else visualLayers = 5;
 
 	static std::mt19937 rng(std::random_device{}());
-	std::uniform_real_distribution<float> dist(-2.0f, 2.0f);
+	std::uniform_real_distribution<float> rotationDist(-2.0f, 2.0f);
+	constexpr float offsetPercent = 1.2f;
 
-	for (int i = visualLayers - 1; i >= 0; --i)
+	for (int i = 0; i < visualLayers; ++i)
 	{
 		auto cardPic = tgui::Picture::create("assets/images/cardBackside.png");
-		cardPic->setSize("100%", "100%");
+
+		cardPic->setSize("90%", "90%");
 		cardPic->setIgnoreMouseEvents(true);
 		cardPic->setOrigin(0.5f, 0.5f);
 
-		float shift = i * offset;
-		cardPic->setPosition({ tgui::String(50 + shift) + "%", tgui::String(50 + shift) + "%" });
+		float shift = i * offsetPercent;
+		cardPic->setPosition({
+			tgui::String(50.0f + shift) + "%",
+			tgui::String(50.0f + shift) + "%"
+			});
 
-		if (i > 0)
+		if (i < visualLayers - 1)
 		{
-			cardPic->setRotation(dist(rng));
-			cardPic->getRenderer()->setOpacity(0.85f);
+			cardPic->setRotation(rotationDist(rng));
+			cardPic->getRenderer()->setOpacity(0.9f);
+		}
+		else
+		{
+			cardPic->setRotation(0);
+			cardPic->getRenderer()->setOpacity(1.0f);
 		}
 
 		m_pilePanel->add(cardPic);

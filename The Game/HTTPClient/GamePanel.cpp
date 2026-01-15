@@ -10,7 +10,7 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	m_timerSound{ m_timerTickBuffer },
 	m_feedbackSound{ m_validMoveBuffer }
 {
-	if (m_gameMusic.openFromFile("assets/sounds/game_panel_sound.ogg"))
+	if (m_gameMusic.openFromFile("assets/sounds/game_panel_sound2.ogg"))
 	{
 		m_gameMusic.setLooping(true);
 		m_gameMusic.setVolume(m_normalMusicVolume);
@@ -19,12 +19,14 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 
 	m_ExitButtonBuffer.loadFromFile("assets/sounds/press_button_sound.wav");
 	m_clickBuffer.loadFromFile("assets/sounds/end_turn.wav");
-	m_leaveBuffer.loadFromFile("assets/sounds/leave_match.wav");
+	m_leaveBuffer.loadFromFile("assets/sounds/press_button_sound.wav");
 	m_cardFlipBuffer.loadFromFile("assets/sounds/pickup_card.wav");
 	m_validMoveBuffer.loadFromFile("assets/sounds/valid_card.wav");
 	m_specialMoveBuffer.loadFromFile("assets/sounds/backwards_trick.wav");
 	m_errorMoveBuffer.loadFromFile("assets/sounds/invalid_card.wav");
 	m_timerTickBuffer.loadFromFile("assets/sounds/timer_sound.wav");
+	m_winBuffer.loadFromFile("assets/sounds/game_win.wav");
+	m_loseBuffer.loadFromFile("assets/sounds/game_lost.wav");
 
 	m_uiSound.setBuffer(m_clickBuffer);
 	m_cardSound.setBuffer(m_cardFlipBuffer);
@@ -416,6 +418,23 @@ void GamePanel::UpdateTurnState()
 	for (auto& card : m_myCards)
 	{
 		card->SetDraggable(m_isMyTurn);
+	}
+
+	std::string currentPlayerName = turnState.value().currentUsername;
+	for (auto& [username, slot] : m_playerSlots)
+	{
+		if (username == currentPlayerName)
+		{
+			slot.panel->getRenderer()->setBorderColor(tgui::Color::Green);
+			slot.panel->getRenderer()->setBorders(2);
+			slot.nameLabel->getRenderer()->setTextColor(tgui::Color::Green);
+		}
+		else
+		{
+			slot.panel->getRenderer()->setBorderColor(tgui::Color::Black);
+			slot.panel->getRenderer()->setBorders(1);
+			slot.nameLabel->getRenderer()->setTextColor(tgui::Color::White);
+		}
 	}
 }
 

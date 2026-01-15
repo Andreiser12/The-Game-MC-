@@ -78,6 +78,7 @@ struct TurnState
 {
 	bool isMyTurn;
 	unsigned currentPlayerId;
+	std::string currentUsername;
 };
 
 struct PlayerState

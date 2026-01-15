@@ -42,6 +42,7 @@ export struct TurnState
 {
 	unsigned currentPlayerId;
 	bool isMyTurn;
+	std::string currentUsername;
 };
 
 export enum class GameResult : uint8_t

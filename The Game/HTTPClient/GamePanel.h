@@ -127,6 +127,8 @@ private:
 	sf::SoundBuffer m_specialMoveBuffer;
 	sf::SoundBuffer m_errorMoveBuffer;
 	sf::SoundBuffer m_timerTickBuffer;
+	sf::SoundBuffer m_winBuffer;
+	sf::SoundBuffer m_loseBuffer;
 
 	sf::Sound m_uiSound;
 	sf::Sound m_cardSound;

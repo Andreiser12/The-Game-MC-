@@ -633,11 +633,13 @@ std::optional<TurnState> ApiClient::GetTurnState() const
 	auto json = crow::json::load(response.text);
 	if (!json
 		|| !json.has("isMyTurn")
-		|| !json.has("currentPlayerId")) return std::nullopt;
+		|| !json.has("currentPlayerId")
+		|| !json.has("currentUsername")) return std::nullopt;
 
 	TurnState state;
 	state.isMyTurn = json["isMyTurn"].b();
 	state.currentPlayerId = static_cast<unsigned>(json["currentPlayerId"].i());
+	state.currentUsername = json["currentUsername"].s();
 	return state;
 }
 

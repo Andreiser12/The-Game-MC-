@@ -529,6 +529,7 @@ crow::response LobbyRoutes::GetTurnState(const std::string& lobbyId, unsigned pl
 	crow::json::wvalue data;
 	data["isMyTurn"] = turnOpt.value().isMyTurn;
 	data["currentPlayerId"] = turnOpt.value().currentPlayerId;
+	data["currentUsername"] = turnOpt.value().currentUsername;
 	return crow::response(200, data);
 }
 

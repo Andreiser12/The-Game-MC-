@@ -271,9 +271,17 @@ std::optional<TurnState> Lobby::GetTurnState(unsigned playerId) const
 	if (!IsGameActive()) return std::nullopt;
 
 	const unsigned currentPlayerId{ m_table->GetCurrentPlayerId() };
+
+	std::string currentName = "";
+	if (m_players.contains(currentPlayerId))
+	{
+		currentName = m_players.at(currentPlayerId).username;
+	}
+
 	return TurnState{
 		.currentPlayerId = currentPlayerId,
-		.isMyTurn = currentPlayerId == playerId
+		.isMyTurn = currentPlayerId == playerId,
+		.currentUsername = currentName
 	};
 }
 

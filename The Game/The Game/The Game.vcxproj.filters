@@ -30,18 +30,6 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Table.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Player.cppm">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Table.cppm">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="Lobby.cpp">
       <Filter>Source Files\Lobby</Filter>
     </ClCompile>
@@ -55,12 +43,6 @@
       <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="AuthenticationRoutes.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GreedyAI.cppm">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GreedyAI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Lobby.cppm">

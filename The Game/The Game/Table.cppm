@@ -1,9 +1,7 @@
 export module Table;
-
 import Card;
 import Player;
 import Deck;
-import DatabaseManager;
 
 import <unordered_map>;
 import <algorithm>;
@@ -14,7 +12,6 @@ import <array>;
 import <ranges>;
 
 #include "AssistantAI.h"
-
 export class Table
 {
 public:

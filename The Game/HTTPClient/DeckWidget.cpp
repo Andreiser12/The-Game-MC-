@@ -1,6 +1,6 @@
 #include "DeckWidget.h"
 
-DeckWidget::DeckWidget(DeckType deckType, uint8_t deckId) : m_deckType{deckType}, m_deckId{deckId}
+DeckWidget::DeckWidget(DeckType deckType, uint8_t deckId) : m_deckType{ deckType }, m_deckId{ deckId }
 {
 	m_lastId = (m_deckType == DeckType::Ascending) ? m_lastId = 1u : m_lastId = 100u;
 	CreateDeckWidget();
@@ -14,7 +14,7 @@ void DeckWidget::CreateDeckWidget()
 	m_deckPanel->getRenderer()->setRoundedBorderRadius(5);
 
 	m_highlightOverlay = tgui::Panel::create({ "100%", "100%" });
-	m_highlightOverlay->setPosition({ "0%", "0%" });
+	m_highlightOverlay->setPosition("0%", "0%");
 	m_highlightOverlay->getRenderer()->setRoundedBorderRadius(5);
 	m_highlightOverlay->setVisible(false);
 	m_highlightOverlay->setIgnoreMouseEvents(true);

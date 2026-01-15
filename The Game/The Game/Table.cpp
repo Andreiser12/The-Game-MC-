@@ -250,20 +250,41 @@ unsigned Table::GetCurrentPlayerId() const
 
 bool Table::CanPlayerPlayMinCards(const Player& player, uint8_t minCards) const
 {
-	if (static_cast<uint8_t>(player.GetCardsCount()) < minCards) return false;
+	const uint8_t cardCount{ static_cast<uint8_t>(player.GetCardsCount()) };
+	if (cardCount == 0) return true;
+	if (cardCount < minCards) return false;
+
+	std::array<uint8_t, DECK_COUNT> deckTops;
+	for (size_t i = 0; i < DECK_COUNT; ++i)
+	{
+		deckTops[i] = m_decks[i]->GetTopCard().GetId();
+	}
+
+	auto cards = player.GetCards();
 	uint8_t validCards{ 0u };
 
-	for (const auto & card : player.GetCards())
+	while (validCards < minCards && !cards.empty())
 	{
-		for (size_t deckIndex = 0; deckIndex < DECK_COUNT; ++deckIndex)
+		bool placedCard{ false };
+		for (auto it = cards.begin(); it != cards.end(); ++it)
 		{
-			if (PlayCard(player.GetPlayerId(), deckIndex, card))
+			const uint8_t cardValue{ it->GetId() };
+			for (size_t deckIndex = 0; deckIndex <DECK_COUNT; ++deckIndex)
 			{
-				if (++validCards >= minCards) return true;
+				if (CanPlayOnDeck(cardValue, deckTops[deckIndex], deckIndex))
+				{
+					deckTops[deckIndex] = cardValue;
+					cards.erase(it);
+					validCards++;
+					placedCard = true;
+					break;
+				}
 			}
+			if (placedCard) break;
 		}
+		if (!placedCard) break;
 	}
-	return false;
+	return validCards >= minCards;
 }
 
 void Table::PlaceCardOnDeck(uint8_t deckIndex, const Card<uint8_t>& card)
@@ -301,8 +322,8 @@ std::vector<uint8_t> Table::EndTurn(unsigned playerId)
 	for (uint8_t i = 0; i < drawCount; ++i)
 	{
 		const uint8_t cardId{ m_pile.top().GetId() };
-		m_pile.pop();
 		player.AddCard(std::move(m_pile.top()));
+		m_pile.pop();
 		drawnCards.emplace_back(cardId);
 	}
 	player.ResetCardsPlaced();
@@ -347,4 +368,16 @@ void Table::MoveCardsToPile(Player& player)
 	{
 		m_pile.push(card);
 	}
+}
+
+bool Table::CanPlayOnDeck(uint8_t cardValue, uint8_t topValue, size_t deckIndex) const
+{
+	const bool isBackwards{
+		std::abs(static_cast<int>(cardValue) - static_cast<int>(topValue)) == 10};
+
+	if (m_decks[deckIndex]->GetDeckType() == Deck::DeckType::Ascending)
+	{
+		return cardValue > topValue || isBackwards;
+	}
+	return cardValue < topValue || isBackwards;
 }

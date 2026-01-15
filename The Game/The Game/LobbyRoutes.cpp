@@ -150,6 +150,11 @@ void LobbyRoutes::Register(crow::SimpleApp& app)
 		([this](const crow::request& req) {
 		return this->ReportGameLoss(req);
 			});
+
+	CROW_ROUTE(app, "/lobby/<string>/players/<uint>/can_play").methods("GET"_method)
+		([this](const crow::request& req, const std::string& lobbyId, unsigned playerId) {
+		return this->GetCanPlayMore(req, lobbyId, playerId);
+			});
 }
 
 crow::response LobbyRoutes::CreateLobby(const crow::request& request)
@@ -470,7 +475,7 @@ crow::response LobbyRoutes::GetGameState(const std::string& lobbyId)
 	auto drawPileCount = lobby->GetDrawPileCount();
 	auto decksState = lobby->GetDecksState();
 
-	if (!drawPileCount.has_value() 
+	if (!drawPileCount.has_value()
 		|| !decksState.has_value()) return crow::response(409, "Game not started");
 
 	crow::json::wvalue data;
@@ -495,6 +500,7 @@ crow::response LobbyRoutes::GetEndTurnState(const std::string& lobbyId, unsigned
 	if (!stateOpt) return crow::response(409, "Game not started or invalid player");
 
 	crow::json::wvalue data;
+	data["playerId"] = stateOpt.value().playerId;
 	data["canEndTurn"] = stateOpt.value().canEndTurn;
 	data["cardsPlaced"] = stateOpt.value().cardsPlaced;
 	data["minRequiredCards"] = stateOpt.value().minRequiredCards;
@@ -618,5 +624,23 @@ crow::response LobbyRoutes::GetPlayerStates(const std::string& lobbyId)
 		data["USERNAMES"][i] = states[i].username;
 		data["IS_IN_MATCH"][i] = states[i].isInMatch;
 	}
+	return crow::response(200, data);
+}
+
+crow::response LobbyRoutes::GetCanPlayMore(const crow::request& request,
+	const std::string& lobbyId, unsigned playerId)
+{
+	auto body = crow::json::load(request.body);
+	if (!body) return crow::response(400, "Invalid JSON");
+
+	auto lobby = m_manager.GetLobby(lobbyId);
+	if (!lobby) return crow::response(404, "Lobby not found");
+
+	const uint8_t remainingCards{ static_cast<uint8_t>(body["remaining_cards"].i()) };
+	const auto canPlayMore = lobby->GetCanPlayMore(playerId, remainingCards);
+	if (!canPlayMore) return crow::response(409, "Cannot get result");
+
+	crow::json::wvalue data;
+	data["can_play"] = canPlayMore.value();
 	return crow::response(200, data);
 }

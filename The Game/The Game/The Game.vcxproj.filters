@@ -36,18 +36,6 @@
     <ClCompile Include="Player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Card.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Deck.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Card.cppm">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Deck.cppm">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="Player.cppm">
       <Filter>Header Files</Filter>
     </ClCompile>

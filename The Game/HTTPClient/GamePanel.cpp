@@ -68,8 +68,8 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	tableShape.setOutlineColor(sf::Color(0, 0, 0));
 	tableShape.setScale({ 2.f, 1.2f });
 
-	float tableWidth = tableShape.getRadius() * 2.f * tableShape.getScale().x;
-	float tableHeight = tableShape.getRadius() * 2.f * tableShape.getScale().y;
+	float tableWidth{ tableShape.getRadius() * 2.f * tableShape.getScale().x };
+	float tableHeight{ tableShape.getRadius() * 2.f * tableShape.getScale().y };
 
 	tableShape.setPosition(
 		{ (canvasSize.x - tableWidth) / 2.f,
@@ -107,7 +107,7 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 		});
 	chatEditBox->onReturnKeyPress([this, chatEditBox]()
 		{
-			const std::string messageSent = chatEditBox->getText().toStdString();
+			const std::string messageSent{ chatEditBox->getText().toStdString() };
 			if (messageSent.empty() || messageSent.size() > 500) return;
 
 			std::thread([this, messageSent]()
@@ -267,83 +267,6 @@ void GamePanel::UpdateGame()
 {
 	if (m_gameFinished) return;
 
-	float deltaTime = m_deltaTimeClock.restart().asSeconds();
-
-	if (m_isMyTurn)
-	{
-		m_timeLeft -= deltaTime;
-
-		if (m_timeLeft <= 0.0f)
-		{
-			m_timeLeft = 0.0f;
-			OnTurnTimeout();
-		}
-
-		uint8_t seconds = static_cast<uint8_t>(m_timeLeft);
-		std::string secStr = std::to_string(seconds);
-		if (seconds < 10) secStr = "0" + secStr;
-		m_timerLabel->setText("00:" + secStr);
-
-		if (seconds <= 10) m_timerLabel->getRenderer()->setTextColor(tgui::Color::Red);
-		else m_timerLabel->getRenderer()->setTextColor(tgui::Color::White);
-
-		int currentSeconds = static_cast<int>(m_timeLeft);
-
-		if (currentSeconds <= 10 && currentSeconds >= 0)
-		{
-			if (!m_isMusicDimmed)
-			{
-				m_gameMusic.setVolume(m_normalMusicVolume / 5.0f);
-				m_isMusicDimmed = true;
-			}
-
-			if (currentSeconds != m_lastTimerSecond)
-			{
-				m_timerSound.setPitch(1.0f + (10 - currentSeconds) * 0.05f);
-				m_timerSound.play();
-				m_lastTimerSecond = currentSeconds;
-			}
-		}
-		else
-		{
-			m_lastTimerSecond = -1;
-			if (m_isMusicDimmed)
-			{
-				m_gameMusic.setVolume(m_normalMusicVolume);
-				m_isMusicDimmed = false;
-			}
-		}
-		bool hasMoves = CanMakeAnyMove();
-
-		bool canEndTurn = m_endTurnButton->isEnabled();
-
-		if (!canEndTurn && !hasMoves)
-		{
-			std::thread([this]() {
-				m_apiClient.ReportGameLoss();
-				}).detach();
-
-			m_gameFinished = true;
-
-			m_feedbackSound.setBuffer(m_errorMoveBuffer);
-			m_feedbackSound.play();
-
-			HandleGameResult(GameResult::Lost);
-			return;
-		}
-	}
-	else
-	{
-		m_timerLabel->setText("WAIT");
-		m_timerLabel->getRenderer()->setTextColor(tgui::Color(200, 200, 200));
-
-		if (m_isMusicDimmed)
-		{
-			m_gameMusic.setVolume(m_normalMusicVolume);
-			m_isMusicDimmed = false;
-		}
-	}
-
 	RemovePlacedCards();
 	UpdateDecks();
 	UpdateChat();
@@ -351,13 +274,9 @@ void GamePanel::UpdateGame()
 	UpdateTurnState();
 	UpdateTableState();
 	UpdatePlayerStates();
-
-	const auto gameResultOpt = m_apiClient.SnapshotGameResult();
-	if (gameResultOpt && gameResultOpt.value() != GameResult::Ongoing)
-	{
-		m_gameFinished = true;
-		HandleGameResult(gameResultOpt.value());
-	}
+	UpdateTimer();
+	CheckAutoBlock();
+	CheckGameResult();
 }
 
 void GamePanel::UpdateDecks()
@@ -449,6 +368,93 @@ void GamePanel::UpdatePlayerStates()
 	}
 }
 
+void GamePanel::UpdateTimer()
+{
+	float deltaTime{ m_deltaTimeClock.restart().asSeconds() };
+
+	if (m_isMyTurn)
+	{
+		m_timeLeft -= deltaTime;
+
+		if (m_timeLeft <= 0.0f)
+		{
+			m_timeLeft = 0.0f;
+			OnTurnTimeout();
+		}
+
+		uint8_t seconds{ static_cast<uint8_t>(m_timeLeft) };
+		std::string secStr{ std::to_string(seconds) };
+		if (seconds < 10u) secStr = "0" + secStr;
+		m_timerLabel->setText("00:" + secStr);
+
+		if (seconds <= 10u) m_timerLabel->getRenderer()->setTextColor(tgui::Color::Red);
+		else m_timerLabel->getRenderer()->setTextColor(tgui::Color::White);
+
+		uint8_t currentSeconds{ static_cast<uint8_t>(m_timeLeft) };
+
+		if (currentSeconds <= 10u && currentSeconds >= 0u)
+		{
+			if (!m_isMusicDimmed)
+			{
+				m_gameMusic.setVolume(m_normalMusicVolume / 5.0f);
+				m_isMusicDimmed = true;
+			}
+
+			if (currentSeconds != m_lastTimerSecond)
+			{
+				m_timerSound.setPitch(1.0f + (10 - currentSeconds) * 0.05f);
+				m_timerSound.play();
+				m_lastTimerSecond = currentSeconds;
+			}
+		}
+		else
+		{
+			m_lastTimerSecond = -1;
+			if (m_isMusicDimmed)
+			{
+				m_gameMusic.setVolume(m_normalMusicVolume);
+				m_isMusicDimmed = false;
+			}
+		}
+	}
+	else
+	{
+		m_timerLabel->setText("WAIT");
+		m_timerLabel->getRenderer()->setTextColor(tgui::Color(200, 200, 200));
+
+		if (m_isMusicDimmed)
+		{
+			m_gameMusic.setVolume(m_normalMusicVolume);
+			m_isMusicDimmed = false;
+		}
+	}
+}
+
+void GamePanel::CheckAutoBlock()
+{
+	if (!m_isMyTurn) return;
+
+	const auto canPlayMore = m_apiClient.SnapshotCanPlayMore();
+	if (!canPlayMore) return;
+
+	if (canPlayMore.value() == false)
+	{
+		m_gameFinished = true;
+		m_apiClient.ReportGameLoss();
+		HandleGameResult(GameResult::Lost);
+	}
+}
+
+void GamePanel::CheckGameResult()
+{
+	const auto gameResultOpt = m_apiClient.SnapshotGameResult();
+	if (gameResultOpt && gameResultOpt.value() != GameResult::Ongoing)
+	{
+		m_gameFinished = true;
+		HandleGameResult(gameResultOpt.value());
+	}
+}
+
 void GamePanel::SetupPlayerSlots()
 {
 	auto playerUsernames = m_apiClient.SnapshotPlayers();
@@ -462,7 +468,7 @@ void GamePanel::SetupPlayerSlots()
 	const auto slots = GetSlotsForPlayerCount(playerUsernames.size());
 	if (slots.empty()) return;
 
-	for (size_t index = 0; index < playerUsernames.size(); index++)
+	for (size_t index = 0; index < playerUsernames.size(); ++index)
 	{
 		PlayerSlotWidget slotWidget;
 		slotWidget.username = playerUsernames[index];
@@ -785,8 +791,6 @@ void GamePanel::RebuildMyHand()
 
 void GamePanel::HandleGameResult(GameResult result)
 {
-	if (result == GameResult::Ongoing) return;
-
 	m_gameMusic.stop();
 
 	for (auto& card : m_myCards)
@@ -835,33 +839,6 @@ void GamePanel::ShowGameResultOverlay(GameResult result)
 	dialog->add(backToMenuButton);
 	overlay->add(dialog);
 	m_root->add(overlay);
-}
-
-bool GamePanel::CanMakeAnyMove() const
-{
-	if (m_myCards.empty()) return false;
-
-	for (const auto& card : m_myCards)
-	{
-		uint8_t cardVal = card->GetId();
-
-		for (const auto& deck : m_decks)
-		{
-			uint8_t deckVal = static_cast<uint8_t>(deck->GetLastId());
-			bool isValid = false;
-
-			if (deck->GetDeckType() == DeckWidget::DeckType::Ascending)
-			{
-				if (cardVal > deckVal || (cardVal == deckVal - 10)) isValid = true;
-			}
-			else
-			{
-				if (cardVal < deckVal || (cardVal == deckVal + 10)) isValid = true;
-			}
-			if (isValid) return true;
-		}
-	}
-	return false;
 }
 
 void GamePanel::MarkPlayerAsLeft(const std::string& username)

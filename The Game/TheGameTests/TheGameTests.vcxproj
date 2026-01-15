@@ -159,6 +159,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CardTests.cpp" />
+    <ClCompile Include="DeckTests.cpp" />
     <ClCompile Include="SessionManagerTests.cpp" />
   </ItemGroup>
   <ItemGroup>

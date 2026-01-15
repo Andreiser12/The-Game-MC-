@@ -37,6 +37,9 @@ public:
 	void UpdateTableState();
 	void UpdateTurnState();
 	void UpdatePlayerStates();
+	void UpdateTimer();
+	void CheckAutoBlock();
+	void CheckGameResult();
 	void SetupPlayerSlots();
 	void OnGameStarted();
 	void HandleMouseEvent(const sf::Event& event);
@@ -54,11 +57,11 @@ private:
 	{
 		switch (count)
 		{
-			case 2: return k_slots2;
-			case 3: return k_slots3;
-			case 4: return k_slots4;
-			case 5: return k_slots5;
-			default: return {};
+		case 2: return k_slots2;
+		case 3: return k_slots3;
+		case 4: return k_slots4;
+		case 5: return k_slots5;
+		default: return {};
 		}
 	}
 	void CreatePlayerHand(size_t playerIndex, const PlayerSlot& slot, std::vector<std::shared_ptr<CardWidget>>& outCards);
@@ -67,7 +70,6 @@ private:
 	void RebuildMyHand();
 	void HandleGameResult(GameResult result);
 	void ShowGameResultOverlay(GameResult result);
-	bool CanMakeAnyMove() const;
 
 private:
 	unsigned m_lastMessageId{ 0u };
@@ -101,7 +103,7 @@ private:
 		{58.0f, 16.0f},
 		{31.0f, 15.0f},
 		{14.0f, 46.0f}} };
-	
+
 	inline static constexpr uint8_t kmaxChars{ 15u };
 	std::vector<std::shared_ptr<CardWidget>> m_myCards;
 	std::array<std::shared_ptr<DeckWidget>, 4> m_decks;
@@ -114,7 +116,7 @@ private:
 	bool m_gameFinished{ false };
 
 	tgui::Label::Ptr m_timerLabel;
-	float m_timeLeft{60.0f};
+	float m_timeLeft{ 60.0f };
 	sf::Clock m_deltaTimeClock;
 
 	sf::Music m_gameMusic;

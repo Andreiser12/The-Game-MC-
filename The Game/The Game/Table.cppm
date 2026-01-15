@@ -47,6 +47,7 @@ public:
 private:
 	void Shuffle();
 	void MoveCardsToPile(Player& player);
+	bool CanPlayOnDeck(uint8_t cardValue, uint8_t topValue, size_t deckIndex) const;
 
 private:
 	uint8_t m_playerCount;

@@ -93,7 +93,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;$(SolutionDir)AssistantAI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
       <PrecompiledHeaderFile>
@@ -161,9 +161,13 @@
   <ItemGroup>
     <ClCompile Include="CardTests.cpp" />
     <ClCompile Include="DeckTests.cpp" />
+    <ClCompile Include="AssistantAITests.cpp" />
     <ClCompile Include="SessionManagerTests.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AssistantAI\AssistantAI.vcxproj">
+      <Project>{b3918795-ea54-4d15-af39-dabd46a23b9e}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\TheGameCore\TheGameCore.vcxproj">
       <Project>{e29dac7c-73db-4765-bb68-93875040a4d2}</Project>
     </ProjectReference>

@@ -112,6 +112,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)AssistantAI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -151,6 +152,12 @@
     <ClCompile Include="..\The Game\Deck.cppm">
       <FileType>Document</FileType>
     </ClCompile>
+    <ClCompile Include="..\The Game\GreedyAI.cpp" />
+    <ClCompile Include="..\The Game\GreedyAI.cppm" />
+    <ClCompile Include="..\The Game\Player.cpp" />
+    <ClCompile Include="..\The Game\Player.cppm">
+      <FileType>Document</FileType>
+    </ClCompile>
     <ClCompile Include="..\The Game\SessionManager.cpp" />
     <ClCompile Include="..\The Game\SessionManager.cppm">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</CompileAs>
@@ -158,6 +165,19 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Default</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Default</CompileAs>
     </ClCompile>
+    <ClCompile Include="..\The Game\Table.cpp" />
+    <ClCompile Include="..\The Game\Table.cppm">
+      <FileType>Document</FileType>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Default</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Default</CompileAs>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AssistantAI\AssistantAI.vcxproj">
+      <Project>{b3918795-ea54-4d15-af39-dabd46a23b9e}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

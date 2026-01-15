@@ -161,8 +161,6 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Default</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Default</CompileAs>
     </ClCompile>
-    <ClCompile Include="GreedyAI.cpp" />
-    <ClCompile Include="GreedyAI.cppm" />
     <ClCompile Include="Lobby.cpp" />
     <ClCompile Include="Lobby.cppm" />
     <ClCompile Include="LobbyManager.cpp" />
@@ -170,19 +168,9 @@
     <ClCompile Include="LobbyRoutes.cpp" />
     <ClCompile Include="LobbyRoutes.cppm" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Player.cpp" />
-    <ClCompile Include="Table.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DatabaseStructures.cppm">
-      <FileType>Document</FileType>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Default</CompileAs>
-    </ClCompile>
-    <ClCompile Include="Player.cppm">
-      <FileType>Document</FileType>
-    </ClCompile>
-    <ClCompile Include="Table.cppm">
       <FileType>Document</FileType>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Default</CompileAs>

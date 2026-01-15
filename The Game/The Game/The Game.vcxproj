@@ -161,7 +161,6 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Default</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Default</CompileAs>
     </ClCompile>
-    <ClCompile Include="Deck.cpp" />
     <ClCompile Include="GreedyAI.cpp" />
     <ClCompile Include="GreedyAI.cppm" />
     <ClCompile Include="Lobby.cpp" />
@@ -179,9 +178,6 @@
       <FileType>Document</FileType>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Default</CompileAs>
-    </ClCompile>
-    <ClCompile Include="Deck.cppm">
-      <FileType>Document</FileType>
     </ClCompile>
     <ClCompile Include="Player.cppm">
       <FileType>Document</FileType>

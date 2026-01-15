@@ -153,9 +153,6 @@
   <ItemGroup>
     <ClCompile Include="AuthenticationRoutes.cpp" />
     <ClCompile Include="AuthenticationRoutes.cppm" />
-    <ClCompile Include="Card.cpp">
-      <FileType>CppCode</FileType>
-    </ClCompile>
     <ClCompile Include="DatabaseManager.cpp" />
     <ClCompile Include="DatabaseManager.cppm">
       <FileType>Document</FileType>
@@ -164,7 +161,6 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Default</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Default</CompileAs>
     </ClCompile>
-    <ClCompile Include="Deck.cpp" />
     <ClCompile Include="GreedyAI.cpp" />
     <ClCompile Include="GreedyAI.cppm" />
     <ClCompile Include="Lobby.cpp" />
@@ -178,18 +174,10 @@
     <ClCompile Include="Table.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Card.cppm">
-      <FileType>Document</FileType>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCppModule</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCppModule</CompileAs>
-    </ClCompile>
     <ClCompile Include="DatabaseStructures.cppm">
       <FileType>Document</FileType>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Default</CompileAs>
-    </ClCompile>
-    <ClCompile Include="Deck.cppm">
-      <FileType>Document</FileType>
     </ClCompile>
     <ClCompile Include="Player.cppm">
       <FileType>Document</FileType>

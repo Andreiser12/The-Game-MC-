@@ -42,11 +42,11 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 	joinLobbyButton->onPress([&gui, onJoinLobby, &apiClient, &btnSound, lobbyEditBox, panel]()
 		{
 			btnSound.play();
-			std::string lobbyId = lobbyEditBox->getText().toStdString();
+			const std::string lobbyId{ lobbyEditBox->getText().toStdString() };
 			std::string errorMessage;
 
 			if (lobbyId.empty()) errorMessage = "Lobby ID can't be empty";
-			else if (lobbyId.size() != 6u) errorMessage = "Lobby must be 6 characters long";
+			else if (lobbyId.size() != 6) errorMessage = "Lobby must be 6 characters long";
 
 			if (!errorMessage.empty())
 			{
@@ -54,19 +54,40 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 				gui.add(errorPopupPanel);
 				return;
 			}
-			if (onJoinLobby)
+
+			JoinLobbyResult joinLobbyResult = apiClient.JoinLobbyValidated(lobbyId,
+				apiClient.GetUsername());
+
+			switch (joinLobbyResult)
 			{
-				if (onJoinLobby(apiClient, lobbyId))
-				{
-					panel->setVisible(false);
-					apiClient.StartPingThread(lobbyId, apiClient.GetPlayerId());
-					s_running.store(true);
-				}
-				else
-				{
-					auto errorPopupPanel = Utils::CreateErrorPopupPanel(gui, "Invalid Lobby ID", btnSound);
-					gui.add(errorPopupPanel);
-				}
+			case JoinLobbyResult::Success:
+				if (onJoinLobby) onJoinLobby(apiClient, lobbyId);
+				panel->setVisible(false);
+				apiClient.StartPingThread(lobbyId, apiClient.GetPlayerId());
+				s_running.store(true);
+				break;
+
+			case JoinLobbyResult::LobbyNotFound:
+				errorMessage = "Lobby not found. Check the ID and try again.";
+				break;
+
+			case JoinLobbyResult::LobbyFull:
+				errorMessage = "Lobby is full. Try another lobby.";
+				break;
+				
+			case JoinLobbyResult::GameAlreadyStarted:
+				errorMessage = "Game has already started. You can't join now.";
+				break;
+
+			case JoinLobbyResult::NetworkError:
+				errorMessage = "Network error. Please try again.";
+				break;
+			}
+
+			if (!errorMessage.empty())
+			{
+				auto errorPopupPanel = Utils::CreateErrorPopupPanel(gui, errorMessage, btnSound);
+				gui.add(errorPopupPanel);
 			}
 		});
 

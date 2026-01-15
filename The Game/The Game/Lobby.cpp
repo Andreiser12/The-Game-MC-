@@ -139,6 +139,11 @@ bool Lobby::IsFull() const noexcept
 	return m_players.size() == kMaxPlayers;
 }
 
+size_t Lobby::GetPlayerCount() const noexcept
+{
+	return m_players.size();
+}
+
 bool Lobby::StartGame(unsigned playerId)
 {
 	std::lock_guard lock(m_mutex);

@@ -15,13 +15,13 @@ void HostPanel::PreloadImages()
 
 	for (uint16_t i = 0; i < totalFrames; ++i)
 	{
-		std::stringstream ss;
+		std::stringstream gifPath;
 
-		ss << "assets/gif/TheGameLevelSequence."
+		gifPath << "assets/gif/TheGameLevelSequence."
 			<< std::setw(4) << std::setfill('0') << i
 			<< ".jpeg";
 
-		std::string path = ss.str();
+		std::string path = gifPath.str();
 
 		try {
 			s_frames.emplace_back(path);
@@ -71,9 +71,19 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	playersListBox->getRenderer()->setFont("assets/fonts/Sanchez-Regular.ttf");
 	playersListBox->setSize("20%", "30%");
 	playersListBox->setPosition("0%", "0%");
-	playersListBox->getRenderer()->setOpacity(0.7f);
 	playersListBox->getRenderer()->setTextSize(20);
-	playersListBox->getRenderer()->setBackgroundColor(tgui::Color(128, 128, 128));
+	playersListBox->getRenderer()->setBackgroundColor(tgui::Color(30, 35, 45));
+	playersListBox->getRenderer()->setTextColor(tgui::Color(220, 220, 230));
+	playersListBox->getRenderer()->setTextColorHover(tgui::Color(255, 255, 255));
+	playersListBox->getRenderer()->setBackgroundColorHover(tgui::Color(50, 60, 80));
+	playersListBox->getRenderer()->setSelectedBackgroundColor(tgui::Color(70, 130, 180));
+	playersListBox->getRenderer()->setSelectedTextColor(tgui::Color(255, 255, 255));
+
+	playersListBox->getRenderer()->setBorderColor(tgui::Color(70, 130, 180));
+	playersListBox->getRenderer()->setBorders(2);
+	playersListBox->getRenderer()->setOpacity(0.7f);
+	playersListBox->getRenderer()->setPadding({ 10, 5, 10, 5 });
+
 	for (const auto& username : apiClient.SnapshotPlayers())
 	{
 		playersListBox->addItem(username);

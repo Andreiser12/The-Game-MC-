@@ -42,6 +42,7 @@ private:
 	crow::response GetPlayerStates(const std::string& lobbyId);
 	crow::response GetCanPlayMore(const crow::request& request,
 		const std::string& lobbyId, unsigned playerId);
+	crow::response GetLobbyInfo(const std::string& lobbyId);
 
 private:
 	LobbyManager& m_manager;

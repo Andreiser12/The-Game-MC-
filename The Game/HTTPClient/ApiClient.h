@@ -89,6 +89,26 @@ struct PlayerState
 	bool isInMatch;
 };
 
+enum class JoinLobbyResult
+{
+	Success,
+	LobbyNotFound,
+	LobbyFull,
+	GameAlreadyStarted,
+	AlreadyInLobby,
+	NetworkError
+};
+
+struct LobbyInfo
+{
+	std::string lobbyId;
+	std::string status;
+	uint8_t currentPlayers;
+	uint8_t maxPlayers;
+	unsigned hostId;
+	bool isGameStarted;
+};
+
 class ApiClient
 {
 public:
@@ -100,6 +120,7 @@ public:
 	std::optional<std::string> CreateLobby(const std::string& username);
 	bool JoinLobby(const std::string& lobbyId,
 		const std::string& username);
+	JoinLobbyResult JoinLobbyValidated(const std::string& lobbyId, const std::string& username);
 	bool LeaveLobby(const std::string& lobbyId, unsigned playerId);
 	std::optional<LeaveMatchResult> LeaveMatch();
 	std::optional<LobbyState> GetLobbyState(const std::string& lobbyId);
@@ -128,6 +149,7 @@ public:
 	std::optional<TurnState> GetTurnState() const;
 	std::optional<GameResult> ParseGameResult(const std::string& result) const;
 	std::optional<GameResult> GetGameResult(const std::string& lobbyId) const;
+	std::optional<LobbyInfo> GetLobbyInfo(const std::string& lobbyId) const;
 
 	void StartNetworkLoop();
 	void StopNetworkLoop();

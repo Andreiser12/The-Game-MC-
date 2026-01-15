@@ -45,22 +45,19 @@ tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 			},
 			[&gui, &apiClient, &btnSound, panel](ApiClient& api, std::string lobbyIdEntered)
 			{
-				if (api.JoinLobby(lobbyIdEntered, api.GetUsername()))
-				{
-					panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(150));
-					std::string lobbyId = api.GetLobbyId();
-					auto host = HostPanel::Create(
-						gui,
-						apiClient,
-						btnSound,
-						lobbyId,
-						[lobbyId](ApiClient& api) { return api.LeaveLobby(lobbyId, api.GetPlayerId()); },
-						[lobbyId](ApiClient& api) { return api.StartMatch(lobbyId, api.GetPlayerId()); }
-					);
-					gui.add(host);
-					return true;
-				}
-				return false;
+				panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(150));
+				std::string lobbyId{ api.GetLobbyId() };
+				auto host = HostPanel::Create(
+					gui,
+					apiClient,
+					btnSound,
+					lobbyId,
+					[lobbyId](ApiClient& api) { return api.LeaveLobby(lobbyId, api.GetPlayerId()); },
+					[lobbyId](ApiClient& api) { return api.StartMatch(lobbyId, api.GetPlayerId()); }
+				);
+
+				gui.add(host);
+				return true;
 			}
 		);
 		gui.add(joinPanel);
@@ -77,7 +74,7 @@ tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 		btnSound.play();
 		if (onHost)
 		{
-			std::string lobbyId = onHost(apiClient, apiClient.GetUsername());
+			std::string lobbyId{ onHost(apiClient, apiClient.GetUsername()) };
 			apiClient.SetLobbyId(lobbyId);
 			panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(150));
 			auto hostPanel = HostPanel::Create(gui,
@@ -112,4 +109,3 @@ tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 	panel->add(titleLabel);
 	return panel;
 }
-

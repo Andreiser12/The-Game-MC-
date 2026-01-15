@@ -4,7 +4,7 @@ MainMenuWindow::MainMenuWindow(sf::RenderWindow& window, ApiClient& api) :
 	m_window{ window },
 	m_mainMenu{ window },
 	m_apiClient{ api },
-	m_clickSound{m_clickBuffer}
+	m_clickSound{ m_clickBuffer }
 {
 	m_mainMenu.setFont("assets/fonts/Cinzel-Regular.ttf");
 	m_background = tgui::Picture::create("assets/images/mainMenuBackground.png");
@@ -14,7 +14,7 @@ MainMenuWindow::MainMenuWindow(sf::RenderWindow& window, ApiClient& api) :
 
 	auto buttonsBackground = tgui::Picture::create("assets/images/buttonsBackground.png");
 	buttonsBackground->setSize("90%", "90%");
-	buttonsBackground->setPosition("50%", "50%");
+	buttonsBackground->setPosition("50%", "52.5%");
 	buttonsBackground->setOrigin(0.5f, 0.5f);
 	m_mainMenu.add(buttonsBackground);
 
@@ -42,9 +42,9 @@ MainMenuWindow::MainMenuWindow(sf::RenderWindow& window, ApiClient& api) :
 
 	if (m_bgMusic.openFromFile("assets/sounds/main_menu_sound.ogg"))
 	{
-		m_bgMusic.setLooping(true);      
-		m_bgMusic.setVolume(50.0f);   
-		m_bgMusic.play();             
+		m_bgMusic.setLooping(true);
+		m_bgMusic.setVolume(50.0f);
+		m_bgMusic.play();
 	}
 
 	if (m_clickBuffer.loadFromFile("assets/sounds/press_button_sound.wav"))
@@ -58,7 +58,7 @@ void MainMenuWindow::LoadWidgets()
 	auto playButton = tgui::Button::create();
 	playButton->getRenderer()->setTexture("assets/images/buttons.png");
 	playButton->setSize("14%", "5%");
-	playButton->setPosition("50%", "47.5%");
+	playButton->setPosition("50%", "50%");
 	playButton->setOrigin(0.5f, 0.5f);
 	playButton->setText("Play");
 	Utils::StyleButton(playButton);
@@ -69,7 +69,7 @@ void MainMenuWindow::LoadWidgets()
 
 	auto profileButton = tgui::Button::create();
 	profileButton->setSize("14%", "5%");
-	profileButton->setPosition("50%", "57.5%");
+	profileButton->setPosition("50%", "60%");
 	profileButton->setOrigin(0.5f, 0.5f);
 	profileButton->setText("Profile");
 	profileButton->getRenderer()->setTexture("assets/images/buttons.png");
@@ -81,7 +81,7 @@ void MainMenuWindow::LoadWidgets()
 
 	auto settingsButton = tgui::Button::create();
 	settingsButton->setSize("14%", "5%");
-	settingsButton->setPosition("50%", "67.5%");
+	settingsButton->setPosition("50%", "70%");
 	settingsButton->setOrigin(0.5f, 0.5f);
 	settingsButton->setText("Settings");
 	settingsButton->getRenderer()->setTexture("assets/images/buttons.png");
@@ -93,7 +93,7 @@ void MainMenuWindow::LoadWidgets()
 
 	auto exitButton = tgui::Button::create();
 	exitButton->setSize("14%", "5%");
-	exitButton->setPosition("50%", "77.5%");
+	exitButton->setPosition("50%", "80%");
 	exitButton->setOrigin(0.5f, 0.5f);
 	exitButton->setText("Exit");
 	exitButton->getRenderer()->setTexture("assets/images/buttons.png");
@@ -117,17 +117,14 @@ void MainMenuWindow::GoBackToMenu()
 	m_gameStartedLocally = false;
 	m_apiClient.ClearEvent();
 
-	if (m_bgMusic.getStatus() != sf::SoundSource::Status::Playing)
-	{
-		m_bgMusic.play();
-	}
+	if (m_bgMusic.getStatus() != sf::SoundSource::Status::Playing) m_bgMusic.play();
 }
 
 void MainMenuWindow::HandleLocalPlayerLeft()
 {
 	if (!m_gamePanel) return;
 
-	const std::string myUsername = m_apiClient.GetUsername();
+	const std::string myUsername{ m_apiClient.GetUsername() };
 	m_gamePanel->MarkPlayerAsLeft(myUsername);
 
 	if (!m_apiClient.GetLobbyId().empty() && m_apiClient.GetPlayerId() != 0u)
@@ -146,10 +143,7 @@ void MainMenuWindow::HandleLocalPlayerLeft()
 	m_apiClient.SetLobbyId("");
 	m_apiClient.ClearEvent();
 
-	if (m_bgMusic.getStatus() != sf::SoundSource::Status::Playing)
-	{
-		m_bgMusic.play();
-	}
+	if (m_bgMusic.getStatus() != sf::SoundSource::Status::Playing) m_bgMusic.play();
 }
 
 
@@ -200,7 +194,6 @@ void MainMenuWindow::Update()
 	if (lobbyStateOpt.value().m_status == "GAME_STARTED" && !m_gamePanel)
 	{
 		m_bgMusic.stop();
-
 		m_gamePanel = std::make_shared<GamePanel>(m_mainMenu, m_apiClient,
 			[this]() { GoBackToMenu(); }, [this]() {
 				m_clickSound.play();
@@ -254,7 +247,7 @@ void MainMenuWindow::SettingsButtonPressed()
 			m_buttonsVolume = newBtnVol;
 			m_backgroundVolume = newBgVol;
 
-			float masterMult = m_masterVolume / 100.0f;
+			float masterMult{ m_masterVolume / 100.0f };
 
 			if (m_bgMusic.getStatus() != sf::SoundSource::Status::Stopped)
 			{

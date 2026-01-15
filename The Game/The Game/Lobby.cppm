@@ -84,6 +84,7 @@ public:
 	[[nodiscard]] RemoveResult RemovePlayer(unsigned playerId);
 	void MarkPlayerAsDisconnected(unsigned playerId) noexcept;
 	[[nodiscard]] RemoveResult RemoveMatchPlayer(unsigned playerId);
+	bool IsGameActive() const noexcept;
 
 	void AddChatMessage(std::string_view username, std::string_view message);
 	[[nodiscard]] std::optional<std::vector<ChatMessage>> GetMessagesAfter(unsigned afterId) const;
@@ -112,6 +113,7 @@ public:
 	std::vector<unsigned> GetInactivePlayers(std::chrono::seconds timeout) const;
 
 	[[nodiscard]] bool IsFull() const noexcept;
+	[[nodiscard]] size_t GetPlayerCount() const noexcept;
 
 	[[nodiscard]] const std::unordered_map<unsigned, PlayerInfo>& GetPlayers() const;
 	[[nodiscard]] bool IsPlayerHost(unsigned playerId) const;
@@ -122,8 +124,6 @@ public:
 private:
 	Lobby() = delete;
 	void TrimChatBuffer() noexcept;
-
-	bool IsGameActive() const noexcept;
 
 public:
 	inline static constexpr size_t kMaxChatMessages{ 100 };

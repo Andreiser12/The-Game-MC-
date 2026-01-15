@@ -21,5 +21,11 @@
     <ClCompile Include="..\The Game\SessionManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\The Game\Card.cppm">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\The Game\Card.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

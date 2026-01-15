@@ -33,6 +33,7 @@ export struct DeckState
 
 export struct EndTurnState
 {
+	unsigned playerId;
 	uint8_t cardsPlaced;
 	uint8_t minRequiredCards;
 	bool canEndTurn;
@@ -103,6 +104,8 @@ public:
 	[[nodiscard]] std::optional<std::vector<uint8_t>> GetPlayerCards(unsigned playerId) const;
 	[[nodiscard]] std::optional<std::array<bool, 4>> GetValidDecks(uint8_t cardId) const;
 	[[nodiscard]] std::optional<std::vector<PlayerState>> GetPlayerStates() const;
+	[[nodiscard]] std::optional<bool> GetCanPlayMore(unsigned playerId,
+		uint8_t remainingCards) const;
 
 	void UpdatePlayerPing(unsigned playerId) noexcept;
 	std::vector<unsigned> GetInactivePlayers(std::chrono::seconds timeout) const;

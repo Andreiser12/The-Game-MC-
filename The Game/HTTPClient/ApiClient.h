@@ -45,8 +45,9 @@ struct ChatMessage
 	std::string username;
 	std::string message;
 
-	ChatMessage(unsigned i, std::string u, std::string m) : 
-		id(i), username(std::move(u)), message(std::move(m)) {}
+	ChatMessage(unsigned i, std::string u, std::string m) :
+		id(i), username(std::move(u)), message(std::move(m)) {
+	}
 };
 
 struct DeckState
@@ -69,6 +70,7 @@ struct GameTableState
 
 struct EndTurnState
 {
+	unsigned playerId;
 	bool canEndTurn;
 	uint8_t cardsPlaced;
 	uint8_t minRequiredCards;
@@ -116,7 +118,7 @@ public:
 
 	void StartLobbyWatcher();
 	void StopLobbyWatcher();
-	
+
 	std::string GetUsername() const;
 	unsigned GetPlayerId() const;
 	std::string GetLobbyId() const;
@@ -140,12 +142,14 @@ public:
 	std::optional<TurnState> SnapshotTurnState() const;
 	std::optional<GameResult> SnapshotGameResult() const;
 	std::optional<std::vector<PlayerState>> SnapshotPlayerStates() const;
+	std::optional<bool> SnapshotCanPlayMore() const;
 
 	std::optional<std::vector<DeckState>> GetDeckState() const;
 	std::optional<EndTurnState> GetEndTurnState() const;
 	std::vector<std::string> GetLobbyPlayers(const std::string& lobbyId) const;
 	std::optional<std::vector<uint8_t>> GetPlayerCards() const;
 	std::optional<std::array<bool, 4>> GetValidDecks(uint8_t cardId) const;
+	std::optional<bool> GetCanPlayMore(uint8_t remainingCards) const;
 
 	void SetUsername(const std::string& username);
 	void SetPlayerId(unsigned playerId);
@@ -182,4 +186,5 @@ private:
 	std::optional<GameResult> m_cachedGameResult;
 	std::optional<std::vector<PlayerState>> m_cachedPlayerStates;
 	std::unordered_map<uint8_t, std::optional<std::array<bool, 4>>> m_cachedValidDecks;
+	std::optional<bool> m_canPlayMore{ true };
 };

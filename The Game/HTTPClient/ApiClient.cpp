@@ -6,8 +6,8 @@ ApiClient::ApiClient(const std::string& serverURL) : m_serverURL{ serverURL } {}
 
 LoginResult ApiClient::Login(const std::string& username)
 {
-	const std::string url = m_serverURL + "/login";
-	const std::string jsonBody = "{\"username\":\"" + username + "\"}";
+	const std::string url{ m_serverURL + "/login" };
+	const std::string jsonBody{ "{\"username\":\"" + username + "\"}" };
 
 	cpr::Response response = cpr::Post(
 		cpr::Url{ url },
@@ -194,8 +194,8 @@ std::optional<LobbyState> ApiClient::GetLobbyState(const std::string& lobbyId)
 
 std::optional<std::vector<PlayerState>> ApiClient::GetPlayerStates()
 {
-	const std::string url = m_serverURL + "/lobby/" + m_lobbyId
-		+ "/players/states";
+	const std::string url{ m_serverURL + "/lobby/" + m_lobbyId
+		+ "/players/states" };
 	cpr::Response response = cpr::Get(
 		cpr::Url{ url },
 		kTimeout
@@ -346,8 +346,8 @@ std::optional<EndTurnState> ApiClient::GetEndTurnState() const
 {
 	if (m_lobbyId.empty() || m_playerId == 0u) return std::nullopt;
 
-	const std::string url = m_serverURL + "/lobby/" + m_lobbyId +
-		"/players/" + std::to_string(m_playerId) + "/endturn";
+	const std::string url{ m_serverURL + "/lobby/" + m_lobbyId +
+		"/players/" + std::to_string(m_playerId) + "/endturn" };
 	cpr::Response response = cpr::Get(
 		cpr::Url{ url },
 		kTimeout
@@ -356,11 +356,13 @@ std::optional<EndTurnState> ApiClient::GetEndTurnState() const
 
 	auto json = crow::json::load(response.text);
 	if (!json
+		|| !json.has("playerId")
 		|| !json.has("canEndTurn")
 		|| !json.has("cardsPlaced")
 		|| !json.has("minRequiredCards")) return std::nullopt;
 
 	EndTurnState state;
+	state.playerId = static_cast<unsigned>(json["playerId"].i());
 	state.canEndTurn = json["canEndTurn"].b();
 	state.cardsPlaced = static_cast<uint8_t>(json["cardsPlaced"].i());
 	state.minRequiredCards = static_cast<uint8_t>(json["minRequiredCards"].i());
@@ -574,9 +576,9 @@ std::optional<std::vector<uint8_t>> ApiClient::GetPlayerCards() const
 
 std::optional<std::array<bool, 4>> ApiClient::GetValidDecks(uint8_t cardId) const
 {
-	const std::string url = m_serverURL + "/lobby/" + m_lobbyId
-		+ "/decks/valid";
-	const std::string jsonBody = "{\"cardId\":\"" + std::to_string(cardId) + "\"}";
+	const std::string url{ m_serverURL + "/lobby/" + m_lobbyId
+		+ "/decks/valid" };
+	const std::string jsonBody{ "{\"cardId\":\"" + std::to_string(cardId) + "\"}" };
 	cpr::Response response = cpr::Get(
 		cpr::Url{ url },
 		cpr::Body{ jsonBody },
@@ -597,12 +599,32 @@ std::optional<std::array<bool, 4>> ApiClient::GetValidDecks(uint8_t cardId) cons
 	return std::make_optional(validDecks);
 }
 
+std::optional<bool> ApiClient::GetCanPlayMore(uint8_t remainingCards) const
+{
+	const std::string url{ m_serverURL + "/lobby/" + m_lobbyId +
+	"/players/" + std::to_string(m_playerId) + "/can_play" };
+	const std::string jsonBody{ "{\"remaining_cards\":\""
+		+ std::to_string(remainingCards) + "\"}" };
+
+	cpr::Response response = cpr::Get(
+		cpr::Url{ url },
+		cpr::Body{ jsonBody },
+		kTimeout);
+
+	if (response.error || response.status_code != 200) return std::nullopt;
+
+	auto json = crow::json::load(response.text);
+	if (!json || !json.has("can_play")) return std::nullopt;
+
+	return json["can_play"].b();
+}
+
 std::optional<std::vector<uint8_t>> ApiClient::EndTurn()
 {
 	if (m_lobbyId.empty() || m_playerId == 0u) return std::nullopt;
 
-	const std::string url = m_serverURL + "/lobby/" + m_lobbyId +
-		"/players/" + std::to_string(m_playerId) + "/endturn";
+	const std::string url{ m_serverURL + "/lobby/" + m_lobbyId +
+		"/players/" + std::to_string(m_playerId) + "/endturn" };
 	cpr::Response response = cpr::Post(
 		cpr::Url{ url },
 		kTimeout
@@ -622,8 +644,8 @@ std::optional<std::vector<uint8_t>> ApiClient::EndTurn()
 
 std::optional<TurnState> ApiClient::GetTurnState() const
 {
-	const std::string url = m_serverURL + "/lobby/" + m_lobbyId
-		+ "/players/" + std::to_string(m_playerId) + "/turn";
+	const std::string url{ m_serverURL + "/lobby/" + m_lobbyId
+		+ "/players/" + std::to_string(m_playerId) + "/turn" };
 	cpr::Response response = cpr::Get(
 		cpr::Url{ url },
 		kTimeout
@@ -683,6 +705,7 @@ void ApiClient::StartNetworkLoop()
 		auto lastTurnState = std::chrono::steady_clock::now();
 		auto lastGameResult = std::chrono::steady_clock::now();
 		auto lastPlayerStates = std::chrono::steady_clock::now();
+		auto lastCanStillPlay = std::chrono::steady_clock::now();
 
 		while (!st.stop_requested())
 		{
@@ -730,12 +753,12 @@ void ApiClient::StartNetworkLoop()
 			}
 			if (now - lastChat >= std::chrono::milliseconds(200))
 			{
-				unsigned after = m_afterChatId.load();
+				unsigned after{ m_afterChatId.load() };
 				auto messages = GetNewMessages(after);
 				std::lock_guard<std::mutex> lk(m_cacheMutex);
 				if (messages && !messages->empty())
 				{
-					unsigned maxId = after;
+					unsigned maxId{ after };
 					for (auto& message : messages.value())
 					{
 						maxId = std::max(maxId, message.id);
@@ -839,6 +862,25 @@ void ApiClient::StartNetworkLoop()
 				}
 				lastPlayerStates = now;
 			}
+			if (now - lastCanStillPlay >= std::chrono::milliseconds(500))
+			{
+				if (m_cachedEndTurnState && 
+					m_cachedEndTurnState.value().playerId != m_playerId &&
+					m_cachedEndTurnState.value().minRequiredCards == 2 &&
+					m_cachedEndTurnState.value().cardsPlaced < 
+					m_cachedEndTurnState.value().minRequiredCards)
+				{
+					const uint8_t remainingCards =
+						m_cachedEndTurnState.value().minRequiredCards -
+						m_cachedEndTurnState.value().cardsPlaced;
+					if (remainingCards > 0)
+					{
+						auto canPlayMore = GetCanPlayMore(remainingCards);
+						m_canPlayMore = canPlayMore;
+					}
+				}
+				lastCanStillPlay = now;
+			}
 			std::this_thread::sleep_for(std::chrono::milliseconds(50));
 		}
 		});
@@ -933,4 +975,10 @@ std::optional<std::vector<PlayerState>> ApiClient::SnapshotPlayerStates() const
 {
 	std::lock_guard<std::mutex> lk(m_cacheMutex);
 	return m_cachedPlayerStates;
+}
+
+std::optional<bool> ApiClient::SnapshotCanPlayMore() const
+{
+	std::lock_guard<std::mutex> lk(m_cacheMutex);
+	return m_canPlayMore;
 }

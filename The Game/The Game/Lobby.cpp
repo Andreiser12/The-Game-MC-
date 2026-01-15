@@ -257,8 +257,9 @@ std::optional<EndTurnState> Lobby::GetEndTurnState(unsigned playerId) const
 	const auto& player = m_table->GetPlayer(playerId);
 	const uint8_t cardsPlaced{ player.GetCardsPlacedRound() };
 	const bool pileEmpty{ m_table->GetDrawPileCount() == 0 };
-	const uint8_t minRequired = pileEmpty ? 1u : 2u;
+	const uint8_t minRequired{ pileEmpty ? 1u : 2u };
 	return EndTurnState{
+		.playerId = playerId,
 		.cardsPlaced = cardsPlaced,
 		.minRequiredCards = minRequired,
 		.canEndTurn = cardsPlaced >= minRequired
@@ -292,8 +293,12 @@ void Lobby::UpdateGameResult() noexcept
 
 	if (m_gameResult == GameResult::Lost) return;
 
-	if (m_table->CheckWinCondition()) m_gameResult = GameResult::Won;
-	else if (m_table->CheckLoseCondition()) m_gameResult = GameResult::Lost;
+	if (m_table->CheckWinCondition())
+	{
+		m_gameResult = GameResult::Won;
+		return;
+	}
+	if (m_table->CheckLoseCondition()) m_gameResult = GameResult::Lost;
 }
 
 std::optional<GameResult> Lobby::GetGameResult() const
@@ -338,4 +343,12 @@ std::optional<std::vector<PlayerState>> Lobby::GetPlayerStates() const
 			});
 	}
 	return states;
+}
+
+std::optional<bool> Lobby::GetCanPlayMore(unsigned playerId, uint8_t remainingCards) const
+{
+	if (!m_gameStarted || !m_table) return std::nullopt;
+
+	const auto& player = m_table->GetPlayer(playerId);
+	return m_table->CanPlayerPlayMinCards(player, remainingCards);
 }

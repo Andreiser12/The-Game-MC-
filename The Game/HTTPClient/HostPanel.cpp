@@ -1,8 +1,13 @@
 ﻿module;
+
+#define STB_IMAGE_IMPLEMENTATION
+#define STBI_ONLY_GIF
+
 #include "SFML/Graphics.hpp"
 #include "TGUI/TGUI.hpp"
 #include "TGUI/Backend/SFML-Graphics.hpp"
 #include <SFML/Audio.hpp>
+#include "stb_image.h"
 
 module HostPanel;
 
@@ -12,7 +17,9 @@ import <vector>;
 import <sstream>;
 import <iomanip>;
 import <stdexcept>; 
+import <fstream>;
 import ApiClient;
+
 
 static constexpr uint8_t kMinPlayers{ 2u };
 static std::vector<tgui::Texture> s_frames;
@@ -21,30 +28,51 @@ static float s_animationTime{ 0.0f };
 static int s_currentFrame{ 0 };
 static const float kFrameDuration{ 0.04f };
 
-void HostPanel::PreloadImages()
+//void HostPanel::PreloadImages()
+//{
+//	if (!s_frames.empty()) return;
+//
+//	constexpr uint16_t totalFrames{ 300 };
+//
+//	for (uint16_t i = 0; i < totalFrames; ++i)
+//	{
+//		std::stringstream gifPath;
+//
+//		gifPath << "assets/gif/TheGameLevelSequence."
+//			<< std::setw(4) << std::setfill('0') << i
+//			<< ".jpeg";
+//
+//		std::string path = gifPath.str();
+//
+//		try {
+//			s_frames.emplace_back(path);
+//		}
+//		catch (...) {
+//			throw std::runtime_error("One of the GIF file is missing");
+//		}
+//	}
+//}
+
+static std::vector<uint8_t> ReadFileToBuffer(const std::string& filename)
 {
-	if (!s_frames.empty()) return;
+	std::ifstream file(filename, std::ios::binary | std::ios::ate);
+	if (!file) return {};
 
-	constexpr uint16_t totalFrames{ 300 };
+	std::streamsize size = file.tellg();
+	file.seekg(0, std::ios::beg);
 
-	for (uint16_t i = 0; i < totalFrames; ++i)
-	{
-		std::stringstream gifPath;
-
-		gifPath << "assets/gif/TheGameLevelSequence."
-			<< std::setw(4) << std::setfill('0') << i
-			<< ".jpeg";
-
-		std::string path = gifPath.str();
-
-		try {
-			s_frames.emplace_back(path);
-		}
-		catch (...) {
-			throw std::runtime_error("One of the GIF file is missing");
-		}
+	std::vector<uint8_t> buffer(size);
+	if (file.read(reinterpret_cast<char*>(buffer.data()), size)) {
+		return buffer;
 	}
+	return {};
 }
+
+static bool ProcessNextRawFrame()
+{
+	return false;
+}
+
 
 tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	ApiClient& apiClient,
@@ -53,14 +81,20 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	std::function<bool(ApiClient&)> onLeave,
 	std::function<bool(ApiClient&)> onStart)
 {
-	PreloadImages();
+	//PreloadImages();
+
+	if (s_frames.empty() && !s_rawFrames.empty())
+	{
+		GenerateTextures(1);
+	}
+
 	if (!s_frames.empty())
 	{
 		s_backgroundPicture = tgui::Picture::create(s_frames[0]);
 	}
 	else
 	{
-		s_backgroundPicture = tgui::Picture::create("assets/images/mainMenuBackground.png");
+		s_backgroundPicture = tgui::Picture::create("assets/images/hostPanelBackground.png");
 	}
 	s_backgroundPicture->setSize("100%", "100%");
 
@@ -198,6 +232,7 @@ void HostPanel::UpdateStartButton()
 
 void HostPanel::UpdateBackground(float deltaTime)
 {
+	GenerateTextures(1);
 	if (s_frames.empty() || !s_backgroundPicture) return;
 
 	s_animationTime += deltaTime;
@@ -208,4 +243,83 @@ void HostPanel::UpdateBackground(float deltaTime)
 		s_currentFrame = (s_currentFrame + 1) % s_frames.size();
 	}
 	s_backgroundPicture->getRenderer()->setTexture(s_frames[s_currentFrame]);
+}
+
+void HostPanel::LoadGifDataAsync()
+{
+	{
+		std::lock_guard<std::mutex> lock(s_framesMutex);
+		if (!s_frames.empty() || !s_rawFrames.empty()) return;
+	}
+
+	std::vector<uint8_t> fileBuffer = ReadFileToBuffer("assets/gif/gif_animation.gif");
+	if (fileBuffer.empty()) return;
+
+	int* delays = nullptr;
+	int x = 0, y = 0, frames = 0, comp = 0;
+
+	stbi_uc* data = stbi_load_gif_from_memory(
+		fileBuffer.data(),
+		static_cast<int>(fileBuffer.size()),
+		&delays, &x, &y, &frames, &comp, 4
+	);
+
+	if (!data) return;
+
+	std::vector<RawFrameData> tempFrames;
+	tempFrames.reserve(frames);
+
+	size_t frameSize = static_cast<size_t>(x) * y * 4;
+
+	for (int i = 0; i < frames; ++i) {
+		RawFrameData rawFrame;
+		rawFrame.width = static_cast<unsigned int>(x);
+		rawFrame.height = static_cast<unsigned int>(y);
+		rawFrame.pixels.resize(frameSize);
+
+		stbi_uc* currentFrameSource = data + (i * frameSize);
+		std::copy(currentFrameSource, currentFrameSource + frameSize, rawFrame.pixels.begin());
+
+		tempFrames.emplace_back(std::move(rawFrame));
+	}
+
+	stbi_image_free(data);
+	if (delays) STBI_FREE(delays);
+
+	{
+		std::lock_guard<std::mutex> lock(s_framesMutex);
+		s_rawFrames = std::move(tempFrames);
+	}
+}
+
+void HostPanel::GenerateTextures(int limit)
+{
+	std::lock_guard<std::mutex> lock(s_framesMutex);
+
+	if (s_rawFrames.empty()) return;
+
+	if (s_frames.size() >= s_rawFrames.size())
+	{
+		if (!s_rawFrames.empty()) {
+			s_rawFrames.clear();
+		}
+		return;
+	}
+
+	int processedCount = 0;
+	while (processedCount < limit && s_frames.size() < s_rawFrames.size())
+	{
+		size_t indexToLoad = s_frames.size();
+		RawFrameData& raw = s_rawFrames[indexToLoad];
+
+		tgui::Texture tguiTex;
+		tguiTex.loadFromPixelData(
+			{ raw.width, raw.height },
+			raw.pixels.data()
+		);
+		s_frames.emplace_back(tguiTex);
+
+		std::vector<uint8_t>().swap(raw.pixels);
+		processedCount++;
+	}
 }

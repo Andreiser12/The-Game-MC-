@@ -11,6 +11,14 @@ export module HostPanel;
 import <functional>;
 import <string>;
 import ApiClient;
+import <mutex>;
+
+export struct RawFrameData {
+    unsigned int width;
+    unsigned int height;
+    std::vector<uint8_t> pixels;
+    int delayMs;
+};
 
 export class HostPanel
 {
@@ -27,10 +35,15 @@ public:
     static inline tgui::ListBox::Ptr GetPlayersListBox() { return playersListBox; }
 
     static void UpdateBackground(float deltaTime);
-    static void PreloadImages();
+    //static void PreloadImages();
+    static void LoadGifDataAsync();
+    static void GenerateTextures(int limit = 1000);
+
 private:
     static inline tgui::ListBox::Ptr playersListBox{ nullptr };
     static inline tgui::Button::Ptr startButton{ nullptr };
     static inline int s_hostId{ -1 };
     static inline int s_playerId{ -1 };
+    static inline std::vector<RawFrameData> s_rawFrames;
+    static inline std::mutex s_framesMutex;
 };

@@ -200,7 +200,7 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	for (const auto& deck : m_decks)
 	{
 		auto deckPanel = deck->GetDeckPanel();
-		deckPanel->setSize("2.25%", "6.5%");
+		deckPanel->setSize({ "2.25%", "6.5%" });
 		deckPanel->setPosition({
 			tgui::String(std::to_string(xDeckPosition) + "%"),
 			tgui::String(std::to_string(yDeckPosition) + "%")
@@ -210,7 +210,7 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	}
 	m_pileWidget = std::make_shared<PileWidget>(PileWidget());
 	auto pilePanel = m_pileWidget->GetPilePanel();
-	pilePanel->setSize("2.25%", "6.5%");
+	pilePanel->setSize({ "2.25%", "6.5%" });
 	pilePanel->setPosition({
 		tgui::String(std::to_string(xDeckPosition) + "%"),
 		tgui::String(std::to_string(yDeckPosition) + "%")
@@ -268,6 +268,7 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 			m_isExiting = true;
 			m_uiSound.setBuffer(m_leaveBuffer);
 			m_uiSound.play();
+			m_apiClient.StopNetworkLoop();
 			auto result = m_apiClient.LeaveMatch();
 			if (m_onLocalPlayerLeft) m_onLocalPlayerLeft();
 		});
@@ -277,7 +278,7 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	m_timerLabel->setPosition("85%", "5%");
 	m_timerLabel->setSize({ "12%", "6%" });
 	m_timerLabel->setText("01:00");
-	m_timerLabel->setTextSize(24);
+	m_timerLabel->getRenderer()->setTextSize(24);
 	m_timerLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
 	m_timerLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
 
@@ -291,7 +292,7 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 
 void GamePanel::UpdateGame()
 {
-	if (m_gameFinished || m_isExiting) return;
+	if (m_gameFinished) return;
 
 	RemovePlacedCards();
 	UpdateDecks();
@@ -301,8 +302,12 @@ void GamePanel::UpdateGame()
 	UpdateTableState();
 	UpdatePlayerStates();
 	UpdateTimer();
-	CheckAutoBlock();
-	CheckGameResult();
+
+	if (!m_isExiting)
+	{
+		CheckAutoBlock();
+		CheckGameResult();
+	}
 }
 
 void GamePanel::UpdateDecks()
@@ -542,7 +547,7 @@ void GamePanel::SetupPlayerSlots()
 		avatarPanel->getRenderer()->setBackgroundColor(tgui::Color(40, 40, 40));
 
 		auto userAvatar = tgui::Picture::create("assets/images/playerDefaultAvatar.jpg");
-		userAvatar->setSize("100%", "100%");
+		userAvatar->setSize({ "100%", "100%" });
 		userAvatar->setPosition("0%", "0%");
 		userAvatar->setIgnoreMouseEvents(true);
 
@@ -844,6 +849,7 @@ void GamePanel::ShowGameResultOverlay(GameResult result)
 	titleLabel->getRenderer()->setTextSize(42);
 	titleLabel->getRenderer()->setTextSize(tgui::TextStyle::Bold);
 	titleLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+	titleLabel->setSize({ "30%", "30%" });
 	titleLabel->setPosition("50%", "25%");
 	titleLabel->setOrigin(0.5f, 0.5f);
 
@@ -915,9 +921,7 @@ void GamePanel::MarkPlayerAsLeft(const std::string& username)
 
 	slot.isActive = false;
 	for (auto& card : slot.cards)
-	{
 		m_root->remove(card->GetWidget());
-	}
 	slot.cards.clear();
 
 	slot.panel->getRenderer()->setBackgroundColor(tgui::Color(60, 60, 60, 100));

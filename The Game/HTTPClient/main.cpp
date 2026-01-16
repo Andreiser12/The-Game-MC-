@@ -78,7 +78,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	RegisterWindow _register(loginWindow, api);
 
 	std::thread backgroundLoader([]() {
-		HostPanel::PreloadImages();
+		HostPanel::LoadGifDataAsync();
 		});
 
 	while (loginWindow.isOpen())

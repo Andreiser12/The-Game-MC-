@@ -188,6 +188,7 @@
     <ClCompile Include="Utils.cppm">
       <FileType>Document</FileType>
     </ClCompile>
+    <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ApiClient.cpp" />

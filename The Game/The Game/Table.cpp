@@ -1,5 +1,7 @@
 ﻿module Table;
 
+import AssistantAI;
+
 import GreedyAI;
 
 constexpr static uint8_t DECK_COUNT{ 4u };

@@ -33,23 +33,26 @@
     <ClCompile Include="..\The Game\Deck.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\The Game\Table.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\The Game\Table.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\The Game\GreedyAI.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\The Game\GreedyAI.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\The Game\Player.cppm">
       <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="..\The Game\Player.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\The Game\Table.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\The Game\Table.cppm">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\The Game\GreedyAI.cppm">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\The Game\GreedyAI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="x64\Debug\AssistantAI.cppm">
+      <Filter>Header Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

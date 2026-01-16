@@ -177,6 +177,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AssistantAI\AssistantAI.vcxproj">
+      <Project>{b3918795-ea54-4d15-af39-dabd46a23b9e}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\TheGameCore\TheGameCore.vcxproj">
       <Project>{e29dac7c-73db-4765-bb68-93875040a4d2}</Project>
     </ProjectReference>

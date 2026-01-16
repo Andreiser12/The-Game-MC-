@@ -11,9 +11,7 @@ Lobby::Lobby(std::string_view lobbyId, unsigned hostId, const std::string& usern
 bool Lobby::AddPlayer(unsigned playerId, const std::string& username)
 {
 	std::lock_guard lock(m_mutex);
-	if (IsFull()) return false;
-
-	if (m_players.contains(playerId)) return false;
+	if (IsFull() || m_players.contains(playerId)) return false;
 
 	m_players.try_emplace(playerId, playerId, username);
 	m_lastPingPlayer[playerId] = std::chrono::steady_clock::now();

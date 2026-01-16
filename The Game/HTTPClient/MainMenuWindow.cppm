@@ -39,6 +39,7 @@ private:
 	void LoadWidgets() override;
 	void GoBackToMenu();
 	void HandleLocalPlayerLeft();
+	void TransitionToGame();
 
 private:
 	sf::RenderWindow& m_window;

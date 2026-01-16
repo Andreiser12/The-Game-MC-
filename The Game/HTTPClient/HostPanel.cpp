@@ -103,11 +103,15 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 		playersListBox->addItem(username);
 	}
 
-	if (auto lobbyState = apiClient.GetLobbyState(lobbyId))
+	auto info = apiClient.GetLobbyInfo(lobbyId);
+	if (info)
 	{
-		s_hostId = lobbyState->m_hostId;
-		s_playerId = apiClient.GetPlayerId();
+		if (info->has("host_id"))
+		{
+			s_hostId = static_cast<unsigned>((*info)["host_id"].i());
+		}
 	}
+	s_playerId = apiClient.GetPlayerId();
 
 	apiClient.StartNetworkLoop();
 	auto leaveButton = tgui::Button::create("Leave Lobby");
@@ -148,8 +152,8 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	startButtonLocal->getRenderer()->setOpacity(0.85f);
 	startButton = startButtonLocal;
 
-	bool isHost{ (s_playerId != -1 && s_hostId != -1 && s_playerId == s_hostId) };
-	bool enoughPlayers{ playersListBox->getItemCount() - 1 >= kMinPlayers };
+	bool isHost{ (s_playerId != 0 && s_hostId != 0 && s_playerId == s_hostId) };
+	bool enoughPlayers{ apiClient.SnapshotPlayers().size() >= kMinPlayers };
 	startButton->setVisible(isHost);
 	startButton->setEnabled(isHost && enoughPlayers);
 	startButton->onPress([onStart, &apiClient, &btnSound]()

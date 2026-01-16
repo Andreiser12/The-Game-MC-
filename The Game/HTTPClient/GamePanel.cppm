@@ -131,6 +131,7 @@ private:
 
 	bool m_isMyTurn{ false };
 	bool m_gameFinished{ false };
+	bool m_isExiting{ false };
 
 	tgui::Label::Ptr m_timerLabel;
 	float m_timeLeft{ 60.0f };

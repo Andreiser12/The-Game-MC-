@@ -20,14 +20,6 @@ inline static std::string GenerateLobbyId()
 	return lobbyId;
 }
 
-inline static std::optional<crow::json::rvalue> ParseJson(
-	const crow::request& request)
-{
-	auto json = crow::json::load(request.body);
-	if (!json) return std::nullopt;
-	return json;
-}
-
 LobbyRoutes::LobbyRoutes(LobbyManager& manager, DatabaseManager& db) :
 	m_manager{ manager },
 	m_db{ db } {
@@ -40,14 +32,14 @@ void LobbyRoutes::Register(crow::SimpleApp& app)
 		return this->CreateLobby(req);
 			});
 
+	CROW_ROUTE(app, "/lobby/join").methods("POST"_method)
+		([this](const crow::request& req) {
+		return this->JoinLobby(req);
+			});
+
 	CROW_ROUTE(app, "/lobby/leave").methods("POST"_method)
 		([this](const crow::request& req) {
 		return this->LeaveLobby(req);
-			});
-
-	CROW_ROUTE(app, "/lobby/info/<string>").methods("GET"_method)
-		([this](const std::string& lobbyId) {
-		return this->GetLobbyState(lobbyId);
 			});
 
 	CROW_ROUTE(app, "/lobby/start").methods("POST"_method)
@@ -173,6 +165,39 @@ crow::response LobbyRoutes::CreateLobby(const crow::request& request)
 	return crow::response(200, data);
 }
 
+crow::response LobbyRoutes::JoinLobby(const crow::request& request)
+{
+	auto body = crow::json::load(request.body);
+	if (!body
+		|| !body.has("playerId")
+		|| !body.has("lobbyId")) return crow::response(400, "Invalid JSON");
+
+	const std::string lobbyId{ body["lobbyId"].s() };
+	const std::string username{ body["username"].s() };
+	unsigned playerId = static_cast<unsigned>(body["playerId"].i());
+
+	auto lobby = m_manager.GetLobby(lobbyId);
+	if (!lobby) return crow::response(404, "Lobby not found");
+
+	if (lobby->IsGameActive())
+	{
+		crow::json::wvalue errorData;
+		errorData["error"] = "game_started";
+		return crow::response(409, errorData);
+	}
+
+	if (!lobby->AddPlayer(playerId, username))
+	{
+		crow::json::wvalue errorData;
+		errorData["error"] = "lobby_full";
+		return crow::response(409, errorData);
+	}
+
+	crow::json::wvalue data;
+	data["playerId"] = playerId;
+	return crow::response(200, data);
+}
+
 crow::response LobbyRoutes::LeaveLobby(const crow::request& request)
 {
 	auto body = crow::json::load(request.body);
@@ -220,40 +245,6 @@ crow::response LobbyRoutes::LeaveMatch(const std::string& lobbyId, unsigned play
 	return crow::response(500);
 }
 
-crow::response LobbyRoutes::GetLobbyState(const std::string& lobbyId)
-{
-	auto lobby = m_manager.GetLobby(lobbyId);
-	if (!lobby) return crow::response(404, "Lobby not found");
-
-	crow::json::wvalue data;
-	data["hostId"] = lobby->GetHostId();
-
-	if (lobby->HasGameStarted())
-	{
-		data["status"] = "GAME_STARTED";
-		data["message"] = "Match is ongoing.";
-		return crow::response(200, data);
-	}
-
-	if (lobby->GetPlayers().size() < Lobby::kMinPlayers)
-	{
-		data["status"] = "NOT_ENOUGH_PLAYERS";
-		data["message"] = "Waiting for players.";
-		return crow::response(200, data);
-	}
-
-	if (lobby->IsFull())
-	{
-		data["status"] = "FULL_LOBBY";
-		data["message"] = "Lobby is full.";
-		return crow::response(200, data);
-	}
-
-	data["status"] = "WAITING_FOR_PLAYERS";
-	data["message"] = "Match hasn't started.";
-	return crow::response(200, data);
-}
-
 crow::response LobbyRoutes::StartMatch(const crow::request& request)
 {
 	auto body = crow::json::load(request.body);
@@ -265,30 +256,13 @@ crow::response LobbyRoutes::StartMatch(const crow::request& request)
 	auto lobby = m_manager.GetLobby(lobbyId);
 	if (!lobby) return crow::response(404, "Lobby not found");
 
-	if (!lobby->IsPlayerHost(playerId)) return crow::response(409, "Player is not host.");
-
-	if (lobby->GetPlayers().empty()) return crow::response(409, "Lobby empty.");
-
-	crow::json::wvalue data;
-	if (lobby->GetPlayers().size() < Lobby::kMinPlayers)
+	if (lobby->StartGame(playerId))
 	{
-		data["status"] = "NOT_ENOUGH_PLAYERS";
-		data["message"] = "Waiting for players.";
+		crow::json::wvalue data;
+		data["status"] = "GAME_STARTED";
 		return crow::response(200, data);
 	}
-
-	if (lobby->HasGameStarted())
-	{
-		data["status"] = "ALREADY_STARTED";
-		data["message"] = "Game already in progress.";
-		return crow::response(200, data);
-	}
-
-	if (!lobby->StartGame(playerId)) return crow::response(409, "Start rejected.");
-
-	data["status"] = "GAME_STARTED";
-	data["message"] = "Game has started.";
-	return crow::response(200, data);
+	return crow::response(403, "Failed to start: Not host or not enough players");
 }
 
 crow::response LobbyRoutes::FetchLobbyPlayers(const std::string& lobbyId)
@@ -623,14 +597,19 @@ crow::response LobbyRoutes::GetCanPlayMore(const crow::request& request,
 crow::response LobbyRoutes::GetLobbyInfo(const std::string& lobbyId)
 {
 	auto lobby = m_manager.GetLobby(lobbyId);
-	if (!lobby) return crow::response(404, "Lobby not found");
+	if (!lobby)
+	{
+		crow::json::wvalue errorData;
+		errorData["error"] = "Lobby not found";
+		return crow::response(404, errorData);
+	}
 
 	crow::json::wvalue data;
 	data["status"] = lobby->IsGameActive() ? "in_progress" : "waiting";
-	data["current_players"] = lobby->GetPlayerCount();
+	data["current_players"] = static_cast<int>(lobby->GetPlayerCount());
 	data["max_players"] = 5;
-	data["host_id"] = lobby->GetHostId();
 	data["is_game_started"] = lobby->IsGameActive();
+	data["host_id"] = lobby->GetHostId();
 
 	return crow::response(200, data);
 }

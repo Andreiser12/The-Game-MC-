@@ -20,7 +20,8 @@ tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 	sf::Sound& btnSound,
 	std::function<void()> onClose,
 	std::function<void()> onJoin,
-	std::function<std::string(ApiClient&, const std::string&)> onHost)
+	std::function<std::string(ApiClient&, const std::string&)> onHost,
+	std::function<void()> onTransition)
 {
 	auto background = tgui::Picture::create("assets/images/mainMenuBackground.png");
 	background->setSize("100%", "100%");
@@ -48,17 +49,15 @@ tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 	joinButton->setPosition("5%", "70%");
 	Utils::StyleButton(joinButton);
 	joinButton->getRenderer()->setTextSize(22);
-	joinButton->onPress([&gui, onJoin, &apiClient, &btnSound, panel]() {
+	joinButton->onPress([&gui, &apiClient, &btnSound, panel, onTransition, onJoin]() {
 		btnSound.play();
 		panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(150));
 		auto joinPanel = JoinPanel::Create(
 			gui,
 			apiClient,
 			btnSound,
-			[panel]() {
-				panel->setVisible(true);
-			},
-			[&gui, &apiClient, &btnSound, panel](ApiClient& api, std::string lobbyIdEntered)
+			[panel]() { panel->setVisible(true); },
+			[&gui, &apiClient, &btnSound, panel, onTransition](ApiClient& api, std::string lobbyIdEntered)
 			{
 				panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(150));
 				std::string lobbyId{ api.GetLobbyId() };
@@ -68,10 +67,14 @@ tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 					btnSound,
 					lobbyId,
 					[lobbyId](ApiClient& api) { return api.LeaveLobby(lobbyId, api.GetPlayerId()); },
-					[lobbyId](ApiClient& api) { return api.StartMatch(lobbyId, api.GetPlayerId()); }
+					[lobbyId, onTransition](ApiClient& api) {
+						bool success{ api.StartMatch(lobbyId, api.GetPlayerId()) };
+						if (success && onTransition) onTransition();
+						return success;
+					}
 				);
 
-				gui.add(host);
+				gui.add(host, "HostPanel");
 				return true;
 			}
 		);
@@ -85,21 +88,26 @@ tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 	hostButton->getRenderer()->setTexture("assets/images/buttons.png");
 	Utils::StyleButton(hostButton);
 	hostButton->getRenderer()->setTextSize(22);
-	hostButton->onPress([&gui, &apiClient, &btnSound, onHost, panel]() {
+	hostButton->onPress([&gui, &apiClient, &btnSound, onHost, onTransition, panel]() {
 		btnSound.play();
 		if (onHost)
 		{
 			std::string lobbyId{ onHost(apiClient, apiClient.GetUsername()) };
 			apiClient.SetLobbyId(lobbyId);
 			panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(150));
-			auto hostPanel = HostPanel::Create(gui,
+			auto hostPanel = HostPanel::Create(
+				gui,
 				apiClient,
 				btnSound,
 				lobbyId,
 				[lobbyId](ApiClient& api) { return api.LeaveLobby(lobbyId, api.GetPlayerId()); },
-				[lobbyId](ApiClient& api) { return api.StartMatch(lobbyId, api.GetPlayerId()); }
+				[lobbyId, onTransition](ApiClient& api) {
+					bool success = api.StartMatch(lobbyId, api.GetPlayerId());
+					if (success && onTransition) onTransition();
+					return success;
+				}
 			);
-			gui.add(hostPanel);
+			gui.add(hostPanel, "HostPanel");
 		}
 		});
 

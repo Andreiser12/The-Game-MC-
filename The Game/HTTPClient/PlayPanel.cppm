@@ -24,7 +24,8 @@ public:
 		sf::Sound& btnSound,
 		std::function<void()> onClose,
 		std::function<void()> onJoin,
-		std::function<std::string(ApiClient&, const std::string&)> onHost);
+		std::function<std::string(ApiClient&, const std::string&)> onHost,
+		std::function<void()> onTransition);
 
 private:
 };

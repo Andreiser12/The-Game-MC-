@@ -74,7 +74,7 @@ void MainMenuWindow::LoadWidgets()
 {
 	auto playButton = tgui::Button::create();
 	playButton->getRenderer()->setTexture("assets/images/buttons.png");
-	playButton->setSize("14%", "5%");
+	playButton->setSize({ "14%", "5%" });
 	playButton->setPosition("50%", "50%");
 	playButton->setOrigin(0.5f, 0.5f);
 	playButton->setText("Play");
@@ -85,7 +85,7 @@ void MainMenuWindow::LoadWidgets()
 		PlayPanelPressed(); });
 
 	auto profileButton = tgui::Button::create();
-	profileButton->setSize("14%", "5%");
+	profileButton->setSize({ "14%", "5%" });
 	profileButton->setPosition("50%", "60%");
 	profileButton->setOrigin(0.5f, 0.5f);
 	profileButton->setText("Profile");
@@ -97,7 +97,7 @@ void MainMenuWindow::LoadWidgets()
 	m_mainMenu.add(profileButton);
 
 	auto settingsButton = tgui::Button::create();
-	settingsButton->setSize("14%", "5%");
+	settingsButton->setSize({ "14%", "5%" });
 	settingsButton->setPosition("50%", "70%");
 	settingsButton->setOrigin(0.5f, 0.5f);
 	settingsButton->setText("Settings");
@@ -109,7 +109,7 @@ void MainMenuWindow::LoadWidgets()
 		SettingsButtonPressed(); });
 
 	auto exitButton = tgui::Button::create();
-	exitButton->setSize("14%", "5%");
+	exitButton->setSize({ "14%", "5%" });
 	exitButton->setPosition("50%", "80%");
 	exitButton->setOrigin(0.5f, 0.5f);
 	exitButton->setText("Exit");
@@ -141,26 +141,42 @@ void MainMenuWindow::HandleLocalPlayerLeft()
 {
 	if (!m_gamePanel) return;
 
-	const std::string myUsername{ m_apiClient.GetUsername() };
-	m_gamePanel->MarkPlayerAsLeft(myUsername);
+	if (m_mainMenu.get("GameRoot"))
+		m_mainMenu.remove(m_mainMenu.get("GameRoot"));
 
-	if (!m_apiClient.GetLobbyId().empty() && m_apiClient.GetPlayerId() != 0u)
-	{
-		auto result = m_apiClient.LeaveMatch();
-		if (result && result.value() == LeaveMatchResult::Success)
-		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(200));
-			m_apiClient.LeaveLobby(m_apiClient.GetLobbyId(), m_apiClient.GetPlayerId());
-		}
-	}
-
+	m_apiClient.ClearEvent();
 	m_gamePanel.reset();
 	m_gameStartedLocally = false;
+	m_apiClient.LeaveMatch();
 	CloseHostPanel();
 	m_apiClient.SetLobbyId("");
-	m_apiClient.ClearEvent();
 
 	if (m_bgMusic.getStatus() != sf::SoundSource::Status::Playing) m_bgMusic.play();
+}
+
+void MainMenuWindow::TransitionToGame()
+{
+	if (m_gameStartedLocally) return;
+
+	m_bgMusic.stop();
+
+	auto hostPanel = m_mainMenu.get<tgui::Panel>("HostPanel");
+	if (hostPanel)
+	{
+		m_mainMenu.remove(hostPanel);
+	}
+
+	m_gamePanel = std::make_shared<GamePanel>(m_mainMenu, m_apiClient,
+		[this]() { GoBackToMenu(); },
+		[this]() {
+			m_clickSound.play();
+			HandleLocalPlayerLeft();
+		});
+
+	m_gamePanel->OnGameStarted();
+	m_gameStartedLocally = true;
+
+	m_apiClient.StopLobbyWatcher();
 }
 
 
@@ -187,17 +203,18 @@ void MainMenuWindow::Update()
 		HostPanel::RefreshPlayersList(m_apiClient);
 		HostPanel::UpdateStartButton();
 		m_apiClient.ClearEvent();
-		return;
+		break;
 
 	case ClientEvent::LobbyClosed:
+	case ClientEvent::HostLeftLobby:
 	{
 		ShutdownLobby();
-		m_mainMenu.add(Utils::CreateErrorPopupPanel(m_mainMenu, "Lobby was closed by host.", m_clickSound, []() {}));
+		m_mainMenu.add(Utils::CreateErrorPopupPanel(m_mainMenu, "Lobby was closed",
+			m_clickSound, []() {}));
 		return;
 	}
-
-	case ClientEvent::HostLeftLobby:
-		ShutdownLobby();
+	case ClientEvent::MatchStarted:
+		TransitionToGame();
 		return;
 
 	default:
@@ -205,18 +222,10 @@ void MainMenuWindow::Update()
 	}
 
 	if (m_apiClient.GetLobbyId().empty()) return;
-	auto lobbyStateOpt = m_apiClient.GetLobbyState(m_apiClient.GetLobbyId());
-	if (!lobbyStateOpt) return;
-
-	if (lobbyStateOpt.value().m_status == "GAME_STARTED" && !m_gamePanel)
+	auto info = m_apiClient.GetLobbyInfo(m_apiClient.GetLobbyId());
+	if (info && info->has("is_game_started") && (*info)["is_game_started"].b())
 	{
-		m_bgMusic.stop();
-		m_gamePanel = std::make_shared<GamePanel>(m_mainMenu, m_apiClient,
-			[this]() { GoBackToMenu(); }, [this]() {
-				m_clickSound.play();
-				HandleLocalPlayerLeft(); });
-		m_gamePanel->OnGameStarted();
-		m_gameStartedLocally = true;
+		TransitionToGame();
 	}
 }
 
@@ -320,15 +329,13 @@ void MainMenuWindow::PlayPanelPressed()
 		m_mainMenu,
 		m_apiClient,
 		m_clickSound,
-		[this]() {m_clickSound.play(); },
-		[this]() {m_clickSound.play(); },
-		[this](ApiClient& api, const std::string& user)
-		{
-			m_clickSound.play();
+		[this]() { m_clickSound.play(); }, 
+		[this]() { m_clickSound.play(); }, 
+		[this](ApiClient& api, const std::string& user) { 
 			auto lobbyId = api.CreateLobby(user);
-			if (!lobbyId) return std::string{ "ERROR" };
-			return lobbyId.value();
-		}
+			return lobbyId ? lobbyId.value() : "ERROR";
+		},
+		[this]() { this->TransitionToGame(); } 
 	);
 	m_mainMenu.add(playPanel);
 }

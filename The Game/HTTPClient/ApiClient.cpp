@@ -97,50 +97,49 @@ std::optional<std::string> ApiClient::CreateLobby(const std::string& username)
 
 JoinLobbyResult ApiClient::JoinLobbyValidated(const std::string& lobbyId, const std::string& username)
 {
+	auto infoOpt = GetLobbyInfo(lobbyId);
+	if (!infoOpt) return JoinLobbyResult::NetworkError;
+
+	const auto& info = infoOpt.value();
+
+	if (info.has("is_game_started") && info["is_game_started"].b())
+		return JoinLobbyResult::GameAlreadyStarted;
+
+	if (info.has("current_players") && info.has("max_players") &&
+		info["current_players"].i() >= info["max_players"].i())
+		return JoinLobbyResult::LobbyFull;
+
 	const std::string url{ m_serverURL + "/lobby/join" };
-	std::string jsonBody{
-		"{\"lobbyId\":\"" + lobbyId +
-		"\",\"username\":\"" + username + "\"}" };
+	std::string jsonBody{ "{"
+		"\"lobbyId\":\"" + lobbyId + "\","
+		"\"username\":\"" + username + "\","
+		"\"playerId\":" + std::to_string(m_playerId) +
+		"}" };
 
 	cpr::Response response = cpr::Post(
 		cpr::Url{ url },
 		cpr::Body{ jsonBody },
 		kTimeout
 	);
-
 	if (response.error) return JoinLobbyResult::NetworkError;
 
 	auto json = crow::json::load(response.text);
-
-	switch (response.status_code)
+	if (response.status_code == 200)
 	{
-	case 200:
+		if (!json || !json.has("playerId")) return JoinLobbyResult::NetworkError;
 
-		if (!json || !json.has("playerId") || !json.has("lobbyId"))
-			return JoinLobbyResult::NetworkError;
-		{
-			std::lock_guard<std::mutex> lock(m_mutex);
-			m_playerId = static_cast<unsigned>(json["playerId"].i());
-			m_lobbyId = json["lobbyId"].s();
-		}
+		std::lock_guard<std::mutex> lock(m_mutex);
+		m_playerId = static_cast<unsigned>(json["playerId"].i());
+		m_lobbyId = lobbyId;
 		return JoinLobbyResult::Success;
-
-	case 404:
-		return JoinLobbyResult::LobbyNotFound;
-
-	case 409:
-		if (json && json.has("error"))
-		{
-			const std::string errorType{ json["error"].s() };
-			if (errorType == "lobby_full") return JoinLobbyResult::LobbyFull;
-			else if (errorType == "game_started") return JoinLobbyResult::GameAlreadyStarted;
-
-		}
-		return JoinLobbyResult::NetworkError;
-
-	default:
-		return JoinLobbyResult::NetworkError;
 	}
+
+	if (response.status_code == 409 && json && json.has("error"))
+	{
+		if (json["error"].s() == "lobby_full") return JoinLobbyResult::LobbyFull;
+		if (json["error"].s() == "game_started") return JoinLobbyResult::GameAlreadyStarted;
+	}
+	return JoinLobbyResult::NetworkError;
 }
 
 bool ApiClient::LeaveLobby(const std::string& lobbyId, unsigned playerId)
@@ -196,26 +195,6 @@ std::optional<LeaveMatchResult> ApiClient::LeaveMatch()
 		return LeaveMatchResult::Success;
 	}
 	return LeaveMatchResult::NotInLobby;
-}
-
-std::optional<LobbyState> ApiClient::GetLobbyState(const std::string& lobbyId)
-{
-	const std::string url = m_serverURL + "/lobby/info/" + lobbyId;
-	cpr::Response response = cpr::Get
-	(cpr::Url{ url },
-		kTimeout
-	);
-
-	if (response.error || response.status_code != 200) return std::nullopt;
-
-	auto json = crow::json::load(response.text);
-	if (!json) return std::nullopt;
-
-	LobbyState state;
-	state.m_status = json["status"].s();
-	state.m_message = json["message"].s();
-	state.m_hostId = static_cast<unsigned>(json["hostId"].i());
-	return state;
 }
 
 std::optional<std::vector<PlayerState>> ApiClient::GetPlayerStates()
@@ -449,13 +428,13 @@ void ApiClient::StartLobbyWatcher()
 			{
 				std::string lobbyId = GetLobbyId();
 
-				if (lobbyId.empty()) return;
-				auto lobby = GetLobbyState(lobbyId);
-				if (!lobby || lobby->m_status == "LOBBY_DELETED")
-				{
-					m_event.store(ClientEvent::LobbyClosed);
-					return;
-				}
+				//if (lobbyId.empty()) return;
+				//auto lobby = GetLobbyState(lobbyId);
+				//if (!lobby || lobby->m_status == "LOBBY_DELETED")
+				//{
+				//	m_event.store(ClientEvent::LobbyClosed);
+				//	return;
+				//}
 				std::this_thread::sleep_for(std::chrono::seconds(1));
 			}
 		});
@@ -718,10 +697,8 @@ std::optional<GameResult> ApiClient::GetGameResult(const std::string& lobbyId) c
 	return result;
 }
 
-std::optional<LobbyInfo> ApiClient::GetLobbyInfo(const std::string& lobbyId) const
+std::optional<crow::json::rvalue> ApiClient::GetLobbyInfo(const std::string& lobbyId) const
 {
-	if (lobbyId.empty()) return std::nullopt;
-
 	const std::string url{ m_serverURL + "/lobby/" + lobbyId
 	+ "/info" };
 	cpr::Response response = cpr::Get(
@@ -731,22 +708,7 @@ std::optional<LobbyInfo> ApiClient::GetLobbyInfo(const std::string& lobbyId) con
 
 	if (response.error || response.status_code != 200) return std::nullopt;
 
-	auto json = crow::json::load(response.text);
-	if (!json
-		|| !json.has("status")
-		|| !json.has("current_players")
-		|| !json.has("max_players")
-		|| !json.has("host_id")
-		|| !json.has("is_game_started")) return std::nullopt;
-
-	LobbyInfo info;
-	info.lobbyId = lobbyId;
-	info.status = json["status"].s();
-	info.currentPlayers = static_cast<uint8_t>(json["current_players"].i());
-	info.maxPlayers = static_cast<uint8_t>(json["max_players"].i());
-	info.hostId = static_cast<unsigned>(json["host_id"].i());
-	info.isGameStarted = json["is_game_started"].b();
-	return info;
+	return crow::json::load(response.text);
 }
 
 void ApiClient::StartNetworkLoop()
@@ -786,20 +748,6 @@ void ApiClient::StartNetworkLoop()
 			{
 				SendPing(lobbyId, playerId);
 				lastPing = now;
-			}
-			if (now - lastLobby >= std::chrono::seconds(2))
-			{
-				auto lobby = GetLobbyState(lobbyId);
-				{
-					std::lock_guard<std::mutex> lk(m_cacheMutex);
-					m_cachedLobby = lobby;
-				}
-				if (!lobby || lobby->m_status == "LOBBY_DELETED")
-				{
-					m_event.store(ClientEvent::LobbyClosed);
-					return;
-				}
-				lastLobby = now;
 			}
 			if (now - lastPlayers >= std::chrono::milliseconds(500))
 			{
@@ -939,6 +887,15 @@ void ApiClient::StartNetworkLoop()
 					}
 				}
 				lastCanStillPlay = now;
+			}
+			if (now - lastLobby >= std::chrono::seconds(1))
+			{
+				auto info = GetLobbyInfo(lobbyId);
+				if (info && info->has("is_game_started") && (*info)["is_game_started"].b())
+				{
+					m_event.store(ClientEvent::MatchStarted);
+				}
+				lastLobby = now;
 			}
 			std::this_thread::sleep_for(std::chrono::milliseconds(50));
 		}

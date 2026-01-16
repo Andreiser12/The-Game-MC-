@@ -414,7 +414,7 @@ tgui::Panel::Ptr Utils::CreateProfilePanel(
 
 	auto title = tgui::Label::create("PLAYER PROFILE");
 	title->getRenderer()->setTextStyle(tgui::TextStyle::Bold);
-	title->setTextSize(32);
+	title->getRenderer()->setTextSize(32);
 	title->setPosition({ "50%", "6%" });
 	title->setOrigin(0.5f, 0.f);
 	panel->add(title);
@@ -426,22 +426,22 @@ tgui::Panel::Ptr Utils::CreateProfilePanel(
 
 	auto username = tgui::Label::create("Username: " + profile.username);
 	username->setPosition({ "5%", "22%" });
-	username->setTextSize(24);
+	username->getRenderer()->setTextSize(24);
 	panel->add(username);
 
 	auto gamesPlayed = tgui::Label::create("Games played: " + std::to_string(profile.gamesPlayed));
 	gamesPlayed->setPosition({ "5%", "34%" });
-	gamesPlayed->setTextSize(24);
+	gamesPlayed->getRenderer()->setTextSize(24);
 	panel->add(gamesPlayed);
 
 	auto gamesWon = tgui::Label::create("Games won: " + std::to_string(profile.gamesWon));
 	gamesWon->setPosition({ "5%", "46%" });
-	gamesWon->setTextSize(24);
+	gamesWon->getRenderer()->setTextSize(24);
 	panel->add(gamesWon);
 
 	auto hoursPlayed = tgui::Label::create("Hours played: " + std::to_string(profile.hoursPlayed));
 	hoursPlayed->setPosition({ "5%", "58%" });
-	hoursPlayed->setTextSize(24);
+	hoursPlayed->getRenderer()->setTextSize(24);
 	panel->add(hoursPlayed);
 
 	auto closeButton = tgui::Button::create("X");
@@ -449,7 +449,7 @@ tgui::Panel::Ptr Utils::CreateProfilePanel(
 	closeButton->getRenderer()->setTexture("assets/images/buttons.png");
 	closeButton->getRenderer()->setBorders(1);
 	StyleButton(closeButton);
-	closeButton->setTextSize(22);
+	closeButton->getRenderer()->setTextSize(22);
 	closeButton->setOrigin(1.f, 0.f);
 	closeButton->setPosition({ "98%", "2%" });
 	closeButton->onPress(
@@ -461,11 +461,10 @@ tgui::Panel::Ptr Utils::CreateProfilePanel(
 		});
 	panel->add(closeButton);
 
-	panel->getRenderer()->setBackgroundColor({ 255, 255, 255, 210 });
-	panel->getRenderer()->setBorders({ 2 });
-	panel->getRenderer()->setBorderColor({ 60, 60, 60 });
+	panel->getRenderer()->setBackgroundColor(tgui::Color(255, 255, 255, 210));
+	panel->getRenderer()->setBorders(2);
+	panel->getRenderer()->setBorderColor(tgui::Color(60, 60, 60));
 	panel->getRenderer()->setRoundedBorderRadius(18);
-	panel->getRenderer()->setOpacity(0.97f);
 
 	return panel;
 }
@@ -493,14 +492,14 @@ tgui::Panel::Ptr Utils::CreateExitPanel(tgui::Gui& gui,
 	textLabel->getRenderer()->setTextColor(tgui::Color(245, 240, 230));
 	textLabel->getRenderer()->setTextOutlineColor(tgui::Color(40, 25, 15));
 	textLabel->getRenderer()->setTextOutlineThickness(1.5f);
-	textLabel->setTextSize(24);
+	textLabel->getRenderer()->setTextSize(24);
 
 	auto noButton = tgui::Button::create("No");
 	noButton->setSize({ "15%", "20%" });
 	noButton->setPosition({ "10%", "70%" });
 	noButton->getRenderer()->setTexture("assets/images/buttons.png");
 	StyleButton(noButton);
-	noButton->setTextSize(20);
+	noButton->getRenderer()->setTextSize(20);
 	noButton->onPress([panel, onNo, &btnSound]() {
 		btnSound.play();
 		panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(100));
@@ -512,7 +511,7 @@ tgui::Panel::Ptr Utils::CreateExitPanel(tgui::Gui& gui,
 	yesButton->setPosition({ "75%", "70%" });
 	yesButton->getRenderer()->setTexture("assets/images/buttons.png");
 	StyleButton(yesButton);
-	yesButton->setTextSize(20);
+	yesButton->getRenderer()->setTextSize(20);
 	yesButton->onPress([panel, onYes, &btnSound]() {
 		btnSound.play();
 		if (onYes) onYes();
@@ -554,11 +553,10 @@ tgui::Panel::Ptr Utils::CreateErrorPopupPanel(tgui::Gui& gui,
 	auto errorLabel = tgui::Label::create(message);
 	errorLabel->setSize({ "60%", "40%" });
 	errorLabel->setPosition({ "50%", "45%" });
-	errorLabel->setTextSize(24);
+	errorLabel->getRenderer()->setTextSize(24);
 	errorLabel->setOrigin(0.5f, 0.5f);
 	errorLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
 	errorLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-
 	errorPopupPanel->add(errorLabel);
 
 	return errorPopupPanel;
@@ -576,7 +574,6 @@ void Utils::StyleButton(const tgui::Button::Ptr& button)
 void Utils::StyleSlider(const tgui::Slider::Ptr& slider)
 {
 	auto renderer = slider->getRenderer();
-
 	renderer->setTrackColor(tgui::Color::Black);
 	renderer->setTrackColorHover(tgui::Color::Black);
 	renderer->setBorders(0);

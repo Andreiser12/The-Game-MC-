@@ -22,7 +22,8 @@ export enum class ClientEvent
 	None,
 	PlayerLeft,
 	LobbyClosed,
-	HostLeftLobby
+	HostLeftLobby,
+	MatchStarted
 };
 
 export enum class LoginResult
@@ -129,7 +130,6 @@ public:
 	JoinLobbyResult JoinLobbyValidated(const std::string& lobbyId, const std::string& username);
 	bool LeaveLobby(const std::string& lobbyId, unsigned playerId);
 	std::optional<LeaveMatchResult> LeaveMatch();
-	std::optional<LobbyState> GetLobbyState(const std::string& lobbyId);
 	std::optional<std::vector<PlayerState>> GetPlayerStates();
 
 	bool StartMatch(const std::string& lobbyId, unsigned playerId);
@@ -155,7 +155,7 @@ public:
 	std::optional<TurnState> GetTurnState() const;
 	std::optional<GameResult> ParseGameResult(const std::string& result) const;
 	std::optional<GameResult> GetGameResult(const std::string& lobbyId) const;
-	std::optional<LobbyInfo> GetLobbyInfo(const std::string& lobbyId) const;
+	std::optional<crow::json::rvalue> GetLobbyInfo(const std::string& lobbyId) const;
 
 	void StartNetworkLoop();
 	void StopNetworkLoop();

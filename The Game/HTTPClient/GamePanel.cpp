@@ -62,7 +62,7 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	m_timerSound.setBuffer(m_timerTickBuffer);
 
 	m_root = tgui::Group::create({ "100%", "100%" });
-	m_gui.add(m_root);
+	m_gui.add(m_root, "GameRoot");
 
 	auto gamePanel = tgui::Panel::create({ "100%", "100%" });
 	m_root->add(gamePanel);
@@ -125,6 +125,7 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	chatEditBox->setPosition("0", "25%");
 	chatEditBox->getRenderer()->setTextSize(25);
 	chatEditBox->getRenderer()->setOpacity(0.5f);
+	chatEditBox->getRenderer()->setTextColor(tgui::Color(128, 128, 128));
 	chatEditBox->setDefaultText("Message...");
 	chatEditBox->onFocus([chatEditBox]()
 		{
@@ -153,10 +154,10 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	auto sendButton = tgui::Button::create("Send");
 	sendButton->setSize({ "5%", "5%" });
 	sendButton->setPosition("22.5%", "25%");
-	sendButton->setTextSize(25);
+	sendButton->getRenderer()->setTextSize(25);
 	sendButton->onPress([this, chatEditBox]()
 		{
-			const std::string messageSent = chatEditBox->getText().toStdString();
+			const std::string messageSent{ chatEditBox->getText().toStdString() };
 			if (messageSent.empty() || messageSent.size() > 500) return;
 
 			std::thread([this, messageSent]()
@@ -264,15 +265,11 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	m_leaveMatchButton->getRenderer()->setBackgroundColorDown(tgui::Color(60, 60, 65));
 	m_leaveMatchButton->onPress([this]()
 		{
+			m_isExiting = true;
 			m_uiSound.setBuffer(m_leaveBuffer);
 			m_uiSound.play();
 			auto result = m_apiClient.LeaveMatch();
-			if (!result) return;
-
-			if (result == LeaveMatchResult::Success)
-			{
-				if (m_onLocalPlayerLeft) m_onLocalPlayerLeft();
-			}
+			if (m_onLocalPlayerLeft) m_onLocalPlayerLeft();
 		});
 	m_root->add(m_leaveMatchButton);
 
@@ -294,7 +291,7 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 
 void GamePanel::UpdateGame()
 {
-	if (m_gameFinished) return;
+	if (m_gameFinished || m_isExiting) return;
 
 	RemovePlacedCards();
 	UpdateDecks();
@@ -834,39 +831,71 @@ void GamePanel::HandleGameResult(GameResult result)
 void GamePanel::ShowGameResultOverlay(GameResult result)
 {
 	auto overlay = tgui::Panel::create({ "100%", "100%" });
-	overlay->getRenderer()->setBackgroundColor(
-		tgui::Color(0, 0, 0, 180)
-	);
+	overlay->getRenderer()->setBackgroundColor(tgui::Color(0, 0, 0, 180));
 
-	auto dialog = tgui::Panel::create({ "40%", "30%" });
+	auto dialog = tgui::Panel::create({ "45%", "35%" });
 	dialog->setPosition("50%", "50%");
 	dialog->setOrigin(0.5f, 0.5f);
-	dialog->getRenderer()->setBackgroundColor(tgui::Color(40, 40, 40));
-	dialog->getRenderer()->setBorders(2);
-	dialog->getRenderer()->setBorderColor(tgui::Color::White);
+	dialog->getRenderer()->setBackgroundColor(tgui::Color(30, 30, 30));
+	dialog->getRenderer()->setBorders(3);
+	dialog->getRenderer()->setRoundedBorderRadius(15);
 
-	auto gameResultLabel = tgui::Label::create(
-		result == GameResult::Won ? "YOU WON!" : "YOU LOST!"
-	);
-	gameResultLabel->getRenderer()->setTextSize(36);
-	gameResultLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
-	gameResultLabel->setPosition("50%", "30%");
-	gameResultLabel->setOrigin(0.5f, 0.5f);
+	auto titleLabel = tgui::Label::create();
+	titleLabel->getRenderer()->setTextSize(42);
+	titleLabel->getRenderer()->setTextSize(tgui::TextStyle::Bold);
+	titleLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+	titleLabel->setPosition("50%", "25%");
+	titleLabel->setOrigin(0.5f, 0.5f);
+
+	auto descriptionLabel = tgui::Label::create();
+	descriptionLabel->getRenderer()->setTextSize(20);
+	descriptionLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+	descriptionLabel->setPosition("50%", "45%");
+	descriptionLabel->setOrigin(0.5f, 0.5f);
+	descriptionLabel->getRenderer()->setTextColor(tgui::Color(200, 200, 200));
+
+	switch (result)
+	{
+	case GameResult::Won:
+		titleLabel->setText("VICTORY!");
+		titleLabel->getRenderer()->setTextColor(tgui::Color(255, 215, 0));
+		descriptionLabel->setText("Congratulations! You've placed all cards.");
+		break;
+	case GameResult::Lost:
+		titleLabel->setText("DEFEAT!");
+		titleLabel->getRenderer()->setTextColor(tgui::Color(220, 50, 50));
+		descriptionLabel->setText("No more possibles moves left.");
+		break;
+	case GameResult::NotEnoughPlayers:
+		titleLabel->setText("MATCH ENDED");
+		titleLabel->getRenderer()->setTextColor(tgui::Color(50, 150, 255));
+		descriptionLabel->setText("Not enough players left to continue the game");
+		break;
+
+	default:
+		titleLabel->setText("GAME OVER!");
+		descriptionLabel->setText("The session has ended.");
+		break;
+	}
 
 	auto backToMenuButton = tgui::Button::create("Back to Menu");
-	backToMenuButton->setSize({ "40%", "20%" });
-	backToMenuButton->setPosition("50%", "70%");
+	backToMenuButton->setSize({ "50%", "18%" });
+	backToMenuButton->setPosition("50%", "75%");
 	backToMenuButton->setOrigin(0.5f, 0.5f);
 	backToMenuButton->getRenderer()->setTextSize(20);
+	Utils::StyleButton(backToMenuButton);
 	backToMenuButton->onPress([this]()
 		{
 			m_ExitButtonSound.play();
 			if (m_onExitToMenu) m_onExitToMenu();
 		});
 
-	dialog->add(gameResultLabel);
+	dialog->add(titleLabel);
+	dialog->add(descriptionLabel);
 	dialog->add(backToMenuButton);
 	overlay->add(dialog);
+
+	overlay->showWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(300));
 	m_root->add(overlay);
 }
 

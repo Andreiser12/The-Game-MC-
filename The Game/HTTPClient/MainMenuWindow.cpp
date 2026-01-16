@@ -1,4 +1,21 @@
-﻿#include "MainMenuWindow.h"
+﻿module;
+#define NOMINMAX
+#include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
+#include <TGUI/TGUI.hpp>
+#include <TGUI/Backend/SFML-Graphics.hpp>
+#include <memory>
+#include <string>
+#include <thread>
+#include <chrono>
+
+module MainMenuWindow;
+
+import ApiClient;
+import GamePanel;
+import HostPanel;
+import Utils;
+import PlayPanel;
 
 MainMenuWindow::MainMenuWindow(sf::RenderWindow& window, ApiClient& api) :
 	m_window{ window },
@@ -8,24 +25,24 @@ MainMenuWindow::MainMenuWindow(sf::RenderWindow& window, ApiClient& api) :
 {
 	m_mainMenu.setFont("assets/fonts/Cinzel-Regular.ttf");
 	m_background = tgui::Picture::create("assets/images/mainMenuBackground.png");
-	m_background->setSize("100%", "100%");
+	m_background->setSize({ "100%", "100%" });
 	m_background->setPosition("0%", "0%");
 	m_mainMenu.add(m_background);
 
 	auto buttonsBackground = tgui::Picture::create("assets/images/buttonsBackground.png");
-	buttonsBackground->setSize("90%", "90%");
+	buttonsBackground->setSize({ "90%", "90%" });
 	buttonsBackground->setPosition("50%", "52.5%");
 	buttonsBackground->setOrigin(0.5f, 0.5f);
 	m_mainMenu.add(buttonsBackground);
 
 	auto cardsImage = tgui::Picture::create("assets/images/cardsMainMenuImage.png");
-	cardsImage->setSize("67%", "67%");
+	cardsImage->setSize({ "67%", "67%" });
 	cardsImage->setPosition("80%", "60%");
 	cardsImage->setOrigin(0.5f, 0.5f);
 	cardsImage->getRenderer()->setOpacity(0.95f);
 
 	auto cardsShadow = tgui::Picture::create("assets/images/cardsMainMenuImage.png");
-	cardsShadow->setSize("67%", "67%");
+	cardsShadow->setSize({ "67%", "67%" });
 	cardsShadow->setPosition("80% + 5", "60% + 5");
 	cardsShadow->setOrigin(0.5f, 0.5f);
 	cardsShadow->getRenderer()->setOpacity(0.3f);
@@ -33,7 +50,7 @@ MainMenuWindow::MainMenuWindow(sf::RenderWindow& window, ApiClient& api) :
 	m_mainMenu.add(cardsImage);
 
 	auto gameTitle = tgui::Picture::create("assets/images/gameTitle.png");
-	gameTitle->setSize("50%", "50%");
+	gameTitle->setSize({ "50%", "50%" });
 	gameTitle->setPosition("50%", "15%");
 	gameTitle->setOrigin(0.5f, 0.1f);
 	m_mainMenu.add(gameTitle);

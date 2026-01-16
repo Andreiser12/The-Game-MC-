@@ -1,14 +1,23 @@
-#pragma once
-
-#include "UserProfile.h"
-#include "crow.h"
-#include <cpr/cpr.h>
-#include <memory>
+module;
+#define NOMINMAX
+#include <string>
 #include <vector>
-#include <array>
+#include <memory>
 #include <optional>
+#include <array>
+#include <mutex>
+#include <atomic>
+#include <thread>
+#include <unordered_map>
 
-enum class ClientEvent
+#include <cpr/cpr.h>
+#include "crow.h"
+
+export module ApiClient;
+
+import UserProfile;
+
+export enum class ClientEvent
 {
 	None,
 	PlayerLeft,
@@ -16,7 +25,7 @@ enum class ClientEvent
 	HostLeftLobby
 };
 
-enum class LoginResult
+export enum class LoginResult
 {
 	Success,
 	UserNotFound,
@@ -24,7 +33,7 @@ enum class LoginResult
 	NetworkError
 };
 
-enum class GameResult
+export enum class GameResult
 {
 	Ongoing,
 	Won,
@@ -32,14 +41,14 @@ enum class GameResult
 	NotEnoughPlayers
 };
 
-enum class LeaveMatchResult
+export enum class LeaveMatchResult
 {
 	Success,
 	NotInLobby,
 	AlreadyLeft
 };
 
-struct ChatMessage
+export struct ChatMessage
 {
 	unsigned id;
 	std::string username;
@@ -50,25 +59,25 @@ struct ChatMessage
 	}
 };
 
-struct DeckState
+export struct DeckState
 {
 	uint8_t deckId;
 	uint8_t topCardId;
 };
 
-struct LobbyState
+export struct LobbyState
 {
 	std::string m_status;
 	std::string m_message;
 	unsigned m_hostId;
 };
 
-struct GameTableState
+export struct GameTableState
 {
 	int drawPileCount{ 0 };
 };
 
-struct EndTurnState
+export struct EndTurnState
 {
 	unsigned playerId;
 	bool canEndTurn;
@@ -76,30 +85,29 @@ struct EndTurnState
 	uint8_t minRequiredCards;
 };
 
-struct TurnState
+export struct TurnState
 {
 	bool isMyTurn;
 	unsigned currentPlayerId;
 	std::string currentUsername;
 };
 
-struct PlayerState
+export struct PlayerState
 {
 	std::string username;
 	bool isInMatch;
 };
 
-enum class JoinLobbyResult
+export enum class JoinLobbyResult
 {
 	Success,
 	LobbyNotFound,
 	LobbyFull,
 	GameAlreadyStarted,
-	AlreadyInLobby,
 	NetworkError
 };
 
-struct LobbyInfo
+export struct LobbyInfo
 {
 	std::string lobbyId;
 	std::string status;
@@ -109,7 +117,7 @@ struct LobbyInfo
 	bool isGameStarted;
 };
 
-class ApiClient
+export class ApiClient
 {
 public:
 	ApiClient(const std::string& serverURL);
@@ -118,8 +126,6 @@ public:
 	bool Logout();
 	bool IsLoggedIn();
 	std::optional<std::string> CreateLobby(const std::string& username);
-	bool JoinLobby(const std::string& lobbyId,
-		const std::string& username);
 	JoinLobbyResult JoinLobbyValidated(const std::string& lobbyId, const std::string& username);
 	bool LeaveLobby(const std::string& lobbyId, unsigned playerId);
 	std::optional<LeaveMatchResult> LeaveMatch();
@@ -129,9 +135,9 @@ public:
 	bool StartMatch(const std::string& lobbyId, unsigned playerId);
 	bool SendChatMessage(const std::string& message);
 	std::optional<std::vector<ChatMessage>> GetNewMessages(unsigned afterId);
-	bool PlayCard(uint8_t cardId, uint8_t deckId);
+	bool PlayCard(uint8_t cardId, uint8_t deckId) const;
 
-	bool SendPing(const std::string& lobbyId, unsigned playerId);
+	bool SendPing(const std::string& lobbyId, unsigned playerId) const;
 	void StartPingThread(const std::string& lobbyId, unsigned playerId);
 	void StopPingThread();
 
@@ -144,7 +150,7 @@ public:
 	std::string GetUsername() const;
 	unsigned GetPlayerId() const;
 	std::string GetLobbyId() const;
-	std::optional<UserProfile> GetUserProfile(unsigned playerId);
+	std::optional<UserProfile> GetUserProfile(unsigned playerId) const;
 	std::optional<std::vector<uint8_t>> EndTurn();
 	std::optional<TurnState> GetTurnState() const;
 	std::optional<GameResult> ParseGameResult(const std::string& result) const;

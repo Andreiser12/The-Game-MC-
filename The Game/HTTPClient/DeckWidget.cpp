@@ -1,4 +1,14 @@
-﻿#include "DeckWidget.h"
+﻿module;
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+#include <random>
+#include <string>
+#include <SFML/Graphics.hpp>
+#include <TGUI/TGUI.hpp>
+
+module DeckWidget;
 
 DeckWidget::DeckWidget(DeckType deckType, uint8_t deckId) : m_deckType{ deckType }, m_deckId{ deckId }
 {
@@ -12,7 +22,6 @@ void DeckWidget::CreateDeckWidget()
 {
 	m_deckPanel = tgui::Panel::create({ "100%", "100%" });
 
-	m_deckPanel->getRenderer()->setBorders(0);
 	m_deckPanel->getRenderer()->setBackgroundColor(tgui::Color::Transparent);
 }
 
@@ -20,7 +29,7 @@ void DeckWidget::RenderDeck()
 {
 	m_deckPanel->removeAllWidgets();
 
-	int cardsPlayed = 0;
+	int cardsPlayed{ 0 };
 	if (m_deckType == DeckType::Ascending)
 		cardsPlayed = m_lastId - 1;
 	else
@@ -30,7 +39,7 @@ void DeckWidget::RenderDeck()
 	if (visualLayers > 5) visualLayers = 5;
 
 	static tgui::Texture tguiTexture;
-	static bool initialized = false;
+	static bool initialized{ false };
 
 	if (!initialized)
 	{
@@ -42,7 +51,7 @@ void DeckWidget::RenderDeck()
 		initialized = true;
 	}
 
-	float offsetPercent = 1.2f;
+	float offsetPercent{ 1.2f };
 	static std::mt19937 rng(std::random_device{}());
 	std::uniform_real_distribution<float> rotationDist(-2.0f, 2.0f);
 
@@ -50,11 +59,11 @@ void DeckWidget::RenderDeck()
 	{
 		auto bgCard = tgui::Picture::create(tguiTexture);
 
-		bgCard->setSize("90%", "90%");
+		bgCard->setSize({ "90%", "90%" });
 		bgCard->setOrigin(0.5f, 0.5f);
 		bgCard->setIgnoreMouseEvents(true);
 
-		float shift = (i + 1) * offsetPercent;
+		float shift{ (i + 1) * offsetPercent };
 		bgCard->setPosition({
 			tgui::String(50.0f + shift) + "%",
 			tgui::String(50.0f + shift) + "%"
@@ -70,7 +79,7 @@ void DeckWidget::RenderDeck()
 	m_topCard = tgui::Picture::create(tguiTexture);
 	m_topCard->setSize({ "90%", "90%" });
 
-	float topShift = visualLayers * offsetPercent;
+	float topShift{ visualLayers * offsetPercent };
 
 	m_topCard->setPosition({
 			tgui::String(50.0f + topShift) + "%",
@@ -157,6 +166,5 @@ void DeckWidget::SetHighlight(bool canPlace, bool isBackwards)
 
 void DeckWidget::ClearHighlight()
 {
-	if (m_highlightOverlay)
-		m_highlightOverlay->setVisible(false);
+	if (m_highlightOverlay) m_highlightOverlay->setVisible(false);
 }

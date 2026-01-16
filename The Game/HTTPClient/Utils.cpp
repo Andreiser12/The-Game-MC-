@@ -1,10 +1,23 @@
-#include "Utils.h"
+module;
+#define NOMINMAX
+#include <string>
+#include <vector>
+#include <functional>
+#include <memory>
+#include "SFML/Graphics.hpp"
+#include <SFML/Audio.hpp>
+#include "TGUI/TGUI.hpp"
+#include "TGUI/Backend/SFML-Graphics.hpp"
+
+module Utils;
+
+import UserProfile;
 
 tgui::String Utils::TruncateText(const tgui::String& text, uint8_t maxChars)
 {
 	if (text.length() < maxChars) return text;
 
-    return text.substr(0, maxChars - 1) + "...";
+	return text.substr(0, maxChars - 1) + "...";
 }
 
 tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
@@ -40,10 +53,10 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 		std::vector<unsigned>
 	{
 		30u,
-		60u,
-		120u,
-		144u,
-		180u
+			60u,
+			120u,
+			144u,
+			180u
 	});
 
 	auto masterVolPtr = std::make_shared<float>(masterVolume);
@@ -51,7 +64,7 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 	auto bgVolPtr = std::make_shared<float>(backgroundVolume);
 
 	auto panel = tgui::Panel::create({ "60%", "60%" });
-	panel->setPosition({ "50%", "50%" });
+	panel->setPosition("50%", "50%");
 	panel->getRenderer()->setBackgroundColor(tgui::Color(0, 0, 0, 180));
 	panel->getRenderer()->setBorders(2);
 	panel->getRenderer()->setBorderColor(tgui::Color::Black);
@@ -61,7 +74,7 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 	background->setSize({ "100%", "100%" });
 
 	auto sidebar = tgui::Panel::create({ "20%", "100%" });
-	sidebar->setPosition({ "0%", "0%" });
+	sidebar->setPosition("0%", "0%");
 	sidebar->getRenderer()->setBackgroundColor(tgui::Color(50, 50, 50, 180));
 	sidebar->getRenderer()->setBorders(2);
 	sidebar->getRenderer()->setBorderColor(tgui::Color::Black);
@@ -69,7 +82,7 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 	panel->add(sidebar);
 
 	auto content = tgui::Panel::create({ "80%", "100%" });
-	content->setPosition({ "20%", "0%" });
+	content->setPosition("20%", "0%");
 	content->getRenderer()->setBackgroundColor(tgui::Color(0, 0, 0, 0));
 	panel->add(content);
 
@@ -83,34 +96,34 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 	content->add(audioPanel);
 	content->add(gameplayPanel);
 
-	videoPanel->setPosition({ "0%", "0%" });
+	videoPanel->setPosition("0%", "0%");
 	audioPanel->getRenderer()->setBackgroundColor(tgui::Color(0, 0, 0, 0));
 
-	audioPanel->setPosition({ "0%", "0%" });
+	audioPanel->setPosition("0%", "0%");
 	audioPanel->getRenderer()->setBackgroundColor(tgui::Color(128, 128, 128));
 	audioPanel->add(background);
 
-	gameplayPanel->setPosition({ "0%", "0%" });
+	gameplayPanel->setPosition("0%", "0%");
 	gameplayPanel->getRenderer()->setBackgroundColor(tgui::Color(128, 128, 128));
 	gameplayPanel->add(background);
 
 	auto videoButton = tgui::Button::create("Video");
 	videoButton->setSize({ "90%", "10%" });
-	videoButton->setPosition({ "5%", "20%" });
+	videoButton->setPosition("5%", "20%");
 	videoButton->getRenderer()->setTexture("assets/images/buttons.png");
 	StyleButton(videoButton);
 	sidebar->add(videoButton);
 
 	auto audioButton = tgui::Button::create("Audio");
 	audioButton->setSize({ "90%", "10%" });
-	audioButton->setPosition({ "5%", "35%" });
+	audioButton->setPosition("5%", "35%");
 	audioButton->getRenderer()->setTexture("assets/images/buttons.png");
 	StyleButton(audioButton);
 	sidebar->add(audioButton);
 
 	auto gameplayButton = tgui::Button::create("Gameplay");
 	gameplayButton->setSize({ "90%", "10%" });
-	gameplayButton->setPosition({ "5%", "50%" });
+	gameplayButton->setPosition("5%", "50%");
 	gameplayButton->getRenderer()->setTexture("assets/images/buttons.png");
 	StyleButton(gameplayButton);
 	sidebar->add(gameplayButton);
@@ -138,48 +151,48 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 
 	auto resolutionContainer = tgui::Panel::create();
 	resolutionContainer->setSize({ "40%", "12.5%" });
-	resolutionContainer->setPosition({ "75%", "10%" });
+	resolutionContainer->setPosition("75%", "10%");
 	resolutionContainer->setOrigin(0.5f, 0.f);
 	resolutionContainer->getRenderer()->setBackgroundColor(tgui::Color(0, 0, 0, 0));
 
 	auto resolutionText = tgui::Label::create("Resolution");
-	resolutionText->setSize({ "16%", "12.5%" });
-	resolutionText->setPosition({ "5%", "10%" });
+	resolutionText->setSize("16%", "12.5%");
+	resolutionText->setPosition("5%", "10%");
 	resolutionText->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
 	resolutionText->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
 	resolutionText->getRenderer()->setBorders(2);
 	resolutionText->getRenderer()->setTextColor(tgui::Color(245, 240, 230));
 	resolutionText->getRenderer()->setTextOutlineColor(tgui::Color(40, 25, 15));
 	resolutionText->getRenderer()->setTextOutlineThickness(1.5f);
-	resolutionText->setTextSize(24);
+	resolutionText->getRenderer()->setTextSize(24);
 	videoPanel->add(resolutionText);
 
 	auto resolutionValue = tgui::Label::create(
 		std::to_string((*resolutions)[*resolutionsIndexPtr].x) + "x" +
 		std::to_string((*resolutions)[*resolutionsIndexPtr].y)
 	);
-	resolutionValue->setSize({ "70%", "100%" });
-	resolutionValue->setPosition({ "15%", "0%" });
+	resolutionValue->setSize("70%", "100%");
+	resolutionValue->setPosition("15%", "0%");
 	resolutionValue->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
 	resolutionValue->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
 	resolutionValue->getRenderer()->setBorders(2);
 	resolutionValue->getRenderer()->setTextColor(tgui::Color(245, 240, 230));
 	resolutionValue->getRenderer()->setTextOutlineColor(tgui::Color(40, 25, 15));
 	resolutionValue->getRenderer()->setTextOutlineThickness(1.5f);
-	resolutionValue->setTextSize(24);
+	resolutionValue->getRenderer()->setTextSize(24);
 
 	auto leftResolutionArrow = tgui::Button::create("<");
 	leftResolutionArrow->setSize({ "15%", "100%" });
-	leftResolutionArrow->setPosition({ "0%", "0%" });
+	leftResolutionArrow->setPosition("0%", "0%");
 	leftResolutionArrow->getRenderer()->setTexture("assets/images/buttons.png");
 	Utils::StyleButton(leftResolutionArrow);
 
 	auto rightResolutionArrow = tgui::Button::create(">");
 	rightResolutionArrow->setSize({ "15%", "100%" });
-	rightResolutionArrow->setPosition({ "85%", "0%" });
+	rightResolutionArrow->setPosition("85%", "0%");
 	rightResolutionArrow->getRenderer()->setTexture("assets/images/buttons.png");
 	Utils::StyleButton(rightResolutionArrow);
-	rightResolutionArrow->setTextSize(24);
+	rightResolutionArrow->getRenderer()->setTextSize(24);
 
 	leftResolutionArrow->onClick([resolutions, resolutionsIndexPtr, resolutionValue, &btnSound]
 		{
@@ -204,8 +217,8 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 	resolutionContainer->add(rightResolutionArrow);
 
 	auto fullscreenText = tgui::Label::create("Fullscreen");
-	fullscreenText->setSize({ "16%", "12.5%" });
-	fullscreenText->setPosition({ "5%", "35%" });
+	fullscreenText->setSize("16%", "12.5%");
+	fullscreenText->setPosition("5%", "35%");
 	fullscreenText->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
 	fullscreenText->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
 	fullscreenText->getRenderer()->setBorders(2);
@@ -216,8 +229,8 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 	videoPanel->add(fullscreenText);
 
 	auto fullscreenCheckbox = tgui::CheckBox::create();
-	fullscreenCheckbox->setSize({ "5%", "6%" });
-	fullscreenCheckbox->setPosition({ "73%", "37.5%" });
+	fullscreenCheckbox->setSize("5%", "6%");
+	fullscreenCheckbox->setPosition("73%", "37.5%");
 	fullscreenCheckbox->setChecked(true);
 	fullscreenCheckbox->onCheck([fullscreenPtr, &btnSound] {
 		btnSound.play();
@@ -230,13 +243,13 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 
 	auto framerateContainer = tgui::Panel::create();
 	framerateContainer->setSize({ "40%", "12.5%" });
-	framerateContainer->setPosition({ "75%", "60%" });
+	framerateContainer->setPosition("75%", "60%");
 	framerateContainer->setOrigin(0.5f, 0.f);
 	framerateContainer->getRenderer()->setBackgroundColor(tgui::Color(0, 0, 0, 0));
 
 	auto applyButton = tgui::Button::create("Apply");
 	applyButton->setSize({ "15%", "10%" });
-	applyButton->setPosition({ "75%", "80%" });
+	applyButton->setPosition("75%", "80%");
 	applyButton->getRenderer()->setBorders(2);
 	applyButton->getRenderer()->setRoundedBorderRadius(10);
 	applyButton->getRenderer()->setTexture("assets/images/buttons.png");
@@ -260,8 +273,8 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 
 	auto closeButton = tgui::Button::create("Close");
 	closeButton->setSize({ "15%", "10%" });
-	closeButton->setPosition({ "10%", "80%" });
-	closeButton->setTextSize(24);
+	closeButton->setPosition("10%", "80%");
+	closeButton->getRenderer()->setTextSize(24);
 	closeButton->getRenderer()->setBorders(2);
 	closeButton->getRenderer()->setRoundedBorderRadius(10);
 	closeButton->getRenderer()->setTexture("assets/images/buttons.png");
@@ -273,8 +286,8 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 	content->add(closeButton);
 
 	auto framerateText = tgui::Label::create("Framerate");
-	framerateText->setSize({ "16%", "12.5%" });
-	framerateText->setPosition({ "5%", "60%" });
+	framerateText->setSize("16%", "12.5%");
+	framerateText->setPosition("5%", "60%");
 	framerateText->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
 	framerateText->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
 	framerateText->setTextSize(24);
@@ -285,8 +298,8 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 	videoPanel->add(framerateText);
 
 	auto framerateValue = tgui::Label::create(std::to_string((*framerates)[*framerateIndexPtr]));
-	framerateValue->setSize({ "70%", "100%" });
-	framerateValue->setPosition({ "15%", "0%" });
+	framerateValue->setSize("70%", "100%");
+	framerateValue->setPosition("15%", "0%");
 	framerateValue->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
 	framerateValue->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
 	framerateValue->setTextSize(24);
@@ -297,7 +310,7 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 
 	auto leftFramerateArrow = tgui::Button::create("<");
 	leftFramerateArrow->setSize({ "15%", "100%" });
-	leftFramerateArrow->setPosition({ "0%", "0%" });
+	leftFramerateArrow->setPosition("0%", "0%");
 	leftFramerateArrow->getRenderer()->setTexture("assets/images/buttons.png");
 	Utils::StyleButton(leftFramerateArrow);
 	leftFramerateArrow->onClick([framerateIndexPtr, framerates, framerateValue, &btnSound] {
@@ -413,7 +426,7 @@ tgui::Panel::Ptr Utils::CreateProfilePanel(
 
 	auto username = tgui::Label::create("Username: " + profile.username);
 	username->setPosition({ "5%", "22%" });
-	username->setTextSize(24); 
+	username->setTextSize(24);
 	panel->add(username);
 
 	auto gamesPlayed = tgui::Label::create("Games played: " + std::to_string(profile.gamesPlayed));
@@ -569,5 +582,4 @@ void Utils::StyleSlider(const tgui::Slider::Ptr& slider)
 	renderer->setBorders(0);
 	renderer->setThumbColor(tgui::Color(245, 240, 230));
 	renderer->setThumbColorHover(tgui::Color::White);
-
 }

@@ -1,4 +1,17 @@
-#include "LoginWindow.h"
+module;
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <string>
+#include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
+#include <TGUI/TGUI.hpp>
+
+module LoginWindow;
+
+import IWindow;
+import ApiClient;
+import Utils;
 
 LoginWindow::LoginWindow(sf::RenderWindow& window, ApiClient& api)
 	: m_login{ window }, m_apiClient{ api }, m_clickSound{ m_clickBuffer }
@@ -9,7 +22,7 @@ LoginWindow::LoginWindow(sf::RenderWindow& window, ApiClient& api)
 	}
 	m_login.setFont("assets/fonts/Cinzel-Regular.ttf");
 	m_background = tgui::Picture::create("assets/images/mainMenuBackground.png");
-	m_background->setSize("100%", "100%");
+	m_background->setSize({ "100%", "100%" });
 	m_background->setPosition("0%", "0%");
 	m_login.add(m_background);
 	LoadWidgets();

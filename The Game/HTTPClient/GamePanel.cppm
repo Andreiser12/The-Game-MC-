@@ -1,20 +1,37 @@
-#pragma once
-#include <SFML/System.hpp>
+module;
+#define NOMINMAX
 
-#include "ApiClient.h"
-#include "Utils.h"
-#include "CardWidget.h"
-#include "DeckWidget.h"
-#include "PileWidget.h"
+#include <string>
+#include <vector>
+#include <memory>
+#include <functional>
+#include <array>
+#include <optional>
+#include <unordered_map>
 #include <span>
 
-struct PlayerSlot
+#include <SFML/System.hpp>
+#include <SFML/Audio.hpp>
+#include <SFML/Graphics.hpp>
+
+#include "TGUI/TGUI.hpp"
+#include <TGUI/Backend/SFML-Graphics.hpp>
+
+export module GamePanel;
+
+import ApiClient;
+import Utils;
+import CardWidget;
+import DeckWidget;
+import PileWidget;
+
+export struct PlayerSlot
 {
 	float xPercent;
 	float yPercent;
 };
 
-struct PlayerSlotWidget
+export struct PlayerSlotWidget
 {
 	std::string username;
 	tgui::Panel::Ptr panel;
@@ -23,9 +40,9 @@ struct PlayerSlotWidget
 	bool isActive{ true };
 };
 
-using SlotArray = std::span<const PlayerSlot>;
+export using SlotArray = std::span<const PlayerSlot>;
 
-class GamePanel
+export class GamePanel
 {
 public:
 	explicit GamePanel(tgui::Gui& gui, ApiClient& api, std::function<void()> onExit,

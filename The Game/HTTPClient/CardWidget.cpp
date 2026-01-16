@@ -1,4 +1,16 @@
-#include "CardWidget.h"
+module;
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <cmath>
+#include <algorithm>
+#include <memory>
+#include <functional>
+#include <string>
+#include <TGUI/TGUI.hpp>
+#include <SFML/Graphics.hpp>
+
+module CardWidget;
 
 CardWidget::CardWidget(uint8_t id, bool isOwner) :
 	m_id{ id },
@@ -31,7 +43,7 @@ void CardWidget::SetPosition(const tgui::String& x, const tgui::String& y)
 
 void CardWidget::SetSize(const tgui::String& width, const tgui::String& height)
 {
-	m_cardPanel->setSize(width, height);
+	m_cardPanel->setSize({ width, height });
 }
 
 void CardWidget::SetDraggable(bool draggable)

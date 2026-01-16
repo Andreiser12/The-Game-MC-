@@ -1,9 +1,12 @@
-#pragma once
-#include "TGUI/TGUI.hpp"
-#include <algorithm>
+module;
+#include <memory>
 #include <random>
+#include <algorithm>
+#include <TGUI/TGUI.hpp>
 
-class PileWidget
+export module PileWidget;
+
+export class PileWidget
 {
 public:
 	PileWidget();
@@ -13,7 +16,7 @@ public:
 
 private:
 	tgui::Panel::Ptr m_pilePanel;
-	int m_lastCardCount = -1;
+	int m_lastCardCount{ -1 };
 	tgui::Picture::Ptr m_backsidePicture;
 };
 

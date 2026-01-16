@@ -1,11 +1,20 @@
-#pragma once
-#include "TGUI/TGUI.hpp"
+module;
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
 #include <string>
 #include <random>
 #include <cmath>
-#include <SFML/Graphics/Image.hpp>
+#include <memory>
+#include <cstdint>
 
-class DeckWidget
+#include <SFML/Graphics.hpp>
+#include <TGUI/TGUI.hpp>
+
+export module DeckWidget;
+
+export class DeckWidget
 {
 public:
 	enum class DeckType
@@ -36,6 +45,4 @@ private:
 	tgui::Panel::Ptr m_highlightOverlay;
 	tgui::Picture::Ptr m_topCard;
 	tgui::Label::Ptr m_topIdLabel;
-
 };
-

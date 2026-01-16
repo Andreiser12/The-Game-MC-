@@ -1,4 +1,16 @@
-#include "RegisterWindow.h"
+module;
+#define NOMINMAX
+#include <SFML/Graphics.hpp>
+#include <TGUI/TGUI.hpp>
+#include <TGUI/Backend/SFML-Graphics.hpp>
+
+#include <cpr/cpr.h>
+#include "crow.h"
+#include <string>
+
+module RegisterWindow;
+
+import Utils;
 
 RegisterWindow::RegisterWindow(sf::RenderWindow& window, ApiClient& api)
 	: m_register{ window }, m_apiClient{ api }, m_clickSound{ m_clickBuffer }
@@ -9,7 +21,7 @@ RegisterWindow::RegisterWindow(sf::RenderWindow& window, ApiClient& api)
 	}
 	m_register.setFont("assets/fonts/Cinzel-Regular.ttf");
 	m_background = tgui::Picture::create("assets/images/mainMenuBackground.png");
-	m_background->setSize("100%", "100%");
+	m_background->setSize({ "100%", "100%" });
 	m_background->setPosition("0%", "0%");
 	m_register.add(m_background);
 	LoadWidgets();
@@ -90,7 +102,7 @@ void RegisterWindow::LoadWidgets()
 
 	auto registerButton = tgui::Button::create("Register");
 	registerButton->getRenderer()->setTexture("assets/images/buttons.png");
-	registerButton->setSize("20%", "15%");
+	registerButton->setSize({ "20%", "15%" });
 	registerButton->setPosition("50%", "80%");
 	registerButton->setOrigin(0.5f, 0.5f);
 	Utils::StyleButton(registerButton);
@@ -100,7 +112,7 @@ void RegisterWindow::LoadWidgets()
 		CheckRegister(editBoxUsername->getText().toStdString()); });
 
 	auto backButton = tgui::Button::create("Back");
-	backButton->setSize("15%", "12.5%");
+	backButton->setSize({ "15%", "12.5%" });
 	backButton->setPosition("3.5%", "5%");
 	backButton->getRenderer()->setTexture("assets/images/buttons.png");
 	Utils::StyleButton(backButton);

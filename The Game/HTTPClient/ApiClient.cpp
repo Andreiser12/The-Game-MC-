@@ -1,4 +1,13 @@
-#include "ApiClient.h"
+module;
+#define NOMINMAX
+#include <algorithm> 
+#include <cmath>     
+#include <cpr/cpr.h>
+#include "crow.h"
+
+module ApiClient;
+
+import UserProfile;
 
 static inline cpr::Timeout kTimeout{ 400 };
 
@@ -84,36 +93,6 @@ std::optional<std::string> ApiClient::CreateLobby(const std::string& username)
 	auto json = crow::json::load(response.text);
 	if (!json || !json.has("lobbyId")) return std::nullopt;
 	return json["lobbyId"].s();
-}
-
-bool ApiClient::JoinLobby(const std::string& lobbyId, const std::string& username)
-{
-	const std::string url{ m_serverURL + "/lobby/join" };
-
-	std::string jsonBody =
-		"{\"lobbyId\":\"" + lobbyId +
-		"\",\"username\":\"" + username + "\"}";
-
-	cpr::Response response = cpr::Post(
-		cpr::Url{ url },
-		cpr::Body{ jsonBody },
-		kTimeout
-	);
-
-	if (response.error || response.status_code != 200) return false;
-
-	auto json = crow::json::load(response.text);
-	if (!json) return false;
-
-	if (json.has("lobbyId"))
-		m_lobbyId = json["lobbyId"].s();
-
-	if (json.has("playerId"))
-		m_playerId = json["playerId"].i();
-
-	if (json.has("status") && json["status"].s() == "OK") return true;
-
-	return false;
 }
 
 JoinLobbyResult ApiClient::JoinLobbyValidated(const std::string& lobbyId, const std::string& username)
@@ -235,7 +214,7 @@ std::optional<LobbyState> ApiClient::GetLobbyState(const std::string& lobbyId)
 	LobbyState state;
 	state.m_status = json["status"].s();
 	state.m_message = json["message"].s();
-	state.m_hostId = json["hostId"].i();
+	state.m_hostId = static_cast<unsigned>(json["hostId"].i());
 	return state;
 }
 
@@ -342,7 +321,7 @@ std::optional<std::vector<ChatMessage>> ApiClient::GetNewMessages(unsigned after
 	return result;
 }
 
-bool ApiClient::PlayCard(uint8_t cardId, uint8_t deckId)
+bool ApiClient::PlayCard(uint8_t cardId, uint8_t deckId) const
 {
 	const std::string url = m_serverURL + "/lobby/" + m_lobbyId
 		+ "/players/" + std::to_string(m_playerId) + "/cards";
@@ -416,7 +395,7 @@ std::optional<EndTurnState> ApiClient::GetEndTurnState() const
 	return state;
 }
 
-bool ApiClient::SendPing(const std::string& lobbyId, unsigned playerId)
+bool ApiClient::SendPing(const std::string& lobbyId, unsigned playerId) const
 {
 	const std::string url = m_serverURL + "/lobby/ping";
 	std::string jsonBody = "{\"lobbyId\":\"" + lobbyId + "\",\"playerId\":" + std::to_string(playerId) + "}";
@@ -561,7 +540,7 @@ std::string ApiClient::GetLobbyId() const
 	return m_lobbyId;
 }
 
-std::optional<UserProfile> ApiClient::GetUserProfile(unsigned playerId)
+std::optional<UserProfile> ApiClient::GetUserProfile(unsigned playerId) const
 {
 	const std::string url = m_serverURL + "/users/" + std::to_string(playerId) + "/profile";
 	cpr::Response response = cpr::Get
@@ -841,7 +820,7 @@ void ApiClient::StartNetworkLoop()
 					unsigned maxId{ after };
 					for (auto& message : messages.value())
 					{
-						maxId = std::max(maxId, message.id);
+						maxId = (std::max)(maxId, message.id);
 					}
 					m_afterChatId.store(maxId);
 					m_cachedChat = std::move(messages);

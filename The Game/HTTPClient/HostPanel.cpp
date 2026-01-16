@@ -1,4 +1,18 @@
-﻿#include "HostPanel.h"
+﻿module;
+#include "SFML/Graphics.hpp"
+#include "TGUI/TGUI.hpp"
+#include "TGUI/Backend/SFML-Graphics.hpp"
+#include <SFML/Audio.hpp>
+
+module HostPanel;
+
+import <functional>;
+import <string>;
+import <vector>;
+import <sstream>;
+import <iomanip>;
+import <stdexcept>; 
+import ApiClient;
 
 static constexpr uint8_t kMinPlayers{ 2u };
 static std::vector<tgui::Texture> s_frames;
@@ -69,7 +83,7 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 
 	playersListBox = tgui::ListBox::create();
 	playersListBox->getRenderer()->setFont("assets/fonts/Sanchez-Regular.ttf");
-	playersListBox->setSize("20%", "30%");
+	playersListBox->setSize({ "20%", "30%" });
 	playersListBox->setPosition("0%", "0%");
 	playersListBox->getRenderer()->setTextSize(20);
 	playersListBox->getRenderer()->setBackgroundColor(tgui::Color(30, 35, 45));
@@ -97,7 +111,7 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 
 	apiClient.StartNetworkLoop();
 	auto leaveButton = tgui::Button::create("Leave Lobby");
-	leaveButton->setSize("22.5%", "12.5%");
+	leaveButton->setSize({ "22.5%", "12.5%" });
 	leaveButton->setPosition("3.5%", "82%");
 	leaveButton->getRenderer()->setFont("assets/fonts/Sanchez-Regular.ttf");
 	leaveButton->getRenderer()->setTextSize(20);
@@ -118,7 +132,7 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 		});
 
 	auto startButtonLocal = tgui::Button::create("Start Match");
-	startButtonLocal->setSize("22.5%", "12.5%");
+	startButtonLocal->setSize({ "22.5%", "12.5%" });
 	startButtonLocal->setPosition("74%", "82%");
 	startButtonLocal->getRenderer()->setFont("assets/fonts/Sanchez-Regular.ttf");
 	startButtonLocal->getRenderer()->setTextSize(20);

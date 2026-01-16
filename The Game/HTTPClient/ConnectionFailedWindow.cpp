@@ -1,4 +1,10 @@
-#include "ConnectionFailedWindow.h"
+module;
+#include "TGUI/TGUI.hpp"
+#include "TGUI/Backend/SFML-Graphics.hpp"
+
+module ConnectionFailedWindow;
+
+import IWindow;
 
 ConnectionFailedWindow::ConnectionFailedWindow(sf::RenderWindow& window) : m_connectionFailed{ window }
 {

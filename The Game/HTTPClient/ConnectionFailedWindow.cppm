@@ -1,10 +1,14 @@
-#pragma once
-#include "IWindow.h"
+module;
 #include "TGUI/TGUI.hpp"
 #include "TGUI/Core.hpp"
 #include "TGUI/Backend/SFML-Graphics.hpp"
+#include <TGUI/Widgets/Label.hpp>
 
-class ConnectionFailedWindow : public IWindow
+export module ConnectionFailedWindow;
+
+import IWindow;
+
+export class ConnectionFailedWindow : public IWindow
 {
 public:
 	ConnectionFailedWindow(sf::RenderWindow& window);

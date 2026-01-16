@@ -1,9 +1,26 @@
-#include "LoginWindow.h"
-#include "RegisterWindow.h"
-#include "MainMenuWindow.h"
-#include "ConnectionFailedWindow.h"
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
 
+#include <string>
+#include <vector>
 #include <thread>
+#include <memory>
+#include <stdexcept>
+#include <optional>
+
+#include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
+#include <TGUI/TGUI.hpp>
+#include <cpr/cpr.h>
+
+import ApiClient;
+import LoginWindow;
+import RegisterWindow;
+import MainMenuWindow;
+import ConnectionFailedWindow;
+import HostPanel; 
+import Utils;
 
 static inline constexpr uint16_t LOGIN_WIDTH{ 640u };
 static inline constexpr uint16_t LOGIN_HEIGHT{ 480u };
@@ -139,7 +156,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				HostPanel::UpdateStartButton();
 				HostPanel::UpdateBackground(deltaTime);
 			}
-
 			_menu.Update();
 			_menu.Draw();
 			menuWindow.display();

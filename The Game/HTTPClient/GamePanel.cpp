@@ -1,4 +1,33 @@
-﻿#include "GamePanel.h"
+﻿module;
+#define NOMINMAX
+
+#include <string>
+#include <vector>
+#include <memory>
+#include <thread>
+#include <functional>
+#include <array>
+#include <optional>
+#include <unordered_map>
+#include <span>
+#include <algorithm>
+#include <chrono>
+
+#include <SFML/System.hpp>
+#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
+
+#include <TGUI/TGUI.hpp>
+#include <TGUI/Backend/SFML-Graphics.hpp>
+
+module GamePanel;
+
+import ApiClient;
+import Utils;
+import CardWidget;
+import DeckWidget;
+import PileWidget;
 
 GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	std::function<void()> onExit, std::function<void()> onLocalPlayerLeft) :
@@ -39,7 +68,7 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	m_root->add(gamePanel);
 
 	auto gameBackground = tgui::Picture::create("assets/images/gameBackground.jpg");
-	gameBackground->setSize("100%", "100%");
+	gameBackground->setSize({ "100%", "100%" });
 	gameBackground->setPosition("0%", "0%");
 	gamePanel->add(gameBackground);
 	gameBackground->moveToBack();
@@ -85,7 +114,7 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	gamePanel->add(chatGroup);
 
 	m_chat = tgui::ChatBox::create();
-	m_chat->setSize("27.5%", "25%");
+	m_chat->setSize({ "27.5%", "25%" });
 	m_chat->setPosition("0%", "0%");
 	m_chat->getRenderer()->setTextSize(25);
 	m_chat->getRenderer()->setOpacity(0.7f);
@@ -122,7 +151,7 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	chatGroup->add(chatEditBox);
 
 	auto sendButton = tgui::Button::create("Send");
-	sendButton->setSize("5%", "5%");
+	sendButton->setSize({ "5%", "5%" });
 	sendButton->setPosition("22.5%", "25%");
 	sendButton->setTextSize(25);
 	sendButton->onPress([this, chatEditBox]()
@@ -143,7 +172,7 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	chatGroup->add(sendButton);
 
 	auto toggleChatButton = tgui::Button::create("^");
-	toggleChatButton->setSize("3%", "3%");
+	toggleChatButton->setSize({ "3%", "3%" });
 	toggleChatButton->setPosition("24.5%", "0%");
 	toggleChatButton->setTextSize(25);
 	toggleChatButton->onPress([toggleChatButton, chatGroup]()
@@ -188,7 +217,7 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	m_root->add(pilePanel);
 
 	m_endTurnButton = tgui::Button::create("End Turn");
-	m_endTurnButton->setSize("14%", "9%");
+	m_endTurnButton->setSize({ "14%", "9%" });
 	m_endTurnButton->setPosition("85%", "90%");
 	m_endTurnButton->getRenderer()->setBorders(2);
 	m_endTurnButton->getRenderer()->setBorderColor(tgui::Color(100, 20, 30));
@@ -218,7 +247,7 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 	m_root->add(m_endTurnButton);
 
 	m_leaveMatchButton = tgui::Button::create("Leave Match");
-	m_leaveMatchButton->setSize("14%", "9%");
+	m_leaveMatchButton->setSize({ "14%", "9%" });
 	m_leaveMatchButton->setPosition("1%", "90%");
 	m_leaveMatchButton->getRenderer()->setBorders(2);
 	m_leaveMatchButton->onSizeChange([this](tgui::Vector2f size)
@@ -249,7 +278,7 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 
 	m_timerLabel = tgui::Label::create();
 	m_timerLabel->setPosition("85%", "5%");
-	m_timerLabel->setSize("12%", "6%");
+	m_timerLabel->setSize({ "12%", "6%" });
 	m_timerLabel->setText("01:00");
 	m_timerLabel->setTextSize(24);
 	m_timerLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
@@ -491,7 +520,7 @@ void GamePanel::SetupPlayerSlots()
 		slotWidget.nameLabel = tgui::Label::create(Utils::TruncateText(
 			tgui::String(playerUsernames[index]), kmaxChars));
 		slotWidget.nameLabel->setAutoSize(false);
-		slotWidget.nameLabel->setSize("90%", "40%");
+		slotWidget.nameLabel->setSize({ "90%", "40%" });
 		slotWidget.nameLabel->setPosition("50%", "50%");
 		slotWidget.nameLabel->setOrigin(0.5f, 0.5f);
 		slotWidget.nameLabel->getRenderer()->setTextSize(20);
@@ -825,7 +854,7 @@ void GamePanel::ShowGameResultOverlay(GameResult result)
 	gameResultLabel->setOrigin(0.5f, 0.5f);
 
 	auto backToMenuButton = tgui::Button::create("Back to Menu");
-	backToMenuButton->setSize("40%", "20%");
+	backToMenuButton->setSize({ "40%", "20%" });
 	backToMenuButton->setPosition("50%", "70%");
 	backToMenuButton->setOrigin(0.5f, 0.5f);
 	backToMenuButton->getRenderer()->setTextSize(20);

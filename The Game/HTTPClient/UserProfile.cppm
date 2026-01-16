@@ -1,7 +1,9 @@
-#pragma once
-#include <string>
+module; 
+#include <string> 
 
-struct UserProfile
+export module UserProfile;
+
+export struct UserProfile
 {
 	std::string username;
 	unsigned gamesPlayed;

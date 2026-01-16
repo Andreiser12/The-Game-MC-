@@ -1,7 +1,7 @@
 module;
 
 #include "crow.h"
-#include <cstdint>
+import <cstdint>;
 
 export module LobbyRoutes;
 
@@ -19,7 +19,6 @@ public:
 
 private:
 	crow::response CreateLobby(const crow::request& request);
-	crow::response JoinLobby(const crow::request& request);
 	crow::response LeaveLobby(const crow::request& request);
 	crow::response LeaveMatch(const std::string& lobbyId, unsigned playerId);
 	crow::response GetLobbyState(const std::string& lobbyId);

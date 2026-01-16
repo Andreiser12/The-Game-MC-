@@ -1,9 +1,22 @@
-#pragma once
-#include "DeckWidget.h"
+module;
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
 #include <optional>
 #include <functional>
+#include <memory>
+#include <string>
+#include <cstdint>
 
-class CardWidget
+#include <TGUI/TGUI.hpp>
+#include <SFML/Graphics.hpp>
+
+export module CardWidget;
+
+import DeckWidget;
+
+export class CardWidget
 {
 public:
 	enum class FaceState

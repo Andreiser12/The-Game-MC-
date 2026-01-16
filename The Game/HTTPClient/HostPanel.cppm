@@ -1,12 +1,18 @@
-#pragma once
+module;
 #include "SFML/Graphics.hpp"
 #include "TGUI/TGUI.hpp"
 #include "TGUI/Core.hpp"
 #include "TGUI/Widgets/Button.hpp"
 #include "TGUI/Backend/SFML-Graphics.hpp"
 #include <SFML/Audio.hpp>
-#include "ApiClient.h"
-class HostPanel
+
+export module HostPanel;
+
+import <functional>;
+import <string>;
+import ApiClient;
+
+export class HostPanel
 {
 public:
     static tgui::Panel::Ptr Create(tgui::Gui& gui,

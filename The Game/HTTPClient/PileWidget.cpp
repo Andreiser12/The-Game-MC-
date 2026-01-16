@@ -1,5 +1,10 @@
-﻿#include "PileWidget.h"
+﻿module;
+#include <memory>
+#include <random>
+#include <algorithm>
+#include <TGUI/TGUI.hpp>
 
+module PileWidget;
 
 PileWidget::PileWidget()
 {
@@ -33,7 +38,7 @@ void PileWidget::UpdatePile(int cardCount)
 
 	m_pilePanel->setVisible(true);
 
-	int visualLayers = 0;
+	int visualLayers{ 0 };
 	if (cardCount == 1) visualLayers = 1;
 	else if (cardCount <= 10) visualLayers = 2;
 	else if (cardCount <= 30) visualLayers = 3;
@@ -47,11 +52,11 @@ void PileWidget::UpdatePile(int cardCount)
 	{
 		auto cardPic = tgui::Picture::create("assets/images/cardBackside.png");
 
-		cardPic->setSize("90%", "90%");
+		cardPic->setSize({ "90%", "90%" });
 		cardPic->setIgnoreMouseEvents(true);
 		cardPic->setOrigin(0.5f, 0.5f);
 
-		float shift = i * offsetPercent;
+		float shift{ i * offsetPercent };
 		cardPic->setPosition({
 			tgui::String(50.0f + shift) + "%",
 			tgui::String(50.0f + shift) + "%"

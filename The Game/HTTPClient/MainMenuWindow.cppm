@@ -1,11 +1,26 @@
-#pragma once
-#include "PlayPanel.h"
-#include "IWindow.h"
-#include "GamePanel.h"
+module; 
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
 
-#include <iostream>
+#include <vector>
+#include <string>
+#include <memory>
 
-class MainMenuWindow : IWindow
+#include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
+#include <TGUI/TGUI.hpp>
+#include <TGUI/Backend/SFML-Graphics.hpp>
+
+export module MainMenuWindow;
+
+import IWindow;
+import ApiClient;
+import PlayPanel;
+import GamePanel;
+import Utils;
+
+export class MainMenuWindow : public IWindow
 {
 public:
 	MainMenuWindow(sf::RenderWindow& window, ApiClient& api);

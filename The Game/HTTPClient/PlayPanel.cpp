@@ -1,4 +1,19 @@
-#include "PlayPanel.h"
+module;
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+#include <string>
+#include <functional>
+#include <SFML/Audio.hpp>
+#include <TGUI/TGUI.hpp>
+
+module PlayPanel;
+
+import JoinPanel;
+import HostPanel;
+import ApiClient;
+import Utils; 
 
 tgui::Panel::Ptr PlayPanel::Create(tgui::Gui& gui,
 	ApiClient& apiClient,

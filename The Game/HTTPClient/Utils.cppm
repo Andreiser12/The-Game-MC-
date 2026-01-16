@@ -1,15 +1,20 @@
-#pragma once
+module;
+#define NOMINMAX
+#include <string>
+#include <vector>
+#include <functional>
 #include "SFML/Graphics.hpp"
 #include "TGUI/TGUI.hpp"
 #include "TGUI/Core.hpp"
 #include "TGUI/Widgets/Button.hpp"
 #include "TGUI/Backend/SFML-Graphics.hpp"
 #include <SFML/Audio.hpp>
-#include <functional>
-#include <vector>
-#include "UserProfile.h"
 
-class Utils
+export module Utils;
+
+import UserProfile;
+
+export class Utils
 {
 public:
 	static tgui::String TruncateText(const tgui::String& text, uint8_t maxChars);

@@ -1,4 +1,18 @@
-#include "JoinPanel.h"
+module;
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <functional>
+#include <string>
+#include <atomic>
+#include <TGUI/TGUI.hpp>
+#include <SFML/Audio.hpp>
+
+module JoinPanel;
+
+import ApiClient;
+import HostPanel;
+import Utils;
 
 std::atomic<bool> JoinPanel::s_running{ false };
 
@@ -74,7 +88,7 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 			case JoinLobbyResult::LobbyFull:
 				errorMessage = "Lobby is full. Try another lobby.";
 				break;
-				
+
 			case JoinLobbyResult::GameAlreadyStarted:
 				errorMessage = "Game has already started. You can't join now.";
 				break;

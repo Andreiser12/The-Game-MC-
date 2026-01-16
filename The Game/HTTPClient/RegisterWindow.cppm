@@ -1,9 +1,22 @@
-#pragma once
-#include "IWindow.h"
-#include "ApiClient.h"
-#include "Utils.h"
+module;
+#define NOMINMAX
 
-class RegisterWindow : public IWindow
+#include <string>
+#include <vector>
+#include <memory>
+
+#include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
+#include <TGUI/TGUI.hpp>
+#include <TGUI/Backend/SFML-Graphics.hpp>
+
+export module RegisterWindow;
+
+import IWindow;
+import ApiClient;
+import Utils;
+
+export class RegisterWindow : public IWindow
 {
 public:
 	RegisterWindow(sf::RenderWindow& window, ApiClient& api);

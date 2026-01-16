@@ -112,6 +112,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ScanSourceForModuleDependencies>true</ScanSourceForModuleDependencies>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -131,6 +132,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ScanSourceForModuleDependencies>true</ScanSourceForModuleDependencies>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -140,22 +142,52 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="ApiClient.h" />
-    <ClInclude Include="CardWidget.h" />
-    <ClInclude Include="ConnectionFailedWindow.h" />
-    <ClInclude Include="DeckWidget.h" />
-    <ClInclude Include="GamePanel.h" />
-    <ClInclude Include="HostPanel.h" />
-    <ClInclude Include="IWindow.h" />
-    <ClInclude Include="JoinPanel.h" />
-    <ClInclude Include="LoginWindow.h" />
-    <ClInclude Include="MainMenuWindow.h" />
-    <ClInclude Include="PileWidget.h" />
-    <ClInclude Include="PlayPanel.h" />
-    <ClInclude Include="RegisterWindow.h" />
+    <ClCompile Include="ApiClient.cppm">
+      <FileType>Document</FileType>
+    </ClCompile>
+    <ClCompile Include="CardWidget.cppm">
+      <FileType>CppHeader</FileType>
+    </ClCompile>
+    <ClCompile Include="ConnectionFailedWindow.cppm">
+      <FileType>Document</FileType>
+    </ClCompile>
+    <ClCompile Include="DeckWidget.cppm">
+      <FileType>CppHeader</FileType>
+    </ClCompile>
+    <ClCompile Include="GamePanel.cppm">
+      <FileType>Document</FileType>
+    </ClCompile>
+    <ClCompile Include="HostPanel.cppm">
+      <FileType>CppHeader</FileType>
+    </ClCompile>
+    <ClCompile Include="IWindow.cppm">
+      <FileType>Document</FileType>
+    </ClCompile>
+    <ClCompile Include="JoinPanel.cppm">
+      <FileType>CppHeader</FileType>
+    </ClCompile>
+    <ClCompile Include="LoginWindow.cppm">
+      <FileType>Document</FileType>
+    </ClCompile>
+    <ClCompile Include="MainMenuWindow.cppm">
+      <FileType>Document</FileType>
+    </ClCompile>
+    <ClCompile Include="PileWidget.cppm">
+      <FileType>CppHeader</FileType>
+    </ClCompile>
+    <ClCompile Include="PlayPanel.cppm">
+      <FileType>Document</FileType>
+    </ClCompile>
+    <ClCompile Include="RegisterWindow.cppm">
+      <FileType>Document</FileType>
+    </ClCompile>
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="UserProfile.h" />
-    <ClInclude Include="Utils.h" />
+    <ClCompile Include="UserProfile.cppm">
+      <FileType>Document</FileType>
+    </ClCompile>
+    <ClCompile Include="Utils.cppm">
+      <FileType>Document</FileType>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ApiClient.cpp" />
@@ -166,7 +198,6 @@
     <ClCompile Include="HostPanel.cpp" />
     <ClCompile Include="PileWidget.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="IWindow.cpp" />
     <ClCompile Include="JoinPanel.cpp" />
     <ClCompile Include="LoginWindow.cpp" />
     <ClCompile Include="MainMenuWindow.cpp" />

@@ -1,4 +1,4 @@
-module;
+﻿module;
 #define NOMINMAX
 #include <string>
 #include <vector>
@@ -63,6 +63,8 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 	auto buttonsVolPtr = std::make_shared<float>(buttonsVolume);
 	auto bgVolPtr = std::make_shared<float>(backgroundVolume);
 
+	auto gameplayIndexPtr = std::make_shared<unsigned>(1);
+
 	auto panel = tgui::Panel::create({ "60%", "60%" });
 	panel->setPosition("50%", "50%");
 	panel->getRenderer()->setBackgroundColor(tgui::Color(0, 0, 0, 180));
@@ -70,7 +72,7 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 	panel->getRenderer()->setBorderColor(tgui::Color::Black);
 	panel->setOrigin(0.5f, 0.5f);
 
-	auto background = tgui::Picture::create("assets/images/mainMenuBackground.png");
+	auto background = tgui::Picture::create("assets/images/utilsBackground.png");
 	background->setSize({ "100%", "100%" });
 
 	auto sidebar = tgui::Panel::create({ "20%", "100%" });
@@ -97,11 +99,16 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 	content->add(gameplayPanel);
 
 	videoPanel->setPosition("0%", "0%");
-	audioPanel->getRenderer()->setBackgroundColor(tgui::Color(0, 0, 0, 0));
+	videoPanel->getRenderer()->setBackgroundColor(tgui::Color(0, 0, 0, 0));
+	auto vidioBackground = tgui::Picture::create("assets/images/utilsBackground.png");
+	vidioBackground->setSize({ "100%", "100%" });
+	videoPanel->add(vidioBackground);
 
 	audioPanel->setPosition("0%", "0%");
-	audioPanel->getRenderer()->setBackgroundColor(tgui::Color(128, 128, 128));
-	audioPanel->add(background);
+	audioPanel->getRenderer()->setBackgroundColor(tgui::Color(0, 0, 0, 0));
+	auto audioBackground = tgui::Picture::create("assets/images/utilsBackground.png");
+	audioBackground->setSize({ "100%", "100%" });
+	audioPanel->add(audioBackground);
 
 	gameplayPanel->setPosition("0%", "0%");
 	gameplayPanel->getRenderer()->setBackgroundColor(tgui::Color(128, 128, 128));
@@ -127,27 +134,6 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 	gameplayButton->getRenderer()->setTexture("assets/images/buttons.png");
 	StyleButton(gameplayButton);
 	sidebar->add(gameplayButton);
-
-	videoButton->onClick([=, &btnSound] {
-		btnSound.play();
-		videoPanel->setVisible(true);
-		audioPanel->setVisible(false);
-		gameplayPanel->setVisible(false);
-		});
-
-	audioButton->onClick([=, &btnSound] {
-		btnSound.play();
-		videoPanel->setVisible(false);
-		audioPanel->setVisible(true);
-		gameplayPanel->setVisible(false);
-		});
-
-	gameplayButton->onClick([=, &btnSound] {
-		btnSound.play();
-		videoPanel->setVisible(false);
-		audioPanel->setVisible(false);
-		gameplayPanel->setVisible(true);
-		});
 
 	auto resolutionContainer = tgui::Panel::create();
 	resolutionContainer->setSize({ "40%", "12.5%" });
@@ -270,6 +256,30 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 			}
 		});
 	content->add(applyButton);
+
+	videoButton->onClick([=, &btnSound] {
+		btnSound.play();
+		videoPanel->setVisible(true);
+		audioPanel->setVisible(false);
+		gameplayPanel->setVisible(false);
+		applyButton->setVisible(true);
+		});
+
+	audioButton->onClick([=, &btnSound] {
+		btnSound.play();
+		videoPanel->setVisible(false);
+		audioPanel->setVisible(true);
+		gameplayPanel->setVisible(false);
+		applyButton->setVisible(true);
+		});
+
+	gameplayButton->onClick([=, &btnSound] {
+		btnSound.play();
+		videoPanel->setVisible(false);
+		audioPanel->setVisible(false);
+		gameplayPanel->setVisible(true);
+		applyButton->setVisible(false);
+		});
 
 	auto closeButton = tgui::Button::create("Close");
 	closeButton->setSize({ "15%", "10%" });
@@ -400,6 +410,58 @@ tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 		*bgVolPtr = value;
 		});
 	audioPanel->add(bgSlider);
+
+	auto gameplayPicture = tgui::Picture::create("assets/images/gameplayImage1.png");
+	gameplayPicture->setSize("70%", "70%");
+	gameplayPicture->setPosition("50%", "45%");
+	gameplayPicture->setOrigin(0.5f, 0.5f);
+	gameplayPanel->add(gameplayPicture);
+
+	auto leftArrow = tgui::Button::create("<");
+	leftArrow->setSize({ "10%", "10%" });
+	leftArrow->setPosition("5%", "45%");
+	leftArrow->setOrigin(0.f, 0.5f);
+	leftArrow->getRenderer()->setTexture("assets/images/buttons.png");
+	StyleButton(leftArrow);
+	leftArrow->setVisible(false);
+	gameplayPanel->add(leftArrow);
+
+	auto rightArrow = tgui::Button::create(">");
+	rightArrow->setSize({ "10%", "10%" });
+	rightArrow->setPosition("95%", "45%");
+	rightArrow->setOrigin(1.f, 0.5f);
+	rightArrow->getRenderer()->setTexture("assets/images/buttons.png");
+	StyleButton(rightArrow);
+	gameplayPanel->add(rightArrow);
+
+	auto updateGameplayState = [gameplayIndexPtr, gameplayPicture, leftArrow, rightArrow]() {
+		try {
+			std::string path = "assets/images/gameplayImage" + std::to_string(*gameplayIndexPtr) + ".png";
+			gameplayPicture->getRenderer()->setTexture(tgui::Texture(path));
+		}
+		catch (...) {
+		}
+
+		leftArrow->setVisible(*gameplayIndexPtr > 1);
+		rightArrow->setVisible(*gameplayIndexPtr < 6);
+		};
+
+	leftArrow->onClick([=, &btnSound]() {
+		btnSound.play();
+		if (*gameplayIndexPtr > 1) {
+			(*gameplayIndexPtr)--;
+			updateGameplayState();
+		}
+		});
+
+	rightArrow->onClick([=, &btnSound]() {
+		btnSound.play();
+		if (*gameplayIndexPtr < 6) {
+			(*gameplayIndexPtr)++;
+			updateGameplayState();
+		}
+		});
+
 
 	return panel;
 }

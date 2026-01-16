@@ -854,17 +854,23 @@ void GamePanel::ShowGameResultOverlay(GameResult result)
 	descriptionLabel->setOrigin(0.5f, 0.5f);
 	descriptionLabel->getRenderer()->setTextColor(tgui::Color(200, 200, 200));
 
+	m_feedbackSound.stop();
+
 	switch (result)
 	{
 	case GameResult::Won:
 		titleLabel->setText("VICTORY!");
 		titleLabel->getRenderer()->setTextColor(tgui::Color(255, 215, 0));
 		descriptionLabel->setText("Congratulations! You've placed all cards.");
+		m_feedbackSound.setBuffer(m_winBuffer);
+		m_feedbackSound.play();
 		break;
 	case GameResult::Lost:
 		titleLabel->setText("DEFEAT!");
 		titleLabel->getRenderer()->setTextColor(tgui::Color(220, 50, 50));
 		descriptionLabel->setText("No more possibles moves left.");
+		m_feedbackSound.setBuffer(m_loseBuffer);
+		m_feedbackSound.play();
 		break;
 	case GameResult::NotEnoughPlayers:
 		titleLabel->setText("MATCH ENDED");

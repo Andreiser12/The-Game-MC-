@@ -51,8 +51,8 @@ bool ApiClient::Logout()
 		playerIdCopy = m_playerId;
 	}
 
-	const std::string url = m_serverURL + "/logout";
-	std::string jsonBody = "{\"playerId\":" + std::to_string(playerIdCopy) + "}";
+	const std::string url{ m_serverURL + "/logout" };
+	std::string jsonBody{ "{\"playerId\":" + std::to_string(playerIdCopy) + "}" };
 
 	cpr::Response response = cpr::Post(
 		cpr::Url{ url },
@@ -61,6 +61,7 @@ bool ApiClient::Logout()
 	);
 
 	if (response.error || response.status_code != 200) return false;
+
 	{
 		std::lock_guard<std::mutex> lock(m_mutex);
 		m_playerId = 0;
@@ -391,24 +392,6 @@ bool ApiClient::SendPing(const std::string& lobbyId, unsigned playerId) const
 	return json && json["status"].s() == "OK";
 }
 
-void ApiClient::StartPingThread(const std::string& lobbyId, unsigned playerId)
-{
-	StopPingThread();
-	m_pingThread = std::jthread([this, lobbyId, playerId](std::stop_token st)
-		{
-			while (!st.stop_requested())
-			{
-				std::this_thread::sleep_for(std::chrono::seconds(5));
-				SendPing(lobbyId, playerId);
-			}
-		});
-}
-
-void ApiClient::StopPingThread()
-{
-	m_pingThread.request_stop();
-}
-
 ClientEvent ApiClient::GetEvent() const
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
@@ -418,35 +401,6 @@ ClientEvent ApiClient::GetEvent() const
 void ApiClient::ClearEvent()
 {
 	m_event.store(ClientEvent::None);
-}
-
-void ApiClient::StartLobbyWatcher()
-{
-	m_lobbyWatcher = std::jthread([this](std::stop_token st)
-		{
-			while (!st.stop_requested())
-			{
-				std::string lobbyId = GetLobbyId();
-
-				//if (lobbyId.empty()) return;
-				//auto lobby = GetLobbyState(lobbyId);
-				//if (!lobby || lobby->m_status == "LOBBY_DELETED")
-				//{
-				//	m_event.store(ClientEvent::LobbyClosed);
-				//	return;
-				//}
-				std::this_thread::sleep_for(std::chrono::seconds(1));
-			}
-		});
-}
-
-void ApiClient::StopLobbyWatcher()
-{
-	if (m_lobbyWatcher.joinable())
-	{
-		m_lobbyWatcher.request_stop();
-		m_lobbyWatcher.join();
-	}
 }
 
 void ApiClient::SetUsername(const std::string& username)
@@ -465,6 +419,11 @@ void ApiClient::SetLobbyId(const std::string& lobbyId)
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
 	m_lobbyId = lobbyId;
+}
+
+void ApiClient::SetGameActive(bool active)
+{
+	m_isGameActive.store(active);
 }
 
 bool ApiClient::ReportGameLoss()
@@ -604,6 +563,11 @@ std::optional<std::array<bool, 4>> ApiClient::GetValidDecks(uint8_t cardId) cons
 	return std::make_optional(validDecks);
 }
 
+bool ApiClient::IsGameActive() const
+{
+	return m_isGameActive.load();
+}
+
 std::optional<bool> ApiClient::GetCanPlayMore(uint8_t remainingCards) const
 {
 	const std::string url{ m_serverURL + "/lobby/" + m_lobbyId +
@@ -719,6 +683,7 @@ void ApiClient::StartNetworkLoop()
 		auto lastPing = std::chrono::steady_clock::now();
 		auto lastLobby = std::chrono::steady_clock::now();
 		auto lastPlayers = std::chrono::steady_clock::now();
+
 		auto lastChat = std::chrono::steady_clock::now();
 		auto lastDecks = std::chrono::steady_clock::now();
 		auto lastEndTurn = std::chrono::steady_clock::now();
@@ -744,12 +709,13 @@ void ApiClient::StartNetworkLoop()
 			}
 
 			auto now = std::chrono::steady_clock::now();
+
 			if (now - lastPing >= std::chrono::seconds(10))
 			{
 				SendPing(lobbyId, playerId);
 				lastPing = now;
 			}
-			if (now - lastPlayers >= std::chrono::milliseconds(500))
+			if (now - lastPlayers >= std::chrono::seconds(1))
 			{
 				auto players = GetLobbyPlayers(lobbyId);
 				{
@@ -757,136 +723,6 @@ void ApiClient::StartNetworkLoop()
 					m_cachedPlayers = std::move(players);
 				}
 				lastPlayers = now;
-			}
-			if (now - lastChat >= std::chrono::milliseconds(200))
-			{
-				unsigned after{ m_afterChatId.load() };
-				auto messages = GetNewMessages(after);
-				std::lock_guard<std::mutex> lk(m_cacheMutex);
-				if (messages && !messages->empty())
-				{
-					unsigned maxId{ after };
-					for (auto& message : messages.value())
-					{
-						maxId = (std::max)(maxId, message.id);
-					}
-					m_afterChatId.store(maxId);
-					m_cachedChat = std::move(messages);
-				}
-				else
-				{
-					m_cachedChat.reset();
-				}
-				lastChat = now;
-			}
-			if (now - lastDecks >= std::chrono::milliseconds(500))
-			{
-				auto decks = GetDeckState();
-				bool decksChanged{ false };
-				{
-					std::lock_guard<std::mutex> lk(m_cacheMutex);
-					if (!m_cachedDecks.has_value() && decks.has_value())
-					{
-						decksChanged = true;
-					}
-					else if (m_cachedDecks.has_value() && decks.has_value())
-					{
-						if (m_cachedDecks->size() != decks->size())
-						{
-							decksChanged = true;
-						}
-						else
-						{
-							for (size_t i = 0; i < decks->size(); ++i)
-							{
-								if (m_cachedDecks.value()[i].topCardId != decks.value()[i].topCardId)
-								{
-									decksChanged = true;
-									break;
-								}
-							}
-						}
-					}
-					m_cachedDecks = decks;
-					if (decksChanged)
-					{
-						auto playerCards = GetPlayerCards();
-						if (playerCards)
-						{
-							m_cachedValidDecks.clear();
-							for (uint8_t card : playerCards.value())
-							{
-								auto validDecks = GetValidDecks(card);
-								m_cachedValidDecks[card] = validDecks;
-							}
-						}
-					}
-				}
-				lastDecks = now;
-			}
-			if (now - lastEndTurn >= std::chrono::milliseconds(500))
-			{
-				auto endTurn = GetEndTurnState();
-				{
-					std::lock_guard<std::mutex> lk(m_cacheMutex);
-					m_cachedEndTurnState = endTurn;
-				}
-				lastEndTurn = now;
-			}
-			if (now - lastGameTabelState >= std::chrono::milliseconds(500))
-			{
-				auto gameTableState = GetTableState(lobbyId);
-				{
-					std::lock_guard<std::mutex> lk(m_cacheMutex);
-					m_cachedGameTableState = gameTableState;
-				}
-				lastGameTabelState = now;
-			}
-			if (now - lastTurnState >= std::chrono::milliseconds(500))
-			{
-				auto turnState = GetTurnState();
-				{
-					std::lock_guard<std::mutex> lk(m_cacheMutex);
-					m_cachedTurnState = turnState;
-				}
-				lastTurnState = now;
-			}
-			if (now - lastGameResult >= std::chrono::seconds(1))
-			{
-				auto result = GetGameResult(lobbyId);
-				{
-					std::lock_guard<std::mutex> lk(m_cacheMutex);
-					m_cachedGameResult = result;
-				}
-				lastGameResult = now;
-			}
-			if (now - lastPlayerStates >= std::chrono::milliseconds(500))
-			{
-				auto playerStates = GetPlayerStates();
-				{
-					std::lock_guard<std::mutex> lk(m_cacheMutex);
-					m_cachedPlayerStates = playerStates;
-				}
-				lastPlayerStates = now;
-			}
-			if (now - lastCanStillPlay >= std::chrono::milliseconds(500))
-			{
-				if (m_cachedEndTurnState &&
-					m_cachedEndTurnState.value().playerId != m_playerId &&
-					m_cachedEndTurnState.value().minRequiredCards == 2 &&
-					m_cachedEndTurnState.value().cardsPlaced <
-					m_cachedEndTurnState.value().minRequiredCards)
-				{
-					const uint8_t remainingCards =
-						m_cachedEndTurnState.value().minRequiredCards -
-						m_cachedEndTurnState.value().cardsPlaced;
-					if (remainingCards > 0)
-					{
-						auto canPlayMore = GetCanPlayMore(remainingCards);
-						m_canPlayMore = canPlayMore;
-					}
-				}
-				lastCanStillPlay = now;
 			}
 			if (now - lastLobby >= std::chrono::seconds(1))
 			{
@@ -896,6 +732,140 @@ void ApiClient::StartNetworkLoop()
 					m_event.store(ClientEvent::MatchStarted);
 				}
 				lastLobby = now;
+			}
+
+			if (m_isGameActive.load())
+			{
+				if (now - lastChat >= std::chrono::milliseconds(200))
+				{
+					unsigned after{ m_afterChatId.load() };
+					auto messages = GetNewMessages(after);
+					std::lock_guard<std::mutex> lk(m_cacheMutex);
+					if (messages && !messages->empty())
+					{
+						unsigned maxId{ after };
+						for (auto& message : messages.value())
+						{
+							maxId = (std::max)(maxId, message.id);
+						}
+						m_afterChatId.store(maxId);
+						m_cachedChat = std::move(messages);
+					}
+					else
+					{
+						m_cachedChat.reset();
+					}
+					lastChat = now;
+				}
+				if (now - lastDecks >= std::chrono::milliseconds(500))
+				{
+					auto decks = GetDeckState();
+					bool decksChanged{ false };
+					{
+						std::lock_guard<std::mutex> lk(m_cacheMutex);
+						if (!m_cachedDecks.has_value() && decks.has_value())
+						{
+							decksChanged = true;
+						}
+						else if (m_cachedDecks.has_value() && decks.has_value())
+						{
+							if (m_cachedDecks->size() != decks->size())
+							{
+								decksChanged = true;
+							}
+							else
+							{
+								for (size_t i = 0; i < decks->size(); ++i)
+								{
+									if (m_cachedDecks.value()[i].topCardId != decks.value()[i].topCardId)
+									{
+										decksChanged = true;
+										break;
+									}
+								}
+							}
+						}
+						m_cachedDecks = decks;
+						if (decksChanged)
+						{
+							auto playerCards = GetPlayerCards();
+							if (playerCards)
+							{
+								m_cachedValidDecks.clear();
+								for (uint8_t card : playerCards.value())
+								{
+									auto validDecks = GetValidDecks(card);
+									m_cachedValidDecks[card] = validDecks;
+								}
+							}
+						}
+					}
+					lastDecks = now;
+				}
+				if (now - lastEndTurn >= std::chrono::milliseconds(500))
+				{
+					auto endTurn = GetEndTurnState();
+					{
+						std::lock_guard<std::mutex> lk(m_cacheMutex);
+						m_cachedEndTurnState = endTurn;
+					}
+					lastEndTurn = now;
+				}
+				if (now - lastGameTabelState >= std::chrono::milliseconds(500))
+				{
+					auto gameTableState = GetTableState(lobbyId);
+					{
+						std::lock_guard<std::mutex> lk(m_cacheMutex);
+						m_cachedGameTableState = gameTableState;
+					}
+					lastGameTabelState = now;
+				}
+				if (now - lastTurnState >= std::chrono::milliseconds(500))
+				{
+					auto turnState = GetTurnState();
+					{
+						std::lock_guard<std::mutex> lk(m_cacheMutex);
+						m_cachedTurnState = turnState;
+					}
+					lastTurnState = now;
+				}
+				if (now - lastGameResult >= std::chrono::seconds(1))
+				{
+					auto result = GetGameResult(lobbyId);
+					{
+						std::lock_guard<std::mutex> lk(m_cacheMutex);
+						m_cachedGameResult = result;
+					}
+					lastGameResult = now;
+				}
+				if (now - lastPlayerStates >= std::chrono::milliseconds(500))
+				{
+					auto playerStates = GetPlayerStates();
+					{
+						std::lock_guard<std::mutex> lk(m_cacheMutex);
+						m_cachedPlayerStates = playerStates;
+					}
+					lastPlayerStates = now;
+				}
+				if (now - lastCanStillPlay >= std::chrono::milliseconds(500))
+				{
+					if (m_cachedEndTurnState &&
+						m_cachedEndTurnState.value().playerId != m_playerId &&
+						m_cachedEndTurnState.value().minRequiredCards == 2 &&
+						m_cachedEndTurnState.value().cardsPlaced <
+						m_cachedEndTurnState.value().minRequiredCards)
+					{
+						const uint8_t remainingCards =
+							m_cachedEndTurnState.value().minRequiredCards -
+							m_cachedEndTurnState.value().cardsPlaced;
+						if (remainingCards > 0)
+						{
+							auto canPlayMore = GetCanPlayMore(remainingCards);
+							m_canPlayMore = canPlayMore;
+						}
+					}
+					lastCanStillPlay = now;
+				}
 			}
 			std::this_thread::sleep_for(std::chrono::milliseconds(50));
 		}

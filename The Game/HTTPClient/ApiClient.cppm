@@ -126,39 +126,48 @@ public:
 	LoginResult Login(const std::string& username);
 	bool Logout();
 	bool IsLoggedIn();
+
 	std::optional<std::string> CreateLobby(const std::string& username);
 	JoinLobbyResult JoinLobbyValidated(const std::string& lobbyId, const std::string& username);
 	bool LeaveLobby(const std::string& lobbyId, unsigned playerId);
-	std::optional<LeaveMatchResult> LeaveMatch();
-	std::optional<std::vector<PlayerState>> GetPlayerStates();
+	std::optional<crow::json::rvalue> GetLobbyInfo(const std::string& lobbyId) const;
+	std::vector<std::string> GetLobbyPlayers(const std::string& lobbyId) const;
 
 	bool StartMatch(const std::string& lobbyId, unsigned playerId);
+	std::optional<LeaveMatchResult> LeaveMatch();
+	std::optional<std::vector<PlayerState>> GetPlayerStates();
+	bool ReportGameLoss();
+
 	bool SendChatMessage(const std::string& message);
 	std::optional<std::vector<ChatMessage>> GetNewMessages(unsigned afterId);
+
 	bool PlayCard(uint8_t cardId, uint8_t deckId) const;
+	std::optional<std::vector<uint8_t>> EndTurn();
+	std::optional<std::vector<DeckState>> GetDeckState() const;
+	std::optional<EndTurnState> GetEndTurnState() const;
+	std::optional<std::vector<uint8_t>> GetPlayerCards() const;
+	std::optional<std::array<bool, 4>> GetValidDecks(uint8_t cardId) const;
+	std::optional<bool> GetCanPlayMore(uint8_t remainingCards) const;
+	std::optional<GameResult> GetGameResult(const std::string& lobbyId) const;
+	std::optional<TurnState> GetTurnState() const;
 
 	bool SendPing(const std::string& lobbyId, unsigned playerId) const;
-	void StartPingThread(const std::string& lobbyId, unsigned playerId);
-	void StopPingThread();
+	void StartNetworkLoop();
+	void StopNetworkLoop();
 
 	ClientEvent GetEvent() const;
 	void ClearEvent();
-
-	void StartLobbyWatcher();
-	void StopLobbyWatcher();
 
 	std::string GetUsername() const;
 	unsigned GetPlayerId() const;
 	std::string GetLobbyId() const;
 	std::optional<UserProfile> GetUserProfile(unsigned playerId) const;
-	std::optional<std::vector<uint8_t>> EndTurn();
-	std::optional<TurnState> GetTurnState() const;
-	std::optional<GameResult> ParseGameResult(const std::string& result) const;
-	std::optional<GameResult> GetGameResult(const std::string& lobbyId) const;
-	std::optional<crow::json::rvalue> GetLobbyInfo(const std::string& lobbyId) const;
+	bool IsGameActive() const;
 
-	void StartNetworkLoop();
-	void StopNetworkLoop();
+	void SetUsername(const std::string& username);
+	void SetPlayerId(unsigned playerId);
+	void SetLobbyId(const std::string& lobbyId);
+	void SetGameActive(bool active);
 
 	std::vector<std::string> SnapshotPlayers() const;
 	std::optional<LobbyState> SnapshotLobbyState() const;
@@ -173,18 +182,7 @@ public:
 	std::optional<std::vector<PlayerState>> SnapshotPlayerStates() const;
 	std::optional<bool> SnapshotCanPlayMore() const;
 
-	std::optional<std::vector<DeckState>> GetDeckState() const;
-	std::optional<EndTurnState> GetEndTurnState() const;
-	std::vector<std::string> GetLobbyPlayers(const std::string& lobbyId) const;
-	std::optional<std::vector<uint8_t>> GetPlayerCards() const;
-	std::optional<std::array<bool, 4>> GetValidDecks(uint8_t cardId) const;
-	std::optional<bool> GetCanPlayMore(uint8_t remainingCards) const;
-
-	void SetUsername(const std::string& username);
-	void SetPlayerId(unsigned playerId);
-	void SetLobbyId(const std::string& lobbyId);
-
-	bool ReportGameLoss();
+	std::optional<GameResult> ParseGameResult(const std::string& result) const;
 
 private:
 	ApiClient() = delete;
@@ -193,18 +191,18 @@ private:
 	std::string m_serverURL;
 
 	mutable std::mutex m_mutex;
+	mutable std::mutex m_cacheMutex;
+
 	std::string m_username;
 	std::string m_lobbyId;
 	unsigned m_playerId{ 0u };
+
 	std::atomic<ClientEvent> m_event{ ClientEvent::None };
-	std::atomic<bool> m_pingRunning{ false };
+	std::atomic<bool> m_isGameActive{ false };
 	std::atomic<unsigned> m_afterChatId{ 0u };
 
 	std::jthread m_netThread;
-	std::jthread m_pingThread;
-	std::jthread m_lobbyWatcher;
 
-	mutable std::mutex m_cacheMutex;
 	std::vector<std::string> m_cachedPlayers;
 	std::optional<LobbyState> m_cachedLobby;
 	std::optional<std::vector<ChatMessage>> m_cachedChat;

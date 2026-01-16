@@ -124,15 +124,18 @@ void MainMenuWindow::LoadWidgets()
 void MainMenuWindow::GoBackToMenu()
 {
 	m_apiClient.StopNetworkLoop();
+	m_apiClient.SetGameActive(false);
 
 	if (!m_apiClient.GetLobbyId().empty() && m_apiClient.GetPlayerId() != 0u)
 		m_apiClient.LeaveLobby(m_apiClient.GetLobbyId(), m_apiClient.GetPlayerId());
 
 	CloseHostPanel();
 
+	if (m_mainMenu.get("GameRoot")) m_mainMenu.remove(m_mainMenu.get("GameRoot"));
 	if (m_gamePanel) m_gamePanel.reset();
 	m_gameStartedLocally = false;
 	m_apiClient.ClearEvent();
+	m_apiClient.SetLobbyId("");
 
 	if (m_bgMusic.getStatus() != sf::SoundSource::Status::Playing) m_bgMusic.play();
 }
@@ -147,7 +150,6 @@ void MainMenuWindow::HandleLocalPlayerLeft()
 	m_apiClient.ClearEvent();
 	m_gamePanel.reset();
 	m_gameStartedLocally = false;
-	m_apiClient.LeaveMatch();
 	CloseHostPanel();
 	m_apiClient.SetLobbyId("");
 
@@ -166,6 +168,7 @@ void MainMenuWindow::TransitionToGame()
 		m_mainMenu.remove(hostPanel);
 	}
 
+	m_apiClient.SetGameActive(true);
 	m_gamePanel = std::make_shared<GamePanel>(m_mainMenu, m_apiClient,
 		[this]() { GoBackToMenu(); },
 		[this]() {
@@ -175,10 +178,7 @@ void MainMenuWindow::TransitionToGame()
 
 	m_gamePanel->OnGameStarted();
 	m_gameStartedLocally = true;
-
-	m_apiClient.StopLobbyWatcher();
 }
-
 
 void MainMenuWindow::Draw()
 {
@@ -219,13 +219,6 @@ void MainMenuWindow::Update()
 
 	default:
 		break;
-	}
-
-	if (m_apiClient.GetLobbyId().empty()) return;
-	auto info = m_apiClient.GetLobbyInfo(m_apiClient.GetLobbyId());
-	if (info && info->has("is_game_started") && (*info)["is_game_started"].b())
-	{
-		TransitionToGame();
 	}
 }
 
@@ -343,18 +336,11 @@ void MainMenuWindow::PlayPanelPressed()
 void MainMenuWindow::CloseHostPanel()
 {
 	auto hostPanel = m_mainMenu.get<tgui::Panel>("HostPanel");
-	if (hostPanel)
-	{
-		m_mainMenu.remove(hostPanel);
-		m_apiClient.StopPingThread();
-		m_apiClient.StopLobbyWatcher();
-	}
+	if (hostPanel) m_mainMenu.remove(hostPanel);
 }
 
 void MainMenuWindow::ShutdownLobby()
 {
-	m_apiClient.StopLobbyWatcher();
-	m_apiClient.StopPingThread();
 	CloseHostPanel();
 	m_apiClient.SetLobbyId("");
 	m_apiClient.ClearEvent();

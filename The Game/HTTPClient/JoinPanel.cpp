@@ -14,8 +14,6 @@ import ApiClient;
 import HostPanel;
 import Utils;
 
-std::atomic<bool> JoinPanel::s_running{ false };
-
 tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 	ApiClient& apiClient,
 	sf::Sound& btnSound,
@@ -39,6 +37,8 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 	lobbyEditBox->setDefaultText("Enter lobby ID");
 	lobbyEditBox->setOrigin(0.5f, 0.5f);
 	lobbyEditBox->getRenderer()->setTextSize(26);
+	lobbyEditBox->setMaximumCharacters(6);
+
 	lobbyEditBox->onFocus([lobbyEditBox]() {
 		lobbyEditBox->setDefaultText("");
 		});
@@ -57,15 +57,15 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 		{
 			btnSound.play();
 			const std::string lobbyId{ lobbyEditBox->getText().toStdString() };
-			std::string errorMessage;
 
-			if (lobbyId.empty()) errorMessage = "Lobby ID can't be empty";
-			else if (lobbyId.size() != 6) errorMessage = "Lobby must be 6 characters long";
-
-			if (!errorMessage.empty())
+			if (lobbyId.empty())
 			{
-				auto errorPopupPanel = Utils::CreateErrorPopupPanel(gui, errorMessage, btnSound);
-				gui.add(errorPopupPanel);
+				gui.add(Utils::CreateErrorPopupPanel(gui, "Lobby ID can't be empty.", btnSound));
+				return;
+			}
+			if (lobbyId.size() != 6)
+			{
+				gui.add(Utils::CreateErrorPopupPanel(gui, "Lobby ID must be 6 characters long.", btnSound));
 				return;
 			}
 
@@ -77,31 +77,27 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 			case JoinLobbyResult::Success:
 				if (onJoinLobby) onJoinLobby(apiClient, lobbyId);
 				panel->setVisible(false);
-				apiClient.StartPingThread(lobbyId, apiClient.GetPlayerId());
-				s_running.store(true);
 				break;
 
 			case JoinLobbyResult::LobbyNotFound:
-				errorMessage = "Lobby not found. Check the ID and try again.";
+				gui.add(Utils::CreateErrorPopupPanel(gui,
+					"Lobby not found. Check the ID and try again.", btnSound));
 				break;
 
 			case JoinLobbyResult::LobbyFull:
-				errorMessage = "Lobby is full. Try another lobby.";
+				gui.add(Utils::CreateErrorPopupPanel(gui,
+					"Lobby is full. Try another lobby", btnSound));
 				break;
 
 			case JoinLobbyResult::GameAlreadyStarted:
-				errorMessage = "Game has already started. You can't join now.";
+				gui.add(Utils::CreateErrorPopupPanel(gui,
+					"Game has already started. You can't join now.", btnSound));
 				break;
 
 			case JoinLobbyResult::NetworkError:
-				errorMessage = "Network error. Please try again.";
+				gui.add(Utils::CreateErrorPopupPanel(gui,
+					"Network error. Please try again.", btnSound));
 				break;
-			}
-
-			if (!errorMessage.empty())
-			{
-				auto errorPopupPanel = Utils::CreateErrorPopupPanel(gui, errorMessage, btnSound);
-				gui.add(errorPopupPanel);
 			}
 		});
 
@@ -114,12 +110,8 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 	backButton->onPress([&apiClient, &btnSound, panel, onBack]()
 		{
 			btnSound.play();
-			apiClient.StopPingThread();
 			panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(150));
-			if (onBack)
-			{
-				onBack();
-			}
+			if (onBack) onBack();
 		});
 
 	panel->add(background);
@@ -127,8 +119,4 @@ tgui::Panel::Ptr JoinPanel::Create(tgui::Gui& gui,
 	panel->add(backButton);
 	panel->add(joinLobbyButton);
 	return panel;
-}
-void JoinPanel::StopUpdateThread()
-{
-	s_running.store(false);
 }

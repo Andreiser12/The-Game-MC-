@@ -310,7 +310,7 @@ void HostPanel::GenerateTextures(int limit)
 		return;
 	}
 
-	int processedCount = 0;
+	int processedCount{ 0 };
 	while (processedCount < limit && s_frames.size() < s_rawFrames.size())
 	{
 		size_t indexToLoad = s_frames.size();

@@ -83,7 +83,7 @@ void Player::SetTimeOut(bool value)
 {
 	m_hasTimeOut = value;
 }
-void Player::SetIncative(bool value)
+void Player::SetInactive(bool value)
 {
 	m_isInactive = value;
 }

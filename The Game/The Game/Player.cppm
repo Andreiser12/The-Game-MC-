@@ -26,7 +26,7 @@ public:
 	void ResetCardsPlaced() noexcept;
 
 	void SetTimeOut(bool value);
-	void SetIncative(bool value);
+	void SetInactive(bool value);
 
 	unsigned GetPlayerId() const noexcept;
 	const std::string& GetUsername() const noexcept;

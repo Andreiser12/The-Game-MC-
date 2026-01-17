@@ -163,6 +163,7 @@
     <ClCompile Include="DeckTests.cpp" />
     <ClCompile Include="AssistantAITests.cpp" />
     <ClCompile Include="HeuristicTreeTests.cpp" />
+    <ClCompile Include="PlayerTests.cpp" />
     <ClCompile Include="SessionManagerTests.cpp" />
   </ItemGroup>
   <ItemGroup>

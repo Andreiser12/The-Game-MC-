@@ -113,6 +113,8 @@ public:
 	[[nodiscard]] std::optional<std::vector<PlayerState>> GetPlayerStates() const;
 	[[nodiscard]] std::optional<bool> GetCanPlayMore(unsigned playerId,
 		uint8_t remainingCards) const;
+	[[nodiscard]] std::optional<std::vector<std::pair<uint8_t, uint8_t>>> GetAICards(unsigned playerId,
+		uint8_t cardsRequired);
 
 	void UpdatePlayerPing(unsigned playerId) noexcept;
 	std::vector<unsigned> GetInactivePlayers(std::chrono::seconds timeout) const;

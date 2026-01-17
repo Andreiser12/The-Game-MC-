@@ -4,6 +4,7 @@ import AssistantAI;
 
 import GreedyAI;
 
+constexpr static size_t DECK_SIZE{ 98 };
 constexpr static uint8_t DECK_COUNT{ 4u };
 
 constexpr static uint8_t TWO_PLAYERS{ 2u };
@@ -75,7 +76,7 @@ bool Table::IsPileEmpty() const noexcept
 void Table::Shuffle()
 {
 	std::vector<Card<uint8_t>> cards;
-	cards.reserve(98);
+	cards.reserve(DECK_SIZE);
 
 	for (uint8_t i = 2u; i < 100u; ++i)
 		cards.emplace_back(i);
@@ -120,27 +121,7 @@ bool Table::PlayCard(unsigned playerId, uint8_t deckId, const Card<uint8_t>& car
 void Table::AdvanceTurn() noexcept
 {
 	if (m_turnOrder.empty()) return;
-
-	Player& currentPlayer{ GetPlayer(GetCurrentPlayerId()) };
-
-	if (currentPlayer.HasTimeOut())
-	{
-		RunBotTurn(currentPlayer.GetPlayerId());
-	}
-
-	uint8_t attempts{ 0 };
-	do
-	{
-		m_currentTurnIndex = (m_currentTurnIndex + 1) % m_playerCount;
-		++attempts;
-
-		if (attempts >= m_playerCount) break;
-
-		if (!IsPileEmpty()) break;
-
-		if (GetPlayer(GetCurrentPlayerId()).GetCardsCount() > 0) break;
-
-	} while (true);
+	m_currentTurnIndex = (m_currentTurnIndex + 1) % m_turnOrder.size();
 }
 
 bool Table::HasPlayer(unsigned playerId) const
@@ -148,71 +129,71 @@ bool Table::HasPlayer(unsigned playerId) const
 	return m_players.contains(playerId);
 }
 
-void Table::RunBotTurn(unsigned playerId)
+std::optional<std::vector<std::pair<uint8_t, uint8_t>>> Table::RunBotTurn
+(unsigned playerId, uint8_t cardsRequired)
 {
 	Player& player{ GetPlayer(playerId) };
-	uint8_t minCardsToPlay{ IsPileEmpty() ? MIN_CARDS_EMPTY_DECK : MIN_CARDS_NORMAL };
-	int cardsPlayed{ 0 };
-	bool canPlayMore{ true };
 
-	while (canPlayMore)
+	std::vector<uint8_t> myHand;
+	for (const auto& card : player.GetCards())
 	{
-		std::vector<uint8_t> myHand;
-		for (const auto& card : player.GetCards())
-		{
-			myHand.emplace_back(card.GetId());
-		}
-
-		std::vector<AssistantAI::DeckState> deckStates;
-		auto allDecks{ GetAllDecks() };
-
-		for (const auto& deckRef : allDecks) {
-			AssistantAI::DeckState state;
-			state.index = static_cast<int>(deckRef->GetDeckIndex());
-			state.topCard = deckRef->GetTopCard().GetId();
-			state.type = ConvertDeckType(deckRef->GetDeckType());
-			deckStates.push_back(state);
-		}
-
-		std::vector<std::vector<uint8_t>> otherHands;
-		for (const auto& [id, otherPlayer] : m_players)
-		{
-			if (id != playerId)
-			{
-				std::vector<uint8_t> hand;
-				for (const auto& card : otherPlayer.GetCards())
-				{
-					hand.push_back(card.GetId());
-				}
-				otherHands.push_back(hand);
-			}
-		}
-
-		auto resultOpt{ AssistantAI::GreedyBot::FindBestMove(myHand, deckStates, otherHands) };
-
-		if (!resultOpt) canPlayMore = false;
-
-		else
-		{
-			auto move = resultOpt.value();
-
-			if (cardsPlayed >= minCardsToPlay && move.score > 5)
-			{
-				canPlayMore = false;
-			}
-			else
-			{
-				Card<uint8_t> cardObj(move.cardValue);
-				PlaceCardOnDeck(static_cast<uint8_t>(move.deckIndex), cardObj);
-				player.RemoveCard(move.cardValue);
-				player.IncrementCardsPlaced();
-				++cardsPlayed;
-			}
-		}
-
-		if (player.GetCardsCount() == 0) canPlayMore = false;
+		myHand.emplace_back(card.GetId());
 	}
-	EndTurn(playerId);
+
+	std::vector<AssistantAI::DeckState> deckStates;
+	auto allDecks = GetAllDecks();
+	for (const auto& deckRef : allDecks)
+	{
+		AssistantAI::DeckState state;
+		state.index = static_cast<int>(deckRef->GetDeckIndex());
+		state.topCard = deckRef->GetTopCard().GetId();
+		state.type = ConvertDeckType(deckRef->GetDeckType());
+		deckStates.push_back(state);
+	}
+
+	std::vector<std::vector<uint8_t>> otherHands;
+	for (const auto& [id, otherPlayer] : m_players)
+	{
+		if (id != playerId)
+		{
+			std::vector<uint8_t> hand;
+			for (const auto& card : otherPlayer.GetCards())
+			{
+				hand.emplace_back(card.GetId());
+			}
+			otherHands.emplace_back(hand);
+		}
+	}
+	
+	std::vector<std::pair<uint8_t, uint8_t>> selectedCards;
+	selectedCards.reserve(cardsRequired);
+
+	std::vector<uint8_t> tempHand = myHand;
+	std::vector<AssistantAI::DeckState> tempDecks = deckStates;
+
+	for (uint8_t i = 0u; i < cardsRequired; ++i)
+	{
+		auto moveOpt = AssistantAI::GreedyBot::FindBestMove(tempHand, tempDecks, otherHands);
+		if (!moveOpt) return std::nullopt;
+
+		const auto& move = moveOpt.value();
+		selectedCards.emplace_back(move.cardValue, static_cast<uint8_t>(move.deckIndex));
+		tempHand.erase(std::find(tempHand.begin(), tempHand.end(), move.cardValue));
+
+		for (auto& deck : tempDecks)
+		{
+			if (deck.index == move.deckIndex)
+			{
+				deck.topCard = move.cardValue;
+				break;
+			}
+		}
+
+		if (tempHand.empty()) break;
+	}
+
+	if (selectedCards.size() < cardsRequired) return std::nullopt;
+	return selectedCards;
 }
 
 Deck& Table::GetDeck(uint8_t deckId) const
@@ -271,9 +252,9 @@ bool Table::CanPlayerPlayMinCards(const Player& player, uint8_t minCards) const
 		for (auto it = cards.begin(); it != cards.end(); ++it)
 		{
 			const uint8_t cardValue{ it->GetId() };
-			for (size_t deckIndex = 0; deckIndex <DECK_COUNT; ++deckIndex)
+			for (size_t deckIndex = 0; deckIndex < DECK_COUNT; ++deckIndex)
 			{
-				if (CanPlayOnDeck(cardValue, deckTops[deckIndex], deckIndex))
+				if (CanPlaceCard(player.GetPlayerId(), deckIndex, *it))
 				{
 					deckTops[deckIndex] = cardValue;
 					cards.erase(it);
@@ -291,7 +272,7 @@ bool Table::CanPlayerPlayMinCards(const Player& player, uint8_t minCards) const
 
 void Table::PlaceCardOnDeck(uint8_t deckIndex, const Card<uint8_t>& card)
 {
-	m_decks[deckIndex]->PushCard(card);
+	m_decks[deckIndex]->PlaceCard(card);
 }
 
 bool Table::CheckWinCondition() const noexcept
@@ -357,7 +338,7 @@ bool Table::RemovePlayer(unsigned playerId) noexcept
 	m_players.erase(playerId);
 	--m_playerCount;
 
-	if (m_currentTurnIndex >= m_turnOrder.size() && !m_turnOrder.empty()) 
+	if (m_currentTurnIndex >= m_turnOrder.size() && !m_turnOrder.empty())
 		m_currentTurnIndex = 0;
 	return true;
 }
@@ -372,12 +353,15 @@ void Table::MoveCardsToPile(Player& player)
 	}
 }
 
-bool Table::CanPlayOnDeck(uint8_t cardValue, uint8_t topValue, size_t deckIndex) const
+bool Table::CanPlaceCard(unsigned playerId, uint8_t deckId, const Card<uint8_t>& card) const
 {
-	const bool isBackwards{
-		std::abs(static_cast<int>(cardValue) - static_cast<int>(topValue)) == 10};
+	if (playerId != GetCurrentPlayerId()) return false;
 
-	if (m_decks[deckIndex]->GetDeckType() == Deck::DeckType::Ascending)
+	const uint8_t cardValue{ card.GetId() };
+	const uint8_t topValue{ m_decks[deckId]->GetTopCard().GetId() };
+	const bool isBackwards{ BackwardsTrick(deckId, card) };
+
+	if (m_decks[deckId]->GetDeckType() == Deck::DeckType::Ascending)
 	{
 		return cardValue > topValue || isBackwards;
 	}

@@ -39,7 +39,6 @@ public:
 		return m_playerId < other.GetPlayerId();
 	}
 
-	bool HasTimeOut() const noexcept;
 	bool IsInactive() const noexcept;
 
 private:

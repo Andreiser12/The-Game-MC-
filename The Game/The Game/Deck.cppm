@@ -25,7 +25,7 @@ public:
 	uint8_t GetDeckIndex() const noexcept;
 
 	template<typename CardType>
-	void PushCard(CardType&& card)
+	void PlaceCard(CardType&& card)
 	{
 		m_pile.emplace(std::forward<CardType>(card));
 	};

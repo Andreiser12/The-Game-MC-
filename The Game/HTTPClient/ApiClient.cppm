@@ -150,6 +150,7 @@ public:
 	std::optional<bool> GetCanPlayMore(uint8_t remainingCards) const;
 	std::optional<GameResult> GetGameResult(const std::string& lobbyId) const;
 	std::optional<TurnState> GetTurnState() const;
+	std::optional<std::vector<std::pair<uint8_t, uint8_t>>> GetAICards(uint8_t cardsRequired);
 
 	bool SendPing(const std::string& lobbyId, unsigned playerId) const;
 	void StartNetworkLoop();

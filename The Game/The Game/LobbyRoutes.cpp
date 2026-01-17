@@ -147,7 +147,12 @@ void LobbyRoutes::Register(crow::SimpleApp& app)
 		([this](const std::string& lobbyId) {
 		return this->GetLobbyInfo(lobbyId);
 			});
-}
+
+	CROW_ROUTE(app, "/lobby/<string>/players/<uint>/place-cards-AI").methods("POST"_method)
+		([this](const crow::request& req, const std::string& lobbyId, unsigned playerId) {
+		return this->GetAICards(req, lobbyId, playerId);
+			});
+ }
 
 crow::response LobbyRoutes::CreateLobby(const crow::request& request)
 {
@@ -636,5 +641,29 @@ crow::response LobbyRoutes::GetLobbyInfo(const std::string& lobbyId)
 	data["is_game_started"] = lobby->IsGameActive();
 	data["host_id"] = lobby->GetHostId();
 
+	return crow::response(200, data);
+}
+
+crow::response LobbyRoutes::GetAICards(const crow::request& request, const std::string& lobbyId, unsigned playerId)
+{
+	auto body = crow::json::load(request.body);
+	if (!body || !body.has("cards_required")) return crow::response(400, "Invalid JSON");
+
+	auto lobby = m_manager.GetLobby(lobbyId);
+	if (!lobby) return crow::response(404, "Lobby not found");
+
+	const uint8_t cardsRequired{ static_cast<uint8_t>(body["cards_required"].i()) };
+	auto cardsOpt = lobby->GetAICards(playerId, cardsRequired);
+	if (!cardsOpt) return crow::response(409, "Couldn't get cards");
+
+	crow::json::wvalue data;
+	const auto& cards = cardsOpt.value();
+	data["card_id"] = crow::json::wvalue::list(cards.size());
+	data["deck_id"] = crow::json::wvalue::list(cards.size());
+	for (size_t i = 0; i<cards.size(); ++i)
+	{
+		data["card_id"][i] = static_cast<int>(cards[i].first);
+		data["deck_id"][i] = static_cast<int>(cards[i].second);
+	}
 	return crow::response(200, data);
 }

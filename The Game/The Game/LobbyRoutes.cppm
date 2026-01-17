@@ -42,6 +42,8 @@ private:
 	crow::response GetCanPlayMore(const crow::request& request,
 		const std::string& lobbyId, unsigned playerId);
 	crow::response GetLobbyInfo(const std::string& lobbyId);
+	crow::response GetAICards(const crow::request& request, const std::string& lobbyId,
+		unsigned playerId);
 
 private:
 	LobbyManager& m_manager;

@@ -134,7 +134,7 @@ private:
 	bool m_isExiting{ false };
 
 	tgui::Label::Ptr m_timerLabel;
-	float m_timeLeft{ 60.0f };
+	float m_timeLeft;
 	sf::Clock m_deltaTimeClock;
 
 	sf::Music m_gameMusic;

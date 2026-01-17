@@ -320,7 +320,7 @@ bool ApiClient::PlayCard(uint8_t cardId, uint8_t deckId) const
 	auto json = crow::json::load(response.text);
 	if (!json || !json.has("status")) return false;
 
-	return json["status"] == "OK";
+	return json["status"].s() == "OK";
 }
 
 std::optional<std::vector<DeckState>> ApiClient::GetDeckState() const
@@ -632,6 +632,41 @@ std::optional<TurnState> ApiClient::GetTurnState() const
 	state.currentPlayerId = static_cast<unsigned>(json["currentPlayerId"].i());
 	state.currentUsername = json["currentUsername"].s();
 	return state;
+}
+
+std::optional<std::vector<std::pair<uint8_t, uint8_t>>> ApiClient::GetAICards(uint8_t cardsRequired)
+{
+	const std::string url{ m_serverURL + "/lobby/" + m_lobbyId
+	+ "/players/" + std::to_string(m_playerId) + "/place-cards-AI" };
+	const std::string jsonBody{ "{\"cards_required\":\""
+	+ std::to_string(cardsRequired) + "\"}" };
+
+	cpr::Response response = cpr::Post(
+		cpr::Url{ url },
+		cpr::Body{ jsonBody },
+		kTimeout
+	);
+
+	if (response.error || response.status_code != 200) return std::nullopt;
+
+	auto json = crow::json::load(response.text);
+	if (!json || !json.has("card_id") || !json.has("deck_id")) return std::nullopt;
+
+	const auto& cardIds = json["card_id"];
+	const auto& deckIds = json["deck_id"];
+	if (cardIds.size() != deckIds.size()) return std::nullopt;
+
+	std::vector<std::pair<uint8_t, uint8_t>> cards;
+	cards.reserve(cardsRequired);
+
+	for (size_t i=0; i<cardIds.size(); ++i)
+	{
+		cards.emplace_back(
+			static_cast<uint8_t>(cardIds[i].i()),
+			static_cast<uint8_t>(deckIds[i].i()) 
+		);
+	}
+	return cards;
 }
 
 std::optional<GameResult> ApiClient::ParseGameResult(const std::string& result) const

@@ -219,7 +219,7 @@ bool Lobby::PlayCard(unsigned playerId, uint8_t cardId, uint8_t deckId)
 
 	auto& player = m_table->GetPlayer(playerId);
 	const Card<uint8_t> card{ cardId };
-	if (!m_table->PlayCard(playerId, deckId, card)) return false;
+	if (!m_table->CanPlaceCard(playerId, deckId, card)) return false;
 
 	m_table->PlaceCardOnDeck(deckId, std::move(card));
 	player.RemoveCard(cardId);
@@ -381,4 +381,12 @@ std::optional<bool> Lobby::GetCanPlayMore(unsigned playerId, uint8_t remainingCa
 
 	const auto& player = m_table->GetPlayer(playerId);
 	return m_table->CanPlayerPlayMinCards(player, remainingCards);
+}
+
+std::optional<std::vector<std::pair<uint8_t, uint8_t>>> Lobby::GetAICards(unsigned playerId,
+	uint8_t cardsRequired)
+{
+	if (!m_gameStarted || !m_table) return std::nullopt;
+
+	return m_table->RunBotTurn(playerId, cardsRequired);
 }

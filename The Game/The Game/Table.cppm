@@ -10,6 +10,8 @@ import <span>;
 import <memory>;
 import <array>; 
 import <ranges>;
+import <cstdint>;
+import <optional>;
 
 export class Table
 {
@@ -24,6 +26,7 @@ public:
 
 	bool CanPlayerPlayMinCards(const Player& player, uint8_t minCards) const;
 	void PlaceCardOnDeck(uint8_t deckIndex, const Card<uint8_t>& card);
+	bool CanPlaceCard(unsigned playerId, uint8_t deckId, const Card<uint8_t>& card) const;
 	bool CheckWinCondition() const noexcept;
 	bool CheckLoseCondition() const;
 	std::vector<uint8_t> EndTurn(unsigned playerId);
@@ -38,12 +41,12 @@ public:
 	Player& GetPlayer(unsigned playerId);
 	unsigned GetCurrentPlayerId() const;
 
-	void RunBotTurn(unsigned playerId);
+	std::optional<std::vector<std::pair<uint8_t, uint8_t>>> RunBotTurn(unsigned playerId,
+		uint8_t cardsRequired);
 
 private:
 	void Shuffle();
 	void MoveCardsToPile(Player& player);
-	bool CanPlayOnDeck(uint8_t cardValue, uint8_t topValue, size_t deckIndex) const;
 
 private:
 	uint8_t m_playerCount;

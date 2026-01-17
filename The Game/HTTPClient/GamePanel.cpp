@@ -355,11 +355,11 @@ void GamePanel::UpdateTurnState()
 	auto turnState = m_apiClient.SnapshotTurnState();
 	if (!turnState) return;
 
-	bool serverSaysItIsMyTurn = turnState.value().isMyTurn;
+	bool serverSaysItIsMyTurn{ turnState.value().isMyTurn };
 
 	if (serverSaysItIsMyTurn && !m_isMyTurn)
 	{
-		m_timeLeft = 60.0f;
+		m_timeLeft = 10.0f;
 		m_timerLabel->getRenderer()->setTextColor(tgui::Color::White);
 	}
 
@@ -683,6 +683,45 @@ GamePanel::~GamePanel()
 
 void GamePanel::OnTurnTimeout()
 {
+	auto endTurnState = m_apiClient.SnapshotEndTurnState();
+	if (endTurnState && !endTurnState.value().canEndTurn)
+	{
+		const uint8_t cardsRequired =
+			endTurnState.value().minRequiredCards - endTurnState.value().cardsPlaced;
+		auto aiCardsOpt = m_apiClient.GetAICards(cardsRequired);
+		if (aiCardsOpt)
+		{
+			for (const auto& [cardId, deckId] : aiCardsOpt.value())
+			{
+				if (m_apiClient.PlayCard(cardId, deckId))
+				{
+					for (auto& card : m_myCards)
+					{
+						if (cardId == card->GetId())
+						{
+							if (deckId < m_decks.size())
+							{
+								m_decks[deckId]->SetLastId(cardId);
+								card->MarkAsPlaced();
+							}
+							break;
+						}
+					}
+				}
+
+			}
+			m_chat->addLine("[AI]: Placed " + std::to_string(cardsRequired) +
+				"card(s) automatically", tgui::Color::Yellow);
+		}
+		else
+		{
+			m_chat->addLine("[System]: No valid moves available - Auto-loss", tgui::Color::Red);
+			m_apiClient.ReportGameLoss();
+			HandleGameResult(GameResult::Lost);
+			return;
+		}
+	}
+
 	auto drawnCards = m_apiClient.EndTurn();
 	m_isMyTurn = false;
 	if (drawnCards)

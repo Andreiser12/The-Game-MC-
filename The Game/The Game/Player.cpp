@@ -88,11 +88,6 @@ void Player::SetInactive(bool value)
 	m_isInactive = value;
 }
 
-bool Player::HasTimeOut() const noexcept
-{
-	return m_hasTimeOut;
-}
-
 bool Player::IsInactive() const noexcept
 {
 	return m_isInactive;

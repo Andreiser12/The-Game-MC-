@@ -232,11 +232,11 @@ std::optional<std::vector<PlayerState>> ApiClient::GetPlayerStates()
 
 bool ApiClient::StartMatch(const std::string& lobbyId, unsigned playerId)
 {
-	const std::string url = m_serverURL + "/lobby/start";
-	const std::string jsonBody =
+	const std::string url{ m_serverURL + "/lobby/start" };
+	const std::string jsonBody{
 		"{\"lobbyId\":\"" + lobbyId +
 		"\",\"playerId\":" + std::to_string(playerId) +
-		"}";
+		"}" };
 
 	cpr::Response response = cpr::Post(
 		cpr::Url{ url },
@@ -254,14 +254,14 @@ bool ApiClient::StartMatch(const std::string& lobbyId, unsigned playerId)
 
 bool ApiClient::SendChatMessage(const std::string& message)
 {
-	const std::string url = m_serverURL + "/lobby/chat/send";
-	const std::string jsonBody =
+	const std::string url{ m_serverURL + "/lobby/chat/send" };
+	const std::string jsonBody{
 		"{"
 		"\"lobbyId\": \"" + m_lobbyId + "\","
 		"\"username\": \"" + m_username + "\","
 		"\"playerId\": " + std::to_string(m_playerId) + ","
 		"\"message\": \"" + message + "\""
-		"}";
+		"}" };
 
 	cpr::Response response = cpr::Post(
 		cpr::Url{ url },
@@ -952,7 +952,7 @@ std::optional<std::vector<DeckState>> ApiClient::SnapshotDecks() const
 
 std::optional<GameTableState> ApiClient::GetTableState(const std::string& lobbyId) const
 {
-	const std::string url = m_serverURL + "/lobby/" + lobbyId + "/gamestate";
+	const std::string url{ m_serverURL + "/lobby/" + lobbyId + "/gamestate" };
 	cpr::Response response = cpr::Get(
 		cpr::Url{ url },
 		kTimeout

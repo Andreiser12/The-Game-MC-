@@ -1,6 +1,7 @@
 export module Lobby;
 
 import Table;
+import ChatFilter;
 
 import <stdint.h>;
 import <unordered_map>;

@@ -23,10 +23,12 @@ bool Lobby::AddPlayer(unsigned playerId, const std::string& username)
 void Lobby::AddChatMessage(std::string_view username, std::string_view message)
 {
 	std::lock_guard lock(m_mutex);
+
+	std::string filteredMessage{ ChatFilter::FilterMessage(std::string(message)) };
 	m_chatBuffer.emplace_back(ChatMessage{
 		.id = ++m_lastMessageId,
 		.username = std::string(username),
-		.message = std::string(message)
+		.message = filteredMessage
 		});
 
 	TrimChatBuffer();

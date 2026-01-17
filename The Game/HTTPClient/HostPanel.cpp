@@ -20,38 +20,12 @@ import <stdexcept>;
 import <fstream>;
 import ApiClient;
 
-
 static constexpr uint8_t kMinPlayers{ 2u };
 static std::vector<tgui::Texture> s_frames;
 static tgui::Picture::Ptr s_backgroundPicture;
 static float s_animationTime{ 0.0f };
 static int s_currentFrame{ 0 };
 static const float kFrameDuration{ 0.04f };
-
-//void HostPanel::PreloadImages()
-//{
-//	if (!s_frames.empty()) return;
-//
-//	constexpr uint16_t totalFrames{ 300 };
-//
-//	for (uint16_t i = 0; i < totalFrames; ++i)
-//	{
-//		std::stringstream gifPath;
-//
-//		gifPath << "assets/gif/TheGameLevelSequence."
-//			<< std::setw(4) << std::setfill('0') << i
-//			<< ".jpeg";
-//
-//		std::string path = gifPath.str();
-//
-//		try {
-//			s_frames.emplace_back(path);
-//		}
-//		catch (...) {
-//			throw std::runtime_error("One of the GIF file is missing");
-//		}
-//	}
-//}
 
 static std::vector<uint8_t> ReadFileToBuffer(const std::string& filename)
 {
@@ -81,8 +55,6 @@ tgui::Panel::Ptr HostPanel::Create(tgui::Gui& gui,
 	std::function<bool(ApiClient&)> onLeave,
 	std::function<bool(ApiClient&)> onStart)
 {
-	//PreloadImages();
-
 	if (s_frames.empty() && !s_rawFrames.empty())
 	{
 		GenerateTextures(1);

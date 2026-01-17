@@ -13,10 +13,7 @@ inline static std::string GenerateLobbyId()
 	std::string lobbyId;
 	lobbyId.resize(K_LOBBY_ID_LENGTH);
 
-	for (uint8_t i = 0u; i < K_LOBBY_ID_LENGTH; ++i)
-	{
-		lobbyId[i] = charset[dist(gen)];
-	}
+	for (auto& c : lobbyId) c = charset[dist(gen)];
 	return lobbyId;
 }
 
@@ -299,6 +296,7 @@ crow::response LobbyRoutes::FetchLobbyPlayers(const std::string& lobbyId)
 
 	return crow::response(200, data);
 }
+
 crow::response LobbyRoutes::SendChatMessage(const crow::request& req)
 {
 	auto json = crow::json::load(req.body);

@@ -297,11 +297,27 @@ void MainMenuWindow::ProfileButtonPressed()
 	auto panel = Utils::CreateProfilePanel(
 		userProfileExists.value(),
 		m_clickSound,
-		[this]
+		[this]()
 		{
 			m_clickSound.play();
 			auto panel = m_mainMenu.get<tgui::Panel>("ProfilePanel");
 			if (panel) m_mainMenu.remove(panel);
+		},
+		[this]()
+		{
+			m_clickSound.play();
+			auto confirmPanel = Utils::CreateDeleteAccountPanel(
+				m_mainMenu,
+				m_clickSound,
+				[this]()
+				{
+					m_clickSound.play();
+					m_apiClient.DeleteAccount();
+					m_window.close();
+				},
+				[]() {}
+			);
+			m_mainMenu.add(confirmPanel);
 		}
 	);
 	m_mainMenu.add(panel, "ProfilePanel");

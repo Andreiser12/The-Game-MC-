@@ -29,6 +29,13 @@ bool DatabaseManager::UpdateStats(unsigned userId, bool gamePlayed, bool gameWon
 	return true;
 }
 
+bool DatabaseManager::DeleteUser(unsigned userId)
+{
+	if (!GetUserByID(userId)) return false;
+	m_storage.remove<DB::User>(userId);
+	return true;
+}
+
 std::optional<DB::User> DatabaseManager::GetUserByID(unsigned userID) 
 {
 	return m_storage.get_optional<DB::User>(userID);

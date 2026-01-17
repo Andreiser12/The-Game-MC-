@@ -132,6 +132,7 @@ public:
 	LoginResult Login(const std::string& username);
 	bool Logout();
 	bool IsLoggedIn();
+	bool DeleteAccount();
 
 	std::optional<std::string> CreateLobby(const std::string& username);
 	JoinLobbyResult JoinLobbyValidated(const std::string& lobbyId, const std::string& username);

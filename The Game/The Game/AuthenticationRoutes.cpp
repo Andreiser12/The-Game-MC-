@@ -49,6 +49,15 @@ void AuthenticationRoutes::Profile(crow::SimpleApp& app)
 		});
 }
 
+void AuthenticationRoutes::DeleteAccount(crow::SimpleApp& app)
+{
+	CROW_ROUTE(app, "/users/<uint>").methods(crow::HTTPMethod::Delete)
+		([this](unsigned playerId)
+			{
+				return this->HandleDeleteAccount(playerId);
+			});
+}
+
 crow::response AuthenticationRoutes::HandleRegister(const crow::request& req)
 {
 	auto body = crow::json::load(req.body);
@@ -151,4 +160,18 @@ crow::response AuthenticationRoutes::HandleUserProfile(unsigned playerId)
 	data["gamesWon"] = user.GetGamesWon();
 	data["hoursPlayed"] = user.GetHoursPlayed();
 	return crow::response(200, data);
+}
+
+crow::response AuthenticationRoutes::HandleDeleteAccount(unsigned playerId)
+{
+	auto& sessionManager = SessionManager::Instance();
+	if (sessionManager.IsLoggedIn(playerId))
+		sessionManager.Logout(playerId);
+	if (!m_database.DeleteUser(playerId))
+		return crow::response(404, "User not found");
+
+	crow::json::wvalue result;
+	result["status"] = "ok";
+	result["message"] = "Account deleted";
+	return crow::response(200, result);
 }

@@ -7,7 +7,8 @@ import LobbyRoutes;
 import LobbyManager;
 import AuthenticationRoutes;
 
-static inline const std::string SERVER_IP_ADDRESS{ "192.168.1.131" };
+//192.168.1.131
+static inline const std::string SERVER_IP_ADDRESS{ "0.0.0.0" };
 static inline constexpr uint16_t SERVER_PORT{ 18080 };
 
 int main()
@@ -23,6 +24,7 @@ int main()
 	auth.Logout(app);
 	auth.Users(app);
 	auth.Profile(app);
+	auth.DeleteAccount(app);
 	app.bindaddr(SERVER_IP_ADDRESS).port(SERVER_PORT).multithreaded().run();
 	return 0;
 }

@@ -15,6 +15,7 @@ public:
 	void Logout(crow::SimpleApp& app);
 	void Users(crow::SimpleApp& app);
 	void Profile(crow::SimpleApp& app);
+	void DeleteAccount(crow::SimpleApp& app);
 
 private:
 	crow::response HandleRegister(const crow::request& req);
@@ -22,6 +23,7 @@ private:
 	crow::response HandleLogout(const crow::request& req);
 	crow::response HandleUsers();
 	crow::response HandleUserProfile(unsigned playerId);
+	crow::response HandleDeleteAccount(unsigned playerId);
 
 private:
 	DatabaseManager& m_database;

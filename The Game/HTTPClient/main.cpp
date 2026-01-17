@@ -24,7 +24,8 @@ import Utils;
 
 static inline constexpr uint16_t LOGIN_WIDTH{ 640u };
 static inline constexpr uint16_t LOGIN_HEIGHT{ 480u };
-static inline const std::string SERVER_IP{ "192.168.1.131" };
+//192.168.1.131
+static inline const std::string SERVER_IP{ "127.0.0.1" };
 static inline constexpr uint16_t SERVER_PORT { 18080 };
 static inline const std::string SERVER_IP_ADDRESS{ "http://" + SERVER_IP + ":" + std::to_string(SERVER_PORT) };
 

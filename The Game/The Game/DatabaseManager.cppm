@@ -28,6 +28,7 @@ public:
 
 	bool AddUser(const DB::User& user);
 	bool UpdateStats(unsigned userId, bool gamePlayed, bool gameWon, double hoursPlayed);
+	bool DeleteUser(unsigned userId);
 	std::optional<DB::User> GetUserByID(unsigned userID);
 	std::optional<DB::User> GetUserByName(const std::string& username);
 	[[nodiscard]] std::vector<DB::User> GetUsers();

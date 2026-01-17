@@ -593,10 +593,11 @@ namespace Utils
 		return panel;
 	}
 
-	tgui::Panel::Ptr CreateProfilePanel(
+	tgui::Panel::Ptr Utils::CreateProfilePanel(
 		const UserProfile& profile,
 		sf::Sound& btnSound,
-		std::function<void()> onClose)
+		std::function<void()> onClose,
+		std::function<void()> onDeleteAccount)
 	{
 		auto panel = tgui::Panel::create({ "60%", "60%" });
 		panel->setPosition({ "20%", "20%" });
@@ -628,27 +629,43 @@ namespace Utils
 		gamesWon->getRenderer()->setTextSize(24);
 		panel->add(gamesWon);
 
-		auto hoursPlayed = tgui::Label::create("Hours played: " + std::to_string(profile.hoursPlayed));
+		std::ostringstream outstream;
+		outstream << std::fixed << std::setprecision(1) << profile.hoursPlayed;
+
+		auto hoursPlayed = tgui::Label::create("Hours played: " + outstream.str());
 		hoursPlayed->setPosition({ "5%", "58%" });
 		hoursPlayed->getRenderer()->setTextSize(24);
 		panel->add(hoursPlayed);
 
+		outstream.str("");
+		outstream.clear();
+
 		double performanceScore;
-		if (profile.gamesPlayed == 0)
-		{
-			performanceScore = 1.0;
-		}
-		else {
-			performanceScore = 1.0 + (static_cast<double>(profile.gamesWon) / profile.gamesPlayed) * 4.0;
-		}
-		std::ostringstream outstream;
+		if (profile.gamesPlayed == 0) performanceScore = 1.0;
+		else performanceScore = 1.0 + (static_cast<double>(profile.gamesWon) / profile.gamesPlayed) * 4.0;
 		outstream << std::fixed << std::setprecision(1) << performanceScore;
+
 		auto performance = tgui::Label::create("Performance score: " + outstream.str() + " / 5");
 		performance->setPosition({ "5%", "70%" });
 		performance->getRenderer()->setTextSize(24);
 		panel->add(performance);
 		outstream.str("");
 		outstream.clear();
+
+		auto deleteButton = tgui::Button::create("Delete Account");
+		deleteButton->setSize({ "25%", "10%" });
+		deleteButton->setPosition({ "70%", "85%" });
+		deleteButton->getRenderer()->setTexture("assets/images/buttons.png");
+		StyleButton(deleteButton);
+		deleteButton->getRenderer()->setTextSize(18);
+		deleteButton->onPress(
+			[&btnSound, onDeleteAccount]
+			{
+				btnSound.play();
+				if (onDeleteAccount)
+					onDeleteAccount();
+			});
+		panel->add(deleteButton);
 
 		auto closeButton = tgui::Button::create("X");
 		closeButton->setSize({ "8%", "10%" });
@@ -691,6 +708,57 @@ namespace Utils
 		panel->add(background);
 
 		auto textLabel = tgui::Label::create("Are you sure you want to exit?");
+		textLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+		textLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+		textLabel->setPosition({ "50%", "45%" });
+		textLabel->setOrigin(0.5f, 0.5f);
+		textLabel->getRenderer()->setTextColor(tgui::Color(245, 240, 230));
+		textLabel->getRenderer()->setTextOutlineColor(tgui::Color(40, 25, 15));
+		textLabel->getRenderer()->setTextOutlineThickness(1.5f);
+		textLabel->getRenderer()->setTextSize(24);
+
+		auto noButton = tgui::Button::create("No");
+		noButton->setSize({ "15%", "20%" });
+		noButton->setPosition({ "10%", "70%" });
+		noButton->getRenderer()->setTexture("assets/images/buttons.png");
+		StyleButton(noButton);
+		noButton->getRenderer()->setTextSize(20);
+		noButton->onPress([panel, onNo, &btnSound]() {
+			btnSound.play();
+			panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(100));
+			if (onNo) onNo();
+			});
+
+		auto yesButton = tgui::Button::create("Yes");
+		yesButton->setSize({ "15%", "20%" });
+		yesButton->setPosition({ "75%", "70%" });
+		yesButton->getRenderer()->setTexture("assets/images/buttons.png");
+		StyleButton(yesButton);
+		yesButton->getRenderer()->setTextSize(20);
+		yesButton->onPress([panel, onYes, &btnSound]() {
+			btnSound.play();
+			if (onYes) onYes();
+			});
+
+		panel->add(textLabel);
+		panel->add(noButton);
+		panel->add(yesButton);
+		return panel;
+	}
+
+	tgui::Panel::Ptr Utils::CreateDeleteAccountPanel(tgui::Gui& gui, sf::Sound& btnSound, std::function<void()> onYes, std::function<void()> onNo)
+	{
+		auto panel = tgui::Panel::create({ "33.33%", "33.33%" });
+		panel->setPosition({ "50%", "50%" });
+		panel->setOrigin(0.5f, 0.5f);
+		panel->getRenderer()->setBorders(2);
+		panel->getRenderer()->setBorderColor(tgui::Color::Black);
+
+		auto background = tgui::Picture::create("assets/images/mainMenuBackground.png");
+		background->setSize({ "100%", "100%" });
+		panel->add(background);
+
+		auto textLabel = tgui::Label::create("Are you sure you want to delete your account?\nYou cannot undo your decision.");
 		textLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
 		textLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
 		textLabel->setPosition({ "50%", "45%" });
@@ -1005,4 +1073,6 @@ namespace Utils
 		renderer->setThumbColor(tgui::Color(245, 240, 230));
 		renderer->setThumbColorHover(tgui::Color::White);
 	}
+
+
 }

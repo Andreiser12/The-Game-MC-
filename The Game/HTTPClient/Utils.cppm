@@ -33,9 +33,16 @@ export namespace Utils
 	tgui::Panel::Ptr CreateProfilePanel(
 		const UserProfile& profile,
 		sf::Sound& btnSound,
-		std::function<void()> onClose);
+		std::function<void()> onClose,
+		std::function<void()> onDeleteAccount);
 
 	tgui::Panel::Ptr CreateExitPanel(
+		tgui::Gui& gui,
+		sf::Sound& btnSound,
+		std::function<void()> onYes,
+		std::function<void()> onNo);
+
+	tgui::Panel::Ptr CreateDeleteAccountPanel(
 		tgui::Gui& gui,
 		sf::Sound& btnSound,
 		std::function<void()> onYes,

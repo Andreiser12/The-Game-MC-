@@ -77,6 +77,31 @@ bool ApiClient::IsLoggedIn()
 	return m_playerId != 0u;
 }
 
+bool ApiClient::DeleteAccount()
+{
+	unsigned playerId;
+	{
+		std::lock_guard<std::mutex> lock(m_mutex);
+		if (m_playerId == 0u) return false;
+		playerId = m_playerId;
+	}
+	const std::string url = m_serverURL + "/users/" + std::to_string(playerId);
+	cpr::Response response = cpr::Delete(
+		cpr::Url{ url },
+		kTimeout
+	);
+	if (response.error || response.status_code != 200)
+		return false;
+
+	{
+		std::lock_guard<std::mutex> lock(m_mutex);
+		m_playerId = 0;
+		m_username.clear();
+		m_lobbyId.clear();
+	}
+	return true;
+}
+
 std::optional<std::string> ApiClient::CreateLobby(const std::string& username)
 {
 	const std::string url = m_serverURL + "/lobby/create";

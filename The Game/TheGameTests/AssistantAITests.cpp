@@ -1,6 +1,6 @@
 #include "CppUnitTest.h"
-#include "AssistantAI.h"
 #include <vector>
+import AssistantAI;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace TheGameTests

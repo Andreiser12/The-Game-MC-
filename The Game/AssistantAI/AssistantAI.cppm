@@ -13,28 +13,28 @@ import <ranges>;
 #define ASSISTANTAI_API __declspec(dllimport)
 #endif
 
-namespace AssistantAI {
+export namespace AssistantAI {
 
-	enum class DeckType : uint8_t {
+	export enum class DeckType : uint8_t {
 		Ascending = 0,
 		Descending = 1
 	};
 
-	struct DeckState {
+	export struct DeckState {
 		int index;
 		uint8_t topCard;
 		DeckType type;
 	};
 
-	struct MoveResult {
+	export struct MoveResult {
 		int deckIndex;
 		uint8_t cardValue;
 		int score;
 	};
 
-	static constexpr int LOCAL_WEIGHT{ 1 };
-	static constexpr int GLOBAL_WEIGHT{ 2 };
-	static constexpr int RISK_WEIGHT{ 1 };
+	constexpr int LOCAL_WEIGHT{ 1 };
+	constexpr int GLOBAL_WEIGHT{ 2 };
+	constexpr int RISK_WEIGHT{ 1 };
 
 	export class ASSISTANTAI_API GreedyBot
 	{

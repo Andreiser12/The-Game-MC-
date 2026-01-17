@@ -27,5 +27,8 @@
     <ClCompile Include="AssistantAITests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="HeuristicTreeTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

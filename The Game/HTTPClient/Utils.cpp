@@ -371,7 +371,7 @@ namespace Utils
 		audioPanel->add(masterValueLabel);
 
 		auto masterSlider = tgui::Slider::create();
-		masterSlider->setPosition({ "35%", "13.5%" });
+		masterSlider->setPosition({ "32.5%", "14.5%" });
 		masterSlider->setSize({ "55%", "2%" });
 		masterSlider->setMinimum(0);
 		masterSlider->setMaximum(100);
@@ -387,7 +387,6 @@ namespace Utils
 		buttonsLabelBg->setPosition("5%", "36.5%");
 		buttonsLabelBg->getRenderer()->setBackgroundColor(tgui::Color::Transparent);
 		buttonsLabelBg->getRenderer()->setTextureBackground("assets/images/settingsImage.png");
-		buttonsLabelBg->getRenderer()->setBorders(2);
 		audioPanel->add(buttonsLabelBg);
 
 		auto buttonsLabel = tgui::Label::create("Buttons Volume");
@@ -417,7 +416,7 @@ namespace Utils
 		audioPanel->add(buttonsValueLabel);
 
 		auto buttonsSlider = tgui::Slider::create();
-		buttonsSlider->setPosition({ "35%", "38.5%" });
+		buttonsSlider->setPosition({ "32.5%", "39.5%" });
 		buttonsSlider->setSize({ "55%", "2%" });
 		buttonsSlider->setMinimum(0);
 		buttonsSlider->setMaximum(100);
@@ -433,7 +432,6 @@ namespace Utils
 		bgLabelBg->setPosition("5%", "61.5%");
 		bgLabelBg->getRenderer()->setBackgroundColor(tgui::Color::Transparent);
 		bgLabelBg->getRenderer()->setTextureBackground("assets/images/settingsImage.png");
-		bgLabelBg->getRenderer()->setBorders(2);
 		audioPanel->add(bgLabelBg);
 
 		auto bgLabel = tgui::Label::create("Background Vol.");
@@ -463,7 +461,7 @@ namespace Utils
 		audioPanel->add(bgValueLabel);
 
 		auto bgSlider = tgui::Slider::create();
-		bgSlider->setPosition({ "35%", "63.5%" });
+		bgSlider->setPosition({ "32.5%", "64.5%" });
 		bgSlider->setSize({ "55%", "2%" });
 		bgSlider->setMinimum(0);
 		bgSlider->setMaximum(100);
@@ -485,7 +483,7 @@ namespace Utils
 
 		auto leftArrow = tgui::Button::create("<");
 		leftArrow->setSize({ "10%", "10%" });
-		leftArrow->setPosition("5%", "45%");
+		leftArrow->setPosition("2%", "45%");
 		leftArrow->setOrigin(0.f, 0.5f);
 		leftArrow->getRenderer()->setTexture("assets/images/buttons.png");
 		StyleButton(leftArrow);
@@ -494,7 +492,7 @@ namespace Utils
 
 		auto rightArrow = tgui::Button::create(">");
 		rightArrow->setSize({ "10%", "10%" });
-		rightArrow->setPosition("95%", "45%");
+		rightArrow->setPosition("98%", "45%");
 		rightArrow->setOrigin(1.f, 0.5f);
 		rightArrow->getRenderer()->setTexture("assets/images/buttons.png");
 		StyleButton(rightArrow);
@@ -530,7 +528,7 @@ namespace Utils
 
 		auto applyButton = tgui::Button::create("Apply");
 		applyButton->setSize({ "15%", "10%" });
-		applyButton->setPosition("75%", "80%");
+		applyButton->setPosition("75%", "85%");
 		applyButton->getRenderer()->setBorders(2);
 		applyButton->getRenderer()->setRoundedBorderRadius(10);
 		applyButton->getRenderer()->setTexture("assets/images/buttons.png");
@@ -554,7 +552,7 @@ namespace Utils
 
 		auto closeButton = tgui::Button::create("Close");
 		closeButton->setSize({ "15%", "10%" });
-		closeButton->setPosition("10%", "80%");
+		closeButton->setPosition("10%", "85%");
 		closeButton->getRenderer()->setTextSize(24);
 		closeButton->getRenderer()->setBorders(2);
 		closeButton->getRenderer()->setRoundedBorderRadius(10);

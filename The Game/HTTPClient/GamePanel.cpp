@@ -360,7 +360,7 @@ void GamePanel::UpdateTurnState()
 
 	if (serverSaysItIsMyTurn && !m_isMyTurn)
 	{
-		m_timeLeft = 10.0f;
+		m_timeLeft = 60.0f;
 		m_timerLabel->getRenderer()->setTextColor(tgui::Color::White);
 	}
 

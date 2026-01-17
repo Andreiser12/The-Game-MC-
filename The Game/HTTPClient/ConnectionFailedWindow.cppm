@@ -11,7 +11,13 @@ import IWindow;
 export class ConnectionFailedWindow : public IWindow
 {
 public:
-	ConnectionFailedWindow(sf::RenderWindow& window);
+	explicit ConnectionFailedWindow(sf::RenderWindow& window);
+
+	ConnectionFailedWindow(const ConnectionFailedWindow&) = delete;
+	ConnectionFailedWindow& operator=(const ConnectionFailedWindow&) = delete;
+	ConnectionFailedWindow(ConnectionFailedWindow&&) noexcept = default;
+	ConnectionFailedWindow& operator=(ConnectionFailedWindow&&) noexcept = default;
+
 	void HandleEvent(sf::Event event) override;
 	void Draw() override;
 

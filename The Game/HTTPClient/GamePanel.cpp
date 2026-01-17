@@ -30,9 +30,10 @@ import DeckWidget;
 import PileWidget;
 
 GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
-	std::function<void()> onExit, std::function<void()> onLocalPlayerLeft) :
+	std::function<void()>&& onExit, std::function<void()>&& onLocalPlayerLeft) :
 	m_gui{ gui }, m_apiClient{ api },
-	m_onExitToMenu{ std::move(onExit) }, m_onLocalPlayerLeft{ std::move(onLocalPlayerLeft) },
+	m_onExitToMenu{ std::move(onExit) },
+	m_onLocalPlayerLeft{ std::move(onLocalPlayerLeft) },
 	m_ExitButtonSound{ m_ExitButtonBuffer },
 	m_uiSound{ m_clickBuffer },
 	m_cardSound{ m_cardFlipBuffer },

@@ -129,17 +129,17 @@ void LoginWindow::LoadWidgets()
 		});
 }
 
-bool LoginWindow::GetLoggedState() const
+bool LoginWindow::GetLoggedState() const noexcept
 {
 	return m_isLoggedIn;
 }
 
-bool LoginWindow::GetRegisteredState() const
+bool LoginWindow::GetRegisteredState() const noexcept
 {
 	return m_isRegisteredPressed;
 }
 
-bool LoginWindow::GetWindowState() const
+bool LoginWindow::GetWindowState() const noexcept
 {
 	return m_onLoginWindow;
 }

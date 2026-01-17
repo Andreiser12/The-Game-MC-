@@ -19,14 +19,19 @@ import Utils;
 export class RegisterWindow : public IWindow
 {
 public:
-	RegisterWindow(sf::RenderWindow& window, ApiClient& api);
+	explicit RegisterWindow(sf::RenderWindow& window, ApiClient& api);
+
+	RegisterWindow(const RegisterWindow&) = delete;
+	RegisterWindow& operator=(const RegisterWindow&) = delete;
+	RegisterWindow(RegisterWindow&&) noexcept = default;
+	RegisterWindow& operator=(RegisterWindow&&) noexcept = default;
 
 	void HandleEvent(sf::Event event) override;
 	void Draw() override;
 	void GoToLogin();
-	
+
 	void CheckRegister(const std::string& usernameEntered);
-	bool GetRegisteredState() const;
+	bool GetRegisteredState() const noexcept;
 
 private:
 	void LoadWidgets() override;

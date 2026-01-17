@@ -45,8 +45,16 @@ export using SlotArray = std::span<const PlayerSlot>;
 export class GamePanel
 {
 public:
-	explicit GamePanel(tgui::Gui& gui, ApiClient& api, std::function<void()> onExit,
-		std::function<void()> onLocalPlayerLeft);
+	explicit GamePanel(tgui::Gui& gui, ApiClient& api,
+		std::function<void()>&& onExit,
+		std::function<void()>&& onLocalPlayerLeft);
+
+	GamePanel(const GamePanel&) = delete;
+	GamePanel& operator=(const GamePanel&) = delete;
+
+	GamePanel(GamePanel&&) noexcept = default;
+	GamePanel& operator=(GamePanel&&) noexcept = default;
+
 	void UpdateGame();
 	void UpdateDecks();
 	void UpdateEndTurnButton();
@@ -70,7 +78,7 @@ public:
 
 
 private:
-	inline SlotArray GetSlotsForPlayerCount(size_t count)
+	inline constexpr SlotArray GetSlotsForPlayerCount(size_t count) const noexcept
 	{
 		switch (count)
 		{

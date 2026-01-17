@@ -5,45 +5,35 @@ module;
 #include "TGUI/Widgets/Button.hpp"
 #include "TGUI/Backend/SFML-Graphics.hpp"
 #include <SFML/Audio.hpp>
+#include <string>
+#include <functional>
+#include <mutex>
 
 export module HostPanel;
 
-import <functional>;
-import <string>;
 import ApiClient;
-import <mutex>;
 
 export struct RawFrameData {
-    unsigned int width;
-    unsigned int height;
+    unsigned width{};
+    unsigned height{};
     std::vector<uint8_t> pixels;
-    int delayMs;
+    int delayMs{};
 };
 
-export class HostPanel
+export namespace HostPanel
 {
-public:
-    static tgui::Panel::Ptr Create(tgui::Gui& gui,
+    tgui::Panel::Ptr Create(tgui::Gui& gui,
         ApiClient& apiClient,
         sf::Sound& btnSound,
         const std::string& lobbyId,
-        std::function<bool(ApiClient&)> onLeave,
-        std::function<bool(ApiClient&)> onStart);
+        std::function<bool(ApiClient&)>&& onLeave,
+        std::function<bool(ApiClient&)>&& onStart);
 
-    static void RefreshPlayersList(ApiClient& apiClient);
-    static void UpdateStartButton();
-    static inline tgui::ListBox::Ptr GetPlayersListBox() { return playersListBox; }
+    void RefreshPlayersList(ApiClient& apiClient);
+    void UpdateStartButton();
+    tgui::ListBox::Ptr GetPlayersListBox();
 
-    static void UpdateBackground(float deltaTime);
-    //static void PreloadImages();
-    static void LoadGifDataAsync();
-    static void GenerateTextures(int limit = 1000);
-
-private:
-    static inline tgui::ListBox::Ptr playersListBox{ nullptr };
-    static inline tgui::Button::Ptr startButton{ nullptr };
-    static inline int s_hostId{ -1 };
-    static inline int s_playerId{ -1 };
-    static inline std::vector<RawFrameData> s_rawFrames;
-    static inline std::mutex s_framesMutex;
+    void UpdateBackground(float deltaTime);
+    void LoadGifDataAsync();
+    void GenerateTextures(int limit = 1000);
 };

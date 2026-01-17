@@ -163,9 +163,6 @@
     <ClCompile Include="IWindow.cppm">
       <FileType>Document</FileType>
     </ClCompile>
-    <ClCompile Include="JoinPanel.cppm">
-      <FileType>CppHeader</FileType>
-    </ClCompile>
     <ClCompile Include="LoginWindow.cppm">
       <FileType>Document</FileType>
     </ClCompile>
@@ -174,9 +171,6 @@
     </ClCompile>
     <ClCompile Include="PileWidget.cppm">
       <FileType>CppHeader</FileType>
-    </ClCompile>
-    <ClCompile Include="PlayPanel.cppm">
-      <FileType>Document</FileType>
     </ClCompile>
     <ClCompile Include="RegisterWindow.cppm">
       <FileType>Document</FileType>
@@ -199,10 +193,8 @@
     <ClCompile Include="HostPanel.cpp" />
     <ClCompile Include="PileWidget.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="JoinPanel.cpp" />
     <ClCompile Include="LoginWindow.cpp" />
     <ClCompile Include="MainMenuWindow.cpp" />
-    <ClCompile Include="PlayPanel.cpp" />
     <ClCompile Include="RegisterWindow.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>

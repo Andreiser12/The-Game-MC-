@@ -1,8 +1,4 @@
 module; 
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-
 #include <vector>
 #include <string>
 #include <memory>
@@ -16,14 +12,19 @@ export module MainMenuWindow;
 
 import IWindow;
 import ApiClient;
-import PlayPanel;
 import GamePanel;
 import Utils;
 
 export class MainMenuWindow : public IWindow
 {
 public:
-	MainMenuWindow(sf::RenderWindow& window, ApiClient& api);
+	explicit MainMenuWindow(sf::RenderWindow& window, ApiClient& api);
+
+	MainMenuWindow(const MainMenuWindow&) = delete;
+	MainMenuWindow& operator= (const MainMenuWindow&) = delete;
+	MainMenuWindow(MainMenuWindow&&) = default;
+	MainMenuWindow& operator= (MainMenuWindow&&) = default;
+
 	void HandleEvent(sf::Event event) override;
 	void Draw() override;
 	void Update();
@@ -50,7 +51,7 @@ private:
 	bool m_gameStartedLocally{ false };
 
 	unsigned m_resolutionIndex{ 8u };
-	std::vector<sf::Vector2u> m_resolutions = {
+	inline static const std::vector<sf::Vector2u> m_resolutions = {
 			{640, 480},
 			{ 800, 600 },
 			{ 1024, 768 },
@@ -63,7 +64,7 @@ private:
 			{ 1920, 1200 },
 			{ 2560, 1440 }
 	};
-	std::vector<unsigned> m_textSizes = {
+	inline static const std::vector<unsigned> m_textSizes = {
 		8u,
 		10u,
 		12u,
@@ -76,7 +77,7 @@ private:
 		24u,
 		24u
 	};
-	std::vector<unsigned> m_framerates = {
+	inline static const std::vector<unsigned> m_framerates = {
 		30u,
 		60u,
 		120u,

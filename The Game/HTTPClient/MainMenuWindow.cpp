@@ -1,21 +1,12 @@
 ﻿module;
-#define NOMINMAX
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <TGUI/TGUI.hpp>
 #include <TGUI/Backend/SFML-Graphics.hpp>
-#include <memory>
-#include <string>
-#include <thread>
-#include <chrono>
 
 module MainMenuWindow;
 
-import ApiClient;
-import GamePanel;
 import HostPanel;
-import Utils;
-import PlayPanel;
 
 MainMenuWindow::MainMenuWindow(sf::RenderWindow& window, ApiClient& api) :
 	m_window{ window },
@@ -318,7 +309,7 @@ void MainMenuWindow::ProfileButtonPressed()
 
 void MainMenuWindow::PlayPanelPressed()
 {
-	auto playPanel = PlayPanel::Create(
+	auto playPanel = Utils::CreatePlayPanel(
 		m_mainMenu,
 		m_apiClient,
 		m_clickSound,

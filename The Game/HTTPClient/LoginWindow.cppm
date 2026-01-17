@@ -19,15 +19,21 @@ import Utils;
 export class LoginWindow : public IWindow
 {
 public:
-	LoginWindow(sf::RenderWindow& window, ApiClient& api);
+	explicit LoginWindow(sf::RenderWindow& window, ApiClient& api);
+
+	LoginWindow(const LoginWindow&) = delete;
+	LoginWindow& operator=(const LoginWindow&) = delete;
+	LoginWindow(LoginWindow&&) noexcept = default;
+	LoginWindow& operator=(LoginWindow&&) noexcept = default;
 
 	void CheckLogin(const std::string& usernameEntered);
 
 	void Draw() override;
 	void HandleEvent(sf::Event event) override;
-	bool GetLoggedState() const;
-	bool GetRegisteredState() const;
-	bool GetWindowState() const override;
+
+	bool GetLoggedState() const noexcept;
+	bool GetRegisteredState() const noexcept;
+	bool GetWindowState() const noexcept override;
 
 private:
 	void LoadWidgets() override;

@@ -123,7 +123,7 @@ void RegisterWindow::LoadWidgets()
 		GoToLogin(); });
 }
 
-bool RegisterWindow::GetRegisteredState() const
+bool RegisterWindow::GetRegisteredState() const noexcept
 {
 	return m_isRegistered;
 }

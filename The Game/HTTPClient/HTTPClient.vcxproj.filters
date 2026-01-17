@@ -44,12 +44,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="JoinPanel.cpp">
-      <Filter>Source Files\Panels</Filter>
-    </ClCompile>
-    <ClCompile Include="PlayPanel.cpp">
-      <Filter>Source Files\Panels</Filter>
-    </ClCompile>
     <ClCompile Include="ConnectionFailedWindow.cpp">
       <Filter>Source Files\Windows</Filter>
     </ClCompile>
@@ -104,13 +98,7 @@
     <ClCompile Include="UserProfile.cppm">
       <Filter>Header Files\Data</Filter>
     </ClCompile>
-    <ClCompile Include="JoinPanel.cppm">
-      <Filter>Header Files\Panels</Filter>
-    </ClCompile>
     <ClCompile Include="HostPanel.cppm">
-      <Filter>Header Files\Panels</Filter>
-    </ClCompile>
-    <ClCompile Include="PlayPanel.cppm">
       <Filter>Header Files\Panels</Filter>
     </ClCompile>
     <ClCompile Include="GamePanel.cppm">

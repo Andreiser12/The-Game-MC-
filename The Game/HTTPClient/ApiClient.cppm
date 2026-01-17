@@ -121,7 +121,13 @@ export struct LobbyInfo
 export class ApiClient
 {
 public:
-	ApiClient(const std::string& serverURL);
+	explicit ApiClient(const std::string& serverURL);
+
+	ApiClient(const ApiClient&) = delete;
+	ApiClient& operator= (const ApiClient&) = delete;
+
+	ApiClient(ApiClient&&) noexcept = default;
+	ApiClient& operator= (ApiClient&&) noexcept = default;
 
 	LoginResult Login(const std::string& username);
 	bool Logout();

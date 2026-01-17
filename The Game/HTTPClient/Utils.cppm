@@ -1,5 +1,4 @@
 module;
-#define NOMINMAX
 #include <string>
 #include <vector>
 #include <functional>
@@ -13,13 +12,13 @@ module;
 export module Utils;
 
 import UserProfile;
+import ApiClient;
 
-export class Utils
+export namespace Utils
 {
-public:
-	static tgui::String TruncateText(const tgui::String& text, uint8_t maxChars);
+	tgui::String TruncateText(const tgui::String& text, uint8_t maxChars);
 
-	static tgui::Panel::Ptr CreateSettingsPanel(tgui::Gui& gui,
+	tgui::Panel::Ptr CreateSettingsPanel(tgui::Gui& gui,
 		unsigned resolutionIndex,
 		bool isFullscreen,
 		unsigned framerateIndex,
@@ -31,24 +30,39 @@ public:
 		std::function<void(unsigned res, bool fullscreen, unsigned framerate,
 			float masterVol, float btnVol, float bgVol)> onApply);
 
-	static tgui::Panel::Ptr	CreateProfilePanel(
+	tgui::Panel::Ptr CreateProfilePanel(
 		const UserProfile& profile,
 		sf::Sound& btnSound,
 		std::function<void()> onClose);
 
-	static tgui::Panel::Ptr	CreateExitPanel(
+	tgui::Panel::Ptr CreateExitPanel(
 		tgui::Gui& gui,
 		sf::Sound& btnSound,
 		std::function<void()> onYes,
 		std::function<void()> onNo);
 
-	static tgui::Panel::Ptr CreateErrorPopupPanel(
+	tgui::Panel::Ptr CreateErrorPopupPanel(
 		tgui::Gui& gui,
 		const std::string& message,
 		sf::Sound& btnSound,
 		std::function<void()> onClose = nullptr);
 
-	static void StyleButton(const tgui::Button::Ptr& button);
-	static void StyleSlider(const tgui::Slider::Ptr& slider);
+	tgui::Panel::Ptr CreatePlayPanel(tgui::Gui& gui,
+		ApiClient& apiClient,
+		sf::Sound& btnSound,
+		std::function<void()>&& onClose,
+		std::function<void()>&& onJoin,
+		std::function<std::string(ApiClient&, const std::string&)>&& onHost,
+		std::function<void()>&& onTransition);
+
+	tgui::Panel::Ptr CreateJoinPanel(
+		tgui::Gui& gui,
+		ApiClient& apiClient,
+		sf::Sound& btnSound,
+		std::function<void()>&& onBack,
+		std::function<bool(ApiClient&, std::string)>&& onJoinLobby);
+
+	void StyleButton(const tgui::Button::Ptr& button);
+	void StyleSlider(const tgui::Slider::Ptr& slider);
 };
 

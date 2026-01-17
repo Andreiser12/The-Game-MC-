@@ -506,6 +506,23 @@ tgui::Panel::Ptr Utils::CreateProfilePanel(
 	hoursPlayed->getRenderer()->setTextSize(24);
 	panel->add(hoursPlayed);
 
+	double performanceScore;
+	if (profile.gamesPlayed == 0)
+	{
+		performanceScore = 1.0;
+	}
+	else {
+		performanceScore = 1.0 + (static_cast<double>(profile.gamesWon) / profile.gamesPlayed) * 4.0;
+	}
+	std::ostringstream outstream;
+	outstream << std::fixed << std::setprecision(1) << performanceScore;
+	auto performance = tgui::Label::create("Performance score: " + outstream.str() + " / 5");
+	performance->setPosition({ "5%", "70%" });
+	performance->getRenderer()->setTextSize(24);
+	panel->add(performance);
+	outstream.str("");
+	outstream.clear();
+
 	auto closeButton = tgui::Button::create("X");
 	closeButton->setSize({ "8%", "10%" });
 	closeButton->getRenderer()->setTexture("assets/images/buttons.png");

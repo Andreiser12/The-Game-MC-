@@ -165,6 +165,7 @@
     <ClCompile Include="HeuristicTreeTests.cpp" />
     <ClCompile Include="PlayerTests.cpp" />
     <ClCompile Include="SessionManagerTests.cpp" />
+    <ClCompile Include="TableTests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AssistantAI\AssistantAI.vcxproj">

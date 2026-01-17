@@ -7,6 +7,9 @@ import LobbyRoutes;
 import LobbyManager;
 import AuthenticationRoutes;
 
+static inline const std::string SERVER_IP_ADDRESS{ "192.168.1.131" };
+static inline constexpr uint16_t SERVER_PORT{ 18080 };
+
 int main()
 {	
 	DatabaseManager database{ "gameDB.db" };
@@ -20,6 +23,6 @@ int main()
 	auth.Logout(app);
 	auth.Users(app);
 	auth.Profile(app);
-	app.port(18080).multithreaded().run();
+	app.bindaddr(SERVER_IP_ADDRESS).port(SERVER_PORT).multithreaded().run();
 	return 0;
 }

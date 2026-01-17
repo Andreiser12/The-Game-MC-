@@ -24,6 +24,9 @@ import Utils;
 
 static inline constexpr uint16_t LOGIN_WIDTH{ 640u };
 static inline constexpr uint16_t LOGIN_HEIGHT{ 480u };
+static inline const std::string SERVER_IP{ "192.168.1.131" };
+static inline constexpr uint16_t SERVER_PORT { 18080 };
+static inline const std::string SERVER_IP_ADDRESS{ "http://" + SERVER_IP + ":" + std::to_string(SERVER_PORT) };
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -31,13 +34,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_ int       nCmdShow)
 {
 	sf::Image windowIcon;
-	if (!windowIcon.loadFromFile("assets/images/TheGame.png"))
-	{
-		throw std::runtime_error("TheGame.png file is missing");
-	}
-	ApiClient api{ "http://localhost:18080" };
-	cpr::Response response = cpr::Get(cpr::Url{ "http://localhost:18080/users" }, cpr::Timeout(300));
-	if (response.status_code == 404 || response.primary_port != 18080)
+	if (!windowIcon.loadFromFile("assets/images/TheGame.png")) throw std::runtime_error("TheGame.png file is missing");
+
+	ApiClient api{ SERVER_IP_ADDRESS };
+	cpr::Response response = cpr::Get(cpr::Url{ SERVER_IP_ADDRESS + "/users"}, cpr::Timeout(3000));
+	if (response.error || response.status_code == 404 || response.primary_port != 18080)
 	{
 		sf::VideoMode connectionFailedMode = sf::VideoMode::getDesktopMode();
 		connectionFailedMode.size = { LOGIN_WIDTH, LOGIN_HEIGHT };
@@ -115,10 +116,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		loginWindow.display();
 	}
 
-	if (backgroundLoader.joinable())
-	{
-		backgroundLoader.join();
-	}
+	if (backgroundLoader.joinable()) backgroundLoader.join();
 
 	if (_login.GetLoggedState() || _register.GetRegisteredState())
 	{
@@ -134,7 +132,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		while (menuWindow.isOpen())
 		{
-			float deltaTime = animationClock.restart().asSeconds();
+			float deltaTime{ animationClock.restart().asSeconds() };
 
 			std::optional<sf::Event> eventOpt;
 			while ((eventOpt = menuWindow.pollEvent()))

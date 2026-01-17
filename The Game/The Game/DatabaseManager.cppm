@@ -27,6 +27,7 @@ public:
 	explicit DatabaseManager(const std::string& databasePath);
 
 	bool AddUser(const DB::User& user);
+	bool UpdateStats(unsigned userId, bool gamePlayed, bool gameWon, double hoursPlayed);
 	std::optional<DB::User> GetUserByID(unsigned userID);
 	std::optional<DB::User> GetUserByName(const std::string& username);
 	[[nodiscard]] std::vector<DB::User> GetUsers();

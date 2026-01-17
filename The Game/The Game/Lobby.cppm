@@ -11,6 +11,8 @@ import <chrono>;
 import <ranges>;
 import <algorithm>;
 
+export constexpr double kSecondsPerHour = 3600.0;
+
 export enum class RemoveResult : uint8_t
 {
 	NotFound,
@@ -103,6 +105,9 @@ public:
 	[[nodiscard]] std::optional<EndTurnState> GetEndTurnState(unsigned playerId) const;
 	[[nodiscard]] std::optional<TurnState> GetTurnState(unsigned playerId) const;
 	[[nodiscard]] std::optional<GameResult> GetGameResult() const;
+	[[nodiscard]] double GetMatchDurationHours() const;
+	bool StatsAlreadyUpdated() const noexcept;
+	void MarkStatsUpdated() noexcept;
 	[[nodiscard]] std::optional<std::vector<uint8_t>> GetPlayerCards(unsigned playerId) const;
 	[[nodiscard]] std::optional<std::array<bool, 4>> GetValidDecks(uint8_t cardId) const;
 	[[nodiscard]] std::optional<std::vector<PlayerState>> GetPlayerStates() const;
@@ -143,4 +148,6 @@ private:
 	GameResult m_gameResult{ GameResult::Ongoing };
 	mutable std::mutex m_mutex;
 	std::unique_ptr<Table> m_table;
+	std::chrono::steady_clock::time_point m_gameStartTime;
+	bool m_statsUpdated{ false };
 };

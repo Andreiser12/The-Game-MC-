@@ -236,8 +236,20 @@ crow::response LobbyRoutes::LeaveMatch(const std::string& lobbyId, unsigned play
 	switch (result)
 	{
 	case RemoveResult::Removed:
+	{
+		auto gameResultFound = lobby->GetGameResult();
+		if (gameResultFound && *gameResultFound != GameResult::Ongoing && !lobby->StatsAlreadyUpdated())
+		{
+			const double hours = lobby->GetMatchDurationHours();
+			for (const auto& [id, info] : lobby->GetPlayers())
+			{
+				m_db.UpdateStats(id, true, false, hours);
+			}
+			lobby->MarkStatsUpdated();
+		}
 		data["PLAYER_LEFT"] = "SUCCESS";
 		return crow::response(200, data);
+	}
 	case RemoveResult::NotFound:
 		return crow::response(404);
 	}
@@ -463,6 +475,19 @@ crow::response LobbyRoutes::EndTurn(const std::string& lobbyId, unsigned playerI
 
 	auto drawnCards = lobby->EndTurn(playerId);
 	if (!drawnCards) return crow::response(409, "End turn not allowed");
+
+	auto gameResultFound = lobby->GetGameResult();
+	if (gameResultFound && *gameResultFound != GameResult::Ongoing && !lobby->StatsAlreadyUpdated())
+	{
+		const double hours = lobby->GetMatchDurationHours();
+		const bool isWin = (*gameResultFound == GameResult::Won);
+
+		for (const auto& [id, info] : lobby->GetPlayers())
+		{
+			m_db.UpdateStats(id, true, isWin, hours);
+		}
+		lobby->MarkStatsUpdated();
+	}
 
 	crow::json::wvalue data;
 	data["cards"] = crow::json::wvalue::list();

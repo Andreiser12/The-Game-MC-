@@ -159,6 +159,8 @@ bool Lobby::StartGame(unsigned playerId)
 
 	m_table = std::make_unique<Table>
 		(std::span<std::pair<unsigned, std::string_view>>{lobbyPlayers});
+
+	m_gameStartTime = std::chrono::steady_clock::now();
 	m_gameStarted.store(true, std::memory_order_release);
 	return true;
 }
@@ -188,7 +190,7 @@ void Lobby::TrimChatBuffer() noexcept
 	if (m_chatBuffer.size() > kMaxChatMessages) m_chatBuffer.pop_front();
 }
 
-bool Lobby::IsGameActive() const noexcept
+bool Lobby::IsGameActive() const noexcept 
 {
 	return m_gameStarted.load(std::memory_order_acquire) && m_table != nullptr;
 }
@@ -316,6 +318,23 @@ std::optional<GameResult> Lobby::GetGameResult() const
 {
 	if (!IsGameActive()) return std::nullopt;
 	return m_gameResult;
+}
+
+double Lobby::GetMatchDurationHours() const
+{
+	auto now = std::chrono::steady_clock::now();
+	std::chrono::duration<double> seconds = now - m_gameStartTime;
+	return seconds.count() / kSecondsPerHour;
+}
+
+bool Lobby::StatsAlreadyUpdated() const noexcept
+{
+	return m_statsUpdated;
+}
+
+void Lobby::MarkStatsUpdated() noexcept
+{
+	m_statsUpdated = true;
 }
 
 std::optional<std::array<bool, 4>> Lobby::GetValidDecks(uint8_t cardId) const

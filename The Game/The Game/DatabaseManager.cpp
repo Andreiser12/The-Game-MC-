@@ -17,6 +17,18 @@ bool DatabaseManager::AddUser(const DB::User& user)
 	return false;
 }
 
+bool DatabaseManager::UpdateStats(unsigned userId, bool gamePlayed, bool gameWon, double hoursPlayed)
+{
+	auto userFound = GetUserByID(userId);
+	if (!userFound) return false;
+	auto user = userFound.value();
+	if (gamePlayed) user.SetGamesPlayed(user.GetGamesPlayed() + 1);
+	if (gameWon) user.SetGamesWon(user.GetGamesWon() + 1);
+	user.SetHoursPlayed(user.GetHoursPlayed() + hoursPlayed);
+	m_storage.update(user);
+	return true;
+}
+
 std::optional<DB::User> DatabaseManager::GetUserByID(unsigned userID) 
 {
 	return m_storage.get_optional<DB::User>(userID);

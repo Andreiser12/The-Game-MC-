@@ -21,7 +21,7 @@ namespace Utils
 		return text.substr(0, maxChars - 1) + "...";
 	}
 
-	tgui::Panel::Ptr CreateSettingsPanel(tgui::Gui& gui,
+	tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
 		unsigned resolutionIndex,
 		bool isFullscreen,
 		unsigned framerateIndex,
@@ -119,40 +119,57 @@ namespace Utils
 		videoButton->setSize({ "90%", "10%" });
 		videoButton->setPosition("5%", "20%");
 		videoButton->getRenderer()->setTexture("assets/images/buttons.png");
-		Utils::StyleButton(videoButton);
+		StyleButton(videoButton);
 		sidebar->add(videoButton);
 
 		auto audioButton = tgui::Button::create("Audio");
 		audioButton->setSize({ "90%", "10%" });
 		audioButton->setPosition("5%", "35%");
 		audioButton->getRenderer()->setTexture("assets/images/buttons.png");
-		Utils::StyleButton(audioButton);
+		StyleButton(audioButton);
 		sidebar->add(audioButton);
 
 		auto gameplayButton = tgui::Button::create("Gameplay");
 		gameplayButton->setSize({ "90%", "10%" });
 		gameplayButton->setPosition("5%", "50%");
 		gameplayButton->getRenderer()->setTexture("assets/images/buttons.png");
-		Utils::StyleButton(gameplayButton);
+		StyleButton(gameplayButton);
 		sidebar->add(gameplayButton);
+
+		auto resolutionLabelBg = tgui::Panel::create({ "16%", "12.5%" });
+		resolutionLabelBg->setPosition("5%", "10%");
+		resolutionLabelBg->getRenderer()->setBackgroundColor(tgui::Color::Transparent);
+		videoPanel->add(resolutionLabelBg);
+
+		auto resolutionBgPicture = tgui::Picture::create("assets/images/settingsImage.png");
+		resolutionBgPicture->setSize("100%", "100%");
+		resolutionBgPicture->setPosition("0%", "0%");
+		resolutionBgPicture->setIgnoreMouseEvents(true);
+		resolutionLabelBg->add(resolutionBgPicture);
+
+		auto resolutionText = tgui::Label::create("Resolution");
+		resolutionText->setSize("90%", "40%");
+		resolutionText->setPosition("50%", "50%");
+		resolutionText->setOrigin(0.5f, 0.5f);
+		resolutionText->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+		resolutionText->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+		resolutionText->getRenderer()->setTextColor(tgui::Color(245, 240, 230));
+		resolutionText->getRenderer()->setTextOutlineColor(tgui::Color(40, 25, 15));
+		resolutionText->getRenderer()->setTextOutlineThickness(1.5f);
+		resolutionText->getRenderer()->setTextSize(24);
+		resolutionLabelBg->add(resolutionText);
 
 		auto resolutionContainer = tgui::Panel::create();
 		resolutionContainer->setSize({ "40%", "12.5%" });
 		resolutionContainer->setPosition("75%", "10%");
 		resolutionContainer->setOrigin(0.5f, 0.f);
-		resolutionContainer->getRenderer()->setBackgroundColor(tgui::Color(0, 0, 0, 0));
+		resolutionContainer->getRenderer()->setBackgroundColor(tgui::Color::Transparent);
 
-		auto resolutionText = tgui::Label::create("Resolution");
-		resolutionText->setSize("16%", "12.5%");
-		resolutionText->setPosition("5%", "10%");
-		resolutionText->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
-		resolutionText->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-		resolutionText->getRenderer()->setBorders(2);
-		resolutionText->getRenderer()->setTextColor(tgui::Color(245, 240, 230));
-		resolutionText->getRenderer()->setTextOutlineColor(tgui::Color(40, 25, 15));
-		resolutionText->getRenderer()->setTextOutlineThickness(1.5f);
-		resolutionText->getRenderer()->setTextSize(24);
-		videoPanel->add(resolutionText);
+		auto resContainerBg = tgui::Picture::create("assets/images/settingsImage.png");
+		resContainerBg->setSize("68%", "100%");
+		resContainerBg->setPosition("16%", "0%");
+		resContainerBg->setIgnoreMouseEvents(true);
+		resolutionContainer->add(resContainerBg);
 
 		auto resolutionValue = tgui::Label::create(
 			std::to_string((*resolutions)[*resolutionsIndexPtr].x) + "x" +
@@ -202,18 +219,30 @@ namespace Utils
 		resolutionContainer->add(leftResolutionArrow);
 		resolutionContainer->add(resolutionValue);
 		resolutionContainer->add(rightResolutionArrow);
+		videoPanel->add(resolutionContainer);
+
+		auto fullscreenLabelBg = tgui::Panel::create({ "16%", "12.5%" });
+		fullscreenLabelBg->setPosition("5%", "35%");
+		fullscreenLabelBg->getRenderer()->setBackgroundColor(tgui::Color::Transparent);
+		videoPanel->add(fullscreenLabelBg);
+
+		auto fullscreenBgPicture = tgui::Picture::create("assets/images/settingsImage.png");
+		fullscreenBgPicture->setSize("100%", "100%");
+		fullscreenBgPicture->setPosition("0%", "0%");
+		fullscreenBgPicture->setIgnoreMouseEvents(true);
+		fullscreenLabelBg->add(fullscreenBgPicture);
 
 		auto fullscreenText = tgui::Label::create("Fullscreen");
-		fullscreenText->setSize("16%", "12.5%");
-		fullscreenText->setPosition("5%", "35%");
+		fullscreenText->setSize("90%", "40%");
+		fullscreenText->setPosition("50%", "50%");
+		fullscreenText->setOrigin(0.5f, 0.5f);
 		fullscreenText->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
 		fullscreenText->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-		fullscreenText->getRenderer()->setBorders(2);
 		fullscreenText->getRenderer()->setTextColor(tgui::Color(245, 240, 230));
 		fullscreenText->getRenderer()->setTextOutlineColor(tgui::Color(40, 25, 15));
 		fullscreenText->getRenderer()->setTextOutlineThickness(1.5f);
-		fullscreenText->setTextSize(24);
-		videoPanel->add(fullscreenText);
+		fullscreenText->getRenderer()->setTextSize(24);
+		fullscreenLabelBg->add(fullscreenText);
 
 		auto fullscreenCheckbox = tgui::CheckBox::create();
 		fullscreenCheckbox->setSize("5%", "6%");
@@ -227,6 +256,30 @@ namespace Utils
 			btnSound.play();
 			*fullscreenPtr = false;
 			});
+		videoPanel->add(fullscreenCheckbox);
+
+		auto framerateLabelBg = tgui::Panel::create({ "16%", "12.5%" });
+		framerateLabelBg->setPosition("5%", "60%");
+		framerateLabelBg->getRenderer()->setBackgroundColor(tgui::Color::Transparent);
+		videoPanel->add(framerateLabelBg);
+
+		auto framerateBgPicture = tgui::Picture::create("assets/images/settingsImage.png");
+		framerateBgPicture->setSize("100%", "100%");
+		framerateBgPicture->setPosition("0%", "0%");
+		framerateBgPicture->setIgnoreMouseEvents(true);
+		framerateLabelBg->add(framerateBgPicture);
+
+		auto framerateText = tgui::Label::create("Framerate");
+		framerateText->setSize("90%", "40%");
+		framerateText->setPosition("50%", "50%");
+		framerateText->setOrigin(0.5f, 0.5f);
+		framerateText->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+		framerateText->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+		framerateText->getRenderer()->setTextSize(24);
+		framerateText->getRenderer()->setTextColor(tgui::Color(245, 240, 230));
+		framerateText->getRenderer()->setTextOutlineColor(tgui::Color(40, 25, 15));
+		framerateText->getRenderer()->setTextOutlineThickness(1.5f);
+		framerateLabelBg->add(framerateText);
 
 		auto framerateContainer = tgui::Panel::create();
 		framerateContainer->setSize({ "40%", "12.5%" });
@@ -234,90 +287,22 @@ namespace Utils
 		framerateContainer->setOrigin(0.5f, 0.f);
 		framerateContainer->getRenderer()->setBackgroundColor(tgui::Color(0, 0, 0, 0));
 
-		auto applyButton = tgui::Button::create("Apply");
-		applyButton->setSize({ "15%", "10%" });
-		applyButton->setPosition("75%", "80%");
-		applyButton->getRenderer()->setBorders(2);
-		applyButton->getRenderer()->setRoundedBorderRadius(10);
-		applyButton->getRenderer()->setTexture("assets/images/buttons.png");
-		Utils::StyleButton(applyButton);
-		applyButton->onClick([resolutionsIndexPtr, fullscreenPtr, framerateIndexPtr,
-			masterVolPtr, buttonsVolPtr, bgVolPtr, onApply, &btnSound]
-			{
-				btnSound.play();
-				if (onApply) {
-					onApply(
-						*resolutionsIndexPtr,
-						*fullscreenPtr,
-						*framerateIndexPtr,
-						*masterVolPtr,
-						*buttonsVolPtr,
-						*bgVolPtr
-					);
-				}
-			});
-		content->add(applyButton);
-
-		videoButton->onClick([=, &btnSound] {
-			btnSound.play();
-			videoPanel->setVisible(true);
-			audioPanel->setVisible(false);
-			gameplayPanel->setVisible(false);
-			applyButton->setVisible(true);
-			});
-
-		audioButton->onClick([=, &btnSound] {
-			btnSound.play();
-			videoPanel->setVisible(false);
-			audioPanel->setVisible(true);
-			gameplayPanel->setVisible(false);
-			applyButton->setVisible(true);
-			});
-
-		gameplayButton->onClick([=, &btnSound] {
-			btnSound.play();
-			videoPanel->setVisible(false);
-			audioPanel->setVisible(false);
-			gameplayPanel->setVisible(true);
-			applyButton->setVisible(false);
-			});
-
-		auto closeButton = tgui::Button::create("Close");
-		closeButton->setSize({ "15%", "10%" });
-		closeButton->setPosition("10%", "80%");
-		closeButton->getRenderer()->setTextSize(24);
-		closeButton->getRenderer()->setBorders(2);
-		closeButton->getRenderer()->setRoundedBorderRadius(10);
-		closeButton->getRenderer()->setTexture("assets/images/buttons.png");
-		Utils::StyleButton(closeButton);
-		closeButton->onClick([panel, onClose] {
-			panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(150));
-			if (onClose) onClose();
-			});
-		content->add(closeButton);
-
-		auto framerateText = tgui::Label::create("Framerate");
-		framerateText->setSize("16%", "12.5%");
-		framerateText->setPosition("5%", "60%");
-		framerateText->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
-		framerateText->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-		framerateText->setTextSize(24);
-		framerateText->getRenderer()->setBorders(2);
-		framerateText->getRenderer()->setTextColor(tgui::Color(245, 240, 230));
-		framerateText->getRenderer()->setTextOutlineColor(tgui::Color(40, 25, 15));
-		framerateText->getRenderer()->setTextOutlineThickness(1.5f);
-		videoPanel->add(framerateText);
+		auto frameContainerBg = tgui::Picture::create("assets/images/settingsImage.png");
+		frameContainerBg->setSize("68%", "100%");
+		frameContainerBg->setPosition("16%", "0%");
+		frameContainerBg->setIgnoreMouseEvents(true);
+		framerateContainer->add(frameContainerBg);
 
 		auto framerateValue = tgui::Label::create(std::to_string((*framerates)[*framerateIndexPtr]));
 		framerateValue->setSize("70%", "100%");
 		framerateValue->setPosition("15%", "0%");
 		framerateValue->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
 		framerateValue->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-		framerateValue->setTextSize(24);
-		framerateValue->getRenderer()->setBorders(2);
+		framerateValue->getRenderer()->setBackgroundColor(tgui::Color::Transparent);
 		framerateValue->getRenderer()->setTextColor(tgui::Color(245, 240, 230));
 		framerateValue->getRenderer()->setTextOutlineColor(tgui::Color(40, 25, 15));
 		framerateValue->getRenderer()->setTextOutlineThickness(1.5f);
+		framerateValue->getRenderer()->setTextSize(24);
 
 		auto leftFramerateArrow = tgui::Button::create("<");
 		leftFramerateArrow->setSize({ "15%", "100%" });
@@ -346,27 +331,44 @@ namespace Utils
 		framerateContainer->add(framerateValue);
 		framerateContainer->add(leftFramerateArrow);
 		framerateContainer->add(rightFramerateArrow);
-
-		videoPanel->add(resolutionContainer);
-		videoPanel->add(fullscreenCheckbox);
 		videoPanel->add(framerateContainer);
 
-		auto createAudioLabel = [](const tgui::String& text) {
-			auto label = tgui::Label::create(text);
-			label->setSize({ "25%", "12.5%" });
-			label->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
-			label->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-			label->getRenderer()->setBorders(2);
-			label->getRenderer()->setTextColor(tgui::Color(245, 240, 230));
-			label->getRenderer()->setTextOutlineColor(tgui::Color(40, 25, 15));
-			label->getRenderer()->setTextOutlineThickness(1.5f);
-			label->setTextSize(22);
-			return label;
-			};
+		auto masterLabelBg = tgui::Panel::create({ "25%", "8%" });
+		masterLabelBg->setPosition("5%", "11.5%");
+		masterLabelBg->getRenderer()->setBackgroundColor(tgui::Color::Transparent);
+		audioPanel->add(masterLabelBg);
 
-		auto masterLabel = createAudioLabel("Master Volume");
-		masterLabel->setPosition({ "5%", "10%" });
-		audioPanel->add(masterLabel);
+		auto masterBgPicture = tgui::Picture::create("assets/images/settingsImage.png");
+		masterBgPicture->setSize("100%", "100%");
+		masterBgPicture->setPosition("0%", "0%");
+		masterBgPicture->setIgnoreMouseEvents(true);
+		masterLabelBg->add(masterBgPicture);
+
+		auto masterLabel = tgui::Label::create("Master Volume");
+		masterLabel->setSize({ "100%", "100%" });
+		masterLabel->setPosition("0%", "0%");
+		masterLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+		masterLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+		masterLabel->getRenderer()->setBackgroundColor(tgui::Color::Transparent);
+		masterLabel->getRenderer()->setTextColor(tgui::Color(245, 240, 230));
+		masterLabel->getRenderer()->setTextOutlineColor(tgui::Color(40, 25, 15));
+		masterLabel->getRenderer()->setTextOutlineThickness(1.5f);
+		masterLabel->getRenderer()->setTextSize(22);
+		masterLabelBg->add(masterLabel);
+
+		auto masterValueLabel = tgui::Label::create(std::to_string(static_cast<int>(*masterVolPtr)) + "%");
+		masterValueLabel->setSize({ "10%", "8%" });
+		masterValueLabel->setPosition("92%", "11.5%");
+		masterValueLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+		masterValueLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+		masterValueLabel->getRenderer()->setBorders(2);
+		masterValueLabel->getRenderer()->setBackgroundColor(tgui::Color(50, 50, 50, 180));
+		masterValueLabel->getRenderer()->setBorderColor(tgui::Color::Black);
+		masterValueLabel->getRenderer()->setTextColor(tgui::Color(245, 240, 230));
+		masterValueLabel->getRenderer()->setTextOutlineColor(tgui::Color(40, 25, 15));
+		masterValueLabel->getRenderer()->setTextOutlineThickness(1.f);
+		masterValueLabel->getRenderer()->setTextSize(20);
+		audioPanel->add(masterValueLabel);
 
 		auto masterSlider = tgui::Slider::create();
 		masterSlider->setPosition({ "35%", "13.5%" });
@@ -375,14 +377,44 @@ namespace Utils
 		masterSlider->setMaximum(100);
 		masterSlider->setValue(*masterVolPtr);
 		StyleSlider(masterSlider);
-		masterSlider->onValueChange([masterVolPtr](float value) {
+		masterSlider->onValueChange([masterVolPtr, masterValueLabel](float value) {
 			*masterVolPtr = value;
+			masterValueLabel->setText(std::to_string(static_cast<int>(value)) + "%");
 			});
 		audioPanel->add(masterSlider);
 
-		auto buttonsLabel = createAudioLabel("Buttons Volume");
-		buttonsLabel->setPosition({ "5%", "35%" });
-		audioPanel->add(buttonsLabel);
+		auto buttonsLabelBg = tgui::Panel::create({ "25%", "8%" });
+		buttonsLabelBg->setPosition("5%", "36.5%");
+		buttonsLabelBg->getRenderer()->setBackgroundColor(tgui::Color::Transparent);
+		buttonsLabelBg->getRenderer()->setTextureBackground("assets/images/settingsImage.png");
+		buttonsLabelBg->getRenderer()->setBorders(2);
+		audioPanel->add(buttonsLabelBg);
+
+		auto buttonsLabel = tgui::Label::create("Buttons Volume");
+		buttonsLabel->setSize({ "100%", "100%" });
+		buttonsLabel->setPosition("0%", "0%");
+		buttonsLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+		buttonsLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+		buttonsLabel->getRenderer()->setBackgroundColor(tgui::Color::Transparent);
+		buttonsLabel->getRenderer()->setTextColor(tgui::Color(245, 240, 230));
+		buttonsLabel->getRenderer()->setTextOutlineColor(tgui::Color(40, 25, 15));
+		buttonsLabel->getRenderer()->setTextOutlineThickness(1.5f);
+		buttonsLabel->getRenderer()->setTextSize(22);
+		buttonsLabelBg->add(buttonsLabel);
+
+		auto buttonsValueLabel = tgui::Label::create(std::to_string(static_cast<int>(*buttonsVolPtr)) + "%");
+		buttonsValueLabel->setSize({ "10%", "8%" });
+		buttonsValueLabel->setPosition("92%", "36.5%");
+		buttonsValueLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+		buttonsValueLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+		buttonsValueLabel->getRenderer()->setBorders(2);
+		buttonsValueLabel->getRenderer()->setBackgroundColor(tgui::Color(50, 50, 50, 180));
+		buttonsValueLabel->getRenderer()->setBorderColor(tgui::Color::Black);
+		buttonsValueLabel->getRenderer()->setTextColor(tgui::Color(245, 240, 230));
+		buttonsValueLabel->getRenderer()->setTextOutlineColor(tgui::Color(40, 25, 15));
+		buttonsValueLabel->getRenderer()->setTextOutlineThickness(1.f);
+		buttonsValueLabel->getRenderer()->setTextSize(20);
+		audioPanel->add(buttonsValueLabel);
 
 		auto buttonsSlider = tgui::Slider::create();
 		buttonsSlider->setPosition({ "35%", "38.5%" });
@@ -391,14 +423,44 @@ namespace Utils
 		buttonsSlider->setMaximum(100);
 		buttonsSlider->setValue(*buttonsVolPtr);
 		StyleSlider(buttonsSlider);
-		buttonsSlider->onValueChange([buttonsVolPtr](float value) {
+		buttonsSlider->onValueChange([buttonsVolPtr, buttonsValueLabel](float value) {
 			*buttonsVolPtr = value;
+			buttonsValueLabel->setText(std::to_string(static_cast<int>(value)) + "%");
 			});
 		audioPanel->add(buttonsSlider);
 
-		auto bgLabel = createAudioLabel("Background Vol.");
-		bgLabel->setPosition({ "5%", "60%" });
-		audioPanel->add(bgLabel);
+		auto bgLabelBg = tgui::Panel::create({ "25%", "8%" });
+		bgLabelBg->setPosition("5%", "61.5%");
+		bgLabelBg->getRenderer()->setBackgroundColor(tgui::Color::Transparent);
+		bgLabelBg->getRenderer()->setTextureBackground("assets/images/settingsImage.png");
+		bgLabelBg->getRenderer()->setBorders(2);
+		audioPanel->add(bgLabelBg);
+
+		auto bgLabel = tgui::Label::create("Background Vol.");
+		bgLabel->setSize({ "100%", "100%" });
+		bgLabel->setPosition("0%", "0%");
+		bgLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+		bgLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+		bgLabel->getRenderer()->setBackgroundColor(tgui::Color::Transparent);
+		bgLabel->getRenderer()->setTextColor(tgui::Color(245, 240, 230));
+		bgLabel->getRenderer()->setTextOutlineColor(tgui::Color(40, 25, 15));
+		bgLabel->getRenderer()->setTextOutlineThickness(1.5f);
+		bgLabel->getRenderer()->setTextSize(22);
+		bgLabelBg->add(bgLabel);
+
+		auto bgValueLabel = tgui::Label::create(std::to_string(static_cast<int>(*bgVolPtr)) + "%");
+		bgValueLabel->setSize({ "10%", "8%" });
+		bgValueLabel->setPosition("92%", "61.5%");
+		bgValueLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+		bgValueLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+		bgValueLabel->getRenderer()->setBorders(2);
+		bgValueLabel->getRenderer()->setBackgroundColor(tgui::Color(50, 50, 50, 180));
+		bgValueLabel->getRenderer()->setBorderColor(tgui::Color::Black);
+		bgValueLabel->getRenderer()->setTextColor(tgui::Color(245, 240, 230));
+		bgValueLabel->getRenderer()->setTextOutlineColor(tgui::Color(40, 25, 15));
+		bgValueLabel->getRenderer()->setTextOutlineThickness(1.f);
+		bgValueLabel->getRenderer()->setTextSize(20);
+		audioPanel->add(bgValueLabel);
 
 		auto bgSlider = tgui::Slider::create();
 		bgSlider->setPosition({ "35%", "63.5%" });
@@ -406,11 +468,14 @@ namespace Utils
 		bgSlider->setMinimum(0);
 		bgSlider->setMaximum(100);
 		bgSlider->setValue(*bgVolPtr);
-		Utils::StyleSlider(bgSlider);
-		bgSlider->onValueChange([bgVolPtr](float value) {
+		StyleSlider(bgSlider);
+		bgSlider->onValueChange([bgVolPtr, bgValueLabel](float value) {
 			*bgVolPtr = value;
+			bgValueLabel->setText(std::to_string(static_cast<int>(value)) + "%");
 			});
 		audioPanel->add(bgSlider);
+
+
 
 		auto gameplayPicture = tgui::Picture::create("assets/images/gameplayImage1.png");
 		gameplayPicture->setSize("70%", "70%");
@@ -423,7 +488,7 @@ namespace Utils
 		leftArrow->setPosition("5%", "45%");
 		leftArrow->setOrigin(0.f, 0.5f);
 		leftArrow->getRenderer()->setTexture("assets/images/buttons.png");
-		Utils::StyleButton(leftArrow);
+		StyleButton(leftArrow);
 		leftArrow->setVisible(false);
 		gameplayPanel->add(leftArrow);
 
@@ -432,7 +497,7 @@ namespace Utils
 		rightArrow->setPosition("95%", "45%");
 		rightArrow->setOrigin(1.f, 0.5f);
 		rightArrow->getRenderer()->setTexture("assets/images/buttons.png");
-		Utils::StyleButton(rightArrow);
+		StyleButton(rightArrow);
 		gameplayPanel->add(rightArrow);
 
 		auto updateGameplayState = [gameplayIndexPtr, gameplayPicture, leftArrow, rightArrow]() {
@@ -463,6 +528,67 @@ namespace Utils
 			}
 			});
 
+		auto applyButton = tgui::Button::create("Apply");
+		applyButton->setSize({ "15%", "10%" });
+		applyButton->setPosition("75%", "80%");
+		applyButton->getRenderer()->setBorders(2);
+		applyButton->getRenderer()->setRoundedBorderRadius(10);
+		applyButton->getRenderer()->setTexture("assets/images/buttons.png");
+		Utils::StyleButton(applyButton);
+		applyButton->onClick([resolutionsIndexPtr, fullscreenPtr, framerateIndexPtr,
+			masterVolPtr, buttonsVolPtr, bgVolPtr, onApply, &btnSound]
+			{
+				btnSound.play();
+				if (onApply) {
+					onApply(
+						*resolutionsIndexPtr,
+						*fullscreenPtr,
+						*framerateIndexPtr,
+						*masterVolPtr,
+						*buttonsVolPtr,
+						*bgVolPtr
+					);
+				}
+			});
+		content->add(applyButton);
+
+		auto closeButton = tgui::Button::create("Close");
+		closeButton->setSize({ "15%", "10%" });
+		closeButton->setPosition("10%", "80%");
+		closeButton->getRenderer()->setTextSize(24);
+		closeButton->getRenderer()->setBorders(2);
+		closeButton->getRenderer()->setRoundedBorderRadius(10);
+		closeButton->getRenderer()->setTexture("assets/images/buttons.png");
+		Utils::StyleButton(closeButton);
+		closeButton->onClick([panel, onClose] {
+			panel->hideWithEffect(tgui::ShowEffectType::Fade, sf::milliseconds(150));
+			if (onClose) onClose();
+			});
+		content->add(closeButton);
+
+		videoButton->onClick([=, &btnSound] {
+			btnSound.play();
+			videoPanel->setVisible(true);
+			audioPanel->setVisible(false);
+			gameplayPanel->setVisible(false);
+			applyButton->setVisible(true);
+			});
+
+		audioButton->onClick([=, &btnSound] {
+			btnSound.play();
+			videoPanel->setVisible(false);
+			audioPanel->setVisible(true);
+			gameplayPanel->setVisible(false);
+			applyButton->setVisible(true);
+			});
+
+		gameplayButton->onClick([=, &btnSound] {
+			btnSound.play();
+			videoPanel->setVisible(false);
+			audioPanel->setVisible(false);
+			gameplayPanel->setVisible(true);
+			applyButton->setVisible(false);
+			});
 
 		return panel;
 	}

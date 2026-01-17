@@ -697,7 +697,6 @@ namespace Utils
 							return success;
 						}
 					);
-
 					gui.add(host, "HostPanel");
 					return true;
 				}

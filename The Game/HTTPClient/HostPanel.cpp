@@ -17,15 +17,15 @@ module HostPanel;
 
 static constexpr uint8_t kMinPlayers{ 2u };
 static const float kFrameDuration{ 0.04f };
+static inline int s_hostId{ -1 };
+static inline int s_playerId{ -1 };
 
 namespace HostPanel
 {
 	tgui::ListBox::Ptr playersListBox{ nullptr };
 	tgui::Button::Ptr startButton{ nullptr };
-	tgui::Picture::Ptr s_backgroundPicture{nullptr};
+	tgui::Picture::Ptr s_backgroundPicture{ nullptr };
 
-	int s_hostId{ -1 };
-	int s_playerId{ -1 };
 	float s_animationTime{ 0.0f };
 	int s_currentFrame{ 0 };
 
@@ -193,7 +193,6 @@ namespace HostPanel
 		if (playersListBox)
 		{
 			playersListBox->removeAllItems();
-			playersListBox->addItem("Players:");
 			for (const auto& username : playersCopy)
 			{
 				playersListBox->addItem(username);
@@ -206,7 +205,7 @@ namespace HostPanel
 		if (!startButton || !playersListBox) return;
 
 		bool isHost{ (s_hostId == s_playerId) };
-		bool enoughPlayers{ (playersListBox->getItemCount() - 1 >= kMinPlayers) };
+		bool enoughPlayers{ (playersListBox->getItemCount() >= kMinPlayers) };
 		startButton->setVisible(isHost);
 		startButton->setEnabled(isHost && enoughPlayers);
 	}
@@ -241,8 +240,8 @@ namespace HostPanel
 		std::vector<uint8_t> fileBuffer = ReadFileToBuffer("assets/gif/gif_animation.gif");
 		if (fileBuffer.empty()) return;
 
-		int* delays = nullptr;
-		int x = 0, y = 0, frames = 0, comp = 0;
+		int* delays{ nullptr };
+		int x{ 0 }, y{ 0 }, frames{ 0 }, comp{ 0 };
 
 		stbi_uc* data = stbi_load_gif_from_memory(
 			fileBuffer.data(),
@@ -294,8 +293,8 @@ namespace HostPanel
 		int processedCount{ 0 };
 		while (processedCount < limit && s_frames.size() < s_rawFrames.size())
 		{
-			size_t indexToLoad = s_frames.size();
-			RawFrameData& raw = s_rawFrames[indexToLoad];
+			size_t indexToLoad{ s_frames.size() };
+			RawFrameData& raw{ s_rawFrames[indexToLoad] };
 
 			tgui::Texture tguiTex;
 			tguiTex.loadFromPixelData(
@@ -303,7 +302,6 @@ namespace HostPanel
 				raw.pixels.data()
 			);
 			s_frames.emplace_back(tguiTex);
-
 			std::vector<uint8_t>().swap(raw.pixels);
 			processedCount++;
 		}

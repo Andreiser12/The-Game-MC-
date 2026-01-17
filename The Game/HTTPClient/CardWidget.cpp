@@ -12,7 +12,7 @@ module;
 
 module CardWidget;
 
-CardWidget::CardWidget(uint8_t id, bool isOwner) :
+CardWidget::CardWidget(uint8_t id, bool isOwner) noexcept :
 	m_id{ id },
 	m_isOwner{ isOwner },
 	m_faceState{ isOwner ? FaceState::FaceUp : FaceState::FaceDown }
@@ -20,17 +20,17 @@ CardWidget::CardWidget(uint8_t id, bool isOwner) :
 	CreateCardWidget();
 }
 
-tgui::Panel::Ptr CardWidget::GetWidget() const
+tgui::Panel::Ptr CardWidget::GetWidget() const noexcept
 {
 	return m_cardPanel;
 }
 
-uint8_t CardWidget::GetId() const
+uint8_t CardWidget::GetId() const noexcept
 {
 	return m_id;
 }
 
-void CardWidget::SetFaceState(FaceState state)
+void CardWidget::SetFaceState(FaceState state) noexcept
 {
 	m_faceState = state;
 	UpdateCardAppearance();
@@ -76,7 +76,7 @@ void CardWidget::CancelDrag()
 	m_cardPanel->setPosition(m_originalPosition);
 }
 
-void CardWidget::CheckOnDeck(std::shared_ptr<DeckWidget> deckWidget)
+void CardWidget::CheckOnDeck(const std::shared_ptr<DeckWidget>& deckWidget)
 {
 	if (!m_isDragging) return;
 
@@ -95,7 +95,7 @@ void CardWidget::CheckOnDeck(std::shared_ptr<DeckWidget> deckWidget)
 	}
 }
 
-bool CardWidget::IsPlacedOnDeck() const
+bool CardWidget::IsPlacedOnDeck() const noexcept
 {
 	return m_isPlacedOnDeck;
 }
@@ -105,7 +105,7 @@ void CardWidget::MarkAsPlaced()
 	m_isPlacedOnDeck = true;
 }
 
-bool CardWidget::IsDragging() const
+bool CardWidget::IsDragging() const noexcept
 {
 	return m_isDragging;
 }
@@ -181,7 +181,7 @@ void CardWidget::CreateCardWidget()
 	UpdateCardAppearance();
 }
 
-void CardWidget::UpdateCardAppearance()
+void CardWidget::UpdateCardAppearance() noexcept
 {
 	if (m_faceState == FaceState::FaceUp)
 	{
@@ -197,20 +197,20 @@ void CardWidget::UpdateCardAppearance()
 	}
 }
 
-bool CardWidget::IsNearDeck(const tgui::Panel::Ptr& deck)
+bool CardWidget::IsNearDeck(const tgui::Panel::Ptr& deck) const noexcept
 {
-	tgui::Vector2f cardPosition = m_cardPanel->getPosition();
-	tgui::Vector2f cardSize = m_cardPanel->getSize();
-	tgui::Vector2f cardCenter = cardPosition + (cardSize / 2.0f);
+	tgui::Vector2f cardPosition{ m_cardPanel->getPosition() };
+	tgui::Vector2f cardSize{ m_cardPanel->getSize() };
+	tgui::Vector2f cardCenter{ cardPosition + (cardSize / 2.0f) };
 
-	tgui::Vector2f deckPosition = deck->getPosition();
-	tgui::Vector2f deckSize = deck->getSize();
-	tgui::Vector2f deckCenter = deckPosition + (deckSize / 2.0f);
+	tgui::Vector2f deckPosition{ deck->getPosition() };
+	tgui::Vector2f deckSize{ deck->getSize() };
+	tgui::Vector2f deckCenter{ deckPosition + (deckSize / 2.0f) };
 
-	const float dx = cardCenter.x - deckCenter.x;
-	const float dy = cardCenter.y - deckCenter.y;
-	const float distance = std::sqrt(dx * dx + dy * dy);
-	const float threshold = std::max(cardSize.x, cardSize.y) * 0.8f;
+	const float dx{ cardCenter.x - deckCenter.x };
+	const float dy{ cardCenter.y - deckCenter.y };
+	const float distance{ std::sqrt(dx * dx + dy * dy) };
+	const float threshold{ std::max(cardSize.x, cardSize.y) * 0.8f };
 
 	return distance < threshold;
 }

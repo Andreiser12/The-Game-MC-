@@ -1,8 +1,4 @@
 module;
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-
 #include <optional>
 #include <functional>
 #include <memory>
@@ -25,29 +21,35 @@ public:
 		FaceDown
 	};
 	
-	CardWidget(uint8_t id, bool isOwner);
+	explicit CardWidget(uint8_t id, bool isOwner) noexcept;
 
-	tgui::Panel::Ptr GetWidget() const;
-	uint8_t GetId() const;
+	CardWidget(const CardWidget&) = delete;
+	CardWidget& operator=(const CardWidget&) = delete;
+	CardWidget(CardWidget&&) = delete;
+	CardWidget& operator=(CardWidget&&) = delete;
 
-	void SetFaceState(FaceState state);
+	[[nodiscard]] tgui::Panel::Ptr GetWidget() const noexcept;
+	[[nodiscard]] uint8_t GetId() const noexcept;
+	[[nodiscard]] bool IsPlacedOnDeck() const noexcept;
+	[[nodiscard]] bool IsDragging() const noexcept;
+
+	void SetFaceState(FaceState state) noexcept;
 	void SetPosition(const tgui::String& x, const tgui::String& y);
 	void SetSize(const tgui::String& width, const tgui::String& height);
 	void SetDraggable(bool draggable);
 	void UpdateDragPosition(tgui::Vector2f mousePos);
 	void CancelDrag();
-	void CheckOnDeck(std::shared_ptr<DeckWidget> deckWidget);
-	bool IsPlacedOnDeck() const;
+	void CheckOnDeck(const std::shared_ptr<DeckWidget>& deckWidget);
 	void MarkAsPlaced();
-	bool IsDragging() const;
+	
 
 	std::function<void()> onPickup;
 	std::function<bool(uint8_t cardId, std::shared_ptr<DeckWidget>)> onCardPlaced;
 
 private:
 	void CreateCardWidget();
-	void UpdateCardAppearance();
-	bool IsNearDeck(const tgui::Panel::Ptr& deck);
+	void UpdateCardAppearance() noexcept;
+	bool IsNearDeck(const tgui::Panel::Ptr& deck) const noexcept;
 
 private:
 	uint8_t m_id;

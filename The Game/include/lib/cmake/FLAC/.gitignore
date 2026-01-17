@@ -1,0 +1,5 @@
+/flac-config-version.cmake
+/flac-config.cmake
+/targets-debug.cmake
+/targets-release.cmake
+/targets.cmake

@@ -51,7 +51,7 @@
     <ClCompile Include="..\The Game\GreedyAI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="x64\Debug\AssistantAI.cppm">
+    <ClCompile Include="..\AssistantAI\AssistantAI.cppm">
       <Filter>Header Files</Filter>
     </ClCompile>
   </ItemGroup>

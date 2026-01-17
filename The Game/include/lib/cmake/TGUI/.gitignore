@@ -1,0 +1,8 @@
+/TGUIConfig.cmake
+/TGUIConfigVersion.cmake
+/TGUISharedTargets-debug.cmake
+/TGUISharedTargets-release.cmake
+/TGUISharedTargets.cmake
+/TGUIStaticTargets-debug.cmake
+/TGUIStaticTargets-release.cmake
+/TGUIStaticTargets.cmake

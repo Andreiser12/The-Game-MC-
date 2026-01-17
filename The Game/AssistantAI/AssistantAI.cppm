@@ -32,10 +32,6 @@ export namespace AssistantAI {
 		int score;
 	};
 
-	constexpr int LOCAL_WEIGHT{ 1 };
-	constexpr int GLOBAL_WEIGHT{ 2 };
-	constexpr int RISK_WEIGHT{ 1 };
-
 	export class ASSISTANTAI_API GreedyBot
 	{
 	public:
@@ -119,5 +115,9 @@ export namespace AssistantAI {
 
 			return *best;
 		}
+	public:
+		static constexpr int LOCAL_WEIGHT{ 1 };
+		static constexpr int GLOBAL_WEIGHT{ 2 };
+		static constexpr int RISK_WEIGHT{ 1 };
 	};
 }

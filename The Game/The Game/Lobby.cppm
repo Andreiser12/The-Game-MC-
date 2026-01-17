@@ -11,7 +11,7 @@ import <chrono>;
 import <ranges>;
 import <algorithm>;
 
-export constexpr double kSecondsPerHour = 3600.0;
+export constexpr double kSecondsPerHour{ 3600.0 };
 
 export enum class RemoveResult : uint8_t
 {
@@ -144,8 +144,10 @@ private:
 
 	std::unordered_map<unsigned, PlayerInfo> m_players;
 	std::unordered_map<unsigned, std::chrono::steady_clock::time_point> m_lastPingPlayer;
+
 	unsigned m_lastMessageId{ 0u };
 	std::deque<ChatMessage> m_chatBuffer;
+
 	std::atomic<bool> m_gameStarted{ false };
 	GameResult m_gameResult{ GameResult::Ongoing };
 	mutable std::mutex m_mutex;

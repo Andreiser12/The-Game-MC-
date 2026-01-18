@@ -7,7 +7,7 @@ import LobbyRoutes;
 import LobbyManager;
 import AuthenticationRoutes;
 
-static inline const std::string SERVER_IP_ADDRESS{ "192.168.1.131" };
+static inline const std::string SERVER_IP_ADDRESS{ "192.168.1.130" };
 static inline constexpr uint16_t SERVER_PORT{ 18080 };
 
 int main()

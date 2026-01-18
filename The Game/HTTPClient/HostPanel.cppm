@@ -35,5 +35,5 @@ export namespace HostPanel
 
     void UpdateBackground(float deltaTime);
     void LoadGifDataAsync();
-    void GenerateTextures(int limit = 1000);
+    void GenerateTextures(int limit);
 };

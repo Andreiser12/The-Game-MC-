@@ -11,7 +11,7 @@ module RegisterWindow;
 
 import Utils;
 
-static inline const std::string SERVER_IP{ "192.168.1.131" };
+static inline const std::string SERVER_IP{ "192.168.1.130" };
 static inline constexpr uint16_t SERVER_PORT{ 18080 };
 static inline const std::string SERVER_ADDRESS{ "http://" + SERVER_IP + ":" + std::to_string(SERVER_PORT) };
 

@@ -17,6 +17,7 @@ module HostPanel;
 
 static constexpr uint8_t kMinPlayers{ 2u };
 static const float kFrameDuration{ 0.04f };
+static const int kTextureLimit{ 1 };
 static inline int s_hostId{ -1 };
 static inline int s_playerId{ -1 };
 
@@ -62,7 +63,7 @@ namespace HostPanel
 	{
 		if (s_frames.empty() && !s_rawFrames.empty())
 		{
-			GenerateTextures(1);
+			GenerateTextures(kTextureLimit);
 		}
 
 		if (!s_frames.empty())
@@ -217,7 +218,7 @@ namespace HostPanel
 
 	void HostPanel::UpdateBackground(float deltaTime)
 	{
-		GenerateTextures(1);
+		GenerateTextures(kTextureLimit);
 		if (s_frames.empty() || !s_backgroundPicture) return;
 
 		s_animationTime += deltaTime;

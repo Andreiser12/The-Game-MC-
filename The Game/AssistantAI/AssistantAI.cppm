@@ -119,7 +119,8 @@ export namespace AssistantAI {
 				if (canPlay) validMovesAfter++;
 			}
 
-			float futureFlexibility = static_cast<float>(validMovesAfter) / std::max(1, static_cast<int>(remainingHand.size()));
+			float futureFlexibility = static_cast<float>(validMovesAfter) /
+				std::max(1, static_cast<int>(remainingHand.size()));
 			return -futureFlexibility * FUTURE_FLEXIBILITY_WEIGHT;
 		}
 

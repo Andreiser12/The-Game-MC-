@@ -45,12 +45,6 @@
     <ClCompile Include="..\The Game\Table.cppm">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\The Game\GreedyAI.cppm">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\The Game\GreedyAI.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\AssistantAI\AssistantAI.cppm">
       <Filter>Header Files</Filter>
     </ClCompile>

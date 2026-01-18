@@ -26,6 +26,7 @@ export struct ChatMessage
 	unsigned id;
 	std::string username;
 	std::string message;
+	bool isSystem;
 };
 
 export struct DeckState
@@ -90,7 +91,7 @@ public:
 	[[nodiscard]] RemoveResult RemoveMatchPlayer(unsigned playerId);
 	bool IsGameActive() const noexcept;
 
-	void AddChatMessage(std::string_view username, std::string_view message);
+	void AddChatMessage(std::string_view username, std::string_view message, bool isSystem);
 	[[nodiscard]] std::optional<std::vector<ChatMessage>> GetMessagesAfter(unsigned afterId) const;
 
 	[[nodiscard]] bool StartGame(unsigned playerId);

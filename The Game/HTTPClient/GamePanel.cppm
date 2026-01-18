@@ -74,8 +74,9 @@ public:
 
 	void MarkPlayerAsLeft(const std::string& username);
 
-private:
-	uint8_t GetCardsPlaced() const;
+public:
+	const tgui::Color USER_COLOR{ 30, 30, 30 };
+	const tgui::Color SYSTEM_COLOR{ 90, 140, 200 };
 
 private:
 	inline constexpr SlotArray GetSlotsForPlayerCount(size_t count) const noexcept
@@ -95,6 +96,7 @@ private:
 	void RebuildMyHand();
 	void HandleGameResult(GameResult result);
 	void ShowGameResultOverlay(GameResult result);
+	uint8_t GetCardsPlaced() const;
 
 private:
 	unsigned m_lastMessageId{ 0u };

@@ -54,10 +54,14 @@ export struct ChatMessage
 	unsigned id;
 	std::string username;
 	std::string message;
+	bool isSystem;
 
-	ChatMessage(unsigned i, std::string u, std::string m) :
-		id(i), username(std::move(u)), message(std::move(m)) {
-	}
+	ChatMessage(unsigned i, std::string u, std::string m, bool system) :
+		id(i),
+		username(std::move(u)),
+		message(std::move(m)),
+		isSystem(system)
+	{}
 };
 
 export struct DeckState
@@ -135,18 +139,18 @@ public:
 	bool IsLoggedIn();
 	bool DeleteAccount();
 
-	std::optional<std::string> CreateLobby(const std::string& username);
+	std::optional<std::string> CreateLobby(const std::string& username) const;
 	JoinLobbyResult JoinLobbyValidated(const std::string& lobbyId, const std::string& username);
 	bool LeaveLobby(const std::string& lobbyId, unsigned playerId);
 	std::optional<crow::json::rvalue> GetLobbyInfo(const std::string& lobbyId) const;
 	std::vector<std::string> GetLobbyPlayers(const std::string& lobbyId) const;
 
-	bool StartMatch(const std::string& lobbyId, unsigned playerId);
+	bool StartMatch(const std::string& lobbyId, unsigned playerId) const;
 	std::optional<LeaveMatchResult> LeaveMatch();
-	std::optional<std::vector<PlayerState>> GetPlayerStates();
+	std::optional<std::vector<PlayerState>> GetPlayerStates() const;
 	bool ReportGameLoss();
 
-	bool SendChatMessage(const std::string& message) const;
+	bool SendChatMessage(const std::string& message, bool isSystem) const;
 	std::optional<std::vector<ChatMessage>> GetNewMessages(unsigned afterId);
 
 	bool PlayCard(uint8_t cardId, uint8_t deckId) const;

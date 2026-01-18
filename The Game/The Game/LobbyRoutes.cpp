@@ -306,11 +306,12 @@ crow::response LobbyRoutes::SendChatMessage(const crow::request& req)
 	const std::string username{ json["username"].s() };
 	const unsigned playerId{ static_cast<unsigned>(json["playerId"].i()) };
 	const std::string message{ json["message"].s() };
+	const bool isSystem{ json["isSystem"].b() };
 
 	auto lobby = m_manager.GetLobby(lobbyId);
 	if (!lobby) return crow::response(404, "Lobby not found");
 
-	lobby->AddChatMessage(username, message);
+	lobby->AddChatMessage(username, message, isSystem);
 
 	crow::json::wvalue data;
 	data["status"] = "OK";
@@ -347,7 +348,7 @@ crow::response LobbyRoutes::GetNewMessages(const crow::request& request, const s
 		messageJson["id"] = newMsg.id;
 		messageJson["username"] = newMsg.username;
 		messageJson["message"] = newMsg.message;
-		messageJson["timestamp"] = std::chrono::system_clock::now().time_since_epoch().count();
+		messageJson["isSystem"] = newMsg.isSystem;
 		messageList.push_back(std::move(messageJson));
 	}
 	data["messages"] = std::move(messageList);

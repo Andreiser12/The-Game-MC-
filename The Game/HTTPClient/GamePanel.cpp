@@ -141,7 +141,7 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 
 			std::thread([this, messageSent]()
 				{
-					if (!m_apiClient.SendChatMessage(messageSent))
+					if (!m_apiClient.SendChatMessage(messageSent, false))
 					{
 						m_chat->addLine("[Error]: Message has not been sent", tgui::Color::Red);
 					}
@@ -161,7 +161,7 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 
 			std::thread([this, messageSent]()
 				{
-					if (!m_apiClient.SendChatMessage(messageSent))
+					if (!m_apiClient.SendChatMessage(messageSent, false))
 					{
 						m_chat->addLine("[Error]: Message has not been sent", tgui::Color::Red);
 					}
@@ -335,10 +335,17 @@ void GamePanel::UpdateChat()
 	auto newMessages = m_apiClient.SnapshotNewChat();
 	if (!newMessages) return;
 
-	for (const auto& message : newMessages.value())
+	for (const auto& chatMessage : newMessages.value())
 	{
-		m_chat->addLine(message.username + ": " + message.message);
-		m_lastMessageId = std::max(m_lastMessageId, message.id);
+		if (chatMessage.isSystem)
+		{
+			m_chat->addLine(chatMessage.message, SYSTEM_COLOR);
+		}
+		else
+		{
+			m_chat->addLine(chatMessage.username + ": " + chatMessage.message, USER_COLOR);
+		}
+		m_lastMessageId = std::max(m_lastMessageId, chatMessage.id);
 	}
 }
 
@@ -358,7 +365,7 @@ void GamePanel::UpdateTurnState()
 
 	if (serverSaysItIsMyTurn && !m_isMyTurn)
 	{
-		m_timeLeft = 60.0f;
+		m_timeLeft = 10.0f;
 		m_timerLabel->getRenderer()->setTextColor(tgui::Color::White);
 	}
 
@@ -709,12 +716,12 @@ void GamePanel::OnTurnTimeout()
 				}
 
 			}
-			m_chat->addLine("[AI]: Placed " + std::to_string(cardsRequired) +
-				"card(s) automatically", tgui::Color::Yellow);
+			const std::string message{ "[AI]: Placed " + std::to_string(cardsRequired) +
+				" card(s) automatically" };
+			m_apiClient.SendChatMessage(message, true);
 		}
 		else
 		{
-			m_chat->addLine("[System]: No valid moves available - Auto-loss", tgui::Color::Red);
 			m_apiClient.ReportGameLoss();
 			HandleGameResult(GameResult::Lost);
 			return;

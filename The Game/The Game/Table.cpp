@@ -2,8 +2,6 @@
 
 import AssistantAI;
 
-import GreedyAI;
-
 constexpr static size_t DECK_SIZE{ 98 };
 constexpr static uint8_t DECK_COUNT{ 4u };
 

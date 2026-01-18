@@ -20,16 +20,33 @@ bool Lobby::AddPlayer(unsigned playerId, const std::string& username)
 	return true;
 }
 
-void Lobby::AddChatMessage(std::string_view username, std::string_view message)
+void Lobby::AddChatMessage(std::string_view username, std::string_view message, bool isSystem)
 {
 	std::lock_guard lock(m_mutex);
 
-	std::string filteredMessage{ ChatFilter::FilterMessage(std::string(message)) };
-	m_chatBuffer.emplace_back(ChatMessage{
+	std::string finalMessage;
+
+	if (isSystem)
+	{
+		finalMessage = std::string(message);
+		m_chatBuffer.emplace_back(ChatMessage{
+		.id = ++m_lastMessageId,
+		.username = "",
+		.message = finalMessage,
+		.isSystem = isSystem
+			});
+	}
+
+	else
+	{
+		finalMessage = ChatFilter::FilterMessage(std::string(message));
+		m_chatBuffer.emplace_back(ChatMessage{
 		.id = ++m_lastMessageId,
 		.username = std::string(username),
-		.message = filteredMessage
+		.message = finalMessage,
+		.isSystem = isSystem
 		});
+	}
 
 	TrimChatBuffer();
 }
@@ -192,7 +209,7 @@ void Lobby::TrimChatBuffer() noexcept
 	if (m_chatBuffer.size() > kMaxChatMessages) m_chatBuffer.pop_front();
 }
 
-bool Lobby::IsGameActive() const noexcept 
+bool Lobby::IsGameActive() const noexcept
 {
 	return m_gameStarted.load(std::memory_order_acquire) && m_table != nullptr;
 }

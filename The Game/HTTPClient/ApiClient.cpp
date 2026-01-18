@@ -102,7 +102,7 @@ bool ApiClient::DeleteAccount()
 	return true;
 }
 
-std::optional<std::string> ApiClient::CreateLobby(const std::string& username)
+std::optional<std::string> ApiClient::CreateLobby(const std::string& username) const
 {
 	const std::string url = m_serverURL + "/lobby/create";
 	std::string jsonBody = "{\"username\":\"" + username +
@@ -223,7 +223,7 @@ std::optional<LeaveMatchResult> ApiClient::LeaveMatch()
 	return LeaveMatchResult::NotInLobby;
 }
 
-std::optional<std::vector<PlayerState>> ApiClient::GetPlayerStates()
+std::optional<std::vector<PlayerState>> ApiClient::GetPlayerStates() const
 {
 	const std::string url{ m_serverURL + "/lobby/" + m_lobbyId
 		+ "/players/states" };
@@ -255,7 +255,7 @@ std::optional<std::vector<PlayerState>> ApiClient::GetPlayerStates()
 	return playerStates;
 }
 
-bool ApiClient::StartMatch(const std::string& lobbyId, unsigned playerId)
+bool ApiClient::StartMatch(const std::string& lobbyId, unsigned playerId) const
 {
 	const std::string url{ m_serverURL + "/lobby/start" };
 	const std::string jsonBody{
@@ -277,20 +277,19 @@ bool ApiClient::StartMatch(const std::string& lobbyId, unsigned playerId)
 	return json["status"].s() == "GAME_STARTED";
 }
 
-bool ApiClient::SendChatMessage(const std::string& message) const
+bool ApiClient::SendChatMessage(const std::string& message, bool isSystem) const
 {
 	const std::string url{ m_serverURL + "/lobby/chat/send" };
-	const std::string jsonBody{
-		"{"
-		"\"lobbyId\": \"" + m_lobbyId + "\","
-		"\"username\": \"" + m_username + "\","
-		"\"playerId\": " + std::to_string(m_playerId) + ","
-		"\"message\": \"" + message + "\""
-		"}" };
+	crow::json::wvalue jsonBody;
+	jsonBody["lobbyId"] = m_lobbyId;
+	jsonBody["username"] = m_username;
+	jsonBody["playerId"] = m_playerId;
+	jsonBody["isSystem"] = isSystem;
+	jsonBody["message"] = message;
 
 	cpr::Response response = cpr::Post(
 		cpr::Url{ url },
-		cpr::Body{ jsonBody },
+		cpr::Body{ jsonBody.dump() },
 		kTimeout);
 
 	if (response.error || response.status_code != 200) return false;
@@ -302,8 +301,8 @@ std::optional<std::vector<ChatMessage>> ApiClient::GetNewMessages(unsigned after
 {
 	if (m_lobbyId.empty()) return std::nullopt;
 
-	const std::string url = m_serverURL + "/lobby/" + m_lobbyId
-		+ "/chat/messages?after=" + std::to_string(afterId);
+	const std::string url{ m_serverURL + "/lobby/" + m_lobbyId
+		+ "/chat/messages?after=" + std::to_string(afterId) };
 
 	cpr::Response response = cpr::Get(
 		cpr::Url{ url },
@@ -321,7 +320,8 @@ std::optional<std::vector<ChatMessage>> ApiClient::GetNewMessages(unsigned after
 		result.emplace_back(
 			static_cast<unsigned>(message["id"].i()),
 			message["username"].s(),
-			message["message"].s());
+			message["message"].s(),
+			message["isSystem"].b());
 	}
 	return result;
 }
@@ -685,11 +685,11 @@ std::optional<std::vector<std::pair<uint8_t, uint8_t>>> ApiClient::GetAICards(ui
 	std::vector<std::pair<uint8_t, uint8_t>> cards;
 	cards.reserve(cardsRequired);
 
-	for (size_t i=0; i<cardIds.size(); ++i)
+	for (size_t i = 0; i < cardIds.size(); ++i)
 	{
 		cards.emplace_back(
 			static_cast<uint8_t>(cardIds[i].i()),
-			static_cast<uint8_t>(deckIds[i].i()) 
+			static_cast<uint8_t>(deckIds[i].i())
 		);
 	}
 	return cards;

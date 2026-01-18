@@ -169,8 +169,6 @@
     <ClCompile Include="..\The Game\Deck.cppm">
       <FileType>Document</FileType>
     </ClCompile>
-    <ClCompile Include="..\The Game\GreedyAI.cpp" />
-    <ClCompile Include="..\The Game\GreedyAI.cppm" />
     <ClCompile Include="..\The Game\Player.cpp" />
     <ClCompile Include="..\The Game\Player.cppm">
       <FileType>Document</FileType>

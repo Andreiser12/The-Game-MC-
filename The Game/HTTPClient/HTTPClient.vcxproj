@@ -111,13 +111,13 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>"C:\Users\andre\Desktop\third party mc"</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>"C:\Users\razva\Desktop\third party mc"</AdditionalIncludeDirectories>
       <ScanSourceForModuleDependencies>true</ScanSourceForModuleDependencies>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>"C:\Users\andre\Desktop\third party mc\lib"</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>"C:\Users\razva\Desktop\third party mc\lib"</AdditionalLibraryDirectories>
       <AdditionalDependencies>sfml-system-d.lib;sfml-graphics-d.lib;sfml-window-d.lib;sfml-network-d.lib;tgui-d.lib;%(AdditionalDependencies);sfml-audio-d.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -131,13 +131,13 @@
       </PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>"C:\Users\andre\Desktop\third party mc"</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>"C:\Users\razva\Desktop\third party mc"</AdditionalIncludeDirectories>
       <ScanSourceForModuleDependencies>true</ScanSourceForModuleDependencies>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>"C:\Users\andre\Desktop\third party mc\lib"</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>"C:\Users\razva\Desktop\third party mc\lib"</AdditionalLibraryDirectories>
       <AdditionalDependencies>sfml-system.lib;sfml-graphics.lib;sfml-window.lib;sfml-network.lib;tgui.lib;%(AdditionalDependencies);sfml-audio-d.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

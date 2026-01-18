@@ -328,8 +328,8 @@ namespace Utils
 		masterLabelBg->add(masterLabel);
 
 		auto masterValueLabel = tgui::Label::create(std::to_string(static_cast<int>(masterVol)) + "%");
-		masterValueLabel->setSize({ "10%", "8%" });
-		masterValueLabel->setPosition("92%", "11.5%");
+		masterValueLabel->setSize({ "9%", "8%" });
+		masterValueLabel->setPosition("90%", "11.5%");
 		masterValueLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
 		masterValueLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
 		masterValueLabel->getRenderer()->setBorders(2);
@@ -373,8 +373,8 @@ namespace Utils
 		buttonsLabelBg->add(buttonsLabel);
 
 		auto buttonsValueLabel = tgui::Label::create(std::to_string(static_cast<int>(buttonsVol)) + "%");
-		buttonsValueLabel->setSize({ "10%", "8%" });
-		buttonsValueLabel->setPosition("92%", "36.5%");
+		buttonsValueLabel->setSize({ "9%", "8%" });
+		buttonsValueLabel->setPosition("90%", "36.5%");
 		buttonsValueLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
 		buttonsValueLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
 		buttonsValueLabel->getRenderer()->setBorders(2);
@@ -418,8 +418,8 @@ namespace Utils
 		bgLabelBg->add(bgLabel);
 
 		auto bgValueLabel = tgui::Label::create(std::to_string(static_cast<int>(bgVol)) + "%");
-		bgValueLabel->setSize({ "10%", "8%" });
-		bgValueLabel->setPosition("92%", "61.5%");
+		bgValueLabel->setSize({ "9%", "8%" });
+		bgValueLabel->setPosition("90%", "61.5%");
 		bgValueLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
 		bgValueLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
 		bgValueLabel->getRenderer()->setBorders(2);

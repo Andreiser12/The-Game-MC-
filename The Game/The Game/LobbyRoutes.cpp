@@ -598,8 +598,10 @@ crow::response LobbyRoutes::GetPlayerStates(const std::string& lobbyId)
 	crow::json::wvalue data;
 	data["USERNAMES"] = crow::json::wvalue::list(states.size());
 	data["IS_IN_MATCH"] = crow::json::wvalue::list(states.size());
+	data["PLAYERIDS"] = crow::json::wvalue::list(states.size());
 	for (size_t i = 0; i < states.size(); ++i)
 	{
+		data["PLAYERIDS"][i] = states[i].playerId;
 		data["USERNAMES"][i] = states[i].username;
 		data["IS_IN_MATCH"][i] = states[i].isInMatch;
 	}

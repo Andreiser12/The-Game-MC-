@@ -388,6 +388,7 @@ std::optional<std::vector<PlayerState>> Lobby::GetPlayerStates() const
 	{
 		states.emplace_back(
 			PlayerState{
+				.playerId = playerId,
 				.username = playerInfo.username,
 				.isInMatch = playerInfo.isConnected && m_table->HasPlayer(playerId)
 			});

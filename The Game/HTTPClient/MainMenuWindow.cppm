@@ -7,6 +7,7 @@ module;
 #include <SFML/Audio.hpp>
 #include <TGUI/TGUI.hpp>
 #include <TGUI/Backend/SFML-Graphics.hpp>
+#include <filesystem>
 
 export module MainMenuWindow;
 
@@ -32,6 +33,8 @@ public:
 
 	void ExitButtonPressed();
 	void SettingsButtonPressed();
+	void OpenProfilePanel();
+	void OpenAvatarFileDialog();
 	void ProfileButtonPressed();
 	void PlayPanelPressed();
 	void CloseHostPanel();

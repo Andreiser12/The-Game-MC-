@@ -7,6 +7,7 @@
 #include <SFML/Audio.hpp>
 #include "TGUI/TGUI.hpp"
 #include "TGUI/Backend/SFML-Graphics.hpp"
+#include <filesystem>
 
 module Utils;
 
@@ -552,7 +553,8 @@ namespace Utils
 		const UserProfile& profile,
 		sf::Sound& btnSound,
 		std::function<void()> onClose,
-		std::function<void()> onDeleteAccount)
+		std::function<void()> onDeleteAccount,
+		std::function<void()> onChangeAvatar)
 	{
 		auto panel = tgui::Panel::create({ "60%", "60%" });
 		panel->setPosition({ "20%", "20%" });
@@ -608,8 +610,8 @@ namespace Utils
 		outstream.clear();
 
 		auto deleteButton = tgui::Button::create("Delete Account");
-		deleteButton->setSize({ "25%", "10%" });
-		deleteButton->setPosition({ "70%", "85%" });
+		deleteButton->setSize({ "23%", "8%" });
+		deleteButton->setPosition({ "72%", "85%" });
 		deleteButton->getRenderer()->setTexture("assets/images/buttons.png");
 		StyleButton(deleteButton);
 		deleteButton->getRenderer()->setTextSize(18);
@@ -621,6 +623,46 @@ namespace Utils
 					onDeleteAccount();
 			});
 		panel->add(deleteButton);
+
+		auto avatar = tgui::Picture::create();
+		tgui::Texture avatarTexture;
+		const std::string defaultAvatar = "assets/images/playerDefaultAvatar.jpg";
+		sf::Image img;
+		if (!profile.avatarPath.empty())
+		{
+			std::filesystem::path localAvatar =
+				std::filesystem::path("assets/avatars") /
+				std::filesystem::path(profile.avatarPath).filename();
+
+			if (std::filesystem::exists(localAvatar) && img.loadFromFile(localAvatar.string()))
+				avatarTexture.loadFromPixelData({ img.getSize().x, img.getSize().y }, img.getPixelsPtr());
+			else if(img.loadFromFile(defaultAvatar))
+				avatarTexture.loadFromPixelData({ img.getSize().x, img.getSize().y }, img.getPixelsPtr());
+		}
+		else if (img.loadFromFile(defaultAvatar))
+			avatarTexture.loadFromPixelData({ img.getSize().x, img.getSize().y }, img.getPixelsPtr());
+		avatar->getRenderer()->setTexture(avatarTexture);
+		avatar->setSize({ "22%", "30%" });
+		avatar->setPosition({ "72%", "38%" });
+		avatar->setOrigin(0.5f, 0.5f);
+		panel->add(avatar);
+
+		auto changeAvatarButton = tgui::Button::create("Change Avatar");
+		changeAvatarButton->setSize({ "25%", "8%" });
+		changeAvatarButton->setPosition({ "72%", "58%" });
+		changeAvatarButton->setOrigin(0.5f, 0.5f);
+		changeAvatarButton->getRenderer()->setTexture("assets/images/buttons.png");
+		changeAvatarButton->getRenderer()->setBorders(1);
+		StyleButton(changeAvatarButton);
+		changeAvatarButton->getRenderer()->setTextSize(18);
+		changeAvatarButton->onPress(
+			[&btnSound, onChangeAvatar]()
+			{
+				btnSound.play();
+				if (onChangeAvatar)
+					onChangeAvatar();
+			});
+		panel->add(changeAvatarButton);
 
 		auto closeButton = tgui::Button::create("X");
 		closeButton->setSize({ "8%", "10%" });

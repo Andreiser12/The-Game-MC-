@@ -10,6 +10,7 @@
 #include <span>
 #include <algorithm>
 #include <chrono>
+#include <filesystem>
 
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
@@ -377,9 +378,9 @@ void GamePanel::UpdateTurnState()
 	}
 
 	std::string currentPlayerName = turnState.value().currentUsername;
-	for (auto& [username, slot] : m_playerSlots)
+	for (auto& [playerId, slot] : m_playerSlots)
 	{
-		if (username == currentPlayerName)
+		if (slot.username == currentPlayerName)
 		{
 			slot.panel->getRenderer()->setBorderColor(tgui::Color::Green);
 			slot.panel->getRenderer()->setBorders(2);
@@ -401,7 +402,7 @@ void GamePanel::UpdatePlayerStates()
 
 	for (const auto& state : playerStates.value())
 	{
-		if (!state.isInMatch) MarkPlayerAsLeft(state.username);
+		if (!state.isInMatch) MarkPlayerAsLeft(state.playerId);
 	}
 }
 
@@ -494,21 +495,30 @@ void GamePanel::CheckGameResult()
 
 void GamePanel::SetupPlayerSlots()
 {
-	auto playerUsernames = m_apiClient.SnapshotPlayers();
+	auto playerStatesOpt = m_apiClient.SnapshotPlayerStates();
+	if (!playerStatesOpt) return;
+	auto playerStates = playerStatesOpt.value();
 	const std::string currentPlayer = m_apiClient.GetUsername();
-	auto it = std::find(playerUsernames.begin(), playerUsernames.end(), currentPlayer);
-	if (it != playerUsernames.end())
+	auto it = std::find_if(playerStates.begin(), playerStates.end(),
+		[&](const PlayerState& ps)
+		{
+			return ps.username == currentPlayer;
+		});
+	if (it != playerStates.end())
 	{
-		std::rotate(playerUsernames.begin(), it, playerUsernames.end());
+		std::rotate(playerStates.begin(), it, playerStates.end());
 	}
 
-	const auto slots = GetSlotsForPlayerCount(playerUsernames.size());
+	const auto slots = GetSlotsForPlayerCount(playerStates.size());
 	if (slots.empty()) return;
 
-	for (size_t index = 0; index < playerUsernames.size(); ++index)
+	for (size_t index = 0; index < playerStates.size(); ++index)
 	{
+		const auto& state = playerStates[index];
+
 		PlayerSlotWidget slotWidget;
-		slotWidget.username = playerUsernames[index];
+		slotWidget.username = state.username;
+		slotWidget.playerId = state.playerId;
 
 		slotWidget.panel = tgui::Panel::create({ "14%", "12%" });
 		slotWidget.panel->setPosition(
@@ -526,7 +536,7 @@ void GamePanel::SetupPlayerSlots()
 		infoPanel->getRenderer()->setBackgroundColor(tgui::Color(40, 40, 40));
 
 		slotWidget.nameLabel = tgui::Label::create(Utils::TruncateText(
-			tgui::String(playerUsernames[index]), kmaxChars));
+			tgui::String(slotWidget.username), kmaxChars));
 		slotWidget.nameLabel->setAutoSize(false);
 		slotWidget.nameLabel->setSize({ "90%", "40%" });
 		slotWidget.nameLabel->setPosition("50%", "50%");
@@ -551,8 +561,13 @@ void GamePanel::SetupPlayerSlots()
 		auto avatarPanel = tgui::Panel::create({ "32.5%", "100%" });
 		avatarPanel->setPosition("0%", "0%");
 		avatarPanel->getRenderer()->setBackgroundColor(tgui::Color(40, 40, 40));
-
-		auto userAvatar = tgui::Picture::create("assets/images/playerDefaultAvatar.jpg");
+		
+		const std::string avatarPath = "assets/avatars/" + state.username + ".png";
+		const std::string defaultAvatar = "assets/images/playerDefaultAvatar.jpg";
+		if (!std::filesystem::exists(avatarPath))
+			m_apiClient.DownloadAvatar(state.playerId, avatarPath);
+		tgui::String path = std::filesystem::exists(avatarPath) ? avatarPath : defaultAvatar;
+		auto userAvatar = tgui::Picture::create(path);
 		userAvatar->setSize({ "100%", "100%" });
 		userAvatar->setPosition("0%", "0%");
 		userAvatar->setIgnoreMouseEvents(true);
@@ -561,7 +576,7 @@ void GamePanel::SetupPlayerSlots()
 		slotWidget.panel->add(avatarPanel);
 		slotWidget.panel->add(infoPanel);
 		m_root->add(slotWidget.panel);
-		m_playerSlots[slotWidget.username] = slotWidget;
+		m_playerSlots[state.playerId] = slotWidget;
 	}
 }
 
@@ -957,9 +972,9 @@ void GamePanel::ShowGameResultOverlay(GameResult result)
 	m_root->add(overlay);
 }
 
-void GamePanel::MarkPlayerAsLeft(const std::string& username)
+void GamePanel::MarkPlayerAsLeft(unsigned playerId)
 {
-	auto it = m_playerSlots.find(username);
+	auto it = m_playerSlots.find(playerId);
 	if (it == m_playerSlots.end()) return;
 
 	auto& slot = it->second;

@@ -9,4 +9,5 @@ export struct UserProfile
 	unsigned gamesPlayed;
 	unsigned gamesWon;
 	double hoursPlayed;
+	std::string avatarPath;
 };

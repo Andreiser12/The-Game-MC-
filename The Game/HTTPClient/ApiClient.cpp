@@ -234,12 +234,13 @@ std::optional<std::vector<PlayerState>> ApiClient::GetPlayerStates() const
 	if (response.error || response.status_code != 200) return std::nullopt;
 
 	auto json = crow::json::load(response.text);
-	if (!json || !json.has("USERNAMES") || !json.has("IS_IN_MATCH")) return std::nullopt;
+	if (!json || !json.has("PLAYERIDS") || !json.has("USERNAMES") || !json.has("IS_IN_MATCH")) return std::nullopt;
 
+	const auto& ids = json["PLAYERIDS"];
 	const auto& usernames = json["USERNAMES"];
 	const auto& isInMatch = json["IS_IN_MATCH"];
 
-	if (usernames.size() != isInMatch.size()) return std::nullopt;
+	if (ids.size() != usernames.size() || usernames.size() != isInMatch.size()) return std::nullopt;
 
 	std::vector<PlayerState> playerStates;
 	playerStates.reserve(usernames.size());
@@ -247,6 +248,7 @@ std::optional<std::vector<PlayerState>> ApiClient::GetPlayerStates() const
 	{
 		playerStates.emplace_back(
 			PlayerState{
+				static_cast<unsigned>(ids[i].i()),
 				usernames[i].s(),
 				isInMatch[i].b()
 			}
@@ -507,8 +509,8 @@ std::string ApiClient::GetLobbyId() const
 std::optional<UserProfile> ApiClient::GetUserProfile(unsigned playerId) const
 {
 	const std::string url = m_serverURL + "/users/" + std::to_string(playerId) + "/profile";
-	cpr::Response response = cpr::Get
-	(cpr::Url{ url },
+	cpr::Response response = cpr::Get(
+		cpr::Url{ url },
 		kTimeout
 	);
 
@@ -525,7 +527,53 @@ std::optional<UserProfile> ApiClient::GetUserProfile(unsigned playerId) const
 	profile.gamesPlayed = json["gamesPlayed"].u();
 	profile.gamesWon = json["gamesWon"].u();
 	profile.hoursPlayed = json["hoursPlayed"].d();
+	profile.avatarPath = json["avatarPath"].s();
 	return profile;
+}
+
+bool ApiClient::DownloadAvatar(unsigned playerId, const std::string& localPath)
+{
+	const std::string url = m_serverURL + "/users/" + std::to_string(playerId) + "/avatar";
+
+	cpr::Response response = cpr::Get(
+		cpr::Url{ url },
+		kTimeout
+	);
+
+	if (response.error || response.status_code != 200)
+		return false;
+
+	std::ofstream out(localPath, std::ios::binary);
+	if (!out.is_open()) return false;
+
+	out.write(response.text.data(), response.text.size());
+	return true;
+}
+
+
+bool ApiClient::UpdateAvatar(const std::string& imagePath)
+{
+	unsigned playerId;
+	{
+		std::lock_guard<std::mutex> lock(m_mutex);
+		if (m_playerId == 0u) return false;
+		playerId = m_playerId;
+	}
+
+	std::ifstream file(imagePath, std::ios::binary);
+	if (!file.is_open()) return false;
+	std::string buffer{ std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>() };
+	if (buffer.empty()) return false;
+
+	const std::string url = m_serverURL + "/users/" + std::to_string(playerId) + "/avatar";
+	cpr::Response response = cpr::Post(
+		cpr::Url{ url },
+		cpr::Body(buffer),
+		cpr::Header{ {"Content-Type", "image/png"}, {"Content-Length", std::to_string(buffer.size())}},
+		kTimeout
+	);
+
+	return response.status_code == 200;
 }
 
 std::vector<std::string> ApiClient::GetLobbyPlayers(const std::string& lobbyId) const

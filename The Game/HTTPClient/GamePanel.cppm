@@ -7,6 +7,7 @@ module;
 #include <optional>
 #include <unordered_map>
 #include <span>
+#include <filesystem>
 
 #include <SFML/System.hpp>
 #include <SFML/Audio.hpp>
@@ -31,6 +32,7 @@ export struct PlayerSlot
 
 export struct PlayerSlotWidget
 {
+	unsigned playerId;
 	std::string username;
 	tgui::Panel::Ptr panel;
 	tgui::Label::Ptr nameLabel;
@@ -72,7 +74,7 @@ public:
 
 	void OnTurnTimeout();
 
-	void MarkPlayerAsLeft(const std::string& username);
+	void MarkPlayerAsLeft(unsigned playerId);
 
 public:
 	const tgui::Color USER_COLOR{ 30, 30, 30 };
@@ -102,7 +104,7 @@ private:
 	unsigned m_lastMessageId{ 0u };
 	tgui::Gui& m_gui;
 	tgui::Group::Ptr m_root;
-	std::unordered_map<std::string, PlayerSlotWidget> m_playerSlots;
+	std::unordered_map<unsigned, PlayerSlotWidget> m_playerSlots;
 	tgui::ChatBox::Ptr m_chat;
 	sf::Clock m_chatClock;
 	ApiClient& m_apiClient;

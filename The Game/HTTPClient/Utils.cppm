@@ -8,6 +8,7 @@ module;
 #include "TGUI/Widgets/Button.hpp"
 #include "TGUI/Backend/SFML-Graphics.hpp"
 #include <SFML/Audio.hpp>
+#include <filesystem>
 
 export module Utils;
 
@@ -29,7 +30,8 @@ export namespace Utils
 		const UserProfile& profile,
 		sf::Sound& btnSound,
 		std::function<void()> onClose,
-		std::function<void()> onDeleteAccount);
+		std::function<void()> onDeleteAccount,
+		std::function<void()> onChangeAvatar);
 
 	tgui::Panel::Ptr CreateExitPanel(
 		tgui::Gui& gui,

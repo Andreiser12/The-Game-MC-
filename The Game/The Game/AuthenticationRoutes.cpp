@@ -49,6 +49,24 @@ void AuthenticationRoutes::Profile(crow::SimpleApp& app)
 		});
 }
 
+void AuthenticationRoutes::GetAvatar(crow::SimpleApp& app)
+{
+	CROW_ROUTE(app, "/avatars/<string>").methods(crow::HTTPMethod::Get)
+		([this](const std::string& filename)
+		{
+				return this->HandleGetAvatar(filename);
+		});
+}
+
+void AuthenticationRoutes::UpdateAvatar(crow::SimpleApp& app)
+{
+	CROW_ROUTE(app, "/users/<uint>/avatar").methods(crow::HTTPMethod::Post)
+		([this](const crow::request& req, crow::response& response, unsigned playerId)
+		{
+			this->HandleUpdateAvatar(playerId, req, response);
+		});
+}
+
 void AuthenticationRoutes::DeleteAccount(crow::SimpleApp& app)
 {
 	CROW_ROUTE(app, "/users/<uint>").methods(crow::HTTPMethod::Delete)
@@ -159,7 +177,66 @@ crow::response AuthenticationRoutes::HandleUserProfile(unsigned playerId)
 	data["gamesPlayed"] = user.GetGamesPlayed();
 	data["gamesWon"] = user.GetGamesWon();
 	data["hoursPlayed"] = user.GetHoursPlayed();
+	data["avatarPath"] = user.GetAvatarPath();
 	return crow::response(200, data);
+}
+
+crow::response AuthenticationRoutes::HandleGetAvatar(const std::string& filename)
+{
+	std::string path = "avatars/" + filename;
+	std::ifstream file(path, std::ios::binary);
+	if (!file)
+		return crow::response(404, "Avatar not found");
+	std::ostringstream buffer;
+	buffer << file.rdbuf();
+
+	crow::response res;
+	res.code = 200;
+	res.set_header("Content-Type", "image/png");
+	res.body = buffer.str();
+	return res;
+}
+
+void AuthenticationRoutes::HandleUpdateAvatar(unsigned playerId, const crow::request& req, crow::response& response)
+{
+	if (req.body.empty())
+	{
+		response.code = 400;
+		response.body = "Empty body";
+		return;
+	}
+	auto& sessionManager = SessionManager::Instance();
+	if (!sessionManager.IsLoggedIn(playerId))
+	{
+		response.code = 401;
+		response.body = "Not logged in";
+		return;
+	}
+	auto userFound = m_database.GetUserByID(playerId);
+	if (!userFound)
+	{
+		response.code = 404;
+		response.body = "User not found";
+		return;
+	}
+	std::filesystem::create_directories("avatars");
+	const std::string filename = userFound->GetUsername() + ".png";
+	const std::string filePath = "avatars/" + filename;
+	std::ofstream out(filePath, std::ios::binary);
+	out.write(req.body.data(), req.body.size());
+	out.close();
+
+	const std::string avatarPath = "/avatars/" + filename;
+	m_database.UpdateAvatar(playerId, avatarPath);
+
+	crow::json::wvalue result;
+	result["status"] = "ok";
+	result["avatarPath"] = avatarPath;
+
+	response.code = 200;
+	response.set_header("Content-Type", "application/json");
+	response.body = result.dump();
+	response.end();
 }
 
 crow::response AuthenticationRoutes::HandleDeleteAccount(unsigned playerId)

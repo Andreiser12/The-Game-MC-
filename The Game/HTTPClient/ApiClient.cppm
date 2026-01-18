@@ -9,6 +9,7 @@ module;
 #include <atomic>
 #include <thread>
 #include <unordered_map>
+#include <fstream>
 
 #include <cpr/cpr.h>
 #include "crow.h"
@@ -100,6 +101,7 @@ export struct TurnState
 
 export struct PlayerState
 {
+	unsigned playerId;
 	std::string username;
 	bool isInMatch;
 };
@@ -175,6 +177,8 @@ public:
 	unsigned GetPlayerId() const;
 	std::string GetLobbyId() const;
 	std::optional<UserProfile> GetUserProfile(unsigned playerId) const;
+	bool DownloadAvatar(unsigned playerId, const std::string& localPath);
+	bool UpdateAvatar(const std::string& imagePath);
 	bool IsGameActive() const;
 
 	void SetUsername(const std::string& username);

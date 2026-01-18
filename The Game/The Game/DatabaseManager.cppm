@@ -17,7 +17,8 @@ export inline auto CreateStorage(const std::string& filename)
 			sqlite_orm::make_column("gamesPlayed", &DB::User::GetGamesPlayed, &DB::User::SetGamesPlayed),
 			sqlite_orm::make_column("gamesWon", &DB::User::GetGamesWon, &DB::User::SetGamesWon),
 			sqlite_orm::make_column("hoursPlayed", &DB::User::GetHoursPlayed, &DB::User::SetHoursPlayed),
-			sqlite_orm::make_column("finalCards", &DB::User::GetFinalCards, &DB::User::SetFinalCards)));
+			sqlite_orm::make_column("finalCards", &DB::User::GetFinalCards, &DB::User::SetFinalCards),
+			sqlite_orm::make_column("avatarPath", &DB::User::GetAvatarPath, &DB::User::SetAvatarPath)));
 }
 export using Storage = decltype(CreateStorage(" "));
 
@@ -29,6 +30,7 @@ public:
 	bool AddUser(const DB::User& user);
 	bool UpdateStats(unsigned userId, bool gamePlayed, bool gameWon, double hoursPlayed);
 	bool DeleteUser(unsigned userId);
+	bool UpdateAvatar(unsigned userId, const std::string& avatarPath);
 	std::optional<DB::User> GetUserByID(unsigned userID);
 	std::optional<DB::User> GetUserByName(const std::string& username);
 	[[nodiscard]] std::vector<DB::User> GetUsers();

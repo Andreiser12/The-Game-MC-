@@ -61,6 +61,7 @@ export enum class GameResult : uint8_t
 
 export struct PlayerState
 {
+	unsigned playerId;
 	std::string username;
 	bool isInMatch;
 };

@@ -3,6 +3,7 @@
 #include <SFML/Audio.hpp>
 #include <TGUI/TGUI.hpp>
 #include <TGUI/Backend/SFML-Graphics.hpp>
+#include <filesystem>
 
 module MainMenuWindow;
 
@@ -284,14 +285,16 @@ void MainMenuWindow::SettingsButtonPressed()
 	m_mainMenu.add(settingsPanel);
 }
 
-void MainMenuWindow::ProfileButtonPressed()
+void MainMenuWindow::OpenProfilePanel()
 {
 	auto userProfileExists = m_apiClient.GetUserProfile(m_apiClient.GetPlayerId());
 	if (!userProfileExists)
 	{
-		Utils::CreateErrorPopupPanel(m_mainMenu, "Could not load profile", m_clickSound);
+		m_mainMenu.add(Utils::CreateErrorPopupPanel(m_mainMenu, "Could not load profile", m_clickSound));
 		return;
 	}
+	if (auto oldPanel = m_mainMenu.get<tgui::Panel>("ProfilePanel"))
+		m_mainMenu.remove(oldPanel);
 	auto panel = Utils::CreateProfilePanel(
 		userProfileExists.value(),
 		m_clickSound,
@@ -316,9 +319,52 @@ void MainMenuWindow::ProfileButtonPressed()
 				[]() {}
 			);
 			m_mainMenu.add(confirmPanel);
+		},
+		[this]()
+		{
+			OpenAvatarFileDialog();
 		}
 	);
 	m_mainMenu.add(panel, "ProfilePanel");
+}
+
+void MainMenuWindow::OpenAvatarFileDialog()
+{
+	m_clickSound.play();
+	auto fileDialog = tgui::FileDialog::create("Select avatar", "Open");
+	fileDialog->setFileMustExist(true);
+	fileDialog->setSelectingDirectory(false);
+	fileDialog->setMultiSelect(false);
+	fileDialog->setFileTypeFilters({ {"PNG Images", {"*.png"}} });
+	fileDialog->setPath("assets/avatars");
+	fileDialog->onFileSelect(
+		[this, fileDialog](const std::vector<tgui::Filesystem::Path>& paths)
+		{
+			if (paths.empty()) return;
+			fileDialog->setEnabled(false);
+			fileDialog->close();
+			std::filesystem::path filePath(paths[0].asNativeString());
+			std::string avatarPath = filePath.string();
+			if (!m_apiClient.UpdateAvatar(avatarPath))
+			{
+				m_mainMenu.add(Utils::CreateErrorPopupPanel(m_mainMenu, "Failed to update avatar", m_clickSound));
+				return;
+			}	
+			std::filesystem::path avatarsDirectory = "assets/avatars";
+			std::filesystem::create_directories(avatarsDirectory);
+
+			std::string username = m_apiClient.GetUsername();
+			std::filesystem::path localCopy = avatarsDirectory / (username + ".png");
+			std::filesystem::copy_file(filePath, localCopy, std::filesystem::copy_options::overwrite_existing);
+			OpenProfilePanel();
+		}
+	);
+	m_mainMenu.add(fileDialog);
+}
+
+void MainMenuWindow::ProfileButtonPressed()
+{
+	OpenProfilePanel();
 }
 
 void MainMenuWindow::PlayPanelPressed()

@@ -36,6 +36,16 @@ bool DatabaseManager::DeleteUser(unsigned userId)
 	return true;
 }
 
+bool DatabaseManager::UpdateAvatar(unsigned userId, const std::string& avatarPath)
+{
+	auto userFound = GetUserByID(userId);
+	if (!userFound) return false;
+	auto user = userFound.value();
+	user.SetAvatarPath(avatarPath);
+	m_storage.update(user);
+	return true;
+}
+
 std::optional<DB::User> DatabaseManager::GetUserByID(unsigned userID) 
 {
 	return m_storage.get_optional<DB::User>(userID);

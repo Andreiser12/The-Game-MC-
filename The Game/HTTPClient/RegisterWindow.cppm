@@ -1,6 +1,4 @@
 module;
-#define NOMINMAX
-
 #include <string>
 #include <vector>
 #include <memory>

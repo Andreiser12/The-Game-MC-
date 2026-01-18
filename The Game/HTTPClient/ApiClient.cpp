@@ -277,7 +277,7 @@ bool ApiClient::StartMatch(const std::string& lobbyId, unsigned playerId)
 	return json["status"].s() == "GAME_STARTED";
 }
 
-bool ApiClient::SendChatMessage(const std::string& message)
+bool ApiClient::SendChatMessage(const std::string& message) const
 {
 	const std::string url{ m_serverURL + "/lobby/chat/send" };
 	const std::string jsonBody{
@@ -348,10 +348,10 @@ bool ApiClient::PlayCard(uint8_t cardId, uint8_t deckId) const
 	return json["status"].s() == "OK";
 }
 
-std::optional<std::vector<DeckState>> ApiClient::GetDeckState() const
+std::optional<std::vector<DeckState>> ApiClient::GetDecksState() const
 {
-	const std::string url = m_serverURL + "/lobby/" + m_lobbyId +
-		"/decks";
+	const std::string url{ m_serverURL + "/lobby/" + m_lobbyId +
+		"/decks" };
 	cpr::Response response = cpr::Get(
 		cpr::Url{ url },
 		kTimeout
@@ -368,9 +368,10 @@ std::optional<std::vector<DeckState>> ApiClient::GetDeckState() const
 		DeckState deck;
 		deck.deckId = static_cast<uint8_t>(deckJson["deckId"].i());
 		deck.topCardId = static_cast<uint8_t>(deckJson["topCardId"].i());
+		deck.size = static_cast<uint8_t>(deckJson["size"].i());
 		deckStates.emplace_back(deck);
 	}
-	return std::make_optional(deckStates);
+	return deckStates;
 }
 
 std::optional<EndTurnState> ApiClient::GetEndTurnState() const
@@ -659,7 +660,7 @@ std::optional<TurnState> ApiClient::GetTurnState() const
 	return state;
 }
 
-std::optional<std::vector<std::pair<uint8_t, uint8_t>>> ApiClient::GetAICards(uint8_t cardsRequired)
+std::optional<std::vector<std::pair<uint8_t, uint8_t>>> ApiClient::GetAICards(uint8_t cardsRequired) const
 {
 	const std::string url{ m_serverURL + "/lobby/" + m_lobbyId
 	+ "/players/" + std::to_string(m_playerId) + "/place-cards-AI" };
@@ -819,7 +820,7 @@ void ApiClient::StartNetworkLoop()
 				}
 				if (now - lastDecks >= std::chrono::milliseconds(500))
 				{
-					auto decks = GetDeckState();
+					auto decks = GetDecksState();
 					bool decksChanged{ false };
 					{
 						std::lock_guard<std::mutex> lk(m_cacheMutex);

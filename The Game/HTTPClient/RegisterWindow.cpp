@@ -1,5 +1,4 @@
 module;
-#define NOMINMAX
 #include <SFML/Graphics.hpp>
 #include <TGUI/TGUI.hpp>
 #include <TGUI/Backend/SFML-Graphics.hpp>
@@ -11,6 +10,10 @@ module;
 module RegisterWindow;
 
 import Utils;
+
+static inline const std::string SERVER_IP{ "192.168.1.131" };
+static inline constexpr uint16_t SERVER_PORT{ 18080 };
+static inline const std::string SERVER_ADDRESS{ "http://" + SERVER_IP + ":" + std::to_string(SERVER_PORT) };
 
 RegisterWindow::RegisterWindow(sf::RenderWindow& window, ApiClient& api)
 	: m_register{ window }, m_apiClient{ api }, m_clickSound{ m_clickBuffer }
@@ -40,7 +43,7 @@ void RegisterWindow::Draw()
 void RegisterWindow::CheckRegister(const std::string& usernameEntered)
 {
 	cpr::Response response = cpr::Post(
-		cpr::Url{ "http://localhost:18080/register" },
+		cpr::Url{ SERVER_ADDRESS + "/register" },
 		cpr::Body{ "{\"username\": \"" + usernameEntered + "\"}" }
 	);
 	auto json = crow::json::load(response.text);
@@ -97,7 +100,7 @@ void RegisterWindow::LoadWidgets()
 	editBoxUsername->onUnfocus([this, editBoxUsername] {
 		editBoxUsername->setDefaultText("Username");
 		});
-	editBoxUsername->onReturnKeyPress([this, editBoxUsername] 
+	editBoxUsername->onReturnKeyPress([this, editBoxUsername]
 		{CheckRegister(editBoxUsername->getText().toStdString()); });
 
 	auto registerButton = tgui::Button::create("Register");

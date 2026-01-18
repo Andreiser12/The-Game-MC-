@@ -11,6 +11,7 @@
 module Utils;
 
 import HostPanel;
+import SettingsState;
 
 namespace Utils
 {
@@ -22,49 +23,19 @@ namespace Utils
 	}
 
 	tgui::Panel::Ptr Utils::CreateSettingsPanel(tgui::Gui& gui,
-		unsigned resolutionIndex,
-		bool isFullscreen,
-		unsigned framerateIndex,
-		float masterVolume,
-		float buttonsVolume,
-		float backgroundVolume,
+		SettingsState& state,
 		sf::Sound& btnSound,
 		std::function<void()> onClose,
-		std::function<void(unsigned res, bool fullscreen, unsigned framerate,
-			float masterVol, float btnVol, float bgVol)> onApply)
+		std::function<void()> onApply)
 	{
-		auto resolutionsIndexPtr = std::make_shared<unsigned>(resolutionIndex);
-		auto resolutions = std::make_shared<std::vector<sf::Vector2u>>
-			(std::vector<sf::Vector2u>{
-				{640, 480},
-				{ 800, 600 },
-				{ 1024, 768 },
-				{ 1280, 720 },
-				{ 1280, 800 },
-				{ 1366, 768 },
-				{ 1440, 900 },
-				{ 1680, 1050 },
-				{ 1920, 1080 },
-				{ 1920, 1200 },
-				{ 2560, 1440 }
-		});
-		auto fullscreenPtr = std::make_shared<bool>(isFullscreen);
-		auto framerateIndexPtr = std::make_shared<unsigned>(framerateIndex);
-		auto framerates = std::make_shared<std::vector<unsigned>>(
-			std::vector<unsigned>
-		{
-			30u,
-				60u,
-				120u,
-				144u,
-				180u
-		});
+		auto& resolutionIndex = state.resolutionIndex;
+		auto& fullscreen = state.fullscreen;
+		auto& framerateIndex = state.framerateIndex;
 
-		auto masterVolPtr = std::make_shared<float>(masterVolume);
-		auto buttonsVolPtr = std::make_shared<float>(buttonsVolume);
-		auto bgVolPtr = std::make_shared<float>(backgroundVolume);
-
-		auto gameplayIndexPtr = std::make_shared<unsigned>(1);
+		auto& masterVol = state.masterVolume;
+		auto& buttonsVol = state.buttonsVolume;
+		auto& bgVol = state.backgroundVolume;
+		uint8_t gameplayIndex{ 1u };
 
 		auto panel = tgui::Panel::create({ "60%", "60%" });
 		panel->setPosition("50%", "50%");
@@ -136,7 +107,7 @@ namespace Utils
 		StyleButton(gameplayButton);
 		sidebar->add(gameplayButton);
 
-		auto resolutionLabelBg = tgui::Panel::create({ "16%", "12.5%" });
+		auto resolutionLabelBg = tgui::Panel::create({ "19%", "12.5%" });
 		resolutionLabelBg->setPosition("5%", "10%");
 		resolutionLabelBg->getRenderer()->setBackgroundColor(tgui::Color::Transparent);
 		videoPanel->add(resolutionLabelBg);
@@ -148,7 +119,7 @@ namespace Utils
 		resolutionLabelBg->add(resolutionBgPicture);
 
 		auto resolutionText = tgui::Label::create("Resolution");
-		resolutionText->setSize("90%", "40%");
+		resolutionText->setSize("90%", "45%");
 		resolutionText->setPosition("50%", "50%");
 		resolutionText->setOrigin(0.5f, 0.5f);
 		resolutionText->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
@@ -172,8 +143,8 @@ namespace Utils
 		resolutionContainer->add(resContainerBg);
 
 		auto resolutionValue = tgui::Label::create(
-			std::to_string((*resolutions)[*resolutionsIndexPtr].x) + "x" +
-			std::to_string((*resolutions)[*resolutionsIndexPtr].y)
+			std::to_string(SettingsState::Resolutions[resolutionIndex].x) + "x" +
+			std::to_string(SettingsState::Resolutions[resolutionIndex].y)
 		);
 		resolutionValue->setSize("70%", "100%");
 		resolutionValue->setPosition("15%", "0%");
@@ -198,22 +169,22 @@ namespace Utils
 		Utils::StyleButton(rightResolutionArrow);
 		rightResolutionArrow->getRenderer()->setTextSize(24);
 
-		leftResolutionArrow->onClick([resolutions, resolutionsIndexPtr, resolutionValue, &btnSound]
+		leftResolutionArrow->onClick([&resolutionIndex, resolutionValue, &btnSound]
 			{
 				btnSound.play();
-				if (*resolutionsIndexPtr == 0) *resolutionsIndexPtr = resolutions->size() - 1;
-				else --(*resolutionsIndexPtr);
-				resolutionValue->setText(std::to_string((*resolutions)[*resolutionsIndexPtr].x) + "x"
-					+ std::to_string((*resolutions)[*resolutionsIndexPtr].y));
+				if (resolutionIndex == 0) resolutionIndex = static_cast<uint8_t>(SettingsState::Resolutions.size() - 1);
+				else --resolutionIndex;
+				resolutionValue->setText(std::to_string(SettingsState::Resolutions[resolutionIndex].x) + "x"
+					+ std::to_string(SettingsState::Resolutions[resolutionIndex].y));
 			});
-		rightResolutionArrow->onClick([resolutions, resolutionsIndexPtr, resolutionValue, &btnSound]
+		rightResolutionArrow->onClick([&resolutionIndex, resolutionValue, &btnSound]
 			{
-
 				btnSound.play();
-				if (*resolutionsIndexPtr == resolutions->size() - 1) *resolutionsIndexPtr = 0;
-				else ++(*resolutionsIndexPtr);
-				resolutionValue->setText(std::to_string((*resolutions)[*resolutionsIndexPtr].x) + "x"
-					+ std::to_string((*resolutions)[*resolutionsIndexPtr].y));
+				if (resolutionIndex == SettingsState::Resolutions.size() - 1)
+					resolutionIndex = 0;
+				else ++resolutionIndex;
+				resolutionValue->setText(std::to_string(SettingsState::Resolutions[resolutionIndex].x) + "x"
+					+ std::to_string(SettingsState::Resolutions[resolutionIndex].y));
 			});
 
 		resolutionContainer->add(leftResolutionArrow);
@@ -221,7 +192,7 @@ namespace Utils
 		resolutionContainer->add(rightResolutionArrow);
 		videoPanel->add(resolutionContainer);
 
-		auto fullscreenLabelBg = tgui::Panel::create({ "16%", "12.5%" });
+		auto fullscreenLabelBg = tgui::Panel::create({ "19%", "12.5%" });
 		fullscreenLabelBg->setPosition("5%", "35%");
 		fullscreenLabelBg->getRenderer()->setBackgroundColor(tgui::Color::Transparent);
 		videoPanel->add(fullscreenLabelBg);
@@ -233,7 +204,7 @@ namespace Utils
 		fullscreenLabelBg->add(fullscreenBgPicture);
 
 		auto fullscreenText = tgui::Label::create("Fullscreen");
-		fullscreenText->setSize("90%", "40%");
+		fullscreenText->setSize("90%", "45%");
 		fullscreenText->setPosition("50%", "50%");
 		fullscreenText->setOrigin(0.5f, 0.5f);
 		fullscreenText->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
@@ -248,17 +219,17 @@ namespace Utils
 		fullscreenCheckbox->setSize("5%", "6%");
 		fullscreenCheckbox->setPosition("73%", "37.5%");
 		fullscreenCheckbox->setChecked(true);
-		fullscreenCheckbox->onCheck([fullscreenPtr, &btnSound] {
+		fullscreenCheckbox->onCheck([&fullscreen, &btnSound] {
 			btnSound.play();
-			*fullscreenPtr = true;
+			fullscreen = true;
 			});
-		fullscreenCheckbox->onUncheck([fullscreenPtr, &btnSound] {
+		fullscreenCheckbox->onUncheck([&fullscreen, &btnSound] {
 			btnSound.play();
-			*fullscreenPtr = false;
+			fullscreen = false;
 			});
 		videoPanel->add(fullscreenCheckbox);
 
-		auto framerateLabelBg = tgui::Panel::create({ "16%", "12.5%" });
+		auto framerateLabelBg = tgui::Panel::create({ "19%", "12.5%" });
 		framerateLabelBg->setPosition("5%", "60%");
 		framerateLabelBg->getRenderer()->setBackgroundColor(tgui::Color::Transparent);
 		videoPanel->add(framerateLabelBg);
@@ -270,7 +241,7 @@ namespace Utils
 		framerateLabelBg->add(framerateBgPicture);
 
 		auto framerateText = tgui::Label::create("Framerate");
-		framerateText->setSize("90%", "40%");
+		framerateText->setSize("90%", "45%");
 		framerateText->setPosition("50%", "50%");
 		framerateText->setOrigin(0.5f, 0.5f);
 		framerateText->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
@@ -293,7 +264,7 @@ namespace Utils
 		frameContainerBg->setIgnoreMouseEvents(true);
 		framerateContainer->add(frameContainerBg);
 
-		auto framerateValue = tgui::Label::create(std::to_string((*framerates)[*framerateIndexPtr]));
+		auto framerateValue = tgui::Label::create(std::to_string((SettingsState::Framerates[framerateIndex])));
 		framerateValue->setSize("70%", "100%");
 		framerateValue->setPosition("15%", "0%");
 		framerateValue->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
@@ -309,11 +280,11 @@ namespace Utils
 		leftFramerateArrow->setPosition("0%", "0%");
 		leftFramerateArrow->getRenderer()->setTexture("assets/images/buttons.png");
 		Utils::StyleButton(leftFramerateArrow);
-		leftFramerateArrow->onClick([framerateIndexPtr, framerates, framerateValue, &btnSound] {
+		leftFramerateArrow->onClick([&framerateIndex, framerateValue, &btnSound] {
 			btnSound.play();
-			if (*framerateIndexPtr == 0) *framerateIndexPtr = (*framerates).size() - 1;
-			else --(*framerateIndexPtr);
-			framerateValue->setText(std::to_string((*framerates)[*framerateIndexPtr]));
+			if (framerateIndex == 0) framerateIndex = static_cast<uint8_t>(SettingsState::Framerates.size() - 1);
+			else --framerateIndex;
+			framerateValue->setText(std::to_string(SettingsState::Framerates[framerateIndex]));
 			});
 
 		auto rightFramerateArrow = tgui::Button::create(">");
@@ -321,11 +292,11 @@ namespace Utils
 		rightFramerateArrow->setPosition({ "85%", "0%" });
 		rightFramerateArrow->getRenderer()->setTexture("assets/images/buttons.png");
 		Utils::StyleButton(rightFramerateArrow);
-		rightFramerateArrow->onClick([framerateIndexPtr, framerates, framerateValue, &btnSound] {
+		rightFramerateArrow->onClick([&framerateIndex, framerateValue, &btnSound] {
 			btnSound.play();
-			if (*framerateIndexPtr == (*framerates).size() - 1) *framerateIndexPtr = 0;
-			else ++(*framerateIndexPtr);
-			framerateValue->setText(std::to_string((*framerates)[*framerateIndexPtr]));
+			if (framerateIndex == SettingsState::Framerates.size() - 1) framerateIndex = 0;
+			else ++framerateIndex;
+			framerateValue->setText(std::to_string(SettingsState::Framerates[framerateIndex]));
 			});
 
 		framerateContainer->add(framerateValue);
@@ -356,7 +327,7 @@ namespace Utils
 		masterLabel->getRenderer()->setTextSize(22);
 		masterLabelBg->add(masterLabel);
 
-		auto masterValueLabel = tgui::Label::create(std::to_string(static_cast<int>(*masterVolPtr)) + "%");
+		auto masterValueLabel = tgui::Label::create(std::to_string(static_cast<int>(masterVol)) + "%");
 		masterValueLabel->setSize({ "10%", "8%" });
 		masterValueLabel->setPosition("92%", "11.5%");
 		masterValueLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
@@ -375,10 +346,10 @@ namespace Utils
 		masterSlider->setSize({ "55%", "2%" });
 		masterSlider->setMinimum(0);
 		masterSlider->setMaximum(100);
-		masterSlider->setValue(*masterVolPtr);
+		masterSlider->setValue(masterVol);
 		StyleSlider(masterSlider);
-		masterSlider->onValueChange([masterVolPtr, masterValueLabel](float value) {
-			*masterVolPtr = value;
+		masterSlider->onValueChange([&masterVol, masterValueLabel](float value) {
+			masterVol = value;
 			masterValueLabel->setText(std::to_string(static_cast<int>(value)) + "%");
 			});
 		audioPanel->add(masterSlider);
@@ -401,7 +372,7 @@ namespace Utils
 		buttonsLabel->getRenderer()->setTextSize(22);
 		buttonsLabelBg->add(buttonsLabel);
 
-		auto buttonsValueLabel = tgui::Label::create(std::to_string(static_cast<int>(*buttonsVolPtr)) + "%");
+		auto buttonsValueLabel = tgui::Label::create(std::to_string(static_cast<int>(buttonsVol)) + "%");
 		buttonsValueLabel->setSize({ "10%", "8%" });
 		buttonsValueLabel->setPosition("92%", "36.5%");
 		buttonsValueLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
@@ -420,10 +391,10 @@ namespace Utils
 		buttonsSlider->setSize({ "55%", "2%" });
 		buttonsSlider->setMinimum(0);
 		buttonsSlider->setMaximum(100);
-		buttonsSlider->setValue(*buttonsVolPtr);
+		buttonsSlider->setValue(buttonsVol);
 		StyleSlider(buttonsSlider);
-		buttonsSlider->onValueChange([buttonsVolPtr, buttonsValueLabel](float value) {
-			*buttonsVolPtr = value;
+		buttonsSlider->onValueChange([&buttonsVol, buttonsValueLabel](float value) {
+			buttonsVol = value;
 			buttonsValueLabel->setText(std::to_string(static_cast<int>(value)) + "%");
 			});
 		audioPanel->add(buttonsSlider);
@@ -446,7 +417,7 @@ namespace Utils
 		bgLabel->getRenderer()->setTextSize(22);
 		bgLabelBg->add(bgLabel);
 
-		auto bgValueLabel = tgui::Label::create(std::to_string(static_cast<int>(*bgVolPtr)) + "%");
+		auto bgValueLabel = tgui::Label::create(std::to_string(static_cast<int>(bgVol)) + "%");
 		bgValueLabel->setSize({ "10%", "8%" });
 		bgValueLabel->setPosition("92%", "61.5%");
 		bgValueLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
@@ -465,15 +436,13 @@ namespace Utils
 		bgSlider->setSize({ "55%", "2%" });
 		bgSlider->setMinimum(0);
 		bgSlider->setMaximum(100);
-		bgSlider->setValue(*bgVolPtr);
+		bgSlider->setValue(bgVol);
 		StyleSlider(bgSlider);
-		bgSlider->onValueChange([bgVolPtr, bgValueLabel](float value) {
-			*bgVolPtr = value;
+		bgSlider->onValueChange([&bgVol, bgValueLabel](float value) {
+			bgVol = value;
 			bgValueLabel->setText(std::to_string(static_cast<int>(value)) + "%");
 			});
 		audioPanel->add(bgSlider);
-
-
 
 		auto gameplayPicture = tgui::Picture::create("assets/images/gameplayImage1.png");
 		gameplayPicture->setSize("70%", "70%");
@@ -498,30 +467,30 @@ namespace Utils
 		StyleButton(rightArrow);
 		gameplayPanel->add(rightArrow);
 
-		auto updateGameplayState = [gameplayIndexPtr, gameplayPicture, leftArrow, rightArrow]() {
+		auto updateGameplayState = [&gameplayIndex, gameplayPicture, leftArrow, rightArrow]() {
 			try {
-				std::string path = "assets/images/gameplayImage" + std::to_string(*gameplayIndexPtr) + ".png";
+				std::string path = "assets/images/gameplayImage" + std::to_string(gameplayIndex) + ".png";
 				gameplayPicture->getRenderer()->setTexture(tgui::Texture(path));
 			}
 			catch (...) {
 			}
 
-			leftArrow->setVisible(*gameplayIndexPtr > 1);
-			rightArrow->setVisible(*gameplayIndexPtr < 6);
+			leftArrow->setVisible(gameplayIndex > 1);
+			rightArrow->setVisible(gameplayIndex < 6);
 			};
 
-		leftArrow->onClick([=, &btnSound]() {
+		leftArrow->onClick([&gameplayIndex, &updateGameplayState, &btnSound]() {
 			btnSound.play();
-			if (*gameplayIndexPtr > 1) {
-				(*gameplayIndexPtr)--;
+			if (gameplayIndex > 1) {
+				--gameplayIndex;
 				updateGameplayState();
 			}
 			});
 
-		rightArrow->onClick([=, &btnSound]() {
+		rightArrow->onClick([&gameplayIndex, &updateGameplayState, &btnSound]() {
 			btnSound.play();
-			if (*gameplayIndexPtr < 6) {
-				(*gameplayIndexPtr)++;
+			if (gameplayIndex < 6) {
+				++gameplayIndex;
 				updateGameplayState();
 			}
 			});
@@ -533,20 +502,9 @@ namespace Utils
 		applyButton->getRenderer()->setRoundedBorderRadius(10);
 		applyButton->getRenderer()->setTexture("assets/images/buttons.png");
 		Utils::StyleButton(applyButton);
-		applyButton->onClick([resolutionsIndexPtr, fullscreenPtr, framerateIndexPtr,
-			masterVolPtr, buttonsVolPtr, bgVolPtr, onApply, &btnSound]
-			{
-				btnSound.play();
-				if (onApply) {
-					onApply(
-						*resolutionsIndexPtr,
-						*fullscreenPtr,
-						*framerateIndexPtr,
-						*masterVolPtr,
-						*buttonsVolPtr,
-						*bgVolPtr
-					);
-				}
+		applyButton->onClick([onApply, &btnSound] {
+			btnSound.play();
+			if (onApply) onApply();
 			});
 		content->add(applyButton);
 
@@ -587,7 +545,6 @@ namespace Utils
 			gameplayPanel->setVisible(true);
 			applyButton->setVisible(false);
 			});
-
 		return panel;
 	}
 
@@ -643,7 +600,7 @@ namespace Utils
 		else performanceScore = 1.0 + (static_cast<double>(profile.gamesWon) / profile.gamesPlayed) * 4.0;
 		outstream << std::fixed << std::setprecision(1) << performanceScore;
 
-		auto performance = tgui::Label::create("Performance score: " + outstream.str() + " / 5");
+		auto performance = tgui::Label::create("Performance score: " + outstream.str());
 		performance->setPosition({ "5%", "70%" });
 		performance->getRenderer()->setTextSize(24);
 		panel->add(performance);

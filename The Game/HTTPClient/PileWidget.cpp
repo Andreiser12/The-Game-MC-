@@ -1,29 +1,23 @@
 ﻿module;
 #include <memory>
 #include <random>
-#include <algorithm>
 #include <TGUI/TGUI.hpp>
 
 module PileWidget;
 
-PileWidget::PileWidget()
+PileWidget::PileWidget() noexcept
 {
-	m_lastCardCount = -1;
-
 	m_pilePanel = tgui::Panel::create({ "100%", "100%" });
-
-	m_pilePanel->getRenderer()->setBorders(0);
 	m_pilePanel->getRenderer()->setBackgroundColor(tgui::Color::Transparent);
-
-	UpdatePile(50);
+	UpdatePile(kPileSize);
 }
 
-tgui::Panel::Ptr PileWidget::GetPilePanel() const
+tgui::Panel::Ptr PileWidget::GetPilePanel() const noexcept
 {
 	return m_pilePanel;
 }
 
-void PileWidget::UpdatePile(int cardCount)
+void PileWidget::UpdatePile(int cardCount) noexcept
 {
 	if (m_lastCardCount == cardCount) return;
 	m_lastCardCount = cardCount;
@@ -38,15 +32,15 @@ void PileWidget::UpdatePile(int cardCount)
 
 	m_pilePanel->setVisible(true);
 
-	int visualLayers{ 0 };
+	int visualLayers{};
 	if (cardCount == 1) visualLayers = 1;
 	else if (cardCount <= 10) visualLayers = 2;
 	else if (cardCount <= 30) visualLayers = 3;
 	else visualLayers = 5;
 
-	static std::mt19937 rng(std::random_device{}());
+	static std::mt19937 rng{ std::random_device{}() };
 	std::uniform_real_distribution<float> rotationDist(-2.0f, 2.0f);
-	constexpr float offsetPercent = 1.2f;
+	constexpr float offsetPercent{ 1.2f };
 
 	for (int i = 0; i < visualLayers; ++i)
 	{
@@ -56,7 +50,7 @@ void PileWidget::UpdatePile(int cardCount)
 		cardPic->setIgnoreMouseEvents(true);
 		cardPic->setOrigin(0.5f, 0.5f);
 
-		float shift{ i * offsetPercent };
+		const float shift{ i * offsetPercent };
 		cardPic->setPosition({
 			tgui::String(50.0f + shift) + "%",
 			tgui::String(50.0f + shift) + "%"
@@ -69,8 +63,8 @@ void PileWidget::UpdatePile(int cardCount)
 		}
 		else
 		{
-			cardPic->setRotation(0);
-			cardPic->getRenderer()->setOpacity(1.0f);
+			cardPic->setRotation(0.f);
+			cardPic->getRenderer()->setOpacity(1.f);
 		}
 
 		m_pilePanel->add(cardPic);

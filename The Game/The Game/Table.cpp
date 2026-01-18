@@ -7,18 +7,10 @@ import GreedyAI;
 constexpr static size_t DECK_SIZE{ 98 };
 constexpr static uint8_t DECK_COUNT{ 4u };
 
-constexpr static uint8_t TWO_PLAYERS{ 2u };
-constexpr static uint8_t CARDS_TWO_PLAYERS{ 8u };
-
-constexpr static uint8_t THREE_PLAYERS{ 3u };
-constexpr static uint8_t CARDS_THREE_PLAYERS{ 7u };
-
-constexpr static uint8_t CARDS_DEFAULT_PLAYERS{ 6u };
-
 constexpr static uint8_t MIN_CARDS_NORMAL{ 2u };
 constexpr static uint8_t MIN_CARDS_EMPTY_DECK{ 1u };
 
-AssistantAI::DeckType ConvertDeckType(Deck::DeckType type)
+static AssistantAI::DeckType ConvertDeckType(Deck::DeckType type)
 {
 	if (type == Deck::DeckType::Ascending) return AssistantAI::DeckType::Ascending;
 	return AssistantAI::DeckType::Descending;
@@ -62,7 +54,7 @@ Table::Table(std::span<const std::pair<unsigned, std::string_view>> lobbyPlayers
 		auto [it, inserted] {m_players.try_emplace(id, id, username)};
 		if (inserted)
 		{
-			it->second.SetupCards(m_pile, cardsPerPlayer);
+			it->second.SetupCards(m_pile, static_cast<uint8_t>(cardsPerPlayer));
 			m_turnOrder.emplace_back(id);
 		}
 	}
@@ -124,7 +116,7 @@ void Table::AdvanceTurn() noexcept
 	m_currentTurnIndex = (m_currentTurnIndex + 1) % m_turnOrder.size();
 }
 
-bool Table::HasPlayer(unsigned playerId) const
+bool Table::HasPlayer(unsigned playerId) const noexcept
 {
 	return m_players.contains(playerId);
 }
@@ -196,7 +188,12 @@ std::optional<std::vector<std::pair<uint8_t, uint8_t>>> Table::RunBotTurn
 	return selectedCards;
 }
 
-Deck& Table::GetDeck(uint8_t deckId) const
+const Deck& Table::GetDeck(uint8_t deckId) const
+{
+	return *m_decks[deckId];
+}
+
+Deck& Table::GetDeck(uint8_t deckId)
 {
 	return *m_decks[deckId];
 }
@@ -254,11 +251,11 @@ bool Table::CanPlayerPlayMinCards(const Player& player, uint8_t minCards) const
 			const uint8_t cardValue{ it->GetId() };
 			for (size_t deckIndex = 0; deckIndex < DECK_COUNT; ++deckIndex)
 			{
-				if (CanPlaceCard(player.GetPlayerId(), deckIndex, *it))
+				if (CanPlaceCard(player.GetPlayerId(), static_cast<uint8_t>(deckIndex), *it))
 				{
 					deckTops[deckIndex] = cardValue;
 					cards.erase(it);
-					validCards++;
+					++validCards;
 					placedCard = true;
 					break;
 				}

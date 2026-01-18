@@ -1,5 +1,5 @@
-module; 
-#include <vector>
+module;
+#include <array>
 #include <string>
 #include <memory>
 
@@ -13,6 +13,7 @@ export module MainMenuWindow;
 import IWindow;
 import ApiClient;
 import GamePanel;
+import SettingsState;
 import Utils;
 
 export class MainMenuWindow : public IWindow
@@ -39,6 +40,7 @@ public:
 private:
 	void LoadWidgets() override;
 	void GoBackToMenu();
+	void ApplySettings();
 	void HandleLocalPlayerLeft();
 	void TransitionToGame();
 
@@ -49,22 +51,9 @@ private:
 	std::shared_ptr<GamePanel> m_gamePanel;
 	sf::Clock m_lobbyPollCheck;
 	bool m_gameStartedLocally{ false };
+	SettingsState m_settings;
 
-	unsigned m_resolutionIndex{ 8u };
-	inline static const std::vector<sf::Vector2u> m_resolutions = {
-			{640, 480},
-			{ 800, 600 },
-			{ 1024, 768 },
-			{ 1280, 720 },
-			{ 1280, 800 },
-			{ 1366, 768 },
-			{ 1440, 900 },
-			{ 1680, 1050 },
-			{ 1920, 1080 },
-			{ 1920, 1200 },
-			{ 2560, 1440 }
-	};
-	inline static const std::vector<unsigned> m_textSizes = {
+	inline static constexpr std::array<uint8_t, 11> m_textSizes = {
 		8u,
 		10u,
 		12u,
@@ -77,22 +66,10 @@ private:
 		24u,
 		24u
 	};
-	inline static const std::vector<unsigned> m_framerates = {
-		30u,
-		60u,
-		120u,
-		144u,
-		180u
-	};
-	unsigned m_framerateIndex{ 1u };
-	bool m_isFullscreen{ true };
-	ApiClient& m_apiClient;
 
+	ApiClient& m_apiClient;
 	sf::Music m_bgMusic;
 	sf::SoundBuffer m_clickBuffer;
 	sf::Sound m_clickSound;
-	float m_masterVolume{ 100.0f };
-	float m_buttonsVolume{ 100.0f };
-	float m_backgroundVolume{ 100.0f };
 };
 

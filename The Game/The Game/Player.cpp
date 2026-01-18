@@ -78,17 +78,3 @@ uint8_t Player::GetCardsPlacedRound() const noexcept
 {
 	return m_cardsPlacedRound;
 }
-
-void Player::SetTimeOut(bool value)
-{
-	m_hasTimeOut = value;
-}
-void Player::SetInactive(bool value)
-{
-	m_isInactive = value;
-}
-
-bool Player::IsInactive() const noexcept
-{
-	return m_isInactive;
-}

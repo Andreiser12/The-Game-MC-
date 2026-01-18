@@ -1,6 +1,7 @@
 #include "CppUnitTest.h"
 #include <utility>
 #include <string_view>
+
 import Table;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -35,7 +36,7 @@ namespace TheGameTests
 			};
 			Table table{ lobbyPlayers };
 			auto &deck = table.GetDeck(0);
-			deck.PushCard(Card<uint8_t>{50});
+			deck.PlaceCard(Card<uint8_t>{50});
 			Assert::IsTrue(table.BackwardsTrick(0, Card<uint8_t>{40}));
 		}
 		TEST_METHOD(Table_BackwardsTrick_DescendingExactTen)
@@ -45,7 +46,7 @@ namespace TheGameTests
 			};
 			Table table{ lobbyPlayers };
 			auto& deck = table.GetDeck(2);
-			deck.PushCard(Card<uint8_t>{40});
+			deck.PlaceCard(Card<uint8_t>{40});
 			Assert::IsTrue(table.BackwardsTrick(2, Card<uint8_t>{50}));
 		}
 		TEST_METHOD(Table_BackwardsTrick_InvalidDifference)
@@ -55,7 +56,7 @@ namespace TheGameTests
 			};
 			Table table{ lobbyPlayers };
 			auto& deck = table.GetDeck(0);
-			deck.PushCard(Card<uint8_t>{50});
+			deck.PlaceCard(Card<uint8_t>{50});
 			Assert::IsFalse(table.BackwardsTrick(0, Card<uint8_t>{45}));
 		}
 		TEST_METHOD(Table_PlayCard_AscendingAcceptsHigher)
@@ -66,7 +67,7 @@ namespace TheGameTests
 			Table table{ lobbyPlayers };
 			unsigned playerId = table.GetCurrentPlayerId();
 			auto& deck = table.GetDeck(0);
-			deck.PushCard(Card<uint8_t>{30});
+			deck.PlaceCard(Card<uint8_t>{30});
 			Assert::IsTrue(table.PlayCard(playerId, 0, Card<uint8_t>{40}));
 		}
 		TEST_METHOD(Table_PlayCard_AscendingRejectsLower)
@@ -77,7 +78,7 @@ namespace TheGameTests
 			Table table{ lobbyPlayers };
 			unsigned playerId = table.GetCurrentPlayerId();
 			auto& deck = table.GetDeck(0);
-			deck.PushCard(Card<uint8_t>{30});
+			deck.PlaceCard(Card<uint8_t>{30});
 			Assert::IsFalse(table.PlayCard(playerId, 0, Card<uint8_t>{25}));
 		}
 		TEST_METHOD(Table_HasPlayer_Existing)

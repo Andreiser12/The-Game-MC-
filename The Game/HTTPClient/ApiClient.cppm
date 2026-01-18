@@ -64,6 +64,7 @@ export struct DeckState
 {
 	uint8_t deckId;
 	uint8_t topCardId;
+	uint8_t size;
 };
 
 export struct LobbyState
@@ -145,19 +146,19 @@ public:
 	std::optional<std::vector<PlayerState>> GetPlayerStates();
 	bool ReportGameLoss();
 
-	bool SendChatMessage(const std::string& message);
+	bool SendChatMessage(const std::string& message) const;
 	std::optional<std::vector<ChatMessage>> GetNewMessages(unsigned afterId);
 
 	bool PlayCard(uint8_t cardId, uint8_t deckId) const;
 	std::optional<std::vector<uint8_t>> EndTurn();
-	std::optional<std::vector<DeckState>> GetDeckState() const;
+	std::optional<std::vector<DeckState>> GetDecksState() const;
 	std::optional<EndTurnState> GetEndTurnState() const;
 	std::optional<std::vector<uint8_t>> GetPlayerCards() const;
 	std::optional<std::array<bool, 4>> GetValidDecks(uint8_t cardId) const;
 	std::optional<bool> GetCanPlayMore(uint8_t remainingCards) const;
 	std::optional<GameResult> GetGameResult(const std::string& lobbyId) const;
 	std::optional<TurnState> GetTurnState() const;
-	std::optional<std::vector<std::pair<uint8_t, uint8_t>>> GetAICards(uint8_t cardsRequired);
+	std::optional<std::vector<std::pair<uint8_t, uint8_t>>> GetAICards(uint8_t cardsRequired) const;
 
 	bool SendPing(const std::string& lobbyId, unsigned playerId) const;
 	void StartNetworkLoop();

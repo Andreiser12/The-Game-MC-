@@ -131,6 +131,41 @@ void MainMenuWindow::GoBackToMenu()
 	if (m_bgMusic.getStatus() != sf::SoundSource::Status::Playing) m_bgMusic.play();
 }
 
+void MainMenuWindow::ApplySettings()
+{
+	m_clickSound.play();
+	const float masterMult{ m_settings.masterVolume / 100.f };
+
+	if (m_bgMusic.getStatus() != sf::SoundSource::Status::Stopped)
+	{
+		m_bgMusic.setVolume(m_settings.backgroundVolume * masterMult);
+	}
+
+	m_clickSound.setVolume(m_settings.buttonsVolume * masterMult);
+
+	const auto& resolution = SettingsState::Resolutions[m_settings.resolutionIndex];
+
+	if (m_settings.fullscreen)
+	{
+		m_window.create(
+			sf::VideoMode({ resolution.x, resolution.y }),
+			"The Game 1.0.0",
+			sf::State::Fullscreen
+		);
+	}
+	else
+	{
+		m_window.create(
+			sf::VideoMode({ resolution.x, resolution.y }),
+			"The Game 1.0.0",
+			sf::State::Windowed
+		);
+	}
+	m_window.setFramerateLimit(SettingsState::Framerates[m_settings.framerateIndex]);
+	m_mainMenu.setTarget(m_window);
+	m_mainMenu.setTextSize(m_textSizes[m_settings.resolutionIndex]);
+}
+
 void MainMenuWindow::HandleLocalPlayerLeft()
 {
 	if (!m_gamePanel) return;
@@ -207,7 +242,6 @@ void MainMenuWindow::Update()
 	case ClientEvent::MatchStarted:
 		TransitionToGame();
 		return;
-
 	default:
 		break;
 	}
@@ -237,52 +271,16 @@ void MainMenuWindow::SettingsButtonPressed()
 {
 	auto settingsPanel = Utils::CreateSettingsPanel(
 		m_mainMenu,
-		m_resolutionIndex,
-		m_isFullscreen,
-		m_framerateIndex,
-		m_masterVolume,
-		m_buttonsVolume,
-		m_backgroundVolume,
+		m_settings,
 		m_clickSound,
-		[this]() {m_clickSound.play(); },
-		[this](unsigned newResolutionIndex, bool fullscreen, unsigned newFramerateIndex,
-			float newMasterVol, float newBtnVol, float newBgVol)
+		[this]()
 		{
 			m_clickSound.play();
-			m_resolutionIndex = newResolutionIndex;
-			m_isFullscreen = fullscreen;
-			m_framerateIndex = newFramerateIndex;
-
-			m_masterVolume = newMasterVol;
-			m_buttonsVolume = newBtnVol;
-			m_backgroundVolume = newBgVol;
-
-			float masterMult{ m_masterVolume / 100.0f };
-
-			if (m_bgMusic.getStatus() != sf::SoundSource::Status::Stopped)
-			{
-				m_bgMusic.setVolume(m_backgroundVolume * masterMult);
-			}
-
-			m_clickSound.setVolume(m_buttonsVolume * masterMult);
-
-			if (m_isFullscreen)
-			{
-				m_window.create(sf::VideoMode(m_resolutions[m_resolutionIndex]),
-					"The Game 1.0.0",
-					sf::State::Fullscreen);
-			}
-			else
-			{
-				m_window.create(sf::VideoMode(m_resolutions[m_resolutionIndex]),
-					"The Game 1.0.0",
-					sf::State::Windowed);
-			}
-			m_window.setFramerateLimit(m_framerates[m_framerateIndex]);
-			m_mainMenu.setTextSize(m_textSizes[newResolutionIndex]);
-			m_mainMenu.setTarget(m_window);
-		}
-	);
+		},
+		[this]()
+		{
+			ApplySettings();
+		});
 	m_mainMenu.add(settingsPanel);
 }
 
@@ -329,13 +327,13 @@ void MainMenuWindow::PlayPanelPressed()
 		m_mainMenu,
 		m_apiClient,
 		m_clickSound,
-		[this]() { m_clickSound.play(); }, 
-		[this]() { m_clickSound.play(); }, 
-		[this](ApiClient& api, const std::string& user) { 
+		[this]() { m_clickSound.play(); },
+		[this]() { m_clickSound.play(); },
+		[this](ApiClient& api, const std::string& user) {
 			auto lobbyId = api.CreateLobby(user);
 			return lobbyId ? lobbyId.value() : "ERROR";
 		},
-		[this]() { this->TransitionToGame(); } 
+		[this]() { this->TransitionToGame(); }
 	);
 	m_mainMenu.add(playPanel);
 }

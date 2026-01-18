@@ -69,13 +69,5 @@ namespace TheGameTests
 			Assert::AreEqual<size_t>(2, currentPlayer.GetCardsCount());
 			Assert::AreEqual<size_t>(0, deck.size());
 		}
-		TEST_METHOD(Player_Timeout_And_Inactive_Flags)
-		{
-			Player currentPlayer{ 8u, "Henry" };
-			currentPlayer.SetTimeOut(true);
-			currentPlayer.SetInactive(true);
-			Assert::IsTrue(currentPlayer.HasTimeOut());
-			Assert::IsTrue(currentPlayer.IsInactive());
-		}
 	};
 }

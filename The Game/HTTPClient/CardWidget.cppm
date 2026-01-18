@@ -42,7 +42,6 @@ public:
 	void CheckOnDeck(const std::shared_ptr<DeckWidget>& deckWidget);
 	void MarkAsPlaced();
 	
-
 	std::function<void()> onPickup;
 	std::function<bool(uint8_t cardId, std::shared_ptr<DeckWidget>)> onCardPlaced;
 

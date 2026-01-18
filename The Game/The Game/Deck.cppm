@@ -23,6 +23,7 @@ public:
 	DeckType GetDeckType() const noexcept;
 	const Card<uint8_t>& GetTopCard() const;
 	uint8_t GetDeckIndex() const noexcept;
+	uint8_t GetDeckSize() const noexcept;
 
 	template<typename CardType>
 	void PlaceCard(CardType&& card)

@@ -32,6 +32,7 @@ export struct DeckState
 {
 	uint8_t deckId;
 	uint8_t topCardId;
+	uint8_t size;
 };
 
 export struct EndTurnState

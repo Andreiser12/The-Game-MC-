@@ -240,7 +240,8 @@ std::optional<std::vector<DeckState>> Lobby::GetDecksState() const
 	{
 		decksState.emplace_back(DeckState{
 			.deckId = i,
-			.topCardId = m_table->GetDeck(i).GetTopCard().GetId()
+			.topCardId = m_table->GetDeck(i).GetTopCard().GetId(),
+			.size = m_table->GetDeck(i).GetDeckSize()
 			});
 	}
 	return decksState;

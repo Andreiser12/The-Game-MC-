@@ -11,6 +11,7 @@ module;
 
 export module Utils;
 
+import SettingsState;
 import UserProfile;
 import ApiClient;
 
@@ -19,16 +20,10 @@ export namespace Utils
 	tgui::String TruncateText(const tgui::String& text, uint8_t maxChars);
 
 	tgui::Panel::Ptr CreateSettingsPanel(tgui::Gui& gui,
-		unsigned resolutionIndex,
-		bool isFullscreen,
-		unsigned framerateIndex,
-		float masterVolume,
-		float buttonsVolume,
-		float backgroundVolume,
+		SettingsState& state,
 		sf::Sound& btnSound,
 		std::function<void()> onClose,
-		std::function<void(unsigned res, bool fullscreen, unsigned framerate,
-			float masterVol, float btnVol, float bgVol)> onApply);
+		std::function<void()> onApply);
 
 	tgui::Panel::Ptr CreateProfilePanel(
 		const UserProfile& profile,

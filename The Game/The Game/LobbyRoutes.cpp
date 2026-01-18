@@ -426,6 +426,7 @@ crow::response LobbyRoutes::GetDecksState(const std::string& lobbyId)
 		crow::json::wvalue deck;
 		deck["deckId"] = decksState.value()[i].deckId;
 		deck["topCardId"] = decksState.value()[i].topCardId;
+		deck["size"] = decksState.value()[i].size;
 		data["decks"][i] = std::move(deck);
 	}
 	return crow::response(200, data);

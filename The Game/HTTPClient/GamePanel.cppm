@@ -1,6 +1,4 @@
 module;
-#define NOMINMAX
-
 #include <string>
 #include <vector>
 #include <memory>
@@ -76,6 +74,8 @@ public:
 
 	void MarkPlayerAsLeft(const std::string& username);
 
+private:
+	uint8_t GetCardsPlaced() const;
 
 private:
 	inline constexpr SlotArray GetSlotsForPlayerCount(size_t count) const noexcept

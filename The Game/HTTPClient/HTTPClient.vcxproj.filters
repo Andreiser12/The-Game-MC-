@@ -119,6 +119,9 @@
     <ClCompile Include="Utils.cppm">
       <Filter>Header Files</Filter>
     </ClCompile>
+    <ClCompile Include="SettingsState.cppm">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="HTTPClient.rc">

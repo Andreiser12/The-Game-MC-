@@ -36,8 +36,7 @@ namespace TheGameTests
 		TEST_METHOD(Deck_PushCard_UpdatesTopCard)
 		{
 			Deck deck{ Deck::DeckType::Ascending, 0 };
-			deck.PushCard(Card<uint8_t>{42});
-
+			deck.PlaceCard(Card<uint8_t>{42});
 			Assert::AreEqual<uint8_t>(42, deck.GetTopCard().GetId());
 		}
 	};

@@ -1,6 +1,4 @@
 ﻿module;
-#define NOMINMAX
-
 #include <string>
 #include <vector>
 #include <memory>
@@ -209,7 +207,7 @@ GamePanel::GamePanel(tgui::Gui& gui, ApiClient& api,
 		xDeckPosition += 3.75f;
 		m_root->add(deckPanel);
 	}
-	m_pileWidget = std::make_shared<PileWidget>(PileWidget());
+	m_pileWidget = std::make_shared<PileWidget>();
 	auto pilePanel = m_pileWidget->GetPilePanel();
 	pilePanel->setSize({ "2.25%", "6.5%" });
 	pilePanel->setPosition({
@@ -886,17 +884,17 @@ void GamePanel::ShowGameResultOverlay(GameResult result)
 	dialog->getRenderer()->setRoundedBorderRadius(15);
 
 	auto titleLabel = tgui::Label::create();
-	titleLabel->getRenderer()->setTextSize(42);
-	titleLabel->getRenderer()->setTextSize(tgui::TextStyle::Bold);
+	titleLabel->getRenderer()->setTextSize(55);
+	titleLabel->getRenderer()->setTextStyle(tgui::TextStyle::Bold);
 	titleLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
-	titleLabel->setSize({ "30%", "30%" });
-	titleLabel->setPosition("50%", "25%");
+	titleLabel->setSize({ "80%", "45%" });
+	titleLabel->setPosition("50%", "40%");
 	titleLabel->setOrigin(0.5f, 0.5f);
 
 	auto descriptionLabel = tgui::Label::create();
 	descriptionLabel->getRenderer()->setTextSize(20);
 	descriptionLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
-	descriptionLabel->setPosition("50%", "45%");
+	descriptionLabel->setPosition("50%", "50%");
 	descriptionLabel->setOrigin(0.5f, 0.5f);
 	descriptionLabel->getRenderer()->setTextColor(tgui::Color(200, 200, 200));
 
@@ -914,7 +912,8 @@ void GamePanel::ShowGameResultOverlay(GameResult result)
 	case GameResult::Lost:
 		titleLabel->setText("DEFEAT!");
 		titleLabel->getRenderer()->setTextColor(tgui::Color(220, 50, 50));
-		descriptionLabel->setText("No more possibles moves left.");
+		descriptionLabel->setText("No more possibles moves left. " + 
+			std::to_string(GetCardsPlaced()) + "/98 cards have been placed.");
 		m_feedbackSound.setBuffer(m_loseBuffer);
 		m_feedbackSound.play();
 		break;
@@ -973,4 +972,18 @@ void GamePanel::MarkPlayerAsLeft(const std::string& username)
 	overlay->getRenderer()->setBackgroundColor(tgui::Color(40, 40, 40, 120));
 	overlay->setIgnoreMouseEvents(true);
 	slot.panel->add(overlay);
+}
+
+uint8_t GamePanel::GetCardsPlaced() const
+{
+	auto decksOpt = m_apiClient.SnapshotDecks();
+	if (!decksOpt) return 0u;
+
+	const auto& decks = decksOpt.value();
+	uint8_t cardsPlaced{ 0u };
+	for (const auto& deck : decks)
+	{
+		cardsPlaced += deck.size;
+	}
+	return cardsPlaced;
 }

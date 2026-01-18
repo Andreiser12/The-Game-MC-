@@ -10,7 +10,8 @@
 
 module DeckWidget;
 
-DeckWidget::DeckWidget(DeckType deckType, uint8_t deckId) : m_deckType{ deckType }, m_deckId{ deckId }
+DeckWidget::DeckWidget(DeckType deckType, uint8_t deckId) noexcept :
+	m_deckType{ deckType }, m_deckId{ deckId }
 {
 	m_lastId = (m_deckType == DeckType::Ascending) ? m_lastId = 1u : m_lastId = 100u;
 	CreateDeckWidget();
@@ -113,27 +114,27 @@ void DeckWidget::RenderDeck()
 	m_deckPanel->add(m_highlightOverlay);
 }
 
-DeckWidget::DeckType DeckWidget::GetDeckType() const
+DeckWidget::DeckType DeckWidget::GetDeckType() const noexcept
 {
 	return m_deckType;
 }
 
-uint16_t DeckWidget::GetLastId() const
+uint8_t DeckWidget::GetLastId() const noexcept
 {
 	return m_lastId;
 }
 
-uint8_t DeckWidget::GetDeckId() const
+uint8_t DeckWidget::GetDeckId() const noexcept
 {
 	return m_deckId;
 }
 
-tgui::Panel::Ptr DeckWidget::GetDeckPanel() const
+tgui::Panel::Ptr DeckWidget::GetDeckPanel() const noexcept
 {
 	return m_deckPanel;
 }
 
-void DeckWidget::SetLastId(uint16_t lastId)
+void DeckWidget::SetLastId(uint8_t lastId) noexcept
 {
 	if (m_lastId == lastId) return;
 
@@ -141,7 +142,7 @@ void DeckWidget::SetLastId(uint16_t lastId)
 	RenderDeck();
 }
 
-void DeckWidget::SetHighlight(bool canPlace, bool isBackwards)
+void DeckWidget::SetHighlight(bool canPlace, bool isBackwards) noexcept
 {
 	if (!m_highlightOverlay) return;
 
@@ -164,7 +165,7 @@ void DeckWidget::SetHighlight(bool canPlace, bool isBackwards)
 	}
 }
 
-void DeckWidget::ClearHighlight()
+void DeckWidget::ClearHighlight() noexcept
 {
 	if (m_highlightOverlay) m_highlightOverlay->setVisible(false);
 }

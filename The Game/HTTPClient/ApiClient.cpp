@@ -104,9 +104,9 @@ bool ApiClient::DeleteAccount()
 
 std::optional<std::string> ApiClient::CreateLobby(const std::string& username) const
 {
-	const std::string url = m_serverURL + "/lobby/create";
-	std::string jsonBody = "{\"username\":\"" + username +
-		"\",\"playerId\":\"" + std::to_string(m_playerId) + "\"}";
+	const std::string url{ m_serverURL + "/lobby/create" };
+	std::string jsonBody{ "{\"username\":\"" + username +
+		"\",\"playerId\":\"" + std::to_string(m_playerId) + "\"}" };
 
 	cpr::Response response = cpr::Post(
 		cpr::Url{ url },

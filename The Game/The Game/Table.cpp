@@ -137,7 +137,7 @@ std::optional<std::vector<std::pair<uint8_t, uint8_t>>> Table::RunBotTurn
 	for (const auto& deckRef : allDecks)
 	{
 		AssistantAI::DeckState state;
-		state.index = static_cast<int>(deckRef->GetDeckIndex());
+		state.id = static_cast<int>(deckRef->GetDeckIndex());
 		state.topCard = deckRef->GetTopCard().GetId();
 		state.type = ConvertDeckType(deckRef->GetDeckType());
 		deckStates.push_back(state);
@@ -169,12 +169,12 @@ std::optional<std::vector<std::pair<uint8_t, uint8_t>>> Table::RunBotTurn
 		if (!moveOpt) return std::nullopt;
 
 		const auto& move = moveOpt.value();
-		selectedCards.emplace_back(move.cardValue, static_cast<uint8_t>(move.deckIndex));
+		selectedCards.emplace_back(move.cardValue, static_cast<uint8_t>(move.deckId));
 		tempHand.erase(std::find(tempHand.begin(), tempHand.end(), move.cardValue));
 
 		for (auto& deck : tempDecks)
 		{
-			if (deck.index == move.deckIndex)
+			if (deck.id == move.deckId)
 			{
 				deck.topCard = move.cardValue;
 				break;

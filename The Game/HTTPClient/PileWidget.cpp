@@ -44,29 +44,29 @@ void PileWidget::UpdatePile(int cardCount) noexcept
 
 	for (int i = 0; i < visualLayers; ++i)
 	{
-		auto cardPic = tgui::Picture::create("assets/images/cardBackside.png");
+		auto cardBackside = tgui::Picture::create("assets/images/cardBackside.png");
 
-		cardPic->setSize({ "90%", "90%" });
-		cardPic->setIgnoreMouseEvents(true);
-		cardPic->setOrigin(0.5f, 0.5f);
+		cardBackside->setSize({ "90%", "90%" });
+		cardBackside->setIgnoreMouseEvents(true);
+		cardBackside->setOrigin(0.5f, 0.5f);
 
 		const float shift{ i * offsetPercent };
-		cardPic->setPosition({
+		cardBackside->setPosition({
 			tgui::String(50.0f + shift) + "%",
 			tgui::String(50.0f + shift) + "%"
 			});
 
 		if (i < visualLayers - 1)
 		{
-			cardPic->setRotation(rotationDist(rng));
-			cardPic->getRenderer()->setOpacity(0.9f);
+			cardBackside->setRotation(rotationDist(rng));
+			cardBackside->getRenderer()->setOpacity(0.9f);
 		}
 		else
 		{
-			cardPic->setRotation(0.f);
-			cardPic->getRenderer()->setOpacity(1.f);
+			cardBackside->setRotation(0.f);
+			cardBackside->getRenderer()->setOpacity(1.f);
 		}
 
-		m_pilePanel->add(cardPic);
+		m_pilePanel->add(cardBackside);
 	}
 }

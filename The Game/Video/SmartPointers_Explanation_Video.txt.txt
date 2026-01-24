@@ -1,0 +1,8 @@
+Smart Pointer Design Explanation Video - The Game
+
+This video presents the architectural decision behind using smart pointers (std::shared_ptr and std::unique_ptr) in the project.
+
+Link:
+https://drive.google.com/file/d/1snu9Mot5MG5UTjP08XLTOotyOpANI-mE/view?usp=drive_link
+
+Recorded as part of the project documentation.

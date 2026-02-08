@@ -120,15 +120,18 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)AssistantAI</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalOptions>/D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS /D_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS /D_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING /reference "AssistantAI=C:\Users\razva\Git-projects\The-Game-MC-\The-Game-MC-\The Game\x64\Debug\AssistantAI.cppm.ifc" %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)x64\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -139,20 +142,34 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)AssistantAI</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalOptions>/D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS /D_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS /D_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING /reference "AssistantAI=C:\Users\razva\Git-projects\The-Game-MC-\The-Game-MC-\The Game\x64\Debug\AssistantAI.cppm.ifc" %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)x64\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AuthenticationRoutes.cpp" />
     <ClCompile Include="AuthenticationRoutes.cppm" />
+    <ClCompile Include="Card.cpp">
+      <FileType>CppCode</FileType>
+    </ClCompile>
+    <ClCompile Include="Card.cppm">
+      <FileType>Document</FileType>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCppModule</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCppModule</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCppModule</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCppModule</CompileAs>
+    </ClCompile>
+    <ClCompile Include="ChatFilter.cppm" />
     <ClCompile Include="DatabaseManager.cpp" />
     <ClCompile Include="DatabaseManager.cppm">
       <FileType>Document</FileType>
@@ -161,6 +178,10 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Default</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Default</CompileAs>
     </ClCompile>
+    <ClCompile Include="Deck.cpp" />
+    <ClCompile Include="Deck.cppm">
+      <FileType>Document</FileType>
+    </ClCompile>
     <ClCompile Include="Lobby.cpp" />
     <ClCompile Include="Lobby.cppm" />
     <ClCompile Include="LobbyManager.cpp" />
@@ -168,6 +189,25 @@
     <ClCompile Include="LobbyRoutes.cpp" />
     <ClCompile Include="LobbyRoutes.cppm" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Player.cppm">
+      <FileType>Document</FileType>
+    </ClCompile>
+    <ClCompile Include="SessionManager.cpp" />
+    <ClCompile Include="SessionManager.cppm">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Default</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Default</CompileAs>
+    </ClCompile>
+    <ClCompile Include="Table.cpp" />
+    <ClCompile Include="Table.cppm">
+      <FileType>Document</FileType>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Default</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Default</CompileAs>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DatabaseStructures.cppm">
@@ -179,9 +219,6 @@
   <ItemGroup>
     <ProjectReference Include="..\AssistantAI\AssistantAI.vcxproj">
       <Project>{b3918795-ea54-4d15-af39-dabd46a23b9e}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\TheGameCore\TheGameCore.vcxproj">
-      <Project>{e29dac7c-73db-4765-bb68-93875040a4d2}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

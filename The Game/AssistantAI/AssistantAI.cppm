@@ -1,21 +1,22 @@
 ﻿module;
 
+#include <vector>
+#include <cstdint>
+#include <optional>
+#include <cmath>
+#include <algorithm>
+#include <ranges>
+
+export module AssistantAI;
+
 #ifdef ASSISTANTAI_EXPORTS
 #define ASSISTANTAI_API __declspec(dllexport)
 #else
 #define ASSISTANTAI_API __declspec(dllimport)
 #endif
 
-import <vector>;
-import <cstdint>;
-import <optional>;
-import <cmath>;
-import <algorithm>;
-import <ranges>;
+namespace AssistantAI {
 
-export module AssistantAI;
-
-export namespace AssistantAI {
 	export enum class DeckType : uint8_t {
 		Ascending = 0,
 		Descending = 1
@@ -39,7 +40,7 @@ export namespace AssistantAI {
 		std::vector<std::vector<uint8_t>> otherHands;
 	};
 
-	export class ASSISTANTAI_API GreedyBot
+	export class __declspec(dllexport) GreedyBot
 	{
 	public:
 

@@ -32,8 +32,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	sf::Image windowIcon;
 	if (!windowIcon.loadFromFile("assets/images/TheGame.png")) throw std::runtime_error("TheGame.png file is missing");
 
-	ApiClient api{ SERVER_IP_ADDRESS };
-	cpr::Response response = cpr::Get(cpr::Url{ SERVER_IP_ADDRESS + "/users"}, cpr::Timeout(3000));
+	ApiClient api{ "http://localhost:18080"};
+	cpr::Response response = cpr::Get(cpr::Url{ "http://localhost:18080/users"}, cpr::Timeout(3000));
 	if (response.error || response.status_code == 404 || response.primary_port != 18080)
 	{
 		sf::VideoMode connectionFailedMode = sf::VideoMode::getDesktopMode();

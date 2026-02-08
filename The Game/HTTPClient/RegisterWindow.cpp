@@ -11,7 +11,7 @@ module RegisterWindow;
 
 import Utils;
 
-static inline const std::string SERVER_IP{ "192.168.1.130" };
+static inline const std::string SERVER_IP{ "192.168.1.131" };
 static inline constexpr uint16_t SERVER_PORT{ 18080 };
 static inline const std::string SERVER_ADDRESS{ "http://" + SERVER_IP + ":" + std::to_string(SERVER_PORT) };
 
@@ -43,7 +43,7 @@ void RegisterWindow::Draw()
 void RegisterWindow::CheckRegister(const std::string& usernameEntered)
 {
 	cpr::Response response = cpr::Post(
-		cpr::Url{ SERVER_ADDRESS + "/register" },
+		cpr::Url{ "http://localhost:18080/register" },
 		cpr::Body{ "{\"username\": \"" + usernameEntered + "\"}" }
 	);
 	auto json = crow::json::load(response.text);

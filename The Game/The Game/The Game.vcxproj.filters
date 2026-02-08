@@ -25,6 +25,12 @@
     <Filter Include="Source Files\Database">
       <UniqueIdentifier>{0639d32a-e7ed-410b-8474-494ba727105b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Core">
+      <UniqueIdentifier>{c83f3247-2bc9-4e9d-bbcc-88fb4710fac1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core">
+      <UniqueIdentifier>{415a4bf8-4856-4e9d-a7ee-e94c4ab3e993}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -62,6 +68,39 @@
     </ClCompile>
     <ClCompile Include="DatabaseManager.cppm">
       <Filter>Header Files\Database</Filter>
+    </ClCompile>
+    <ClCompile Include="Card.cppm">
+      <Filter>Header Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Deck.cppm">
+      <Filter>Header Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cppm">
+      <Filter>Header Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="SessionManager.cppm">
+      <Filter>Header Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Table.cppm">
+      <Filter>Header Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Card.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Deck.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="SessionManager.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Table.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="ChatFilter.cppm">
+      <Filter>Header Files\Core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
